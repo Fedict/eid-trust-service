@@ -3,30 +3,25 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>FedICT eID Trust Service Project</name>
+	<parent>
+		<!--
+			We want to limit duplicate work, so we reuse the eID Applet parent
+			POM. The eID Applet project also holds our JBoss AS runtime
+			configuration anyway.
+		-->
+		<groupId>be.fedict</groupId>
+		<artifactId>eid-applet</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
 	<groupId>be.fedict</groupId>
 	<artifactId>eid-trust-service</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2009</inceptionYear>
-	<licenses>
-		<license>
-			<name>GNU LESSER GENERAL PUBLIC LICENSE, Version 3</name>
-			<url>LICENSE.txt</url>
-		</license>
-	</licenses>
-	<organization>
-		<name>FedICT</name>
-		<url>http://www.fedict.belgium.be/</url>
-	</organization>
-	<url>http://code.google.com/p/eid-trust-service/</url>
-	<developers>
-		<developer>
-			<id>fcorneli</id>
-			<name>Frank Cornelis</name>
-			<email>frank.cornelis@fedict.be</email>
-		</developer>
-	</developers>
 	<scm>
 		<developerConnection>scm:svn:https://eid-trust-service.googlecode.com/svn/trunk</developerConnection>
 	</scm>
+	<modules>
+		<module>eid-trust-service-xkms2-ws</module>
+	</modules>
 </project>
