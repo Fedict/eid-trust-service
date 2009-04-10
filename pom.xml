@@ -23,5 +23,15 @@
 	</scm>
 	<modules>
 		<module>eid-trust-service-xkms2-ws</module>
+		<module>eid-trust-service-model</module>
 	</modules>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>be.fedict</groupId>
+				<artifactId>jtrust</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
