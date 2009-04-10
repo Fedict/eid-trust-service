@@ -18,14 +18,19 @@
 
 package be.fedict.trust.service.bean;
 
+import java.security.cert.CertPathValidatorException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import be.fedict.trust.BelgianTrustValidatorFactory;
+import be.fedict.trust.NetworkConfig;
+import be.fedict.trust.TrustValidator;
 import be.fedict.trust.service.TrustService;
 
 /**
@@ -39,10 +44,27 @@ public class TrustServiceBean implements TrustService {
 
 	private static final Log LOG = LogFactory.getLog(TrustServiceBean.class);
 
+	private TrustValidator trustValidator;
+
+	@PostConstruct
+	public void postConstructCallback() {
+		// TODO: runtime network config via admin configuration console
+		NetworkConfig networkConfig = new NetworkConfig("proxy.yourict.net",
+				8080);
+		this.trustValidator = BelgianTrustValidatorFactory
+				.createTrustValidator(networkConfig);
+	}
+
 	public boolean isValid(List<X509Certificate> authenticationCertificateChain) {
 		LOG.debug("isValid: "
 				+ authenticationCertificateChain.get(0)
 						.getSubjectX500Principal());
+		try {
+			this.trustValidator.isTrusted(authenticationCertificateChain);
+		} catch (CertPathValidatorException e) {
+			LOG.debug("certificate path validation error: " + e.getMessage());
+			return false;
+		}
 		return true;
 	}
 }

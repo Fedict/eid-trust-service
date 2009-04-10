@@ -19,6 +19,9 @@ The following is required for compiling the eID Trust Service software:
 The project can be build via:
 	mvn clean install
 
+The deployable Java EE application can be found under:
+	eid-trust-service-deploy
+
 You can speed up the development build cycle by skipping the unit tests via:
 	mvn -Dmaven.test.skip=true clean install
 
