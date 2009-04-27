@@ -23,10 +23,13 @@
 	</scm>
 	<modules>
 		<module>eid-trust-service-xkms2-ws</module>
+		<module>eid-trust-service-xkms2-ws-impl</module>
+		<module>eid-trust-service-ws</module>
 		<module>eid-trust-service-model</module>
 		<module>eid-trust-service-portal-model</module>
 		<module>eid-trust-service-portal-webapp</module>
 		<module>eid-trust-service-deploy</module>
+		<module>eid-trust-service-client</module>
 	</modules>
 	<dependencyManagement>
 		<dependencies>
