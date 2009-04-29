@@ -25,5 +25,10 @@
 			<artifactId>commons-logging-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-rt</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>

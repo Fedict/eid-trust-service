@@ -18,19 +18,31 @@
 
 package be.fedict.trust.xkms2;
 
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.LinkedList;
 import java.util.List;
 
+import javax.ejb.EJB;
 import javax.jws.WebService;
 import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.X509DataType;
+import org.w3._2002._03.xkms_.KeyBindingType;
+import org.w3._2002._03.xkms_.ObjectFactory;
 import org.w3._2002._03.xkms_.QueryKeyBindingType;
+import org.w3._2002._03.xkms_.StatusType;
 import org.w3._2002._03.xkms_.ValidateRequestType;
 import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
+
+import be.fedict.trust.service.TrustService;
 
 /**
  * Implementation of XKMS2 Web Service JAX-WS Port.
@@ -39,12 +51,22 @@ import org.w3._2002._03.xkms_wsdl.XKMSPortType;
  * 
  */
 @WebService(endpointInterface = "org.w3._2002._03.xkms_wsdl.XKMSPortType")
+@ServiceConsumer
 public class XKMSPortImpl implements XKMSPortType {
 
 	private static final Log LOG = LogFactory.getLog(XKMSPortImpl.class);
 
+	private static final QName X509_CERT_QNAME = new QName(
+			"http://www.w3.org/2000/09/xmldsig#", "X509Certificate");
+
+	@EJB
+	private TrustService trustService;
+
 	public ValidateResultType validate(ValidateRequestType body) {
 		LOG.debug("validate");
+
+		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
+
 		// parse the request
 		QueryKeyBindingType queryKeyBinding = body.getQueryKeyBinding();
 		KeyInfoType keyInfo = queryKeyBinding.getKeyInfo();
@@ -56,12 +78,55 @@ public class XKMSPortImpl implements XKMSPortType {
 				X509DataType x509Data = (X509DataType) elementValue;
 				List<Object> x509DataContent = x509Data
 						.getX509IssuerSerialOrX509SKIOrX509SubjectName();
-				// TODO
+				for (Object x509DataObject : x509DataContent) {
+					if (false == x509DataObject instanceof JAXBElement) {
+						continue;
+					}
+					JAXBElement<?> x509DataElement = (JAXBElement<?>) x509DataObject;
+					if (false == X509_CERT_QNAME.equals(x509DataElement
+							.getName())) {
+						continue;
+					}
+					byte[] x509DataValue = (byte[]) x509DataElement.getValue();
+					try {
+						X509Certificate certificate = getCertificate(x509DataValue);
+						certificateChain.add(certificate);
+					} catch (CertificateException e) {
+						// TODO: proper error handling according to XKMS2 spec
+						throw new RuntimeException("X509 encoding error");
+					}
+				}
 			}
 		}
-		// process the request
+
+		boolean validationResult = this.trustService.isValid(certificateChain);
 
 		// return the result
-		return null;
+		ObjectFactory objectFactory = new ObjectFactory();
+		ValidateResultType validateResult = objectFactory
+				.createValidateResultType();
+		List<KeyBindingType> keyBindings = validateResult.getKeyBinding();
+		KeyBindingType keyBinding = objectFactory.createKeyBindingType();
+		keyBindings.add(keyBinding);
+		StatusType status = objectFactory.createStatusType();
+		keyBinding.setStatus(status);
+		String statusValue;
+		if (true == validationResult) {
+			statusValue = "http://www.w3.org/2002/03/xkms#Valid";
+		} else {
+			statusValue = "http://www.w3.org/2002/03/xkms#Invalid";
+		}
+		status.setStatusValue(statusValue);
+		return validateResult;
+	}
+
+	private X509Certificate getCertificate(byte[] encodedCertificate)
+			throws CertificateException {
+		CertificateFactory certificateFactory = CertificateFactory
+				.getInstance("X.509");
+		X509Certificate certificate = (X509Certificate) certificateFactory
+				.generateCertificate(new ByteArrayInputStream(
+						encodedCertificate));
+		return certificate;
 	}
 }
