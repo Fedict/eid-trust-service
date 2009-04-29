@@ -23,13 +23,19 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.jms.Queue;
+import javax.jms.QueueConnectionFactory;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.NetworkConfig;
+import be.fedict.trust.TrustLinker;
 import be.fedict.trust.TrustValidator;
 import be.fedict.trust.service.TrustService;
 
@@ -44,15 +50,28 @@ public class TrustServiceBean implements TrustService {
 
 	private static final Log LOG = LogFactory.getLog(TrustServiceBean.class);
 
+	// TODO: runtime network config via admin configuration console
+	public static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
+			"proxy.yourict.net", 8080);
+
 	private TrustValidator trustValidator;
+
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@Resource(mappedName = "java:ConnectionFactory")
+	private QueueConnectionFactory queueConnectionFactory;
+
+	@Resource(mappedName = "queue/trust/harvester")
+	private Queue queue;
 
 	@PostConstruct
 	public void postConstructCallback() {
-		// TODO: runtime network config via admin configuration console
-		NetworkConfig networkConfig = new NetworkConfig("proxy.yourict.net",
-				8080);
+		LOG.debug("post construct");
+		TrustLinker trustLinker = new TrustServiceTrustLinker(
+				this.entityManager, this.queueConnectionFactory, this.queue);
 		this.trustValidator = BelgianTrustValidatorFactory
-				.createTrustValidator(networkConfig);
+				.createTrustValidator(NETWORK_CONFIG, trustLinker);
 	}
 
 	public boolean isValid(List<X509Certificate> authenticationCertificateChain) {

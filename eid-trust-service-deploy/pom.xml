@@ -20,6 +20,10 @@
 				<artifactId>maven-ear-plugin</artifactId>
 				<configuration>
 					<modules>
+						<sarModule>
+							<groupId>be.fedict.eid-trust-service</groupId>
+							<artifactId>eid-trust-service-service</artifactId>
+						</sarModule>
 						<jarModule>
 							<groupId>be.fedict.eid-applet</groupId>
 							<artifactId>eid-applet-service-spi</artifactId>
@@ -55,6 +59,12 @@
 		</plugins>
 	</build>
 	<dependencies>
+		<dependency>
+			<groupId>be.fedict.eid-trust-service</groupId>
+			<artifactId>eid-trust-service-service</artifactId>
+			<type>sar</type>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
@@ -149,6 +159,11 @@
 		<dependency>
 			<groupId>bouncycastle</groupId>
 			<artifactId>bcprov-jdk16</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.jms</groupId>
+			<artifactId>jms</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

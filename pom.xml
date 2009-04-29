@@ -22,6 +22,7 @@
 		<developerConnection>scm:svn:https://eid-trust-service.googlecode.com/svn/trunk</developerConnection>
 	</scm>
 	<modules>
+		<module>eid-trust-service-service</module>
 		<module>eid-trust-service-xkms2-ws</module>
 		<module>eid-trust-service-xkms2-ws-impl</module>
 		<module>eid-trust-service-ws</module>
