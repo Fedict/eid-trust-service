@@ -18,8 +18,10 @@
 
 package be.fedict.trust.service.bean;
 
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
@@ -39,6 +41,8 @@ import org.apache.commons.logging.LogFactory;
 import be.fedict.trust.CrlTrustLinker;
 import be.fedict.trust.TrustLinker;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.RevokedCertificateEntity;
+import be.fedict.trust.service.entity.RevokedCertificatePK;
 import be.fedict.trust.service.entity.Status;
 
 /**
@@ -82,36 +86,94 @@ public class TrustServiceTrustLinker implements TrustLinker {
 				LOG.warn("malformed URL: " + e.getMessage(), e);
 				return null;
 			}
-			certificateAuthority = new CertificateAuthorityEntity(issuerName,
-					crlUrl);
+			try {
+				certificateAuthority = new CertificateAuthorityEntity(
+						issuerName, crlUrl, certificate);
+			} catch (CertificateEncodingException e) {
+				LOG.error("certificate encoding error: " + e.getMessage(), e);
+				return null;
+			}
 			this.entityManager.persist(certificateAuthority);
 			try {
 				notifyHarvester(issuerName);
 			} catch (JMSException e) {
 				LOG.error("could not notify harvester: " + e.getMessage(), e);
 			}
+			LOG.debug("harvester notified.");
 			return null;
 		}
 		if (Status.ACTIVE != certificateAuthority.getStatus()) {
 			LOG.debug("CA revocation data cache not yet active: " + issuerName);
+			/*
+			 * Harvester is still busy processing the first CRL.
+			 */
 			return null;
 		}
-		// TODO: use the cached revocation data
-		return null;
+		/*
+		 * Let's use the cached revocation data
+		 */
+		Date thisUpdate = certificateAuthority.getThisUpdate();
+		if (null == thisUpdate) {
+			LOG.warn("no thisUpdate value");
+			return null;
+		}
+		Date nextUpdate = certificateAuthority.getNextUpdate();
+		if (null == nextUpdate) {
+			LOG.warn("no nextUpdate value");
+			return null;
+		}
+		/*
+		 * First check whether the cached revocation data is up-to-date.
+		 */
+		if (thisUpdate.after(validationDate)) {
+			LOG.warn("cached CRL data too recent");
+			return null;
+		}
+		if (validationDate.after(nextUpdate)) {
+			LOG.warn("cached CRL data too old");
+			return null;
+		}
+		LOG.debug("using cached CRL data");
+		BigInteger serialNumber = childCertificate.getSerialNumber();
+		RevokedCertificateEntity revokedCertificate = this.entityManager.find(
+				RevokedCertificateEntity.class, new RevokedCertificatePK(
+						issuerName, serialNumber));
+		if (null == revokedCertificate) {
+			LOG.debug("certificate valid: "
+					+ childCertificate.getSubjectX500Principal());
+			return true;
+		}
+		if (revokedCertificate.getRevocationDate().after(validationDate)) {
+			LOG.debug("CRL OK for: "
+					+ childCertificate.getSubjectX500Principal() + " at "
+					+ validationDate);
+			return true;
+		}
+		LOG.debug("certificate invalid: "
+				+ childCertificate.getSubjectX500Principal());
+		return false;
 	}
 
 	private void notifyHarvester(String issuerName) throws JMSException {
 		QueueConnection queueConnection = this.queueConnectionFactory
 				.createQueueConnection();
-		QueueSession queueSession = queueConnection.createQueueSession(false,
-				Session.AUTO_ACKNOWLEDGE);
 		try {
-			TextMessage textMessage = queueSession
-					.createTextMessage(issuerName);
-			QueueSender queueSender = queueSession.createSender(this.queue);
-			queueSender.send(textMessage);
+			QueueSession queueSession = queueConnection.createQueueSession(
+					true, Session.AUTO_ACKNOWLEDGE);
+			try {
+				TextMessage textMessage = queueSession
+						.createTextMessage(issuerName);
+				QueueSender queueSender = queueSession.createSender(this.queue);
+				try {
+					queueSender.send(textMessage);
+				} finally {
+					queueSender.close();
+				}
+			} finally {
+				queueSession.close();
+			}
 		} finally {
-			queueSession.close();
+			queueConnection.close();
 		}
 	}
 }

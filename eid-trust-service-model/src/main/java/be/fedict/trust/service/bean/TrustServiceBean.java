@@ -25,6 +25,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.jms.Queue;
 import javax.jms.QueueConnectionFactory;
 import javax.persistence.EntityManager;
@@ -59,7 +61,7 @@ public class TrustServiceBean implements TrustService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@Resource(mappedName = "java:ConnectionFactory")
+	@Resource(mappedName = "java:JmsXA")
 	private QueueConnectionFactory queueConnectionFactory;
 
 	@Resource(mappedName = "queue/trust/harvester")
@@ -74,6 +76,7 @@ public class TrustServiceBean implements TrustService {
 				.createTrustValidator(NETWORK_CONFIG, trustLinker);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public boolean isValid(List<X509Certificate> authenticationCertificateChain) {
 		LOG.debug("isValid: "
 				+ authenticationCertificateChain.get(0)
