@@ -32,6 +32,20 @@
 		<module>eid-trust-service-deploy</module>
 		<module>eid-trust-service-client</module>
 	</modules>
+	<profiles>
+		<profile>
+			<id>tests</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>tests</value>
+				</property>
+			</activation>
+			<modules>
+				<module>eid-trust-service-tests</module>
+			</modules>
+		</profile>
+	</profiles>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
