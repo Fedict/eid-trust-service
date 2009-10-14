@@ -70,6 +70,20 @@ public class XKMSTest {
 		LOG.debug("validation result: " + result);
 	}
 
+	@Test
+	public void testValidateViaJTrust() throws Exception {
+		LOG.debug("validate eID certificate.");
+
+		List<X509Certificate> authnCertificateChain = getAuthnCertificateChain();
+
+		NetworkConfig networkConfig = new NetworkConfig("proxy.yourict.net",
+				8080);
+		TrustValidator trustValidator = BelgianTrustValidatorFactory
+				.createTrustValidator(networkConfig);
+
+		trustValidator.isTrusted(authnCertificateChain);
+	}
+
 	private static final int COUNT = 20;
 
 	@Test
