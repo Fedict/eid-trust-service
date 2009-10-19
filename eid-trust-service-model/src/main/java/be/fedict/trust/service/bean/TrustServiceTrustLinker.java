@@ -38,8 +38,8 @@ import javax.persistence.EntityManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import be.fedict.trust.CrlTrustLinker;
 import be.fedict.trust.TrustLinker;
+import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.RevokedCertificatePK;

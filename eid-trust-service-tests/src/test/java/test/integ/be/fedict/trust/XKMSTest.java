@@ -19,10 +19,13 @@
 package test.integ.be.fedict.trust;
 
 import java.awt.Component;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.Security;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,6 +57,9 @@ public class XKMSTest {
 
 	private static final Log LOG = LogFactory.getLog(XKMSTest.class);
 
+	private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
+			"proxy.yourict.net", 8080);
+
 	@Before
 	public void setUp() {
 		Security.addProvider(new BouncyCastleProvider());
@@ -76,12 +82,34 @@ public class XKMSTest {
 
 		List<X509Certificate> authnCertificateChain = getAuthnCertificateChain();
 
-		NetworkConfig networkConfig = new NetworkConfig("proxy.yourict.net",
-				8080);
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
-				.createTrustValidator(networkConfig);
+				.createTrustValidator(NETWORK_CONFIG);
 
 		trustValidator.isTrusted(authnCertificateChain);
+	}
+
+	@Test
+	public void testValidateNonRepudiationViaJTrust() throws Exception {
+		LOG.debug("validate eID certificate.");
+
+		List<X509Certificate> signCertificateChain = getSignCertificateChain();
+
+		TrustValidator trustValidator = BelgianTrustValidatorFactory
+				.createNonRepudiationTrustValidator(NETWORK_CONFIG);
+
+		trustValidator.isTrusted(signCertificateChain);
+	}
+
+	@Test
+	public void testValidateNationalRegistryViaJTrust() throws Exception {
+		LOG.debug("validate eID certificate.");
+
+		List<X509Certificate> nationalRegistryCertificateChain = getNationalRegistryCertificateChain();
+
+		TrustValidator trustValidator = BelgianTrustValidatorFactory
+				.createNationalRegistryTrustValidator(NETWORK_CONFIG);
+
+		trustValidator.isTrusted(nationalRegistryCertificateChain);
 	}
 
 	private static final int COUNT = 20;
@@ -139,6 +167,59 @@ public class XKMSTest {
 			pcscEid.close();
 		}
 		return authnCertificateChain;
+	}
+
+	private List<X509Certificate> getSignCertificateChain() throws Exception,
+			CardException, IOException, CertificateException {
+		Messages messages = new Messages(Locale.getDefault());
+		View view = new LogTestView(LOG);
+		PcscEidSpi pcscEid = new PcscEid(view, messages);
+
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card...");
+			pcscEid.waitForEidPresent();
+		}
+
+		List<X509Certificate> signCertificateChain;
+		try {
+			signCertificateChain = pcscEid.getSignCertificateChain();
+		} finally {
+			pcscEid.close();
+		}
+		return signCertificateChain;
+	}
+
+	private List<X509Certificate> getNationalRegistryCertificateChain()
+			throws Exception, CardException, IOException, CertificateException {
+		Messages messages = new Messages(Locale.getDefault());
+		View view = new LogTestView(LOG);
+		PcscEid pcscEid = new PcscEid(view, messages);
+
+		if (false == pcscEid.isEidPresent()) {
+			LOG.debug("insert eID card...");
+			pcscEid.waitForEidPresent();
+		}
+
+		CertificateFactory certificateFactory = CertificateFactory
+				.getInstance("X.509");
+
+		List<X509Certificate> nrCertificateChain = new LinkedList<X509Certificate>();
+		try {
+			byte[] nrCertData = pcscEid.readFile(PcscEid.RRN_CERT_FILE_ID);
+			X509Certificate nrCert = (X509Certificate) certificateFactory
+					.generateCertificate(new ByteArrayInputStream(nrCertData));
+			nrCertificateChain.add(nrCert);
+			LOG.debug("national registry certificate issuer: "
+					+ nrCert.getIssuerX500Principal());
+			byte[] rootCaCertData = pcscEid.readFile(PcscEid.ROOT_CERT_FILE_ID);
+			X509Certificate rootCaCert = (X509Certificate) certificateFactory
+					.generateCertificate(new ByteArrayInputStream(
+							rootCaCertData));
+			nrCertificateChain.add(rootCaCert);
+		} finally {
+			pcscEid.close();
+		}
+		return nrCertificateChain;
 	}
 
 	private static class LogTestView implements View {

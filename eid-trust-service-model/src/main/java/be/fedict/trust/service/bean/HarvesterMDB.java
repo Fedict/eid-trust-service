@@ -53,8 +53,8 @@ import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DEROctetString;
 import org.joda.time.DateTime;
 
-import be.fedict.trust.CrlTrustLinker;
-import be.fedict.trust.OnlineCrlRepository;
+import be.fedict.trust.crl.CrlTrustLinker;
+import be.fedict.trust.crl.OnlineCrlRepository;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.RevokedCertificatePK;
