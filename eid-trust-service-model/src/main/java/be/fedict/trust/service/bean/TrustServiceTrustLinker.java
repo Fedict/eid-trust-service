@@ -135,6 +135,8 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		}
 		LOG.debug("using cached CRL data");
 		BigInteger serialNumber = childCertificate.getSerialNumber();
+		LOG.debug("find revoked certificate for issuer \"" + issuerName
+				+ "\" with serial number " + serialNumber);
 		RevokedCertificateEntity revokedCertificate = this.entityManager.find(
 				RevokedCertificateEntity.class, new RevokedCertificatePK(
 						issuerName, serialNumber));

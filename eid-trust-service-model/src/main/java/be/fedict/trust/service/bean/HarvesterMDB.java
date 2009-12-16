@@ -135,6 +135,8 @@ public class HarvesterMDB implements MessageListener {
 		Set<? extends X509CRLEntry> revokedCertificates = crl
 				.getRevokedCertificates();
 		if (null != revokedCertificates) {
+			LOG.debug("# of revoked certificates: "
+					+ revokedCertificates.size());
 			for (X509CRLEntry revokedCertificate : revokedCertificates) {
 				X500Principal certificateIssuer = revokedCertificate
 						.getCertificateIssuer();

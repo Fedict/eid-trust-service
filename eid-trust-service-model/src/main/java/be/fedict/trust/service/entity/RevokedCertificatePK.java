@@ -30,7 +30,7 @@ public class RevokedCertificatePK implements Serializable {
 
 	private String issuer;
 
-	private BigInteger serialNumber;
+	private String serialNumber;
 
 	public RevokedCertificatePK() {
 		super();
@@ -38,7 +38,7 @@ public class RevokedCertificatePK implements Serializable {
 
 	public RevokedCertificatePK(String issuer, BigInteger serialNumber) {
 		this.issuer = issuer;
-		this.serialNumber = serialNumber;
+		this.serialNumber = serialNumber.toString();
 	}
 
 	public String getIssuer() {
@@ -49,11 +49,16 @@ public class RevokedCertificatePK implements Serializable {
 		this.issuer = issuer;
 	}
 
-	public BigInteger getSerialNumber() {
+	/**
+	 * HSQLDB/Hibernate has problems with mapping a BigInteger correctly.
+	 * 
+	 * @return
+	 */
+	public String getSerialNumber() {
 		return this.serialNumber;
 	}
 
-	public void setSerialNumber(BigInteger serialNumber) {
+	public void setSerialNumber(String serialNumber) {
 		this.serialNumber = serialNumber;
 	}
 }
