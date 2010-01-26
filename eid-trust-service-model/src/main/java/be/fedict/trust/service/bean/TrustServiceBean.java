@@ -53,8 +53,8 @@ public class TrustServiceBean implements TrustService {
 	private static final Log LOG = LogFactory.getLog(TrustServiceBean.class);
 
 	// TODO: runtime network config via admin configuration console
-	//public static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
-	//		"proxy.yourict.net", 8080);
+	// public static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
+	// "proxy.yourict.net", 8080);
 	public static final NetworkConfig NETWORK_CONFIG = null;
 
 	private TrustValidator trustValidator;
@@ -65,7 +65,7 @@ public class TrustServiceBean implements TrustService {
 	@Resource(mappedName = "java:JmsXA")
 	private QueueConnectionFactory queueConnectionFactory;
 
-	@Resource(mappedName = "queue/trust/harvester")
+	@Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_NAME)
 	private Queue queue;
 
 	@PostConstruct

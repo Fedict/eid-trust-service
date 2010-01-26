@@ -28,19 +28,15 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
-import javax.ejb.Timeout;
-import javax.ejb.Timer;
-import javax.ejb.TimerService;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.TextMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -51,21 +47,22 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DEROctetString;
-import org.joda.time.DateTime;
 
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.crl.OnlineCrlRepository;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
-import be.fedict.trust.service.entity.RevokedCertificatePK;
 import be.fedict.trust.service.entity.Status;
 
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
-		@ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/trust/harvester") })
+		@ActivationConfigProperty(propertyName = "destination", propertyValue = HarvesterMDB.HARVESTER_QUEUE_NAME),
+		@ActivationConfigProperty(propertyName = "transactionTimeout", propertyValue = "600") })
 public class HarvesterMDB implements MessageListener {
 
 	private static final Log LOG = LogFactory.getLog(HarvesterMDB.class);
+
+	public static final String HARVESTER_QUEUE_NAME = "queue/trust/harvester";
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -75,19 +72,18 @@ public class HarvesterMDB implements MessageListener {
 		LOG.debug("post construct");
 	}
 
-	@Resource
-	private TimerService timerService;
-
 	public void onMessage(Message message) {
 		LOG.debug("onMessage");
-		TextMessage textMessage = (TextMessage) message;
-		String caName;
+		HarvestMessage harvestMessage;
 		try {
-			caName = textMessage.getText();
+			harvestMessage = new HarvestMessage(message);
 		} catch (JMSException e) {
 			LOG.error("JMS error: " + e.getMessage());
 			return;
 		}
+		String caName = harvestMessage.getCaName();
+		boolean update = harvestMessage.isUpdate();
+
 		LOG.debug("issuer: " + caName);
 		CertificateAuthorityEntity certificateAuthority = this.entityManager
 				.find(CertificateAuthorityEntity.class, caName);
@@ -95,7 +91,7 @@ public class HarvesterMDB implements MessageListener {
 			LOG.warn("unknown certificate authority: " + caName);
 			return;
 		}
-		if (Status.INACTIVE != certificateAuthority.getStatus()) {
+		if (!update && Status.INACTIVE != certificateAuthority.getStatus()) {
 			/*
 			 * Possible that another harvester instance already activated the CA
 			 * cache in the meanwhile.
@@ -115,6 +111,11 @@ public class HarvesterMDB implements MessageListener {
 		}
 		Date validationDate = new Date();
 		X509CRL crl = onlineCrlRepository.findCrl(crlUri, validationDate);
+		if (null == crl) {
+			// XXX: what to do, throw runtime exception so mdb retries ?
+			LOG.error("failed to download CRL for CA " + caName);
+			throw new RuntimeException();
+		}
 		X509Certificate issuerCertificate;
 		try {
 			issuerCertificate = certificateAuthority.getCertificate();
@@ -132,64 +133,82 @@ public class HarvesterMDB implements MessageListener {
 		LOG.debug("processing CRL... " + caName);
 		BigInteger crlNumber = getCrlNumber(crl);
 		LOG.debug("CRL number: " + crlNumber);
+
 		Set<? extends X509CRLEntry> revokedCertificates = crl
 				.getRevokedCertificates();
 		if (null != revokedCertificates) {
-			LOG.debug("# of revoked certificates: "
-					+ revokedCertificates.size());
-			for (X509CRLEntry revokedCertificate : revokedCertificates) {
-				X500Principal certificateIssuer = revokedCertificate
-						.getCertificateIssuer();
-				String issuerName;
-				if (null == certificateIssuer) {
-					issuerName = crl.getIssuerX500Principal().toString();
-				} else {
-					issuerName = certificateIssuer.toString();
-				}
-				BigInteger serialNumber = revokedCertificate.getSerialNumber();
-				Date revocationDate = revokedCertificate.getRevocationDate();
-				RevokedCertificateEntity revokedCertificateEntity = this.entityManager
-						.find(RevokedCertificateEntity.class,
-								new RevokedCertificatePK(issuerName,
-										serialNumber));
-				if (null == revokedCertificateEntity) {
-					revokedCertificateEntity = new RevokedCertificateEntity(
+			LOG.debug("found " + revokedCertificates.size() + " crl entries");
+
+			boolean entriesFound = false;
+			if (null != crlNumber) {
+				entriesFound = entriesFound(crlNumber, crl
+						.getIssuerX500Principal().toString());
+			}
+
+			if (entriesFound) {
+				LOG.debug("entries already added, skipping...");
+			} else {
+				LOG.debug("no entries found, adding...");
+
+				for (X509CRLEntry revokedCertificate : revokedCertificates) {
+					X500Principal certificateIssuer = revokedCertificate
+							.getCertificateIssuer();
+					String issuerName;
+					if (null == certificateIssuer) {
+						issuerName = crl.getIssuerX500Principal().toString();
+					} else {
+						issuerName = certificateIssuer.toString();
+					}
+					BigInteger serialNumber = revokedCertificate
+							.getSerialNumber();
+					Date revocationDate = revokedCertificate
+							.getRevocationDate();
+
+					RevokedCertificateEntity revokedCertificateEntity = new RevokedCertificateEntity(
 							issuerName, serialNumber, revocationDate, crlNumber);
 					this.entityManager.persist(revokedCertificateEntity);
-				} else {
-					revokedCertificateEntity.setCrlNumber(crlNumber);
 				}
 			}
 		}
+
 		if (null != crlNumber) {
-			LOG.debug("deleting old CRL entries from the cache");
-			Query deleteQuery = this.entityManager
-					.createQuery("DELETE FROM RevokedCertificateEntity cert WHERE cert.crlNumber < :crlNumber AND cert.pk.issuer = :issuerName");
-			deleteQuery.setParameter("crlNumber", crlNumber);
-			deleteQuery.setParameter("issuerName", crl.getIssuerX500Principal()
-					.toString());
-			int deleteResult = deleteQuery.executeUpdate();
-			LOG.debug("delete result: " + deleteResult);
+			removeOldEntries(crlNumber, crl.getIssuerX500Principal().toString());
 		}
 
 		LOG.debug("CRL this update: " + crl.getThisUpdate());
 		LOG.debug("CRL next update: " + crl.getNextUpdate());
-		DateTime timerExpiration = new DateTime(crl.getNextUpdate());
-		// TODO fine-tune timer expiration
-		LOG.debug("programming scheduler to: " + timerExpiration);
-		this.timerService.createTimer(timerExpiration.toDate(), caName);
-
 		certificateAuthority.setStatus(Status.ACTIVE);
 		certificateAuthority.setThisUpdate(crl.getThisUpdate());
 		certificateAuthority.setNextUpdate(crl.getNextUpdate());
 		LOG.debug("cache activated for CA: " + crl.getIssuerX500Principal());
 	}
 
-	@Timeout
-	public void scheduler(Timer timer) {
-		String caName = (String) timer.getInfo();
-		LOG.debug("scheduler timeout for CA: " + caName);
-		// TODO implement me
+	@SuppressWarnings("unchecked")
+	private boolean entriesFound(BigInteger crlNumber, String issuerName) {
+		LOG.debug("find existing CRL entries in the cache with crlNumber="
+				+ crlNumber);
+
+		Query findQuery = this.entityManager
+				.createQuery("SELECT cert FROM RevokedCertificateEntity AS cert"
+						+ " WHERE cert.crlNumber = :crlNumber AND cert.pk.issuer = :issuerName");
+		findQuery.setParameter("crlNumber", crlNumber);
+		findQuery.setParameter("issuerName", issuerName);
+		List<RevokedCertificateEntity> revokedCerts = findQuery.getResultList();
+		if (null == revokedCerts || revokedCerts.isEmpty())
+			return false;
+		return true;
+	}
+
+	private int removeOldEntries(BigInteger crlNumber, String issuerName) {
+		LOG.debug("deleting old CRL entries from the cache");
+		Query deleteQuery = this.entityManager
+				.createQuery("DELETE FROM RevokedCertificateEntity cert "
+						+ "WHERE cert.crlNumber < :crlNumber AND cert.pk.issuer = :issuerName");
+		deleteQuery.setParameter("crlNumber", crlNumber);
+		deleteQuery.setParameter("issuerName", issuerName);
+		int deleteResult = deleteQuery.executeUpdate();
+		LOG.debug("delete result: " + deleteResult);
+		return deleteResult;
 	}
 
 	private BigInteger getCrlNumber(X509CRL crl) {

@@ -11,7 +11,7 @@
 		-->
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.0.GA</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>be.fedict</groupId>
 	<artifactId>eid-trust-service</artifactId>
@@ -19,7 +19,8 @@
 	<packaging>pom</packaging>
 	<inceptionYear>2009</inceptionYear>
 	<scm>
-		<developerConnection>scm:svn:https://eid-trust-service.googlecode.com/svn/trunk</developerConnection>
+		<developerConnection>scm:svn:https://eid-trust-service.googlecode.com/svn/trunk
+		</developerConnection>
 	</scm>
 	<modules>
 		<module>eid-trust-service-service</module>
@@ -29,8 +30,11 @@
 		<module>eid-trust-service-model</module>
 		<module>eid-trust-service-portal-model</module>
 		<module>eid-trust-service-portal-webapp</module>
+		<module>eid-trust-service-admin-portal-model</module>
+		<module>eid-trust-service-admin-portal-webapp</module>
 		<module>eid-trust-service-deploy</module>
 		<module>eid-trust-service-client</module>
+		<module>eid-trust-service-startup-runtime</module>
 	</modules>
 	<profiles>
 		<profile>
@@ -56,21 +60,33 @@
 			<dependency>
 				<groupId>be.fedict.eid-applet</groupId>
 				<artifactId>eid-applet-package</artifactId>
-				<version>${eid-applet.version}</version>
+				<version>1.0.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>be.fedict.eid-applet</groupId>
 				<artifactId>eid-applet-service</artifactId>
-				<version>${eid-applet.version}</version>
+				<version>1.0.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>be.fedict.eid-applet</groupId>
 				<artifactId>eid-applet-service-spi</artifactId>
-				<version>${eid-applet.version}</version>
+				<version>1.0.0-SNAPSHOT</version>
 			</dependency>
+			<!--
+				<dependency> <groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk16</artifactId> <version>1.44</version>
+				</dependency>
+			-->
+			<dependency>
+				<groupId>quartz</groupId>
+				<artifactId>quartz</artifactId>
+				<version>1.5.2</version>
+			</dependency>
+			<!--
+				<dependency> <groupId>commons-digester</groupId>
+				<artifactId>commons-digester</artifactId> <version>1.6</version>
+				</dependency>
+			-->
 		</dependencies>
 	</dependencyManagement>
-	<properties>
-		<eid-applet.version>1.0.0.GA</eid-applet.version>
-	</properties>
 </project>

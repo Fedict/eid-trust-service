@@ -33,6 +33,7 @@ import org.jboss.seam.annotations.Out;
 import org.jboss.seam.contexts.SessionContext;
 import org.jboss.seam.log.Log;
 
+import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 import be.fedict.trust.portal.CertificateValidator;
 import be.fedict.trust.service.TrustService;
 
@@ -56,14 +57,15 @@ public class CertificateValidatorBean implements CertificateValidator {
 
 	public void validate() {
 		this.log.debug("validate");
+
 		X509Certificate authnCert = (X509Certificate) this.sessionContext
-				.get("eid.certs.authn");
+				.get(IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE);
 		X509Certificate signCert = (X509Certificate) this.sessionContext
-				.get("eid.certs.sign");
+				.get(IdentityDataMessageHandler.SIGN_CERT_SESSION_ATTRIBUTE);
 		X509Certificate caCert = (X509Certificate) this.sessionContext
-				.get("eid.certs.ca");
+				.get(IdentityDataMessageHandler.CA_CERT_SESSION_ATTRIBUTE);
 		X509Certificate rootCert = (X509Certificate) this.sessionContext
-				.get("eid.certs.root");
+				.get(IdentityDataMessageHandler.ROOT_CERT_SESSION_ATTRIBTUE);
 
 		List<X509Certificate> authnCertChain = new LinkedList<X509Certificate>();
 		authnCertChain.add(authnCert);

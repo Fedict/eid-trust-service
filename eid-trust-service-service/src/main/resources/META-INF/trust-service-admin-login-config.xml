@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policy PUBLIC
+      "-//JBoss//DTD JBOSS Security Config 3.0//EN"
+      "http://www.jboss.org/j2ee/dtd/security_config.dtd">
+<policy>
+
+	<application-policy name="trust-service-admin">
+		<authentication>
+			<login-module code="be.fedict.trust.jaas.AdminLoginModule"
+				flag="required">
+			</login-module>
+		</authentication>
+	</application-policy>
+
+</policy>

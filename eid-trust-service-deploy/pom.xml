@@ -40,6 +40,10 @@
 						</ejbModule>
 						<webModule>
 							<groupId>be.fedict.eid-trust-service</groupId>
+							<artifactId>eid-trust-service-startup-runtime</artifactId>
+						</webModule>
+						<webModule>
+							<groupId>be.fedict.eid-trust-service</groupId>
 							<artifactId>eid-trust-service-ws</artifactId>
 							<contextRoot>/eid-trust-service-ws</contextRoot>
 						</webModule>
@@ -52,6 +56,15 @@
 							<artifactId>eid-trust-service-portal-webapp</artifactId>
 							<contextRoot>/eid-trust-service-portal</contextRoot>
 						</webModule>
+						<ejbModule>
+							<groupId>be.fedict.eid-trust-service</groupId>
+							<artifactId>eid-trust-service-admin-portal-model</artifactId>
+						</ejbModule>
+						<webModule>
+							<groupId>be.fedict.eid-trust-service</groupId>
+							<artifactId>eid-trust-service-admin-portal-webapp</artifactId>
+							<contextRoot>/eid-trust-service-admin-portal</contextRoot>
+						</webModule>
 						<jarModule>
 							<groupId>org.jboss.el</groupId>
 							<artifactId>jboss-el</artifactId>
@@ -60,6 +73,16 @@
 						</jarModule>
 					</modules>
 					<version>5</version>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+				<configuration>
+					<container>
+						<containerId>jboss4x</containerId>
+						<type>remote</type>
+					</container>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -74,11 +97,18 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-model</artifactId>
 			<type>ejb</type>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>be.fedict.eid-trust-service</groupId>
+			<artifactId>eid-trust-service-startup-runtime</artifactId>
+			<type>war</type>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -96,6 +126,18 @@
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-portal-webapp</artifactId>
+			<type>war</type>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>be.fedict.eid-trust-service</groupId>
+			<artifactId>eid-trust-service-admin-portal-model</artifactId>
+			<type>ejb</type>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>be.fedict.eid-trust-service</groupId>
+			<artifactId>eid-trust-service-admin-portal-webapp</artifactId>
 			<type>war</type>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>

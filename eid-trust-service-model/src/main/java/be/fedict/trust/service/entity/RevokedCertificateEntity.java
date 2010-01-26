@@ -28,13 +28,17 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 @Entity
 @Table(name = "revoked_certificates")
 public class RevokedCertificateEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
 	private RevokedCertificatePK pk;
 
 	private Date revocationDate;
@@ -52,6 +56,7 @@ public class RevokedCertificateEntity implements Serializable {
 		this.crlNumber = crlNumber;
 	}
 
+	@EmbeddedId
 	public RevokedCertificatePK getPk() {
 		return this.pk;
 	}
@@ -76,4 +81,32 @@ public class RevokedCertificateEntity implements Serializable {
 	public void setCrlNumber(BigInteger crlNumber) {
 		this.crlNumber = crlNumber;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+
+		if (this == obj)
+			return true;
+		if (null == obj)
+			return false;
+		if (false == obj instanceof RevokedCertificateEntity)
+			return false;
+		RevokedCertificateEntity rhs = (RevokedCertificateEntity) obj;
+		return new EqualsBuilder().append(pk, rhs.pk).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+
+		return new HashCodeBuilder().append(pk).toHashCode();
+	}
+
+	@Override
+	public String toString() {
+
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+				.append("pk", pk).append("revocationDate", revocationDate)
+				.append("crlNumber", crlNumber).toString();
+	}
+
 }

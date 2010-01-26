@@ -32,7 +32,6 @@ import javax.jms.QueueConnectionFactory;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 import javax.persistence.EntityManager;
 
 import org.apache.commons.logging.Log;
@@ -40,10 +39,12 @@ import org.apache.commons.logging.LogFactory;
 
 import be.fedict.trust.TrustLinker;
 import be.fedict.trust.crl.CrlTrustLinker;
+import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.RevokedCertificatePK;
 import be.fedict.trust.service.entity.Status;
+import be.fedict.trust.service.entity.TrustDomainEntity;
 
 /**
  * Implementation of a trust linker based on the trust service infrastructure.
@@ -86,18 +87,31 @@ public class TrustServiceTrustLinker implements TrustLinker {
 				LOG.warn("malformed URL: " + e.getMessage(), e);
 				return null;
 			}
+			// XXX: for now just default to Belgian eID trust domain
+			TrustDomainEntity trustDomain = this.entityManager.find(
+					TrustDomainEntity.class,
+					TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
+			if (null == trustDomain) {
+				LOG.error("Trust domain not found");
+				return null;
+			}
+
+			// create new CA
 			try {
 				certificateAuthority = new CertificateAuthorityEntity(
-						issuerName, crlUrl, certificate);
+						issuerName, crlUrl, certificate, trustDomain);
 			} catch (CertificateEncodingException e) {
 				LOG.error("certificate encoding error: " + e.getMessage(), e);
 				return null;
 			}
 			this.entityManager.persist(certificateAuthority);
+
+			// notify harvester
 			try {
 				notifyHarvester(issuerName);
 			} catch (JMSException e) {
 				LOG.error("could not notify harvester: " + e.getMessage(), e);
+				// XXX: audit
 			}
 			LOG.debug("harvester notified.");
 			return null;
@@ -135,8 +149,6 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		}
 		LOG.debug("using cached CRL data");
 		BigInteger serialNumber = childCertificate.getSerialNumber();
-		LOG.debug("find revoked certificate for issuer \"" + issuerName
-				+ "\" with serial number " + serialNumber);
 		RevokedCertificateEntity revokedCertificate = this.entityManager.find(
 				RevokedCertificateEntity.class, new RevokedCertificatePK(
 						issuerName, serialNumber));
@@ -163,11 +175,12 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			QueueSession queueSession = queueConnection.createQueueSession(
 					true, Session.AUTO_ACKNOWLEDGE);
 			try {
-				TextMessage textMessage = queueSession
-						.createTextMessage(issuerName);
+				HarvestMessage harvestMessage = new HarvestMessage(issuerName,
+						false);
 				QueueSender queueSender = queueSession.createSender(this.queue);
 				try {
-					queueSender.send(textMessage);
+					queueSender
+							.send(harvestMessage.getJMSMessage(queueSession));
 				} finally {
 					queueSender.close();
 				}

@@ -34,6 +34,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -61,13 +62,15 @@ public class CertificateAuthorityEntity implements Serializable {
 	 * @throws CertificateEncodingException
 	 */
 	public CertificateAuthorityEntity(String name, String crlUrl,
-			X509Certificate certificate) throws CertificateEncodingException {
+			X509Certificate certificate, TrustDomainEntity trustDomain)
+			throws CertificateEncodingException {
 		this.crlUrl = crlUrl;
 		this.name = name;
 		this.status = Status.INACTIVE;
 		this.encodedCertificate = certificate.getEncoded();
 		this.thisUpdate = null;
 		this.nextUpdate = null;
+		this.trustDomain = trustDomain;
 	}
 
 	private String name;
@@ -81,6 +84,8 @@ public class CertificateAuthorityEntity implements Serializable {
 	private Date thisUpdate;
 
 	private Date nextUpdate;
+
+	private TrustDomainEntity trustDomain;
 
 	@Id
 	public String getName() {
@@ -134,6 +139,17 @@ public class CertificateAuthorityEntity implements Serializable {
 
 	public void setNextUpdate(Date nextUpdate) {
 		this.nextUpdate = nextUpdate;
+	}
+
+	@ManyToOne(optional = false)
+	public TrustDomainEntity getTrustDomain() {
+
+		return trustDomain;
+	}
+
+	public void setTrustDomain(TrustDomainEntity trustDomain) {
+
+		this.trustDomain = trustDomain;
 	}
 
 	@Transient

@@ -8,4 +8,18 @@
 		<depends optional-attribute-name="DestinationManager">
 			jboss.mq:service=DestinationManager</depends>
 	</mbean>
+
+	<mbean code="org.jboss.security.auth.login.DynamicLoginConfig"
+		name="trust:service=DynamicLoginConfig">
+		<attribute name="AuthConfig">
+			META-INF/trust-service-admin-login-config.xml
+		</attribute>
+		<depends optional-attribute-name="LoginConfigService">
+			jboss.security:service=XMLLoginConfig
+		</depends>
+		<depends optional-attribute-name="SecurityManagerService">
+			jboss.security:service=JaasSecurityManager
+		</depends>
+	</mbean>
+
 </server>

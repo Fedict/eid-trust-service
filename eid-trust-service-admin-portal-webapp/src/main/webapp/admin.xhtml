@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j">
+	<body>
+		<ui:composition template="/WEB-INF/template.xhtml">
+			<ui:param name="activeMenu" value="main" />
+			<ui:define name="body">
+				<h2>Administrator Page</h2>
+
+				<h:form id="applicationForm">
+					<rich:dataTable id="app-data" var="item"
+						value="#{adminList}" rows="10"
+						rowClasses="listingTable_Row1,listingTable_Row2">
+
+						<h:column>
+							<f:facet name="header">Admin</f:facet>
+							<h:outputText value="#{item.id}" />
+						</h:column>
+						<f:facet name="footer">
+							<rich:datascroller for="app-data" pageIndexVar="pageIndex"
+								pagesVar="pages" fastControls="hide">
+							</rich:datascroller>
+						</f:facet>
+					</rich:dataTable>
+
+					<rich:messages warnClass="error" errorClass="error"
+						fatalClass="error" />
+				</h:form>
+				
+			</ui:define>
+		</ui:composition>
+	</body>
+</html>
