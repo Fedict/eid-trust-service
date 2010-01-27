@@ -4,22 +4,27 @@
 	xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j">
 	<body>
 		<ui:composition template="/WEB-INF/template.xhtml">
-			<ui:param name="activeMenu" value="admin" />
+			<ui:param name="activeMenu" value="domain" />
 			<ui:define name="body">
-				<h2>#{msgs.manageAdmin}</h2>
+				<h2>#{msgs.manageTrustDomains}</h2>
 
 				<h:form id="form">
-					<rich:dataTable id="data" var="item" value="#{adminList}"
-						rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
+					<rich:dataTable id="data" var="item"
+						value="#{trustDomainList}" rows="10"
+						rowClasses="listingTable_Row1,listingTable_Row2">
 
 						<h:column>
-							<f:facet name="header">#{msgs.admin}</f:facet>
+							<f:facet name="header">#{msgs.trustDomain}</f:facet>
 							<h:outputText value="#{item.name}" />
 						</h:column>
 						<h:column>
-							<f:facet name="header">#{msgs.remove}</f:facet>
-							<h:commandLink id="remove" value="#{msgs.remove}"
-								action="#{admin.remove}" />
+							<f:facet name="header">#{msgs.trustDomainCrlCron}</f:facet>
+							<h:outputText value="#{item.cronExpression}" />
+						</h:column>
+						<h:column>
+							<f:facet name="header">#{msgs.modify}</f:facet>
+							<h:commandLink id="modify" value="#{msgs.modify}"
+								action="#{trustDomain.modify}" />
 						</h:column>
 						<f:facet name="footer">
 							<rich:datascroller for="data" pageIndexVar="pageIndex"
@@ -29,9 +34,6 @@
 					</rich:dataTable>
 
 					<h:messages styleClass="error" globalOnly="true" />
-					<p>
-						<a href="./register.seam">#{msgs.registerAdmin}</a>
-					</p>
 
 				</h:form>
 

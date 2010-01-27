@@ -38,6 +38,9 @@ public interface AdministratorService {
 	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
 			+ "/AdministratorServiceBean";
 
+	/**
+	 * List all {@link AdminEntity}'s.
+	 */
 	List<AdminEntity> listAdmins();
 
 	/**

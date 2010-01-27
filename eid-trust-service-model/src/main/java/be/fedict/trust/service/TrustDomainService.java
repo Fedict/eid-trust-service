@@ -18,41 +18,37 @@
 
 package be.fedict.trust.service;
 
-import javax.ejb.Local;
-import javax.ejb.Timer;
+import java.util.List;
 
-import be.fedict.trust.service.bean.HarvesterMDB;
+import javax.ejb.Local;
+
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
- * Scheduler service.
+ * Trust domain service.
  * 
  * @author wvdhaute
  * 
  */
 @Local
-public interface SchedulingService {
+public interface TrustDomainService {
 
 	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
-			+ "/SchedulingServiceBean";
+			+ "/TrustDomainServiceBean";
 
 	/**
-	 * Timer has timeout, scheduler will notify the {@link HarvesterMDB} and
-	 * create a new timer for the next update.
-	 * 
-	 * @param timer
+	 * List all {@link TrustDomainEntity}'s.
 	 */
-	void timeOut(Timer timer);
+	List<TrustDomainEntity> listTrustDomains();
 
 	/**
-	 * Start a new timer for the specified {@link TrustDomainEntity}.
+	 * Save the changes to the specified {@link TrustDomainEntity}
 	 * 
 	 * @param trustDomain
 	 * 
 	 * @throws InvalidCronExpressionException
 	 */
-	void startTimer(TrustDomainEntity trustDomain)
+	void save(TrustDomainEntity trustDomain)
 			throws InvalidCronExpressionException;
-
 }

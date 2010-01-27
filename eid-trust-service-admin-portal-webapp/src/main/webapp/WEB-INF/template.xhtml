@@ -56,6 +56,20 @@
 								</li>
 							</c:otherwise>
 						</c:choose>
+						<c:choose>
+							<c:when test="#{activeMenu == 'domain'}">
+								<li class="selected">
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/domain.seam">#{msgs.trustDomains}</a>
+								</li>
+							</c:when>
+							<c:otherwise>
+								<li>
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/domain.seam">#{msgs.trustDomains}</a>
+								</li>
+							</c:otherwise>
+						</c:choose>
 
 						<c:choose>
 							<c:when test="#{userId == null}">

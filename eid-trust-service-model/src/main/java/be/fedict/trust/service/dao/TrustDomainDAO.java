@@ -16,43 +16,37 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.service;
+package be.fedict.trust.service.dao;
+
+import java.util.List;
 
 import javax.ejb.Local;
-import javax.ejb.Timer;
 
-import be.fedict.trust.service.bean.HarvesterMDB;
+import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.entity.TrustDomainEntity;
-import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
- * Scheduler service.
+ * Trust Domain DAO.
  * 
  * @author wvdhaute
  * 
  */
 @Local
-public interface SchedulingService {
+public interface TrustDomainDAO {
 
 	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
-			+ "/SchedulingServiceBean";
+			+ "/TrustDomainDAOBean";
 
 	/**
-	 * Timer has timeout, scheduler will notify the {@link HarvesterMDB} and
-	 * create a new timer for the next update.
-	 * 
-	 * @param timer
+	 * Returns list of {@link TrustDomainEntity}'s
 	 */
-	void timeOut(Timer timer);
+	List<TrustDomainEntity> listTrustDomains();
 
 	/**
-	 * Start a new timer for the specified {@link TrustDomainEntity}.
+	 * Return {@link TrustDomainEntity} from specified name. Returns
+	 * <code>null</code> if not found.
 	 * 
-	 * @param trustDomain
-	 * 
-	 * @throws InvalidCronExpressionException
+	 * @param name
 	 */
-	void startTimer(TrustDomainEntity trustDomain)
-			throws InvalidCronExpressionException;
-
+	TrustDomainEntity findTrustDomain(String name);
 }

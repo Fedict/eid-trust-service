@@ -19,10 +19,12 @@
 package be.fedict.trust.service.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
+import javax.ejb.TimerHandle;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
@@ -33,7 +35,9 @@ public class TrustDomainEntity implements Serializable {
 
 	private String name;
 
-	private SchedulingEntity scheduling;
+	private String cronExpression;
+	private TimerHandle timerHandle;
+	private Date fireDate;
 
 	/**
 	 * Default constructor.
@@ -48,9 +52,9 @@ public class TrustDomainEntity implements Serializable {
 	 * @param name
 	 * @param scheduling
 	 */
-	public TrustDomainEntity(String name, SchedulingEntity scheduling) {
+	public TrustDomainEntity(String name, String cronExpression) {
 		this.name = name;
-		this.scheduling = scheduling;
+		this.cronExpression = cronExpression;
 	}
 
 	@Id
@@ -62,15 +66,35 @@ public class TrustDomainEntity implements Serializable {
 		this.name = name;
 	}
 
-	@ManyToOne
-	public SchedulingEntity getScheduling() {
+	public String getCronExpression() {
 
-		return scheduling;
+		return cronExpression;
 	}
 
-	public void setScheduling(SchedulingEntity schedulingEntity) {
+	public void setCronExpression(String cronExpression) {
 
-		scheduling = schedulingEntity;
+		this.cronExpression = cronExpression;
+	}
+
+	@Lob
+	public TimerHandle getTimerHandle() {
+
+		return timerHandle;
+	}
+
+	public void setTimerHandle(TimerHandle timerHandle) {
+
+		this.timerHandle = timerHandle;
+	}
+
+	public Date getFireDate() {
+
+		return fireDate;
+	}
+
+	public void setFireDate(Date fireDate) {
+
+		this.fireDate = fireDate;
 	}
 
 }

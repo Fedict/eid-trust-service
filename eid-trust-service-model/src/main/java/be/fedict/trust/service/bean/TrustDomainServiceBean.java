@@ -18,64 +18,65 @@
 
 package be.fedict.trust.service.bean;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.LocalBinding;
+import org.jboss.ejb3.annotation.SecurityDomain;
 
-import be.fedict.trust.service.InitializationService;
 import be.fedict.trust.service.SchedulingService;
+import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
- * Initialization Service Bean implementation.
+ * Trust Domain Service Bean implementation.
  * 
  * @author wvdhaute
  * 
  */
 @Stateless
-@LocalBinding(jndiBinding = InitializationService.JNDI_BINDING)
-public class InitializationServiceBean implements InitializationService {
+@LocalBinding(jndiBinding = TrustDomainService.JNDI_BINDING)
+@SecurityDomain(TrustServiceConstants.ADMIN_SECURITY_DOMAIN)
+public class TrustDomainServiceBean implements TrustDomainService {
 
 	private static final Log LOG = LogFactory
-			.getLog(InitializationServiceBean.class);
+			.getLog(TrustDomainServiceBean.class);
 
-	@PersistenceContext
-	private EntityManager entityManager;
+	@EJB
+	private TrustDomainDAO trustDomainDAO;
 
 	@EJB
 	private SchedulingService schedulingService;
 
-	public void initialize() {
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public List<TrustDomainEntity> listTrustDomains() {
 
-		LOG.debug("initialize");
+		LOG.debug("list trust domains");
+		return trustDomainDAO.listTrustDomains();
+	}
 
-		// Belgian eID trust domain
-		TrustDomainEntity beidTrustDomain = this.entityManager.find(
-				TrustDomainEntity.class,
-				TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
-		if (null == beidTrustDomain) {
-			LOG.debug("create Belgian eID trust domain");
-			beidTrustDomain = new TrustDomainEntity(
-					TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN,
-					TrustServiceConstants.DEFAULT_CRON);
-			entityManager.persist(beidTrustDomain);
-		}
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void save(TrustDomainEntity trustDomain)
+			throws InvalidCronExpressionException {
 
-		// Start default scheduling timer
-		LOG.debug("start timer for domain " + beidTrustDomain.getName());
-		try {
-			schedulingService.startTimer(beidTrustDomain);
-		} catch (InvalidCronExpressionException e) {
-			LOG.error("Failed to start timer for domain: "
-					+ beidTrustDomain.getName(), e);
-			throw new RuntimeException(e);
-		}
+		LOG.debug("save trust domain: " + trustDomain.getName());
+		TrustDomainEntity attachedTrustDomain = trustDomainDAO
+				.findTrustDomain(trustDomain.getName());
+		attachedTrustDomain.setCronExpression(trustDomain.getCronExpression());
+		schedulingService.startTimer(attachedTrustDomain);
 	}
 }

@@ -44,8 +44,8 @@ import org.quartz.CronTrigger;
 
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
-import be.fedict.trust.service.entity.SchedulingEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
  * Scheduler Service Bean implementation.
@@ -81,35 +81,39 @@ public class SchedulingServiceBean implements SchedulingService {
 		String name = (String) timer.getInfo();
 		LOG.debug("scheduler timeout for: " + name);
 
-		SchedulingEntity scheduling = this.entityManager.find(
-				SchedulingEntity.class, name);
-		if (null == scheduling) {
-			LOG.warn("unknown scheduling: " + name);
+		TrustDomainEntity trustDomain = this.entityManager.find(
+				TrustDomainEntity.class, name);
+		if (null == trustDomain) {
+			LOG.warn("unknown trustDomain: " + name);
 			return;
 		}
 
-		// the scheduling apparantly has another timer still running
+		// the trustDomain apparently has another timer still running
 		// we just return without setting this timer again
-		if (!scheduling.getTimerHandle().equals(timer.getHandle())) {
+		if (!trustDomain.getTimerHandle().equals(timer.getHandle())) {
 			LOG.debug("Ignoring duplicate timer for: " + name);
 			return;
 		}
 
 		// notify harvester for the scheduling's trust domains
-		for (TrustDomainEntity trustDomain : scheduling.getTrustDomains()) {
-			LOG.debug("handling domain: " + trustDomain.getName());
-			for (CertificateAuthorityEntity certificateAuthority : getCertificateAuthorities(trustDomain)) {
-				try {
-					notifyHarvester(certificateAuthority.getName());
-					LOG.debug("harvester notified");
-				} catch (JMSException e) {
-					LOG.error("Failed to notify harvester", e);
-					// XXX: audit
-				}
+		for (CertificateAuthorityEntity certificateAuthority : getCertificateAuthorities(trustDomain)) {
+			try {
+				notifyHarvester(certificateAuthority.getName());
+				LOG.debug("harvester notified");
+			} catch (JMSException e) {
+				LOG.error("Failed to notify harvester", e);
+				// XXX: audit
 			}
 		}
 
-		startTimer(scheduling);
+		try {
+			startTimer(trustDomain);
+		} catch (InvalidCronExpressionException e) {
+			LOG.error("Exception starting timer for trust domain: "
+					+ trustDomain.getName());
+			return;
+			// XXX: audit ?
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -124,30 +128,31 @@ public class SchedulingServiceBean implements SchedulingService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void startTimer(SchedulingEntity scheduling) {
-		LOG.debug("start timer for " + scheduling.getName());
+	public void startTimer(TrustDomainEntity trustDomain)
+			throws InvalidCronExpressionException {
+		LOG.debug("start timer for " + trustDomain.getName());
 
 		CronTrigger cronTrigger = null;
 		try {
-			cronTrigger = new CronTrigger("name", "group", scheduling
+			cronTrigger = new CronTrigger("name", "group", trustDomain
 					.getCronExpression());
 		} catch (Exception e) {
-			// XXX: start timer with default cron expression fallback ?
 			LOG.error("invalid cron expression");
-			return;
+			throw new InvalidCronExpressionException(e);
 		}
 		Date fireDate = cronTrigger.computeFirstFireTime(null);
-		if (fireDate.equals(scheduling.getFireDate())) {
+		if (fireDate.equals(trustDomain.getFireDate())) {
 			cronTrigger.triggered(null);
 			fireDate = cronTrigger.getNextFireTime();
 		}
 
-		Timer timer = this.timerService.createTimer(fireDate, scheduling
+		Timer timer = this.timerService.createTimer(fireDate, trustDomain
 				.getName());
-		LOG.debug("created timer for " + scheduling.getName() + " at "
+		LOG.debug("created timer for " + trustDomain.getName() + " at "
 				+ fireDate.toString());
-		scheduling.setFireDate(fireDate);
-		scheduling.setTimerHandle(timer.getHandle());
+		trustDomain.setFireDate(fireDate);
+		trustDomain.setTimerHandle(timer.getHandle());
+		this.entityManager.flush();
 	}
 
 	private void notifyHarvester(String issuerName) throws JMSException {
