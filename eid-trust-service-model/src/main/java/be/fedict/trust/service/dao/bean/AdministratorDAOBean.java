@@ -92,6 +92,15 @@ public class AdministratorDAOBean implements AdministratorDAO {
 		return admin;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeAdmin(AdminEntity admin) {
+
+		LOG.debug("remove admin: " + admin.getName());
+		this.entityManager.remove(admin);
+	}
+
 	private String getName(X500Principal x500Principal) {
 
 		return x500Principal.getName().substring(

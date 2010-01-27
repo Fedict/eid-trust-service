@@ -54,6 +54,11 @@ public class RevokedCertificatePK implements Serializable {
 		this.issuer = issuer;
 	}
 
+	/**
+	 * HSQLDB/Hibernate has problems with mapping a BigInteger correctly.
+	 * 
+	 * @return
+	 */
 	public String getSerialNumber() {
 		return this.serialNumber;
 	}

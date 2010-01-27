@@ -24,6 +24,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import be.fedict.trust.service.entity.AdminEntity;
+import be.fedict.trust.service.exception.RemoveLastAdminException;
 
 /**
  * Administrator service.
@@ -47,4 +48,14 @@ public interface AdministratorService {
 	 * @return the created {@link AdminEntity}
 	 */
 	AdminEntity register(X509Certificate authnCert);
+
+	/**
+	 * Removes the selected administrator. If only 1 administrator remains,
+	 * throws {@link RemoveLastAdminException}.
+	 * 
+	 * @param admin
+	 * 
+	 * @throws RemoveLastAdminException
+	 */
+	void remove(AdminEntity admin) throws RemoveLastAdminException;
 }

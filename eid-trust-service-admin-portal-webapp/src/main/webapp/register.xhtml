@@ -3,10 +3,10 @@
 	xmlns:h="http://java.sun.com/jsf/html">
 	<body>
 		<ui:composition template="/WEB-INF/template.xhtml">
-			<ui:param name="activeMenu" value="main" />
+			<ui:param name="activeMenu" value="admin" />
 			<ui:define name="body">
-				<h2>Registration</h2>
-				<p>Registering a new administrator.</p>
+				<h2>#{msgs.register}</h2>
+				<p>#{msgs.registerAdmin}.</p>
 
 				<script src="https://www.java.com/js/deployJava.js"></script>
 				<script>

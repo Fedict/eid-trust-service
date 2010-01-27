@@ -34,6 +34,7 @@ import be.fedict.trust.service.AdministratorService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.AdministratorDAO;
 import be.fedict.trust.service.entity.AdminEntity;
+import be.fedict.trust.service.exception.RemoveLastAdminException;
 
 /**
  * Administrator Service Bean implementation.
@@ -58,6 +59,9 @@ public class AdministratorServiceBean implements AdministratorService {
 		return administratorDAO.listAdmins();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public AdminEntity register(X509Certificate authnCert) {
 
@@ -71,4 +75,21 @@ public class AdministratorServiceBean implements AdministratorService {
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void remove(AdminEntity admin) throws RemoveLastAdminException {
+
+		LOG.debug("remove admin: " + admin.getName());
+
+		// check not last administrator
+		if (listAdmins().size() == 1) {
+			LOG.error("cannot remove last administrator");
+			throw new RemoveLastAdminException();
+		}
+
+		// remove
+		administratorDAO.removeAdmin(admin);
+	}
 }

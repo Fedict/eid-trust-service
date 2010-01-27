@@ -3,17 +3,17 @@
 	xmlns:h="http://java.sun.com/jsf/html" xmlns:c="http://java.sun.com/jstl/core">
 	<body>
 		<ui:composition template="/WEB-INF/template.xhtml">
-			<ui:param name="activeMenu" value="validate" />
+			<ui:param name="activeMenu" value="admin" />
 			<ui:define name="body">
-				<h2>Administrator registration result</h2>
+				<h2>#{msgs.registerAdminResult}</h2>
 
 				<c:choose>
 					<c:when test="#{selectedAdmin != null}">
 						<h:outputText
-							value="Successfully registered administrator: #{selectedAdmin.name}" />
+							value="#{msgs.registerAdminResultSuccess} #{selectedAdmin.name}" />
 					</c:when>
 					<c:otherwise>
-						Registration failed
+						#{msgs.registerAdminResultFail}
 					</c:otherwise>
 				</c:choose>
 			</ui:define>

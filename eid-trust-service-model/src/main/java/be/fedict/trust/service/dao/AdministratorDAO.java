@@ -58,4 +58,11 @@ public interface AdministratorDAO {
 	 * @param authnCertificate
 	 */
 	AdminEntity addAdmin(X509Certificate authnCertificate);
+
+	/**
+	 * Remove the specified {@link AdminEntity}.
+	 * 
+	 * @param admin
+	 */
+	void removeAdmin(AdminEntity admin);
 }

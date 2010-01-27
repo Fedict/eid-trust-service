@@ -16,32 +16,10 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.admin.portal;
+package be.fedict.trust.service.exception;
 
-import javax.ejb.Local;
+public class RemoveLastAdminException extends Exception {
 
-@Local
-public interface Administrator {
-
-	/*
-	 * Factory
-	 */
-	void adminListFactory();
-
-	/*
-	 * Lifecycle.
-	 */
-	void destroyCallback();
-
-	/*
-	 * Accessors
-	 */
-
-	/*
-	 * Actions
-	 */
-	void register();
-
-	String remove();
+	private static final long serialVersionUID = 1L;
 
 }

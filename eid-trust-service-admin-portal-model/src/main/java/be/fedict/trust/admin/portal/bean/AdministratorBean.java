@@ -36,12 +36,15 @@ import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.datamodel.DataModel;
 import org.jboss.seam.annotations.datamodel.DataModelSelection;
 import org.jboss.seam.contexts.SessionContext;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
 
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 import be.fedict.trust.admin.portal.Administrator;
 import be.fedict.trust.service.AdministratorService;
 import be.fedict.trust.service.entity.AdminEntity;
+import be.fedict.trust.service.exception.RemoveLastAdminException;
 
 @Stateful
 @Name("admin")
@@ -59,6 +62,9 @@ public class AdministratorBean implements Administrator {
 	@In
 	private SessionContext sessionContext;
 
+	@In(create = true)
+	FacesMessages facesMessages;
+
 	@SuppressWarnings("unused")
 	@DataModel(ADMIN_LIST_NAME)
 	private List<AdminEntity> adminList;
@@ -68,6 +74,9 @@ public class AdministratorBean implements Administrator {
 	@In(required = false)
 	private AdminEntity selectedAdmin;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Remove
 	@Destroy
 	public void destroyCallback() {
@@ -76,6 +85,9 @@ public class AdministratorBean implements Administrator {
 		selectedAdmin = null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Factory(ADMIN_LIST_NAME)
 	public void adminListFactory() {
 
@@ -83,6 +95,9 @@ public class AdministratorBean implements Administrator {
 		adminList = administratorService.listAdmins();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void register() {
 
 		log.debug("register");
@@ -93,4 +108,22 @@ public class AdministratorBean implements Administrator {
 		selectedAdmin = administratorService.register(authnCert);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public String remove() {
+
+		log.debug("remove administrator");
+
+		try {
+			administratorService.remove(selectedAdmin);
+		} catch (RemoveLastAdminException e) {
+			log.error("cannot remove last administrator");
+			facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+					"errorRemoveLastAdmin");
+			return null;
+		}
+
+		return "success";
+	}
 }

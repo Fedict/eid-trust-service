@@ -5,6 +5,14 @@
 	version="1.2">
 	<!-- Facelets configuration -->
 	<application>
+		<resource-bundle>
+			<base-name>messages.webapp</base-name>
+			<var>msgs</var>
+		</resource-bundle>
+		<locale-config>
+			<default-locale>en</default-locale>
+			<!-- supported-locale>nl</supported-locale-->
+		</locale-config>
 		<view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
 	</application>
 </faces-config>
