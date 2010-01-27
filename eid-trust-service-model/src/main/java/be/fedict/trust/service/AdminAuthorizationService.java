@@ -18,14 +18,11 @@
 
 package be.fedict.trust.service;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertPathValidatorException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.util.List;
 
 import javax.ejb.Local;
 
+import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.trust.service.entity.AdminEntity;
 
 /**
@@ -35,7 +32,7 @@ import be.fedict.trust.service.entity.AdminEntity;
  * 
  */
 @Local
-public interface AdminAuthorizationService {
+public interface AdminAuthorizationService extends AuthenticationService {
 
 	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
 			+ "/AdminAuthorizationServiceBean";
@@ -45,15 +42,8 @@ public interface AdminAuthorizationService {
 	 * public key verification and looks up if an {@link AdminEntity} matching
 	 * the public key.
 	 * 
-	 * @param authnCertChain
+	 * @param authnCert
 	 * @return id The {@link AdminEntity}'s id.
-	 * 
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
-	 * @throws CertPathValidatorException
 	 */
-	String authenticate(List<X509Certificate> authnCertChain)
-			throws NoSuchAlgorithmException, InvalidKeySpecException,
-			CertPathValidatorException;
-
+	String authenticate(X509Certificate authnCert);
 }

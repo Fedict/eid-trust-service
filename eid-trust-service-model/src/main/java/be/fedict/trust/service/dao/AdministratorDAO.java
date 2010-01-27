@@ -16,35 +16,46 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.service;
+package be.fedict.trust.service.dao;
 
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.ejb.Local;
 
+import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.entity.AdminEntity;
 
 /**
- * Administrator service.
+ * Administrator DAO.
  * 
  * @author wvdhaute
  * 
  */
 @Local
-public interface AdministratorService {
+public interface AdministratorDAO {
 
 	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
-			+ "/AdministratorServiceBean";
+			+ "/AdministratorDAOBean";
 
+	/**
+	 * Returns list of registered administrators.
+	 */
 	List<AdminEntity> listAdmins();
 
 	/**
-	 * Register the specified authentication certificate chain as administrator.
-	 * Does a basic public key verification.
+	 * Returns {@link AdminEntity} matching the specified {@link PublicKey}.
+	 * Returns <code>null</code> if not found.
 	 * 
-	 * @param authnCert
-	 * @return the created {@link AdminEntity}
+	 * @param publicKey
 	 */
-	AdminEntity register(X509Certificate authnCert);
+	AdminEntity findAdmin(PublicKey publicKey);
+
+	/**
+	 * Add new {@link AdminEntity}
+	 * 
+	 * @param authnCertificate
+	 */
+	AdminEntity addAdmin(X509Certificate authnCertificate);
 }

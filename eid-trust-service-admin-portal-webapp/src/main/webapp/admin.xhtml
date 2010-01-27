@@ -4,18 +4,17 @@
 	xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j">
 	<body>
 		<ui:composition template="/WEB-INF/template.xhtml">
-			<ui:param name="activeMenu" value="main" />
+			<ui:param name="activeMenu" value="admin" />
 			<ui:define name="body">
 				<h2>Administrator Page</h2>
 
 				<h:form id="applicationForm">
-					<rich:dataTable id="app-data" var="item"
-						value="#{adminList}" rows="10"
-						rowClasses="listingTable_Row1,listingTable_Row2">
+					<rich:dataTable id="app-data" var="item" value="#{adminList}"
+						rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
 
 						<h:column>
 							<f:facet name="header">Admin</f:facet>
-							<h:outputText value="#{item.id}" />
+							<h:outputText value="#{item.name}" />
 						</h:column>
 						<f:facet name="footer">
 							<rich:datascroller for="app-data" pageIndexVar="pageIndex"
@@ -26,8 +25,11 @@
 
 					<rich:messages warnClass="error" errorClass="error"
 						fatalClass="error" />
+
+					<a href="./register.seam">Register administrator</a>
+
 				</h:form>
-				
+
 			</ui:define>
 		</ui:composition>
 	</body>

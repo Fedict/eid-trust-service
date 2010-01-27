@@ -35,6 +35,11 @@
 	</build>
 	<dependencies>
 		<dependency>
+			<groupId>be.fedict.eid-applet</groupId>
+			<artifactId>eid-applet-service-spi</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>be.fedict</groupId>
 			<artifactId>jtrust</artifactId>
 		</dependency>

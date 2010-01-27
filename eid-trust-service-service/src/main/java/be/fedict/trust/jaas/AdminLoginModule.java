@@ -20,16 +20,12 @@ package be.fedict.trust.jaas;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.acl.Group;
-import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -171,9 +167,9 @@ public class AdminLoginModule implements LoginModule {
 		}
 
 		char[] password = passwordCallback.getPassword();
-		List<X509Certificate> authnCertChain;
+		X509Certificate authnCert;
 		try {
-			authnCertChain = toX509CertificateChain(password);
+			authnCert = toX509Certificate(password);
 		} catch (Exception e) {
 			throw new LoginException("X509 decoding error: " + e.getMessage());
 		}
@@ -181,16 +177,7 @@ public class AdminLoginModule implements LoginModule {
 		// authenticate
 		String userId;
 		AdminAuthorizationService adminAuthorizationService = getAdminAuthorizationService();
-		try {
-			userId = adminAuthorizationService.authenticate(authnCertChain);
-		} catch (NoSuchAlgorithmException e) {
-			throw new FailedLoginException("Failed to login");
-		} catch (InvalidKeySpecException e) {
-			throw new FailedLoginException("Failed to login");
-		} catch (CertPathValidatorException e) {
-			throw new FailedLoginException(
-					"Failed to login: certificate invalid");
-		}
+		userId = adminAuthorizationService.authenticate(authnCert);
 
 		if (null == userId)
 			throw new FailedLoginException("Administrator not found");
@@ -239,8 +226,7 @@ public class AdminLoginModule implements LoginModule {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
-	private static List<X509Certificate> toX509CertificateChain(char[] password)
+	private static X509Certificate toX509Certificate(char[] password)
 			throws DecoderException, CertificateException {
 
 		byte[] encodedCertificate = Hex.decodeHex(password);
@@ -248,8 +234,8 @@ public class AdminLoginModule implements LoginModule {
 				.getInstance("X.509");
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(
 				encodedCertificate);
-		return (List<X509Certificate>) certificateFactory
-				.generateCertificates(inputStream);
+		return (X509Certificate) certificateFactory
+				.generateCertificate(inputStream);
 	}
 
 }

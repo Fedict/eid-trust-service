@@ -37,6 +37,8 @@ import org.junit.Test;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.RevokedCertificatePK;
+import be.fedict.trust.service.entity.SchedulingEntity;
+import be.fedict.trust.service.entity.TrustDomainEntity;
 
 public class PersistenceTest {
 
@@ -57,6 +59,8 @@ public class PersistenceTest {
 		configuration.setProperty("hibernate.hbm2ddl.auto", "create");
 		configuration.addAnnotatedClass(CertificateAuthorityEntity.class);
 		configuration.addAnnotatedClass(RevokedCertificateEntity.class);
+		configuration.addAnnotatedClass(TrustDomainEntity.class);
+		configuration.addAnnotatedClass(SchedulingEntity.class);
 		EntityManagerFactory entityManagerFactory = configuration
 				.buildEntityManagerFactory();
 

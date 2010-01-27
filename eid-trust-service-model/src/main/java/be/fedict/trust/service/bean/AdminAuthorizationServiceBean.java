@@ -18,23 +18,18 @@
 
 package be.fedict.trust.service.bean;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertPathValidatorException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
-import java.util.UUID;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.trust.service.AdminAuthorizationService;
+import be.fedict.trust.service.dao.AdministratorDAO;
 import be.fedict.trust.service.entity.AdminEntity;
 
 /**
@@ -50,54 +45,52 @@ public class AdminAuthorizationServiceBean implements AdminAuthorizationService 
 	private static final Log LOG = LogFactory
 			.getLog(AdminAuthorizationServiceBean.class);
 
-	@PersistenceContext
-	private EntityManager entityManager;
+	@EJB
+	private AdministratorDAO administratorDAO;
 
-	public String authenticate(List<X509Certificate> authnCertChain)
-			throws NoSuchAlgorithmException, InvalidKeySpecException,
-			CertPathValidatorException {
+	/**
+	 * {@inheritDoc}
+	 */
+	public String authenticate(X509Certificate authnCert) {
 
-		LOG.debug("authenticate: "
-				+ authnCertChain.get(0).getSubjectX500Principal().getName());
-
-		// validate
-		if (authnCertChain.size() < 2) {
-			LOG.error("no root certificate found");
-			return null;
-		}
-		try {
-			authnCertChain.get(0).verify(authnCertChain.get(1).getPublicKey());
-		} catch (Exception e) {
-			LOG.error("verification error: " + e.getMessage());
-			throw new CertPathValidatorException(e);
-		}
+		LOG.debug("authenticate");
 
 		// lookup admin entity
-		List<AdminEntity> admins = listAdmins();
-		if (null == admins || admins.isEmpty()) {
-			// no administrator yet, register
-			LOG.debug("register initial administrator");
-			AdminEntity admin = new AdminEntity(UUID.randomUUID().toString(),
-					authnCertChain.get(0).getPublicKey());
-			this.entityManager.persist(admin);
-			return admin.getId();
-		}
-
-		for (AdminEntity admin : listAdmins()) {
-			if (admin.getPublicKey().equals(
-					authnCertChain.get(0).getPublicKey())) {
-				LOG.debug("found admin: " + admin.getId());
+		AdminEntity admin = administratorDAO
+				.findAdmin(authnCert.getPublicKey());
+		if (null == admin) {
+			if (administratorDAO.listAdmins().isEmpty()) {
+				// register initial administrator
+				LOG.debug("register initial admin");
+				admin = administratorDAO.addAdmin(authnCert);
+				LOG.debug("initial admin: " + admin.getId());
 				return admin.getId();
 			}
+		} else {
+			return admin.getId();
 		}
 
 		LOG.error("administrator not found");
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<AdminEntity> listAdmins() {
-		Query query = this.entityManager.createQuery("FROM AdminEntity");
-		return (List<AdminEntity>) query.getResultList();
+	/**
+	 * {@inheritDoc}
+	 */
+	public void validateCertificateChain(List<X509Certificate> authnCertChain)
+			throws SecurityException {
+
+		LOG.debug("validateCertificateChain");
+		if (authnCertChain.size() < 2) {
+			LOG.error("no root certificate found");
+			throw new SecurityException("No root certificate found");
+		}
+		try {
+			authnCertChain.get(0).verify(authnCertChain.get(1).getPublicKey());
+		} catch (Exception e) {
+			LOG.error("verification error: " + e.getMessage());
+			throw new SecurityException(e);
+		}
+
 	}
 }

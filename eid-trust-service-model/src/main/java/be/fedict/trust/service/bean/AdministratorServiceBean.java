@@ -18,13 +18,12 @@
 
 package be.fedict.trust.service.bean;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,6 +32,7 @@ import org.jboss.ejb3.annotation.SecurityDomain;
 
 import be.fedict.trust.service.AdministratorService;
 import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.AdministratorDAO;
 import be.fedict.trust.service.entity.AdminEntity;
 
 /**
@@ -49,16 +49,26 @@ public class AdministratorServiceBean implements AdministratorService {
 	private static final Log LOG = LogFactory
 			.getLog(AdministratorServiceBean.class);
 
-	@PersistenceContext
-	private EntityManager entityManager;
+	@EJB
+	private AdministratorDAO administratorDAO;
 
-	@SuppressWarnings("unchecked")
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public List<AdminEntity> listAdmins() {
 
-		LOG.debug("list admins");
-		Query query = this.entityManager.createQuery("FROM AdminEntity");
-		return (List<AdminEntity>) query.getResultList();
+		return administratorDAO.listAdmins();
+	}
+
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public AdminEntity register(X509Certificate authnCert) {
+
+		LOG.debug("register");
+
+		if (null == administratorDAO.findAdmin(authnCert.getPublicKey())) {
+			return administratorDAO.addAdmin(authnCert);
+		}
+
+		LOG.error("failed to register administrator");
+		return null;
 	}
 
 }

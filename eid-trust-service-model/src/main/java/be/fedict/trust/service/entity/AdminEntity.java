@@ -40,6 +40,7 @@ public class AdminEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String id;
+	private String name;
 	private byte[] encodedPublicKey;
 
 	/**
@@ -54,8 +55,9 @@ public class AdminEntity implements Serializable {
 	 * 
 	 * @param publicKey
 	 */
-	public AdminEntity(String id, PublicKey publicKey) {
+	public AdminEntity(String id, String name, PublicKey publicKey) {
 		this.id = id;
+		this.name = name;
 		this.encodedPublicKey = publicKey.getEncoded();
 	}
 
@@ -66,6 +68,14 @@ public class AdminEntity implements Serializable {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Lob
@@ -79,39 +89,42 @@ public class AdminEntity implements Serializable {
 	}
 
 	@Transient
-	public PublicKey getPublicKey() throws NoSuchAlgorithmException,
-			InvalidKeySpecException {
+	public PublicKey getPublicKey() {
 
-		X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(
-				this.encodedPublicKey);
-		boolean isSupportedKey = false;
-		KeyFactory factory;
-		PublicKey retKey = null;
-
-		// first try the DSA alg
 		try {
-			factory = KeyFactory.getInstance("DSA");
-			retKey = factory.generatePublic(pubSpec);
-			isSupportedKey = true;
-		} catch (InvalidKeySpecException e) {
-		}
+			X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(
+					this.encodedPublicKey);
+			boolean isSupportedKey = false;
+			KeyFactory factory;
+			PublicKey retKey = null;
 
-		// if DSA didnt work, then try RSA
-		if (!isSupportedKey) {
+			// first try the DSA alg
 			try {
-				factory = KeyFactory.getInstance("RSA");
+				factory = KeyFactory.getInstance("DSA");
 				retKey = factory.generatePublic(pubSpec);
 				isSupportedKey = true;
 			} catch (InvalidKeySpecException e) {
 			}
-		}
 
-		// if not DSA or RSA
-		if (!isSupportedKey) {
-			throw new InvalidKeySpecException(
-					"Unsupported key spec: Not RSA or DSA");
-		}
+			// if DSA didnt work, then try RSA
+			if (!isSupportedKey) {
+				try {
+					factory = KeyFactory.getInstance("RSA");
+					retKey = factory.generatePublic(pubSpec);
+					isSupportedKey = true;
+				} catch (InvalidKeySpecException e) {
+				}
+			}
 
-		return retKey;
+			// if not DSA or RSA
+			if (!isSupportedKey) {
+				throw new RuntimeException(
+						"Unsupported key spec: Not RSA or DSA");
+			}
+
+			return retKey;
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

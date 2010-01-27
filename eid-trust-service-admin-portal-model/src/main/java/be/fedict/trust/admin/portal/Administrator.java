@@ -33,4 +33,13 @@ public interface Administrator {
 	 */
 	void destroyCallback();
 
+	/*
+	 * Accessors
+	 */
+
+	/*
+	 * Actions
+	 */
+	void register();
+
 }

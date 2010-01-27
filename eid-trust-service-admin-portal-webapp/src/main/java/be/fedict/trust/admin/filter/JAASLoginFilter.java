@@ -19,13 +19,8 @@
 package be.fedict.trust.admin.filter;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -60,9 +55,9 @@ public class JAASLoginFilter implements Filter {
 	private static final Log LOG = LogFactory.getLog(JAASLoginFilter.class);
 
 	private static final String USERID_ATTRIBUTE = "userId";
-	private static final String AUTHN_CERT_CHAIN_ATTRIBUTE = JAASLoginFilter.class
+	private static final String AUTHN_CERT_ATTRIBUTE = JAASLoginFilter.class
 			.getName()
-			+ ".AUTHN_CERT_CHAIN";
+			+ ".AUTHN_CERT";
 
 	public static final String JAAS_LOGIN_CONTEXT_ATTRIBUTE = JAASLoginFilter.class
 			.getName()
@@ -153,45 +148,31 @@ public class JAASLoginFilter implements Filter {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static void login(HttpServletRequest request,
 			String loginContextName) {
 
 		try {
 			String userId = (String) request.getSession().getAttribute(
 					USERID_ATTRIBUTE);
-			List<X509Certificate> authnCertChain = (List<X509Certificate>) request
-					.getSession().getAttribute(AUTHN_CERT_CHAIN_ATTRIBUTE);
+			X509Certificate authnCert = (X509Certificate) request.getSession()
+					.getAttribute(AUTHN_CERT_ATTRIBUTE);
 
-			if (null == userId && null == authnCertChain) {
-				X509Certificate authnCert = (X509Certificate) request
+			if (null == userId && null == authnCert) {
+				authnCert = (X509Certificate) request
 						.getSession()
 						.getAttribute(
 								IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE);
-				X509Certificate caCert = (X509Certificate) request
-						.getSession()
-						.getAttribute(
-								IdentityDataMessageHandler.CA_CERT_SESSION_ATTRIBUTE);
-				X509Certificate rootCert = (X509Certificate) request
-						.getSession()
-						.getAttribute(
-								IdentityDataMessageHandler.ROOT_CERT_SESSION_ATTRIBTUE);
-
-				authnCertChain = new LinkedList<X509Certificate>();
-				authnCertChain.add(authnCert);
-				authnCertChain.add(caCert);
-				authnCertChain.add(rootCert);
 
 				AdminAuthorizationService adminAuthorizationService = getAdminAuthorizationService();
-				userId = adminAuthorizationService.authenticate(authnCertChain);
+				userId = adminAuthorizationService.authenticate(authnCert);
 
 				request.getSession().setAttribute(USERID_ATTRIBUTE, userId);
-				request.getSession().setAttribute(AUTHN_CERT_CHAIN_ATTRIBUTE,
-						authnCertChain);
+				request.getSession().setAttribute(AUTHN_CERT_ATTRIBUTE,
+						authnCert);
 			}
 
 			UsernamePasswordHandler handler = new UsernamePasswordHandler(
-					userId, toPassword(authnCertChain));
+					userId, toPassword(authnCert));
 
 			LoginContext loginContext = new LoginContext(loginContextName,
 					handler);
@@ -202,12 +183,6 @@ public class JAASLoginFilter implements Filter {
 		} catch (LoginException e) {
 			LOG.error("login error: " + e.getMessage(), e);
 		} catch (CertificateEncodingException e) {
-			LOG.error("login error: " + e.getMessage(), e);
-		} catch (NoSuchAlgorithmException e) {
-			LOG.error("login error: " + e.getMessage(), e);
-		} catch (InvalidKeySpecException e) {
-			LOG.error("login error: " + e.getMessage(), e);
-		} catch (CertPathValidatorException e) {
 			LOG.error("login error: " + e.getMessage(), e);
 		}
 	}
@@ -224,26 +199,10 @@ public class JAASLoginFilter implements Filter {
 		}
 	}
 
-	private static char[] toPassword(List<X509Certificate> authnCertificateChain)
+	private static char[] toPassword(X509Certificate certificate)
 			throws CertificateEncodingException {
 
-		byte[] encodedAuthnCertChain = null;
-		for (X509Certificate certificate : authnCertificateChain) {
-			encodedAuthnCertChain = append(encodedAuthnCertChain, certificate
-					.getEncoded());
-		}
-		char[] password = Hex.encodeHex(encodedAuthnCertChain);
-		return password;
-	}
-
-	private static byte[] append(byte[] source, byte[] append) {
-		if (null == source)
-			return append;
-
-		byte[] destination = new byte[source.length + append.length];
-		System.arraycopy(source, 0, destination, 0, source.length);
-		System.arraycopy(append, 0, destination, source.length, append.length);
-		return destination;
+		return Hex.encodeHex(certificate.getEncoded());
 	}
 
 	private static void logout(ServletRequest request) {

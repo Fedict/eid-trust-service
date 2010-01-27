@@ -18,6 +18,7 @@
 
 package be.fedict.trust.admin.portal.bean;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -34,8 +35,10 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.datamodel.DataModel;
 import org.jboss.seam.annotations.datamodel.DataModelSelection;
+import org.jboss.seam.contexts.SessionContext;
 import org.jboss.seam.log.Log;
 
+import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 import be.fedict.trust.admin.portal.Administrator;
 import be.fedict.trust.service.AdministratorService;
 import be.fedict.trust.service.entity.AdminEntity;
@@ -52,6 +55,9 @@ public class AdministratorBean implements Administrator {
 
 	@EJB
 	private AdministratorService administratorService;
+
+	@In
+	private SessionContext sessionContext;
 
 	@SuppressWarnings("unused")
 	@DataModel(ADMIN_LIST_NAME)
@@ -75,6 +81,16 @@ public class AdministratorBean implements Administrator {
 
 		log.debug("admin list factory");
 		adminList = administratorService.listAdmins();
+	}
+
+	public void register() {
+
+		log.debug("register");
+
+		X509Certificate authnCert = (X509Certificate) this.sessionContext
+				.get(IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE);
+
+		selectedAdmin = administratorService.register(authnCert);
 	}
 
 }
