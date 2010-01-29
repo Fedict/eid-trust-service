@@ -18,19 +18,28 @@
 
 package be.fedict.trust.service.bean;
 
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.LocalBinding;
 
+import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.InitializationService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.TrustDomainDAO;
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
@@ -46,8 +55,8 @@ public class InitializationServiceBean implements InitializationService {
 	private static final Log LOG = LogFactory
 			.getLog(InitializationServiceBean.class);
 
-	@PersistenceContext
-	private EntityManager entityManager;
+	@EJB
+	private TrustDomainDAO trustDomainDAO;
 
 	@EJB
 	private SchedulingService schedulingService;
@@ -57,16 +66,43 @@ public class InitializationServiceBean implements InitializationService {
 		LOG.debug("initialize");
 
 		// Belgian eID trust domain
-		TrustDomainEntity beidTrustDomain = this.entityManager.find(
-				TrustDomainEntity.class,
-				TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
+		TrustDomainEntity beidTrustDomain = trustDomainDAO
+				.findTrustDomain(TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
 		if (null == beidTrustDomain) {
 			LOG.debug("create Belgian eID trust domain");
-			beidTrustDomain = new TrustDomainEntity(
+			beidTrustDomain = trustDomainDAO.addTrustDomain(
 					TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN,
 					TrustServiceConstants.DEFAULT_CRON);
-			entityManager.persist(beidTrustDomain);
 		}
+
+		// add Root CA trust points
+		X509Certificate rootCaCertificate = loadCertificate("be/fedict/trust/belgiumrca.crt");
+		CertificateAuthorityEntity rootCa = this.trustDomainDAO
+				.addCertificateAuthority(getCrlUrl(rootCaCertificate),
+						rootCaCertificate, null);
+
+		TrustPointEntity rootCaTrustPoint = trustDomainDAO
+				.findTrustPoint(TrustServiceConstants.BELGIAN_EID_ROOT_CA_TRUST_POINT);
+		if (null == rootCaTrustPoint) {
+			rootCaTrustPoint = trustDomainDAO.addTrustPoint(
+					TrustServiceConstants.BELGIAN_EID_ROOT_CA_TRUST_POINT,
+					null, beidTrustDomain, rootCa);
+		}
+		rootCa.setTrustPoint(rootCaTrustPoint);
+
+		X509Certificate rootCa2Certificate = loadCertificate("be/fedict/trust/belgiumrca2.crt");
+		CertificateAuthorityEntity rootCa2 = this.trustDomainDAO
+				.addCertificateAuthority(getCrlUrl(rootCa2Certificate),
+						rootCa2Certificate, null);
+
+		TrustPointEntity rootCa2TrustPoint = trustDomainDAO
+				.findTrustPoint(TrustServiceConstants.BELGIAN_EID_ROOT_CA2_TRUST_POINT);
+		if (null == rootCa2TrustPoint) {
+			rootCa2TrustPoint = trustDomainDAO.addTrustPoint(
+					TrustServiceConstants.BELGIAN_EID_ROOT_CA2_TRUST_POINT,
+					null, beidTrustDomain, rootCa2);
+		}
+		rootCa2.setTrustPoint(rootCa2TrustPoint);
 
 		// Start default scheduling timer
 		LOG.debug("start timer for domain " + beidTrustDomain.getName());
@@ -78,4 +114,39 @@ public class InitializationServiceBean implements InitializationService {
 			throw new RuntimeException(e);
 		}
 	}
+
+	private String getCrlUrl(X509Certificate certificate) {
+
+		URI crlUri = CrlTrustLinker.getCrlUri(certificate);
+		if (null == crlUri)
+			return null;
+		try {
+			return crlUri.toURL().toString();
+		} catch (MalformedURLException e) {
+			LOG.warn("malformed URL: " + e.getMessage(), e);
+			return null;
+		}
+	}
+
+	private static X509Certificate loadCertificate(String resourceName) {
+		LOG.debug("loading certificate: " + resourceName);
+		Thread currentThread = Thread.currentThread();
+		ClassLoader classLoader = currentThread.getContextClassLoader();
+		InputStream certificateInputStream = classLoader
+				.getResourceAsStream(resourceName);
+		if (null == certificateInputStream) {
+			throw new IllegalArgumentException("resource not found: "
+					+ resourceName);
+		}
+		try {
+			CertificateFactory certificateFactory = CertificateFactory
+					.getInstance("X.509");
+			X509Certificate certificate = (X509Certificate) certificateFactory
+					.generateCertificate(certificateInputStream);
+			return certificate;
+		} catch (CertificateException e) {
+			throw new RuntimeException("X509 error: " + e.getMessage(), e);
+		}
+	}
+
 }

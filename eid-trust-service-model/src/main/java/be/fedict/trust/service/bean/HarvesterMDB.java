@@ -100,6 +100,11 @@ public class HarvesterMDB implements MessageListener {
 			return;
 		}
 		String crlUrl = certificateAuthority.getCrlUrl();
+		if (null == crlUrl) {
+			LOG.warn("No CRL url for CA " + certificateAuthority.getName());
+			return;
+		}
+
 		OnlineCrlRepository onlineCrlRepository = new OnlineCrlRepository(
 				TrustServiceBean.NETWORK_CONFIG);
 		URI crlUri;
@@ -133,6 +138,10 @@ public class HarvesterMDB implements MessageListener {
 		LOG.debug("processing CRL... " + caName);
 		BigInteger crlNumber = getCrlNumber(crl);
 		LOG.debug("CRL number: " + crlNumber);
+
+		if (null != crlNumber) {
+			removeOldEntries(crlNumber, crl.getIssuerX500Principal().toString());
+		}
 
 		Set<? extends X509CRLEntry> revokedCertificates = crl
 				.getRevokedCertificates();
@@ -171,10 +180,6 @@ public class HarvesterMDB implements MessageListener {
 			}
 		}
 
-		if (null != crlNumber) {
-			removeOldEntries(crlNumber, crl.getIssuerX500Principal().toString());
-		}
-
 		LOG.debug("CRL this update: " + crl.getThisUpdate());
 		LOG.debug("CRL next update: " + crl.getNextUpdate());
 		certificateAuthority.setStatus(Status.ACTIVE);
@@ -208,6 +213,7 @@ public class HarvesterMDB implements MessageListener {
 		deleteQuery.setParameter("issuerName", issuerName);
 		int deleteResult = deleteQuery.executeUpdate();
 		LOG.debug("delete result: " + deleteResult);
+		this.entityManager.flush();
 		return deleteResult;
 	}
 

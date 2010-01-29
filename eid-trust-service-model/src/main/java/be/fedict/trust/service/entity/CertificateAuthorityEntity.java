@@ -46,6 +46,20 @@ public class CertificateAuthorityEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private String name;
+
+	private String crlUrl;
+
+	private Status status;
+
+	private byte[] encodedCertificate;
+
+	private Date thisUpdate;
+
+	private Date nextUpdate;
+
+	private TrustPointEntity trustPoint;
+
 	/**
 	 * Default constructor.
 	 */
@@ -59,10 +73,11 @@ public class CertificateAuthorityEntity implements Serializable {
 	 * @param name
 	 * @param crlUrl
 	 * @param certificate
+	 * @param trustPoint
 	 * @throws CertificateEncodingException
 	 */
 	public CertificateAuthorityEntity(String name, String crlUrl,
-			X509Certificate certificate, TrustDomainEntity trustDomain)
+			X509Certificate certificate, TrustPointEntity trustPoint)
 			throws CertificateEncodingException {
 		this.crlUrl = crlUrl;
 		this.name = name;
@@ -70,22 +85,8 @@ public class CertificateAuthorityEntity implements Serializable {
 		this.encodedCertificate = certificate.getEncoded();
 		this.thisUpdate = null;
 		this.nextUpdate = null;
-		this.trustDomain = trustDomain;
+		this.trustPoint = trustPoint;
 	}
-
-	private String name;
-
-	private String crlUrl;
-
-	private Status status;
-
-	private byte[] encodedCertificate;
-
-	private Date thisUpdate;
-
-	private Date nextUpdate;
-
-	private TrustDomainEntity trustDomain;
 
 	@Id
 	public String getName() {
@@ -141,15 +142,15 @@ public class CertificateAuthorityEntity implements Serializable {
 		this.nextUpdate = nextUpdate;
 	}
 
-	@ManyToOne(optional = false)
-	public TrustDomainEntity getTrustDomain() {
+	@ManyToOne(optional = true)
+	public TrustPointEntity getTrustPoint() {
 
-		return trustDomain;
+		return trustPoint;
 	}
 
-	public void setTrustDomain(TrustDomainEntity trustDomain) {
+	public void setTrustPoint(TrustPointEntity trustPoint) {
 
-		this.trustDomain = trustDomain;
+		this.trustPoint = trustPoint;
 	}
 
 	@Transient

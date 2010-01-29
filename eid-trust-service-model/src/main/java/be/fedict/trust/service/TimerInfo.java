@@ -18,23 +18,39 @@
 
 package be.fedict.trust.service;
 
+import java.io.Serializable;
+
 /**
- * Some general constants.
+ * Contains information for the {@link SchedulingService} as to for who the
+ * timeout is.
  * 
  * @author wvdhaute
  * 
  */
-public abstract class TrustServiceConstants {
+public class TimerInfo implements Serializable {
 
-	public static final String JNDI_CONTEXT = "TrustService";
+	private static final long serialVersionUID = 1L;
 
-	public static final String ADMIN_SECURITY_DOMAIN = "trust-service-admin";
-	public static final String ADMIN_ROLE = "admin";
+	public enum Type {
+		TRUST_DOMAIN, TRUST_POINT;
+	}
 
-	public static final String BELGIAN_EID_TRUST_DOMAIN = "belgian.eid";
-	public static final String BELGIAN_EID_ROOT_CA_TRUST_POINT = "Belgian eID Root CA";
-	public static final String BELGIAN_EID_ROOT_CA2_TRUST_POINT = "Belgian eID Root CA2";
+	private Type type;
 
-	public static final String DEFAULT_CRON = "0 0/10 * * * ?";
-	// public static final String DEFAULT_CRON = "0 0 0/3 * * ?";
+	private String name;
+
+	public TimerInfo(Type type, String name) {
+		this.type = type;
+		this.name = name;
+	}
+
+	public Type getType() {
+
+		return this.type;
+	}
+
+	public String getName() {
+
+		return this.name;
+	}
 }

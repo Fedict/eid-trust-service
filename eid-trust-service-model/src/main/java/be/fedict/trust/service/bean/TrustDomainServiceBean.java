@@ -76,7 +76,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		LOG.debug("save trust domain: " + trustDomain.getName());
 		TrustDomainEntity attachedTrustDomain = trustDomainDAO
 				.findTrustDomain(trustDomain.getName());
-		attachedTrustDomain.setCronExpression(trustDomain.getCronExpression());
+		attachedTrustDomain.setCrlRefreshCron(trustDomain.getCrlRefreshCron());
 		schedulingService.startTimer(attachedTrustDomain);
 	}
 }

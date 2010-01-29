@@ -11,7 +11,7 @@
 				<h:form id="form">
 
 					<h:outputLabel for="cron" value="#{msgs.trustDomainCrlCron}" />
-					<h:inputText id="cron" value="#{selectedTrustDomain.cronExpression}"
+					<h:inputText id="cron" value="#{selectedTrustDomain.crlRefreshCron}"
 						required="true" styleClass="label" />
 
 					<h:outputLabel for="save" value="" />

@@ -19,9 +19,9 @@
 package be.fedict.trust.service.bean;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
@@ -35,7 +35,6 @@ import javax.jms.QueueSession;
 import javax.jms.Session;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,8 +42,12 @@ import org.jboss.ejb3.annotation.LocalBinding;
 import org.quartz.CronTrigger;
 
 import be.fedict.trust.service.SchedulingService;
+import be.fedict.trust.service.TimerInfo;
+import be.fedict.trust.service.TimerInfo.Type;
+import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
@@ -69,6 +72,9 @@ public class SchedulingServiceBean implements SchedulingService {
 	@Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_NAME)
 	private Queue queue;
 
+	@EJB
+	private TrustDomainDAO trustDomainDAO;
+
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -78,8 +84,24 @@ public class SchedulingServiceBean implements SchedulingService {
 	@Timeout
 	public void timeOut(Timer timer) {
 
-		String name = (String) timer.getInfo();
-		LOG.debug("scheduler timeout for: " + name);
+		TimerInfo timerInfo = (TimerInfo) timer.getInfo();
+		if (null == timerInfo) {
+			LOG.error("no timer info ??");
+			return;
+		}
+
+		LOG.debug("scheduler timeout for: " + timerInfo.getType() + " name="
+				+ timerInfo.getName());
+
+		if (timerInfo.getType().equals(Type.TRUST_DOMAIN)) {
+			handleTrustDomainTimeout(timerInfo.getName(), timer);
+		} else {
+			handleTrustPointTimeout(timerInfo.getName(), timer);
+		}
+
+	}
+
+	private void handleTrustDomainTimeout(String name, Timer timer) {
 
 		TrustDomainEntity trustDomain = this.entityManager.find(
 				TrustDomainEntity.class, name);
@@ -91,21 +113,26 @@ public class SchedulingServiceBean implements SchedulingService {
 		// the trustDomain apparently has another timer still running
 		// we just return without setting this timer again
 		if (!trustDomain.getTimerHandle().equals(timer.getHandle())) {
-			LOG.debug("Ignoring duplicate timer for: " + name);
+			LOG.debug("Ignoring duplicate timer for: " + trustDomain.getName());
 			return;
 		}
 
-		// notify harvester for the scheduling's trust domains
-		for (CertificateAuthorityEntity certificateAuthority : getCertificateAuthorities(trustDomain)) {
-			try {
-				notifyHarvester(certificateAuthority.getName());
-				LOG.debug("harvester notified");
-			} catch (JMSException e) {
-				LOG.error("Failed to notify harvester", e);
-				// XXX: audit
+		// notify harvester
+		for (TrustPointEntity trustPoint : trustDomainDAO
+				.listTrustPoints(trustDomain)) {
+			for (CertificateAuthorityEntity certificateAuthority : trustDomainDAO
+					.listCertificateAuthorities(trustPoint)) {
+				try {
+					notifyHarvester(certificateAuthority.getName());
+					LOG.debug("harvester notified");
+				} catch (JMSException e) {
+					LOG.error("Failed to notify harvester", e);
+					// XXX: audit
+				}
 			}
 		}
 
+		// start timer
 		try {
 			startTimer(trustDomain);
 		} catch (InvalidCronExpressionException e) {
@@ -116,13 +143,43 @@ public class SchedulingServiceBean implements SchedulingService {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<CertificateAuthorityEntity> getCertificateAuthorities(
-			TrustDomainEntity trustDomain) {
-		Query query = this.entityManager
-				.createQuery("SELECT ca FROM CertificateAuthorityEntity AS ca WHERE ca.trustDomain = :trustDomain");
-		query.setParameter("trustDomain", trustDomain);
-		return (List<CertificateAuthorityEntity>) query.getResultList();
+	private void handleTrustPointTimeout(String name, Timer timer) {
+
+		TrustPointEntity trustPoint = this.entityManager.find(
+				TrustPointEntity.class, name);
+		if (null == trustPoint) {
+			LOG.warn("unknown trust point: " + name);
+			return;
+		}
+
+		// the trustPoint apparently has another timer still running
+		// we just return without setting this timer again
+		if (!trustPoint.getTimerHandle().equals(timer.getHandle())) {
+			LOG.debug("Ignoring duplicate timer for: " + trustPoint.getName());
+			return;
+		}
+
+		// notify harvester
+		for (CertificateAuthorityEntity certificateAuthority : trustDomainDAO
+				.listCertificateAuthorities(trustPoint)) {
+			try {
+				notifyHarvester(certificateAuthority.getName());
+				LOG.debug("harvester notified");
+			} catch (JMSException e) {
+				LOG.error("Failed to notify harvester", e);
+				// XXX: audit
+			}
+		}
+
+		// start timer
+		try {
+			startTimer(trustPoint);
+		} catch (InvalidCronExpressionException e) {
+			LOG.error("Exception starting timer for trust point: "
+					+ trustPoint.getName());
+			return;
+			// XXX: audit ?
+		}
 	}
 
 	/**
@@ -135,7 +192,7 @@ public class SchedulingServiceBean implements SchedulingService {
 		CronTrigger cronTrigger = null;
 		try {
 			cronTrigger = new CronTrigger("name", "group", trustDomain
-					.getCronExpression());
+					.getCrlRefreshCron());
 		} catch (Exception e) {
 			LOG.error("invalid cron expression");
 			throw new InvalidCronExpressionException(e);
@@ -146,12 +203,48 @@ public class SchedulingServiceBean implements SchedulingService {
 			fireDate = cronTrigger.getNextFireTime();
 		}
 
-		Timer timer = this.timerService.createTimer(fireDate, trustDomain
-				.getName());
+		Timer timer = this.timerService.createTimer(fireDate, new TimerInfo(
+				Type.TRUST_DOMAIN, trustDomain.getName()));
 		LOG.debug("created timer for " + trustDomain.getName() + " at "
 				+ fireDate.toString());
 		trustDomain.setFireDate(fireDate);
 		trustDomain.setTimerHandle(timer.getHandle());
+		this.entityManager.flush();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void startTimer(TrustPointEntity trustPoint)
+			throws InvalidCronExpressionException {
+		LOG.debug("start timer for " + trustPoint.getName());
+
+		if (null == trustPoint.getCrlRefreshCron()) {
+			LOG.debug("no CRL refresh set for trust point "
+					+ trustPoint.getName() + " ignoring...");
+			return;
+		}
+
+		CronTrigger cronTrigger = null;
+		try {
+			cronTrigger = new CronTrigger("name", "group", trustPoint
+					.getCrlRefreshCron());
+		} catch (Exception e) {
+			LOG.error("invalid cron expression");
+			throw new InvalidCronExpressionException(e);
+		}
+		Date fireDate = cronTrigger.computeFirstFireTime(null);
+		if (fireDate.equals(trustPoint.getFireDate())) {
+			cronTrigger.triggered(null);
+			fireDate = cronTrigger.getNextFireTime();
+		}
+
+		Timer timer = this.timerService.createTimer(fireDate, new TimerInfo(
+				Type.TRUST_POINT, trustPoint.getName()));
+		LOG.debug("created timer for " + trustPoint.getName() + " at "
+				+ fireDate.toString());
+		trustPoint.setFireDate(fireDate);
+		trustPoint.setTimerHandle(timer.getHandle());
 		this.entityManager.flush();
 	}
 

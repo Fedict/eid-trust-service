@@ -78,6 +78,24 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		CertificateAuthorityEntity certificateAuthority = this.entityManager
 				.find(CertificateAuthorityEntity.class, issuerName);
 		if (null == certificateAuthority) {
+			/*
+			 * Here we have to first lookup to which trust point the to be
+			 * created CA belongs.
+			 * 
+			 * Do this by fetching the CA Entity matching
+			 * certificate.getIssuerX5099Principal, if this one does not exist,
+			 * something is really wrong as trust is checked top-down. The root
+			 * CA's are pre-added to the trust domains so those should also be
+			 * there.
+			 * 
+			 * When found, just create a new CA Entity with the found
+			 * TrustPointEntity as reference.
+			 * 
+			 * What to do with the trust domain? Right now nothing, cannot
+			 * specify a specific one. If we can, we should check if the trust
+			 * domain attached to the trust point matches the specified trust
+			 * domain...
+			 */
 			LOG.debug("no data cache entry for CA: " + issuerName);
 			URI crlUri = CrlTrustLinker.getCrlUri(childCertificate);
 			String crlUrl;
@@ -87,6 +105,21 @@ public class TrustServiceTrustLinker implements TrustLinker {
 				LOG.warn("malformed URL: " + e.getMessage(), e);
 				return null;
 			}
+
+			/*
+			 * Lookup Root CA's trust point via parent certificates' CA entity.
+			 */
+			String parentIssuerName = certificate.getIssuerX500Principal()
+					.toString();
+			CertificateAuthorityEntity parentCertificateAuthority = this.entityManager
+					.find(CertificateAuthorityEntity.class, parentIssuerName);
+			if (null == parentCertificateAuthority) {
+				LOG.error("CA not found for " + parentIssuerName + " ?!");
+				// XXX: audit?
+				return null;
+			}
+
+			// check that we are dealing with correct trust domain
 			// XXX: for now just default to Belgian eID trust domain
 			TrustDomainEntity trustDomain = this.entityManager.find(
 					TrustDomainEntity.class,
@@ -95,11 +128,21 @@ public class TrustServiceTrustLinker implements TrustLinker {
 				LOG.error("Trust domain not found");
 				return null;
 			}
+			if (!trustDomain.equals(parentCertificateAuthority.getTrustPoint()
+					.getTrustDomain())) {
+				LOG.error("Invalid trust domain: "
+						+ parentCertificateAuthority.getTrustPoint()
+								.getTrustDomain().getName() + " expected: "
+						+ trustDomain.getName());
+				// XXX: audit?
+				return null;
+			}
 
 			// create new CA
 			try {
 				certificateAuthority = new CertificateAuthorityEntity(
-						issuerName, crlUrl, certificate, trustDomain);
+						issuerName, crlUrl, certificate,
+						parentCertificateAuthority.getTrustPoint());
 			} catch (CertificateEncodingException e) {
 				LOG.error("certificate encoding error: " + e.getMessage(), e);
 				return null;

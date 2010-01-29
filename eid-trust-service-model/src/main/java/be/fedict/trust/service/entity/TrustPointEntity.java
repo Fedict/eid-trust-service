@@ -19,37 +19,35 @@
 package be.fedict.trust.service.entity;
 
 import java.io.Serializable;
-import java.security.cert.CertificateEncodingException;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.ejb.TimerHandle;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "scheduling")
-public class SchedulingEntity implements Serializable {
+@Table(name = "trust_point")
+public class TrustPointEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private String name;
 
-	private String cronExpression;
+	private String crlRefreshCron;
 	private TimerHandle timerHandle;
 	private Date fireDate;
 
-	private List<TrustDomainEntity> trustDomains;
+	private TrustDomainEntity trustDomain;
+
+	private CertificateAuthorityEntity certificateAuthority;
 
 	/**
 	 * Default constructor.
 	 */
-	public SchedulingEntity() {
+	public TrustPointEntity() {
 		super();
 	}
 
@@ -57,14 +55,17 @@ public class SchedulingEntity implements Serializable {
 	 * Main constructor.
 	 * 
 	 * @param name
-	 * @param crlUrl
-	 * @param certificate
-	 * @throws CertificateEncodingException
+	 * @param crlRefreshCron
+	 * @param trustDomain
+	 * @param certificateAuthority
 	 */
-	public SchedulingEntity(String name, String cronExpression) {
+	public TrustPointEntity(String name, String crlRefreshCron,
+			TrustDomainEntity trustDomain,
+			CertificateAuthorityEntity certificateAuthority) {
 		this.name = name;
-		this.cronExpression = cronExpression;
-		this.trustDomains = new LinkedList<TrustDomainEntity>();
+		this.trustDomain = trustDomain;
+		this.certificateAuthority = certificateAuthority;
+		this.crlRefreshCron = crlRefreshCron;
 	}
 
 	@Id
@@ -76,25 +77,36 @@ public class SchedulingEntity implements Serializable {
 		this.name = name;
 	}
 
-	public String getCronExpression() {
+	@ManyToOne(optional = false)
+	public TrustDomainEntity getTrustDomain() {
 
-		return cronExpression;
+		return trustDomain;
 	}
 
-	public void setCronExpression(String cronExpression) {
+	public void setTrustDomain(TrustDomainEntity trustDomain) {
 
-		this.cronExpression = cronExpression;
+		this.trustDomain = trustDomain;
 	}
 
-	@OneToMany(mappedBy = "scheduling", fetch = FetchType.EAGER)
-	public List<TrustDomainEntity> getTrustDomains() {
+	public CertificateAuthorityEntity getCertificateAuthority() {
 
-		return trustDomains;
+		return this.certificateAuthority;
 	}
 
-	public void setTrustDomains(List<TrustDomainEntity> trustDomains) {
+	public void setCertificateAuthority(
+			CertificateAuthorityEntity certificateAuthority) {
 
-		this.trustDomains = trustDomains;
+		this.certificateAuthority = certificateAuthority;
+	}
+
+	public String getCrlRefreshCron() {
+
+		return crlRefreshCron;
+	}
+
+	public void setCrlRefreshCron(String crlRefreshCron) {
+
+		this.crlRefreshCron = crlRefreshCron;
 	}
 
 	@Lob
@@ -117,4 +129,5 @@ public class SchedulingEntity implements Serializable {
 
 		this.fireDate = fireDate;
 	}
+
 }

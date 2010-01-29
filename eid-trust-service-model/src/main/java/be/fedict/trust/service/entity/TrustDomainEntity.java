@@ -35,7 +35,7 @@ public class TrustDomainEntity implements Serializable {
 
 	private String name;
 
-	private String cronExpression;
+	private String crlRefreshCron;
 	private TimerHandle timerHandle;
 	private Date fireDate;
 
@@ -50,11 +50,11 @@ public class TrustDomainEntity implements Serializable {
 	 * Main constructor.
 	 * 
 	 * @param name
-	 * @param scheduling
+	 * @param crlRefreshCron
 	 */
-	public TrustDomainEntity(String name, String cronExpression) {
+	public TrustDomainEntity(String name, String crlRefreshCron) {
 		this.name = name;
-		this.cronExpression = cronExpression;
+		this.crlRefreshCron = crlRefreshCron;
 	}
 
 	@Id
@@ -66,14 +66,14 @@ public class TrustDomainEntity implements Serializable {
 		this.name = name;
 	}
 
-	public String getCronExpression() {
+	public String getCrlRefreshCron() {
 
-		return cronExpression;
+		return crlRefreshCron;
 	}
 
-	public void setCronExpression(String cronExpression) {
+	public void setCrlRefreshCron(String crlRefreshCron) {
 
-		this.cronExpression = cronExpression;
+		this.crlRefreshCron = crlRefreshCron;
 	}
 
 	@Lob

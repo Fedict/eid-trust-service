@@ -23,6 +23,7 @@ import javax.ejb.Timer;
 
 import be.fedict.trust.service.bean.HarvesterMDB;
 import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
@@ -55,4 +56,13 @@ public interface SchedulingService {
 	void startTimer(TrustDomainEntity trustDomain)
 			throws InvalidCronExpressionException;
 
+	/**
+	 * Start a new timer for the specified {@link TrustPointEntity}.
+	 * 
+	 * @param trustPoint
+	 * 
+	 * @throws InvalidCronExpressionException
+	 */
+	void startTimer(TrustPointEntity trustPoint)
+			throws InvalidCronExpressionException;
 }
