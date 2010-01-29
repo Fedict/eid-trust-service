@@ -19,11 +19,13 @@
 package be.fedict.trust.service.bean;
 
 import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -36,10 +38,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import be.fedict.trust.BelgianTrustValidatorFactory;
+import be.fedict.trust.MemoryCertificateRepository;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.TrustLinker;
 import be.fedict.trust.TrustValidator;
 import be.fedict.trust.service.TrustService;
+import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.TrustDomainDAO;
+import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
 
 /**
  * Trust Service Bean implementation.
@@ -68,13 +75,35 @@ public class TrustServiceBean implements TrustService {
 	@Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_NAME)
 	private Queue queue;
 
+	@EJB
+	private TrustDomainDAO trustDomainDAO;
+
 	@PostConstruct
 	public void postConstructCallback() {
 		LOG.debug("post construct");
 		TrustLinker trustLinker = new TrustServiceTrustLinker(
 				this.entityManager, this.queueConnectionFactory, this.queue);
+
+		// Get Belgian eID trust points
+		TrustDomainEntity trustDomain = trustDomainDAO
+				.findTrustDomain(TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
+		List<TrustPointEntity> trustPoints = trustDomainDAO
+				.listTrustPoints(trustDomain);
+
+		MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
+		for (TrustPointEntity trustPoint : trustPoints) {
+			try {
+				certificateRepository.addTrustPoint(trustPoint
+						.getCertificateAuthority().getCertificate());
+			} catch (CertificateException e) {
+				LOG.error("Certificate encoding exception: " + e.getMessage());
+				throw new RuntimeException(e);
+			}
+		}
+
 		this.trustValidator = BelgianTrustValidatorFactory
-				.createTrustValidator(NETWORK_CONFIG, trustLinker);
+				.createTrustValidator(NETWORK_CONFIG, trustLinker,
+						certificateRepository);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
