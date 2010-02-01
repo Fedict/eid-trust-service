@@ -35,9 +35,6 @@ import be.fedict.trust.service.exception.InvalidCronExpressionException;
 @Local
 public interface TrustDomainService {
 
-	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
-			+ "/TrustDomainServiceBean";
-
 	/**
 	 * List all {@link TrustDomainEntity}'s.
 	 */

@@ -35,9 +35,6 @@ import be.fedict.trust.service.exception.InvalidCronExpressionException;
 @Local
 public interface SchedulingService {
 
-	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
-			+ "/SchedulingServiceBean";
-
 	/**
 	 * Timer has timeout, scheduler will notify the {@link HarvesterMDB} and
 	 * create a new timer for the next update.

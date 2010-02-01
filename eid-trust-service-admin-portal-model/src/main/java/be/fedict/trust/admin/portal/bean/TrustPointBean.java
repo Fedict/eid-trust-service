@@ -56,7 +56,7 @@ public class TrustPointBean implements TrustPoint {
 	@In(value = TrustDomainBean.SELECTED_TRUST_DOMAIN)
 	private TrustDomainEntity selectedTrustDomain;
 
-	@In(value = "selectedTrustPoint")
+	@In(value = "selectedTrustPoint", required = false)
 	private TrustPointEntity selectedTrustPoint;
 
 	private TreeNode<TrustPointEntity> rootNode = null;

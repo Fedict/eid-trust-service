@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.ejb.EJB;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.servlet.Filter;
@@ -78,6 +77,9 @@ public class JAASLoginFilter implements Filter {
 
 	private String loginPath;
 	private String mainPath;
+
+	@EJB
+	private AdminAuthorizationService adminAuthorizationService;
 
 	public void init(FilterConfig config) {
 
@@ -148,8 +150,7 @@ public class JAASLoginFilter implements Filter {
 		return true;
 	}
 
-	private static void login(HttpServletRequest request,
-			String loginContextName) {
+	private void login(HttpServletRequest request, String loginContextName) {
 
 		try {
 			String userId = (String) request.getSession().getAttribute(
@@ -163,8 +164,7 @@ public class JAASLoginFilter implements Filter {
 						.getAttribute(
 								IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE);
 
-				AdminAuthorizationService adminAuthorizationService = getAdminAuthorizationService();
-				userId = adminAuthorizationService.authenticate(authnCert);
+				userId = this.adminAuthorizationService.authenticate(authnCert);
 
 				request.getSession().setAttribute(USERID_ATTRIBUTE, userId);
 				request.getSession().setAttribute(AUTHN_CERT_ATTRIBUTE,
@@ -187,25 +187,13 @@ public class JAASLoginFilter implements Filter {
 		}
 	}
 
-	private static AdminAuthorizationService getAdminAuthorizationService()
-			throws LoginException {
-
-		try {
-			AdminAuthorizationService adminAuthorizationService = (AdminAuthorizationService) new InitialContext()
-					.lookup(AdminAuthorizationService.JNDI_BINDING);
-			return adminAuthorizationService;
-		} catch (NamingException e) {
-			throw new LoginException("JNDI lookup error: " + e.getMessage());
-		}
-	}
-
-	private static char[] toPassword(X509Certificate certificate)
+	private char[] toPassword(X509Certificate certificate)
 			throws CertificateEncodingException {
 
 		return Hex.encodeHex(certificate.getEncoded());
 	}
 
-	private static void logout(ServletRequest request) {
+	private void logout(ServletRequest request) {
 
 		LoginContext loginContext = (LoginContext) request
 				.getAttribute(JAAS_LOGIN_CONTEXT_ATTRIBUTE);

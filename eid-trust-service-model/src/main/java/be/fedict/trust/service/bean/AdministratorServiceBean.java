@@ -27,7 +27,6 @@ import javax.ejb.Stateless;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.ejb3.annotation.SecurityDomain;
 
 import be.fedict.trust.service.AdministratorService;
@@ -43,7 +42,6 @@ import be.fedict.trust.service.exception.RemoveLastAdminException;
  * 
  */
 @Stateless
-@LocalBinding(jndiBinding = AdministratorService.JNDI_BINDING)
 @SecurityDomain(TrustServiceConstants.ADMIN_SECURITY_DOMAIN)
 public class AdministratorServiceBean implements AdministratorService {
 

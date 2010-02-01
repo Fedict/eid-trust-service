@@ -23,7 +23,6 @@ import java.util.List;
 
 import javax.ejb.Local;
 
-import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
@@ -36,9 +35,6 @@ import be.fedict.trust.service.entity.TrustPointEntity;
  */
 @Local
 public interface TrustDomainDAO {
-
-	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
-			+ "/TrustDomainDAOBean";
 
 	/**
 	 * Returns list of {@link TrustDomainEntity}'s

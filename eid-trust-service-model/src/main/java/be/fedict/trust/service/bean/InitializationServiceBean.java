@@ -30,7 +30,6 @@ import javax.ejb.Stateless;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.InitializationService;
@@ -49,7 +48,6 @@ import be.fedict.trust.service.exception.InvalidCronExpressionException;
  * 
  */
 @Stateless
-@LocalBinding(jndiBinding = InitializationService.JNDI_BINDING)
 public class InitializationServiceBean implements InitializationService {
 
 	private static final Log LOG = LogFactory

@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.ejb.Local;
 
-import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.entity.AdminEntity;
 
 /**
@@ -35,9 +34,6 @@ import be.fedict.trust.service.entity.AdminEntity;
  */
 @Local
 public interface AdministratorDAO {
-
-	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
-			+ "/AdministratorDAOBean";
 
 	/**
 	 * Returns list of registered administrators.

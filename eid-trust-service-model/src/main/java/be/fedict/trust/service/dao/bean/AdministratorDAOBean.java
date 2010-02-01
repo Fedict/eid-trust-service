@@ -31,7 +31,6 @@ import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.trust.service.dao.AdministratorDAO;
 import be.fedict.trust.service.entity.AdminEntity;
@@ -43,7 +42,6 @@ import be.fedict.trust.service.entity.AdminEntity;
  * 
  */
 @Stateless
-@LocalBinding(jndiBinding = AdministratorDAO.JNDI_BINDING)
 public class AdministratorDAOBean implements AdministratorDAO {
 
 	private static final Log LOG = LogFactory

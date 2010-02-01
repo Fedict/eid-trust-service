@@ -29,7 +29,6 @@ import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
@@ -43,7 +42,6 @@ import be.fedict.trust.service.entity.TrustPointEntity;
  * 
  */
 @Stateless
-@LocalBinding(jndiBinding = TrustDomainDAO.JNDI_BINDING)
 public class TrustDomainDAOBean implements TrustDomainDAO {
 
 	private static final Log LOG = LogFactory.getLog(TrustDomainDAOBean.class);

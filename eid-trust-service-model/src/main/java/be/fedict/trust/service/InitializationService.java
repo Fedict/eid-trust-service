@@ -29,9 +29,6 @@ import javax.ejb.Local;
 @Local
 public interface InitializationService {
 
-	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
-			+ "/InitializationServiceBean";
-
 	void initialize();
 
 }

@@ -38,7 +38,6 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.LocalBinding;
 import org.quartz.CronTrigger;
 
 import be.fedict.trust.service.SchedulingService;
@@ -57,7 +56,6 @@ import be.fedict.trust.service.exception.InvalidCronExpressionException;
  * 
  */
 @Stateless
-@LocalBinding(jndiBinding = SchedulingService.JNDI_BINDING)
 public class SchedulingServiceBean implements SchedulingService {
 
 	private static final Log LOG = LogFactory
