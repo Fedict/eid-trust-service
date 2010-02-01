@@ -19,7 +19,6 @@
 package be.fedict.trust.service.bean;
 
 import java.security.cert.CertPathValidatorException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -92,17 +91,12 @@ public class TrustServiceBean implements TrustService {
 
 		MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
 		for (TrustPointEntity trustPoint : trustPoints) {
-			try {
-				certificateRepository.addTrustPoint(trustPoint
-						.getCertificateAuthority().getCertificate());
-			} catch (CertificateException e) {
-				LOG.error("Certificate encoding exception: " + e.getMessage());
-				throw new RuntimeException(e);
-			}
+			certificateRepository.addTrustPoint(trustPoint
+					.getCertificateAuthority().getCertificate());
 		}
 
 		this.trustValidator = BelgianTrustValidatorFactory
-				.createTrustValidator(NETWORK_CONFIG, trustLinker,
+				.createTrustValidatorWithRepo(NETWORK_CONFIG, trustLinker,
 						certificateRepository);
 	}
 

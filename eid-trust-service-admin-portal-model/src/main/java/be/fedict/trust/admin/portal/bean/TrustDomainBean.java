@@ -48,6 +48,7 @@ import be.fedict.trust.service.exception.InvalidCronExpressionException;
 @LocalBinding(jndiBinding = "fedict/eid/trust/admin/portal/TrustDomainBean")
 public class TrustDomainBean implements TrustDomain {
 
+	public static final String SELECTED_TRUST_DOMAIN = "selectedTrustDomain";
 	private static final String TRUST_DOMAIN_LIST_NAME = "trustDomainList";
 
 	@Logger
@@ -64,7 +65,7 @@ public class TrustDomainBean implements TrustDomain {
 	private List<TrustDomainEntity> trustDomainList;
 
 	@DataModelSelection(TRUST_DOMAIN_LIST_NAME)
-	@Out(value = "selectedTrustDomain", required = false, scope = ScopeType.SESSION)
+	@Out(value = SELECTED_TRUST_DOMAIN, required = false, scope = ScopeType.SESSION)
 	@In(required = false)
 	private TrustDomainEntity selectedTrustDomain;
 

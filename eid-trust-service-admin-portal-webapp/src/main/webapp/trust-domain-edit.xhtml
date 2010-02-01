@@ -11,6 +11,7 @@
 				<h:form id="form">
 
 					<h:outputLabel for="cron" value="#{msgs.trustDomainCrlCron}" />
+					&nbsp;
 					<h:inputText id="cron" value="#{selectedTrustDomain.crlRefreshCron}"
 						required="true" styleClass="label" />
 
@@ -19,6 +20,15 @@
 						value="#{msgs.save}" styleClass="submit" />
 					<h:commandButton action="#{trustDomain.cancel}" id="cancel"
 						value="#{msgs.cancel}" immediate="true" styleClass="submit" />
+
+					<rich:tree style="width:300px" value="#{trustPoint.treeNode}"
+						switchType="client" var="item" reRender="selectedNode"
+						ajaxSubmitSelection="true" nodeSelectListener="#{trustPointTree.processSelection}">
+						<rich:treeNode>
+							<h:outputText value="#{item.name}" />
+						</rich:treeNode>
+					</rich:tree>
+
 				</h:form>
 
 			</ui:define>

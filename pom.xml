@@ -77,6 +77,11 @@
 				<artifactId>quartz</artifactId>
 				<version>1.5.2</version>
 			</dependency>
+			<dependency>
+				<groupId>org.richfaces.framework</groupId>
+				<artifactId>richfaces-api</artifactId>
+				<version>3.3.3.BETA1</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<properties>

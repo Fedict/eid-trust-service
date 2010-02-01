@@ -34,6 +34,7 @@ import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
@@ -78,5 +79,15 @@ public class TrustDomainServiceBean implements TrustDomainService {
 				.findTrustDomain(trustDomain.getName());
 		attachedTrustDomain.setCrlRefreshCron(trustDomain.getCrlRefreshCron());
 		schedulingService.startTimer(attachedTrustDomain);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public List<TrustPointEntity> listTrustPoints(TrustDomainEntity trustDomain) {
+
+		LOG.debug("list trust points for " + trustDomain.getName());
+		return trustDomainDAO.listTrustPoints(trustDomain);
 	}
 }

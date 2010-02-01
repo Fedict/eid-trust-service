@@ -78,24 +78,6 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		CertificateAuthorityEntity certificateAuthority = this.entityManager
 				.find(CertificateAuthorityEntity.class, issuerName);
 		if (null == certificateAuthority) {
-			/*
-			 * Here we have to first lookup to which trust point the to be
-			 * created CA belongs.
-			 * 
-			 * Do this by fetching the CA Entity matching
-			 * certificate.getIssuerX5099Principal, if this one does not exist,
-			 * something is really wrong as trust is checked top-down. The root
-			 * CA's are pre-added to the trust domains so those should also be
-			 * there.
-			 * 
-			 * When found, just create a new CA Entity with the found
-			 * TrustPointEntity as reference.
-			 * 
-			 * What to do with the trust domain? Right now nothing, cannot
-			 * specify a specific one. If we can, we should check if the trust
-			 * domain attached to the trust point matches the specified trust
-			 * domain...
-			 */
 			LOG.debug("no data cache entry for CA: " + issuerName);
 			URI crlUri = CrlTrustLinker.getCrlUri(childCertificate);
 			String crlUrl;

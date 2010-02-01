@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
@@ -121,13 +120,9 @@ public class HarvesterMDB implements MessageListener {
 			LOG.error("failed to download CRL for CA " + caName);
 			throw new RuntimeException();
 		}
-		X509Certificate issuerCertificate;
-		try {
-			issuerCertificate = certificateAuthority.getCertificate();
-		} catch (CertificateException e) {
-			LOG.error("certificate error: " + e.getMessage(), e);
-			return;
-		}
+		X509Certificate issuerCertificate = certificateAuthority
+				.getCertificate();
+
 		LOG.debug("checking integrity CRL...");
 		boolean crlValidity = CrlTrustLinker.checkCrlIntegrity(crl,
 				issuerCertificate, validationDate);

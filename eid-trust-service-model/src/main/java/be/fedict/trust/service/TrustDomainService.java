@@ -23,6 +23,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
@@ -41,6 +42,14 @@ public interface TrustDomainService {
 	 * List all {@link TrustDomainEntity}'s.
 	 */
 	List<TrustDomainEntity> listTrustDomains();
+
+	/**
+	 * List all {@link TrustPointEntity}'s for the specified
+	 * {@link TrustDomainEntity}.
+	 * 
+	 * @param trustDomain
+	 */
+	List<TrustPointEntity> listTrustPoints(TrustDomainEntity trustDomain);
 
 	/**
 	 * Save the changes to the specified {@link TrustDomainEntity}

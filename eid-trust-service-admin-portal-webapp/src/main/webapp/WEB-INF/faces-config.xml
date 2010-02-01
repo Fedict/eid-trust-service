@@ -16,23 +16,28 @@
 		<view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
 	</application>
 	<navigation-rule>
-		<from-view-id>/domain.xhtml</from-view-id>
+		<from-view-id>/trust-domain.xhtml</from-view-id>
 		<navigation-case>
 			<from-outcome>success</from-outcome>
-			<to-view-id>/domain-edit.seam</to-view-id>
+			<to-view-id>/trust-domain-edit.seam</to-view-id>
 			<redirect />
 		</navigation-case>
 	</navigation-rule>
 	<navigation-rule>
-		<from-view-id>/domain-edit.xhtml</from-view-id>
+		<from-view-id>/trust-domain-edit.xhtml</from-view-id>
 		<navigation-case>
 			<from-outcome>cancel</from-outcome>
-			<to-view-id>/domain.seam</to-view-id>
+			<to-view-id>/trust-domain.seam</to-view-id>
 			<redirect />
 		</navigation-case>
 		<navigation-case>
 			<from-outcome>success</from-outcome>
-			<to-view-id>/domain.seam</to-view-id>
+			<to-view-id>/trust-domain.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>view</from-outcome>
+			<to-view-id>/trust-point.seam</to-view-id>
 			<redirect />
 		</navigation-case>
 	</navigation-rule>

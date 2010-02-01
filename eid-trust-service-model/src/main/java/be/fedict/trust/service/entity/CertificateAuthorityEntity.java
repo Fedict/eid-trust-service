@@ -154,13 +154,18 @@ public class CertificateAuthorityEntity implements Serializable {
 	}
 
 	@Transient
-	public X509Certificate getCertificate() throws CertificateException {
-		CertificateFactory certificateFactory = CertificateFactory
-				.getInstance("X.509");
-		InputStream certificateStream = new ByteArrayInputStream(
-				this.encodedCertificate);
-		X509Certificate certificate = (X509Certificate) certificateFactory
-				.generateCertificate(certificateStream);
-		return certificate;
+	public X509Certificate getCertificate() {
+
+		try {
+			CertificateFactory certificateFactory = CertificateFactory
+					.getInstance("X.509");
+			InputStream certificateStream = new ByteArrayInputStream(
+					this.encodedCertificate);
+			X509Certificate certificate = (X509Certificate) certificateFactory
+					.generateCertificate(certificateStream);
+			return certificate;
+		} catch (CertificateException e) {
+			throw new RuntimeException("cert factory error: " + e.getMessage());
+		}
 	}
 }
