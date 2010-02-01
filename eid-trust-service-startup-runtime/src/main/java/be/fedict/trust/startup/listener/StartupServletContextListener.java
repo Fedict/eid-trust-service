@@ -18,8 +18,7 @@
 
 package be.fedict.trust.startup.listener;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.ejb.EJB;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -33,17 +32,13 @@ public class StartupServletContextListener implements ServletContextListener {
 	private static final Log LOG = LogFactory
 			.getLog(StartupServletContextListener.class);
 
+	@EJB
+	private InitializationService initializationService;
+
 	public void contextInitialized(ServletContextEvent event) {
 
 		LOG.debug("context initialized");
-
-		try {
-			InitializationService initializationService = (InitializationService) new InitialContext()
-					.lookup(InitializationService.JNDI_BINDING);
-			initializationService.initialize();
-		} catch (NamingException e) {
-			LOG.error("Naming exception thrown: " + e.getMessage(), e);
-		}
+		initializationService.initialize();
 	}
 
 	public void contextDestroyed(ServletContextEvent event) {

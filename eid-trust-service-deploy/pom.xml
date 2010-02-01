@@ -77,16 +77,6 @@
 							<includeInApplicationXml>true</includeInApplicationXml>
 							<bundleDir>lib</bundleDir>
 						</jarModule>
-						<!--
-							<jarModule> <groupId>org.richfaces.ui</groupId>
-							<artifactId>richfaces-ui</artifactId>
-							<includeInApplicationXml>true</includeInApplicationXml>
-							<bundleDir>lib</bundleDir> </jarModule> <jarModule>
-							<groupId>org.richfaces.framework</groupId>
-							<artifactId>richfaces-impl-jsf2</artifactId>
-							<includeInApplicationXml>true</includeInApplicationXml>
-							<bundleDir>lib</bundleDir> </jarModule>
-						-->
 					</modules>
 					<version>5</version>
 				</configuration>
