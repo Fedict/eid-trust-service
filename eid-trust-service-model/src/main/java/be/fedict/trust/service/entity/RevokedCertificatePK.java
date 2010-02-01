@@ -70,29 +70,32 @@ public class RevokedCertificatePK implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 
-		if (null == obj)
+		if (null == obj) {
 			return false;
-		if (this == obj)
+		}
+		if (this == obj) {
 			return true;
-		if (false == obj instanceof RevokedCertificatePK)
+		}
+		if (false == obj instanceof RevokedCertificatePK) {
 			return false;
+		}
 		RevokedCertificatePK rhs = (RevokedCertificatePK) obj;
-		return new EqualsBuilder().append(serialNumber, rhs.serialNumber)
-				.append(issuer, rhs.issuer).isEquals();
+		return new EqualsBuilder().append(this.serialNumber, rhs.serialNumber)
+				.append(this.issuer, rhs.issuer).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 
-		return new HashCodeBuilder().append(serialNumber).append(issuer)
-				.toHashCode();
+		return new HashCodeBuilder().append(this.serialNumber).append(
+				this.issuer).toHashCode();
 	}
 
 	@Override
 	public String toString() {
 
-		return new ToStringBuilder(this).append("serialNumber", serialNumber)
-				.append("issuer", issuer).toString();
+		return new ToStringBuilder(this).append("serialNumber",
+				this.serialNumber).append("issuer", this.issuer).toString();
 	}
 
 }

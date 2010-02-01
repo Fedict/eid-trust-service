@@ -81,8 +81,8 @@ public class AdministratorBean implements Administrator {
 	@Destroy
 	public void destroyCallback() {
 
-		log.debug("#destroy");
-		selectedAdmin = null;
+		this.log.debug("#destroy");
+		this.selectedAdmin = null;
 	}
 
 	/**
@@ -91,8 +91,8 @@ public class AdministratorBean implements Administrator {
 	@Factory(ADMIN_LIST_NAME)
 	public void adminListFactory() {
 
-		log.debug("admin list factory");
-		adminList = administratorService.listAdmins();
+		this.log.debug("admin list factory");
+		this.adminList = this.administratorService.listAdmins();
 	}
 
 	/**
@@ -100,12 +100,12 @@ public class AdministratorBean implements Administrator {
 	 */
 	public void register() {
 
-		log.debug("register");
+		this.log.debug("register");
 
 		X509Certificate authnCert = (X509Certificate) this.sessionContext
 				.get(IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE);
 
-		selectedAdmin = administratorService.register(authnCert);
+		this.selectedAdmin = this.administratorService.register(authnCert);
 	}
 
 	/**
@@ -113,14 +113,14 @@ public class AdministratorBean implements Administrator {
 	 */
 	public String remove() {
 
-		log.debug("remove administrator");
+		this.log.debug("remove administrator");
 
 		try {
-			administratorService.remove(selectedAdmin);
+			this.administratorService.remove(this.selectedAdmin);
 		} catch (RemoveLastAdminException e) {
-			log.error("cannot remove last administrator");
-			facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
-					"errorRemoveLastAdmin");
+			this.log.error("cannot remove last administrator");
+			this.facesMessages.addFromResourceBundle(
+					StatusMessage.Severity.ERROR, "errorRemoveLastAdmin");
 			return null;
 		}
 

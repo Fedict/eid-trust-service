@@ -35,9 +35,9 @@ public class TimerInfo implements Serializable {
 		TRUST_DOMAIN, TRUST_POINT;
 	}
 
-	private Type type;
+	private final Type type;
 
-	private String name;
+	private final String name;
 
 	public TimerInfo(Type type, String name) {
 		this.type = type;

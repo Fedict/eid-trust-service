@@ -80,7 +80,7 @@ public class TrustPointEntity implements Serializable {
 	@ManyToOne(optional = false)
 	public TrustDomainEntity getTrustDomain() {
 
-		return trustDomain;
+		return this.trustDomain;
 	}
 
 	public void setTrustDomain(TrustDomainEntity trustDomain) {
@@ -101,7 +101,7 @@ public class TrustPointEntity implements Serializable {
 
 	public String getCrlRefreshCron() {
 
-		return crlRefreshCron;
+		return this.crlRefreshCron;
 	}
 
 	public void setCrlRefreshCron(String crlRefreshCron) {
@@ -112,7 +112,7 @@ public class TrustPointEntity implements Serializable {
 	@Lob
 	public TimerHandle getTimerHandle() {
 
-		return timerHandle;
+		return this.timerHandle;
 	}
 
 	public void setTimerHandle(TimerHandle timerHandle) {
@@ -122,7 +122,7 @@ public class TrustPointEntity implements Serializable {
 
 	public Date getFireDate() {
 
-		return fireDate;
+		return this.fireDate;
 	}
 
 	public void setFireDate(Date fireDate) {

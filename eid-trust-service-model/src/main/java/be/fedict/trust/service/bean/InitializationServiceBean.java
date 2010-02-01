@@ -66,11 +66,11 @@ public class InitializationServiceBean implements InitializationService {
 		LOG.debug("initialize");
 
 		// Belgian eID trust domain
-		TrustDomainEntity beidTrustDomain = trustDomainDAO
+		TrustDomainEntity beidTrustDomain = this.trustDomainDAO
 				.findTrustDomain(TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
 		if (null == beidTrustDomain) {
 			LOG.debug("create Belgian eID trust domain");
-			beidTrustDomain = trustDomainDAO.addTrustDomain(
+			beidTrustDomain = this.trustDomainDAO.addTrustDomain(
 					TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN,
 					TrustServiceConstants.DEFAULT_CRON);
 		}
@@ -81,10 +81,10 @@ public class InitializationServiceBean implements InitializationService {
 				.addCertificateAuthority(getCrlUrl(rootCaCertificate),
 						rootCaCertificate, null);
 
-		TrustPointEntity rootCaTrustPoint = trustDomainDAO
+		TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
 				.findTrustPoint(TrustServiceConstants.BELGIAN_EID_ROOT_CA_TRUST_POINT);
 		if (null == rootCaTrustPoint) {
-			rootCaTrustPoint = trustDomainDAO.addTrustPoint(
+			rootCaTrustPoint = this.trustDomainDAO.addTrustPoint(
 					TrustServiceConstants.BELGIAN_EID_ROOT_CA_TRUST_POINT,
 					null, beidTrustDomain, rootCa);
 		}
@@ -95,10 +95,10 @@ public class InitializationServiceBean implements InitializationService {
 				.addCertificateAuthority(getCrlUrl(rootCa2Certificate),
 						rootCa2Certificate, null);
 
-		TrustPointEntity rootCa2TrustPoint = trustDomainDAO
+		TrustPointEntity rootCa2TrustPoint = this.trustDomainDAO
 				.findTrustPoint(TrustServiceConstants.BELGIAN_EID_ROOT_CA2_TRUST_POINT);
 		if (null == rootCa2TrustPoint) {
-			rootCa2TrustPoint = trustDomainDAO.addTrustPoint(
+			rootCa2TrustPoint = this.trustDomainDAO.addTrustPoint(
 					TrustServiceConstants.BELGIAN_EID_ROOT_CA2_TRUST_POINT,
 					null, beidTrustDomain, rootCa2);
 		}
@@ -107,7 +107,7 @@ public class InitializationServiceBean implements InitializationService {
 		// Start default scheduling timer
 		LOG.debug("start timer for domain " + beidTrustDomain.getName());
 		try {
-			schedulingService.startTimer(beidTrustDomain);
+			this.schedulingService.startTimer(beidTrustDomain);
 		} catch (InvalidCronExpressionException e) {
 			LOG.error("Failed to start timer for domain: "
 					+ beidTrustDomain.getName(), e);

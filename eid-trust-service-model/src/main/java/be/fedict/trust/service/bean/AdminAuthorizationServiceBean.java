@@ -56,13 +56,13 @@ public class AdminAuthorizationServiceBean implements AdminAuthorizationService 
 		LOG.debug("authenticate");
 
 		// lookup admin entity
-		AdminEntity admin = administratorDAO
-				.findAdmin(authnCert.getPublicKey());
+		AdminEntity admin = this.administratorDAO.findAdmin(authnCert
+				.getPublicKey());
 		if (null == admin) {
-			if (administratorDAO.listAdmins().isEmpty()) {
+			if (this.administratorDAO.listAdmins().isEmpty()) {
 				// register initial administrator
 				LOG.debug("register initial admin");
-				admin = administratorDAO.addAdmin(authnCert);
+				admin = this.administratorDAO.addAdmin(authnCert);
 				LOG.debug("initial admin: " + admin.getId());
 				return admin.getId();
 			}

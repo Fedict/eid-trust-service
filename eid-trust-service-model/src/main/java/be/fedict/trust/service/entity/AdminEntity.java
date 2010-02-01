@@ -94,19 +94,13 @@ public class AdminEntity implements Serializable {
 		try {
 			X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(
 					this.encodedPublicKey);
-			boolean isSupportedKey = false;
 			KeyFactory factory;
 			PublicKey retKey = null;
 
 			try {
 				factory = KeyFactory.getInstance("RSA");
 				retKey = factory.generatePublic(pubSpec);
-				isSupportedKey = true;
 			} catch (InvalidKeySpecException e) {
-			}
-
-			// if not RSA
-			if (!isSupportedKey) {
 				throw new RuntimeException("Unsupported key spec: Not RSA");
 			}
 

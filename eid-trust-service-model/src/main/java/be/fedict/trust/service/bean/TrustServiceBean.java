@@ -84,9 +84,9 @@ public class TrustServiceBean implements TrustService {
 				this.entityManager, this.queueConnectionFactory, this.queue);
 
 		// Get Belgian eID trust points
-		TrustDomainEntity trustDomain = trustDomainDAO
+		TrustDomainEntity trustDomain = this.trustDomainDAO
 				.findTrustDomain(TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
-		List<TrustPointEntity> trustPoints = trustDomainDAO
+		List<TrustPointEntity> trustPoints = this.trustDomainDAO
 				.listTrustPoints(trustDomain);
 
 		MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();

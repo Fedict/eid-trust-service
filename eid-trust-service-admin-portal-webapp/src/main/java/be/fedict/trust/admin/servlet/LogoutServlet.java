@@ -42,11 +42,11 @@ public class LogoutServlet extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 
-		mainPath = config.getInitParameter(MAIN_PATH_PARAM);
-		if (null == mainPath)
+		this.mainPath = config.getInitParameter(MAIN_PATH_PARAM);
+		if (null == this.mainPath)
 			throw new ServletException("Missing " + MAIN_PATH_PARAM
 					+ " init parameter");
-		LOG.debug("MainPath: " + mainPath);
+		LOG.debug("MainPath: " + this.mainPath);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class LogoutServlet extends HttpServlet {
 
 		LOG.debug("handle request");
 		request.getSession().invalidate();
-		response.sendRedirect(mainPath);
+		response.sendRedirect(this.mainPath);
 	}
 
 }

@@ -56,7 +56,7 @@ public class AdministratorServiceBean implements AdministratorService {
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public List<AdminEntity> listAdmins() {
 
-		return administratorDAO.listAdmins();
+		return this.administratorDAO.listAdmins();
 	}
 
 	/**
@@ -67,8 +67,8 @@ public class AdministratorServiceBean implements AdministratorService {
 
 		LOG.debug("register");
 
-		if (null == administratorDAO.findAdmin(authnCert.getPublicKey())) {
-			return administratorDAO.addAdmin(authnCert);
+		if (null == this.administratorDAO.findAdmin(authnCert.getPublicKey())) {
+			return this.administratorDAO.addAdmin(authnCert);
 		}
 
 		LOG.error("failed to register administrator");
@@ -90,6 +90,6 @@ public class AdministratorServiceBean implements AdministratorService {
 		}
 
 		// remove
-		administratorDAO.removeAdmin(admin);
+		this.administratorDAO.removeAdmin(admin);
 	}
 }

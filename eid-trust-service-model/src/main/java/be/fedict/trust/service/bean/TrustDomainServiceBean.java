@@ -64,7 +64,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	public List<TrustDomainEntity> listTrustDomains() {
 
 		LOG.debug("list trust domains");
-		return trustDomainDAO.listTrustDomains();
+		return this.trustDomainDAO.listTrustDomains();
 	}
 
 	/**
@@ -75,10 +75,10 @@ public class TrustDomainServiceBean implements TrustDomainService {
 			throws InvalidCronExpressionException {
 
 		LOG.debug("save trust domain: " + trustDomain.getName());
-		TrustDomainEntity attachedTrustDomain = trustDomainDAO
+		TrustDomainEntity attachedTrustDomain = this.trustDomainDAO
 				.findTrustDomain(trustDomain.getName());
 		attachedTrustDomain.setCrlRefreshCron(trustDomain.getCrlRefreshCron());
-		schedulingService.startTimer(attachedTrustDomain);
+		this.schedulingService.startTimer(attachedTrustDomain);
 	}
 
 	/**
@@ -88,6 +88,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	public List<TrustPointEntity> listTrustPoints(TrustDomainEntity trustDomain) {
 
 		LOG.debug("list trust points for " + trustDomain.getName());
-		return trustDomainDAO.listTrustPoints(trustDomain);
+		return this.trustDomainDAO.listTrustPoints(trustDomain);
 	}
 }

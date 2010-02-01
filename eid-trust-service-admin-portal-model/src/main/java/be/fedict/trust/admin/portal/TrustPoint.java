@@ -40,9 +40,4 @@ public interface TrustPoint {
 	 * Lifecycle.
 	 */
 	void destroyCallback();
-
-	/*
-	 * Actions
-	 */
-	String view();
 }

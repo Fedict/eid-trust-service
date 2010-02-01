@@ -85,14 +85,17 @@ public class RevokedCertificateEntity implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (null == obj)
+		}
+		if (null == obj) {
 			return false;
-		if (false == obj instanceof RevokedCertificateEntity)
+		}
+		if (false == obj instanceof RevokedCertificateEntity) {
 			return false;
+		}
 		RevokedCertificateEntity rhs = (RevokedCertificateEntity) obj;
-		return new EqualsBuilder().append(pk, rhs.pk).isEquals();
+		return new EqualsBuilder().append(this.pk, rhs.pk).isEquals();
 	}
 
 	@Override
@@ -105,8 +108,9 @@ public class RevokedCertificateEntity implements Serializable {
 	public String toString() {
 
 		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-				.append("pk", pk).append("revocationDate", revocationDate)
-				.append("crlNumber", crlNumber).toString();
+				.append("pk", this.pk).append("revocationDate",
+						this.revocationDate)
+				.append("crlNumber", this.crlNumber).toString();
 	}
 
 }

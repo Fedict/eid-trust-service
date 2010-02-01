@@ -74,7 +74,7 @@ public class AdminLoginModule implements LoginModule {
 	public boolean abort() {
 
 		LOG.debug("abort");
-		authenticatedPrincipal = null;
+		this.authenticatedPrincipal = null;
 		return true;
 	}
 
@@ -85,12 +85,12 @@ public class AdminLoginModule implements LoginModule {
 
 		LOG.debug("commit");
 
-		Set<Principal> principals = subject.getPrincipals();
-		if (null == authenticatedPrincipal)
+		Set<Principal> principals = this.subject.getPrincipals();
+		if (null == this.authenticatedPrincipal)
 			throw new LoginException(
 					"authenticated principal should be not null");
 		// authenticate
-		principals.add(authenticatedPrincipal);
+		principals.add(this.authenticatedPrincipal);
 
 		// make JBoss happy
 		Group callerPrincipalGroup = getGroup("CallerPrincipal", principals);
@@ -117,11 +117,11 @@ public class AdminLoginModule implements LoginModule {
 
 		LOG.debug("initialize");
 
-		subject = newSubject;
-		callbackHandler = newCallbackHandler;
-		LOG.debug("subject class: " + subject.getClass().getName());
+		this.subject = newSubject;
+		this.callbackHandler = newCallbackHandler;
+		LOG.debug("subject class: " + this.subject.getClass().getName());
 		LOG.debug("callback handler class: "
-				+ callbackHandler.getClass().getName());
+				+ this.callbackHandler.getClass().getName());
 	}
 
 	private Group getGroup(String groupName, Set<Principal> principals) {
@@ -155,7 +155,7 @@ public class AdminLoginModule implements LoginModule {
 		Callback[] callbacks = new Callback[] { passwordCallback, nameCallback };
 
 		try {
-			callbackHandler.handle(callbacks);
+			this.callbackHandler.handle(callbacks);
 		} catch (IOException e) {
 			String msg = "IO error: " + e.getMessage();
 			LOG.error(msg);
@@ -186,7 +186,8 @@ public class AdminLoginModule implements LoginModule {
 		if (userId != expectedUserId)
 			throw new FailedLoginException("user ID not correct");
 
-		authenticatedPrincipal = new SimplePrincipal(nameCallback.getName());
+		this.authenticatedPrincipal = new SimplePrincipal(nameCallback
+				.getName());
 		LOG.debug("login: " + nameCallback.getName());
 		return true;
 	}
@@ -209,20 +210,20 @@ public class AdminLoginModule implements LoginModule {
 	public boolean logout() throws LoginException {
 
 		LOG.debug("logout");
-		Set<Principal> principals = subject.getPrincipals();
-		if (null == authenticatedPrincipal)
+		Set<Principal> principals = this.subject.getPrincipals();
+		if (null == this.authenticatedPrincipal)
 			throw new LoginException(
 					"authenticated principal should not be null");
-		boolean result = principals.remove(authenticatedPrincipal);
+		boolean result = principals.remove(this.authenticatedPrincipal);
 		if (!result)
 			throw new LoginException("could not remove authenticated principal");
 		/*
 		 * Despite the fact that JBoss AbstractServerLoginModule is not removing
 		 * the roles on the subject, we clear here all data on the subject.
 		 */
-		subject.getPrincipals().clear();
-		subject.getPublicCredentials().clear();
-		subject.getPrivateCredentials().clear();
+		this.subject.getPrincipals().clear();
+		this.subject.getPublicCredentials().clear();
+		this.subject.getPrivateCredentials().clear();
 		return true;
 	}
 

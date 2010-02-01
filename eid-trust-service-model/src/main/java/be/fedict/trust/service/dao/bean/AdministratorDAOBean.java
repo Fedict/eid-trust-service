@@ -98,7 +98,9 @@ public class AdministratorDAOBean implements AdministratorDAO {
 	public void removeAdmin(AdminEntity admin) {
 
 		LOG.debug("remove admin: " + admin.getName());
-		this.entityManager.remove(admin);
+		AdminEntity attachedAdmin = this.entityManager.find(AdminEntity.class,
+				admin.getId());
+		this.entityManager.remove(attachedAdmin);
 	}
 
 	private String getName(X500Principal x500Principal) {

@@ -38,7 +38,7 @@ public class StartupServletContextListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent event) {
 
 		LOG.debug("context initialized");
-		initializationService.initialize();
+		this.initializationService.initialize();
 	}
 
 	public void contextDestroyed(ServletContextEvent event) {

@@ -118,9 +118,9 @@ public class SchedulingServiceBean implements SchedulingService {
 		}
 
 		// notify harvester
-		for (TrustPointEntity trustPoint : trustDomainDAO
+		for (TrustPointEntity trustPoint : this.trustDomainDAO
 				.listTrustPoints(trustDomain)) {
-			for (CertificateAuthorityEntity certificateAuthority : trustDomainDAO
+			for (CertificateAuthorityEntity certificateAuthority : this.trustDomainDAO
 					.listCertificateAuthorities(trustPoint)) {
 				try {
 					notifyHarvester(certificateAuthority.getName());
@@ -160,7 +160,7 @@ public class SchedulingServiceBean implements SchedulingService {
 		}
 
 		// notify harvester
-		for (CertificateAuthorityEntity certificateAuthority : trustDomainDAO
+		for (CertificateAuthorityEntity certificateAuthority : this.trustDomainDAO
 				.listCertificateAuthorities(trustPoint)) {
 			try {
 				notifyHarvester(certificateAuthority.getName());

@@ -36,5 +36,4 @@ public abstract class TrustServiceConstants {
 	public static final String BELGIAN_EID_ROOT_CA2_TRUST_POINT = "Belgian eID Root CA2";
 
 	public static final String DEFAULT_CRON = "0 0/10 * * * ?";
-	// public static final String DEFAULT_CRON = "0 0 0/3 * * ?";
 }

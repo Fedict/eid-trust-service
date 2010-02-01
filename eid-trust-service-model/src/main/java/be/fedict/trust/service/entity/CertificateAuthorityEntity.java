@@ -145,7 +145,7 @@ public class CertificateAuthorityEntity implements Serializable {
 	@ManyToOne(optional = true)
 	public TrustPointEntity getTrustPoint() {
 
-		return trustPoint;
+		return this.trustPoint;
 	}
 
 	public void setTrustPoint(TrustPointEntity trustPoint) {

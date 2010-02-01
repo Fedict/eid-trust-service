@@ -55,7 +55,7 @@ public class TrustPointTreeBean {
 	@Destroy
 	public void destroyCallback() {
 
-		log.debug("#destroy");
+		this.log.debug("#destroy");
 	}
 
 	/**
@@ -69,14 +69,14 @@ public class TrustPointTreeBean {
 				.getRowKey());
 		TrustPointEntity selectedTrustPoint = (TrustPointEntity) currentNode
 				.getData();
-		log.debug("view: " + selectedTrustPoint.getName());
+		this.log.debug("view: " + selectedTrustPoint.getName());
 		FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
 				.put("selectedTrustPoint", selectedTrustPoint);
 		try {
 			FacesContext.getCurrentInstance().getExternalContext().redirect(
 					"trust-point.seam");
 		} catch (IOException e) {
-			log.error("IO Exception: " + e.getMessage(), e);
+			this.log.error("IO Exception: " + e.getMessage(), e);
 			return;
 		}
 	}

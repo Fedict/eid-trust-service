@@ -68,7 +68,7 @@ public class TrustDomainEntity implements Serializable {
 
 	public String getCrlRefreshCron() {
 
-		return crlRefreshCron;
+		return this.crlRefreshCron;
 	}
 
 	public void setCrlRefreshCron(String crlRefreshCron) {
@@ -79,7 +79,7 @@ public class TrustDomainEntity implements Serializable {
 	@Lob
 	public TimerHandle getTimerHandle() {
 
-		return timerHandle;
+		return this.timerHandle;
 	}
 
 	public void setTimerHandle(TimerHandle timerHandle) {
@@ -89,7 +89,7 @@ public class TrustDomainEntity implements Serializable {
 
 	public Date getFireDate() {
 
-		return fireDate;
+		return this.fireDate;
 	}
 
 	public void setFireDate(Date fireDate) {

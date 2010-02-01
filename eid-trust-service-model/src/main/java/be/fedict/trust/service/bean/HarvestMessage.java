@@ -56,15 +56,15 @@ public class HarvestMessage implements Serializable {
 
 	public HarvestMessage(Message message) throws JMSException {
 
-		caName = message.getStringProperty("caName");
-		update = message.getBooleanProperty("update");
+		this.caName = message.getStringProperty("caName");
+		this.update = message.getBooleanProperty("update");
 	}
 
 	public Message getJMSMessage(Session session) throws JMSException {
 
 		Message message = session.createMessage();
-		message.setStringProperty("caName", caName);
-		message.setBooleanProperty("update", update);
+		message.setStringProperty("caName", this.caName);
+		message.setBooleanProperty("update", this.update);
 		return message;
 	}
 

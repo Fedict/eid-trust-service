@@ -81,13 +81,13 @@ public class JAASLoginFilter implements Filter {
 
 	public void init(FilterConfig config) {
 
-		loginContextName = getInitParameter(config, LOGIN_CONTEXT_PARAM,
+		this.loginContextName = getInitParameter(config, LOGIN_CONTEXT_PARAM,
 				DEFAULT_LOGIN_CONTEXT);
-		LOG.debug("JAAS login context: " + loginContextName);
-		loginPath = getInitParameter(config, LOGIN_PATH_PARAM, null);
-		LOG.debug("LoginPath: " + loginPath);
-		mainPath = getInitParameter(config, MAIN_PATH_PARAM, null);
-		LOG.debug("MainPath: " + mainPath);
+		LOG.debug("JAAS login context: " + this.loginContextName);
+		this.loginPath = getInitParameter(config, LOGIN_PATH_PARAM, null);
+		LOG.debug("LoginPath: " + this.loginPath);
+		this.mainPath = getInitParameter(config, MAIN_PATH_PARAM, null);
+		LOG.debug("MainPath: " + this.mainPath);
 	}
 
 	private String getInitParameter(FilterConfig config, String param,
@@ -134,17 +134,17 @@ public class JAASLoginFilter implements Filter {
 			LOG.debug("not authenticated yet");
 			String requestPath = request.getContextPath()
 					+ request.getServletPath();
-			if (null != mainPath && !loginPath.equals(requestPath)
-					&& !mainPath.equals(requestPath)) {
-				LOG.debug("redirect to " + mainPath + ", requestPath: "
+			if (null != this.mainPath && !this.loginPath.equals(requestPath)
+					&& !this.mainPath.equals(requestPath)) {
+				LOG.debug("redirect to " + this.mainPath + ", requestPath: "
 						+ requestPath);
-				response.sendRedirect(mainPath);
+				response.sendRedirect(this.mainPath);
 				return false;
 			}
 			return true;
 		}
 
-		login(request, loginContextName);
+		login(request, this.loginContextName);
 		return true;
 	}
 

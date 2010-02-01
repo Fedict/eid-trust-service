@@ -76,7 +76,7 @@ public class TrustDomainBean implements TrustDomain {
 	@Destroy
 	public void destroyCallback() {
 
-		log.debug("#destroy");
+		this.log.debug("#destroy");
 	}
 
 	/**
@@ -85,8 +85,8 @@ public class TrustDomainBean implements TrustDomain {
 	@Factory(TRUST_DOMAIN_LIST_NAME)
 	public void trustDomainListFactory() {
 
-		log.debug("trust domain list factory");
-		trustDomainList = trustDomainService.listTrustDomains();
+		this.log.debug("trust domain list factory");
+		this.trustDomainList = this.trustDomainService.listTrustDomains();
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class TrustDomainBean implements TrustDomain {
 	 */
 	public String modify() {
 
-		log.debug("modify: " + selectedTrustDomain.getName());
+		this.log.debug("modify: " + this.selectedTrustDomain.getName());
 		return "success";
 	}
 
@@ -103,11 +103,11 @@ public class TrustDomainBean implements TrustDomain {
 	 */
 	public String save() {
 
-		log.debug("save: " + selectedTrustDomain.getName());
+		this.log.debug("save: " + this.selectedTrustDomain.getName());
 		try {
-			trustDomainService.save(selectedTrustDomain);
+			this.trustDomainService.save(selectedTrustDomain);
 		} catch (InvalidCronExpressionException e) {
-			facesMessages.addToControlFromResourceBundle("cron",
+			this.facesMessages.addToControlFromResourceBundle("cron",
 					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
 			return null;
 		}
@@ -119,7 +119,7 @@ public class TrustDomainBean implements TrustDomain {
 	 */
 	public String cancel() {
 
-		log.debug("cancel: " + selectedTrustDomain.getName());
+		this.log.debug("cancel: " + this.selectedTrustDomain.getName());
 		return "cancel";
 	}
 

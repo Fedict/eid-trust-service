@@ -68,28 +68,28 @@ public class TrustPointBean implements TrustPoint {
 	@Destroy
 	public void destroyCallback() {
 
-		log.debug("#destroy");
+		this.log.debug("#destroy");
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public TreeNode<TrustPointEntity> getTreeNode() {
-		if (rootNode == null) {
+		if (this.rootNode == null) {
 			loadTree();
 		}
-		return rootNode;
+		return this.rootNode;
 	}
 
 	private void loadTree() {
-		rootNode = new TreeNodeImpl<TrustPointEntity>();
-		addNodes(null, rootNode);
+		this.rootNode = new TreeNodeImpl<TrustPointEntity>();
+		addNodes(null, this.rootNode);
 	}
 
 	private void addNodes(String path, TreeNode<TrustPointEntity> node) {
 
-		List<TrustPointEntity> trustPoints = trustDomainService
-				.listTrustPoints(selectedTrustDomain);
+		List<TrustPointEntity> trustPoints = this.trustDomainService
+				.listTrustPoints(this.selectedTrustDomain);
 
 		for (TrustPointEntity trustPoint : trustPoints) {
 			TreeNodeImpl<TrustPointEntity> nodeImpl = new TreeNodeImpl<TrustPointEntity>();
@@ -98,59 +98,4 @@ public class TrustPointBean implements TrustPoint {
 		}
 	}
 
-	// /**
-	// * {@inheritDoc}
-	// */
-	// @SuppressWarnings("unchecked")
-	// public TreeModel getTreeModel() {
-	//
-	// log.debug("get tree model for domain: " + selectedTrustDomain);
-	// String domainName = selectedTrustDomain.getName();
-	// List<TrustPointEntity> trustPoints = trustDomainService
-	// .listTrustPoints(selectedTrustDomain);
-	// TreeNode rootNode = new TreeNodeBase(ROOT_NODE_TYPE, domainName, false);
-	// TreeModel treeModel = new TreeModelBase(rootNode);
-	//
-	// HashMap<String, TreeNode> nodes = new HashMap<String, TreeNode>();
-	//
-	// for (TrustPointEntity trustPoint : trustPoints) {
-	// String nodeDescription = trustPoint.getCertificateAuthority()
-	// .getCertificate().getSubjectX500Principal().toString();
-	// log.debug("adding node: " + nodeDescription);
-	// TreeNode newNode = new TrustPointTreeNode(DEFAULT_NODE_TYPE,
-	// nodeDescription, true, trustPoint);
-	// TreeNode parentNode = nodes.get(trustPoint
-	// .getCertificateAuthority().getCertificate()
-	// .getIssuerX500Principal().toString());
-	// if (null != parentNode) {
-	// log.debug("to parent node: " + parentNode.getDescription());
-	// parentNode.getChildren().add(newNode);
-	// parentNode.setLeaf(false);
-	// } else {
-	// log.debug("to root node: " + rootNode.getDescription());
-	// rootNode.getChildren().add(newNode);
-	// rootNode.setLeaf(false);
-	// }
-	// // be careful for self-signed certs here
-	// nodes.put(nodeDescription, newNode);
-	// }
-	// return treeModel;
-	// }
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String view() {
-
-		log.debug("view");
-		// TrustPointTreeNode selectedNode = (TrustPointTreeNode) FacesContext
-		// .getCurrentInstance().getExternalContext().getRequestMap().get(
-		// "node");
-		// TrustPointEntity selectedTrustPoint = selectedNode.getTrustPoint();
-		// log.debug("view: " + selectedTrustPoint);
-		// FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
-		// .put("selectedTrustPoint", selectedTrustPoint);
-		// return "view";
-		return "view";
-	}
 }
