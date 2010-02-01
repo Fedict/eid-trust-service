@@ -98,28 +98,16 @@ public class AdminEntity implements Serializable {
 			KeyFactory factory;
 			PublicKey retKey = null;
 
-			// first try the DSA alg
 			try {
-				factory = KeyFactory.getInstance("DSA");
+				factory = KeyFactory.getInstance("RSA");
 				retKey = factory.generatePublic(pubSpec);
 				isSupportedKey = true;
 			} catch (InvalidKeySpecException e) {
 			}
 
-			// if DSA didnt work, then try RSA
+			// if not RSA
 			if (!isSupportedKey) {
-				try {
-					factory = KeyFactory.getInstance("RSA");
-					retKey = factory.generatePublic(pubSpec);
-					isSupportedKey = true;
-				} catch (InvalidKeySpecException e) {
-				}
-			}
-
-			// if not DSA or RSA
-			if (!isSupportedKey) {
-				throw new RuntimeException(
-						"Unsupported key spec: Not RSA or DSA");
+				throw new RuntimeException("Unsupported key spec: Not RSA");
 			}
 
 			return retKey;
