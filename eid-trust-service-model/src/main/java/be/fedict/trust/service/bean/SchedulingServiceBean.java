@@ -85,7 +85,8 @@ public class SchedulingServiceBean implements SchedulingService {
 
 		TimerInfo timerInfo = (TimerInfo) timer.getInfo();
 		if (null == timerInfo) {
-			LOG.error("no timer info ??");
+			LOG.error("no timer info ?? cancel timer");
+			timer.cancel();
 			return;
 		}
 

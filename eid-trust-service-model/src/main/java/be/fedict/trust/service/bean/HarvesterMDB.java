@@ -32,6 +32,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.ActivationConfigProperty;
+import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -49,6 +50,7 @@ import org.bouncycastle.asn1.DEROctetString;
 
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.crl.OnlineCrlRepository;
+import be.fedict.trust.service.dao.NetworkConfigDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.Status;
@@ -62,6 +64,9 @@ public class HarvesterMDB implements MessageListener {
 	private static final Log LOG = LogFactory.getLog(HarvesterMDB.class);
 
 	public static final String HARVESTER_QUEUE_NAME = "queue/trust/harvester";
+
+	@EJB
+	private NetworkConfigDAO networkConfigDAO;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -105,7 +110,7 @@ public class HarvesterMDB implements MessageListener {
 		}
 
 		OnlineCrlRepository onlineCrlRepository = new OnlineCrlRepository(
-				TrustServiceBean.NETWORK_CONFIG);
+				this.networkConfigDAO.getNetworkConfig());
 		URI crlUri;
 		try {
 			crlUri = new URI(crlUrl);

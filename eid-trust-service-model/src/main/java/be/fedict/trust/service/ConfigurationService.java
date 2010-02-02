@@ -18,24 +18,30 @@
 
 package be.fedict.trust.service;
 
+import javax.ejb.Local;
+
+import be.fedict.trust.service.entity.NetworkConfigEntity;
+
 /**
- * Some general constants.
+ * Configuration service.
  * 
  * @author wvdhaute
  * 
  */
-public abstract class TrustServiceConstants {
+@Local
+public interface ConfigurationService {
 
-	public static final String JNDI_CONTEXT = "TrustService";
+	/**
+	 * Returns the {@link NetworkConfigEntity}.
+	 */
+	NetworkConfigEntity getNetworkConfig();
 
-	public static final String ADMIN_SECURITY_DOMAIN = "trust-service-admin";
-	public static final String ADMIN_ROLE = "admin";
-
-	public static final String NETWORK_CONFIG = "network-config";
-
-	public static final String BELGIAN_EID_TRUST_DOMAIN = "belgian.eid";
-	public static final String BELGIAN_EID_ROOT_CA_TRUST_POINT = "Belgian eID Root CA";
-	public static final String BELGIAN_EID_ROOT_CA2_TRUST_POINT = "Belgian eID Root CA2";
-
-	public static final String DEFAULT_CRON = "0 0/10 * * * ?";
+	/**
+	 * Save the {@link NetworkConfigEntity}.
+	 * 
+	 * @param proxyHost
+	 * @param proxyPort
+	 * @param enabled
+	 */
+	void saveNetworkConfig(String proxyHost, int proxyPort, boolean enabled);
 }

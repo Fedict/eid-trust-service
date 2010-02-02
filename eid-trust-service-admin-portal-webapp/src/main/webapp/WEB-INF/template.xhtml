@@ -43,6 +43,20 @@
 							</c:otherwise>
 						</c:choose>
 						<c:choose>
+							<c:when test="#{activeMenu == 'config'}">
+								<li class="selected">
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{msgs.configuration}</a>
+								</li>
+							</c:when>
+							<c:otherwise>
+								<li>
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{msgs.configuration}</a>
+								</li>
+							</c:otherwise>
+						</c:choose>
+						<c:choose>
 							<c:when test="#{activeMenu == 'admin'}">
 								<li class="selected">
 									<a

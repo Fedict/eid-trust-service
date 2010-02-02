@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core">
+	<body>
+		<ui:composition template="/WEB-INF/template.xhtml">
+			<ui:param name="activeMenu" value="config" />
+			<ui:define name="body">
+				<h2>#{msgs.configuration}</h2>
+
+				<h:form id="network_form">
+					<h:panelGrid id="panel" columns="2" border="1">
+						<f:facet name="header">
+							<h:outputText value="#{msgs.networkConfig}" />
+						</f:facet>
+						<h:outputLabel for="host" value="#{msgs.proxyHost}" />
+						<h:inputText id="host" value="#{config.proxyHost}"
+							required="true" />
+						<h:outputLabel for="port" value="#{msgs.proxyPort}" />
+						<h:inputText id="port" value="#{config.proxyPort}"
+							required="true">
+						</h:inputText>
+						<h:outputLabel for="enabled" value="#{msgs.enabled}" />
+						<h:selectBooleanCheckbox value="#{config.enabled}" />
+						<f:facet name="footer">
+							<h:panelGroup style="display:block; text-align:center">
+								<h:commandButton id="submit" value="#{msgs.save}"
+									action="#{config.saveNetworkConfig}" />
+							</h:panelGroup>
+						</f:facet>
+					</h:panelGrid>
+				</h:form>
+
+				<h:messages styleClass="error" globalOnly="true" />
+
+			</ui:define>
+		</ui:composition>
+	</body>
+</html>

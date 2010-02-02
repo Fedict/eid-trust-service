@@ -22,7 +22,6 @@ import java.security.cert.CertPathValidatorException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
@@ -39,11 +38,11 @@ import org.apache.commons.logging.LogFactory;
 
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.MemoryCertificateRepository;
-import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.TrustLinker;
 import be.fedict.trust.TrustValidator;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.NetworkConfigDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
@@ -59,12 +58,8 @@ public class TrustServiceBean implements TrustService {
 
 	private static final Log LOG = LogFactory.getLog(TrustServiceBean.class);
 
-	// TODO: runtime network config via admin configuration console
-	// public static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
-	// "proxy.yourict.net", 8080);
-	public static final NetworkConfig NETWORK_CONFIG = null;
-
-	private TrustValidator trustValidator;
+	@EJB
+	private NetworkConfigDAO networkConfigDAO;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -78,9 +73,8 @@ public class TrustServiceBean implements TrustService {
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
 
-	@PostConstruct
-	public void postConstructCallback() {
-		LOG.debug("post construct");
+	private TrustValidator getTrustValidator() {
+
 		TrustLinker trustLinker = new TrustServiceTrustLinker(
 				this.entityManager, this.queueConnectionFactory, this.queue);
 
@@ -103,9 +97,9 @@ public class TrustServiceBean implements TrustService {
 					.getCertificateAuthority().getCertificate());
 		}
 
-		this.trustValidator = BelgianTrustValidatorFactory
-				.createTrustValidator(NETWORK_CONFIG, trustLinker,
-						certificateRepository);
+		return BelgianTrustValidatorFactory.createTrustValidator(
+				networkConfigDAO.getNetworkConfig(), trustLinker,
+				certificateRepository);
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -113,8 +107,9 @@ public class TrustServiceBean implements TrustService {
 		LOG.debug("isValid: "
 				+ authenticationCertificateChain.get(0)
 						.getSubjectX500Principal());
+
 		try {
-			this.trustValidator.isTrusted(authenticationCertificateChain);
+			getTrustValidator().isTrusted(authenticationCertificateChain);
 		} catch (CertPathValidatorException e) {
 			LOG.debug("certificate path validation error: " + e.getMessage());
 			return false;

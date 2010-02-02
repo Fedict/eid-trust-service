@@ -35,6 +35,7 @@ import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.InitializationService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.NetworkConfigDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -54,6 +55,9 @@ public class InitializationServiceBean implements InitializationService {
 			.getLog(InitializationServiceBean.class);
 
 	@EJB
+	private NetworkConfigDAO networkConfigDAO;
+
+	@EJB
 	private TrustDomainDAO trustDomainDAO;
 
 	@EJB
@@ -62,6 +66,10 @@ public class InitializationServiceBean implements InitializationService {
 	public void initialize() {
 
 		LOG.debug("initialize");
+
+		// Default network config
+		networkConfigDAO.setNetworkConfig(null, 0);
+		networkConfigDAO.setEnabled(false);
 
 		// Belgian eID trust domain
 		TrustDomainEntity beidTrustDomain = this.trustDomainDAO
@@ -74,7 +82,7 @@ public class InitializationServiceBean implements InitializationService {
 			this.trustDomainDAO.setDefaultTrustDomain(beidTrustDomain);
 		}
 
-		// add Root CA trust points
+		// Belgian eID Root CA trust points
 		X509Certificate rootCaCertificate = loadCertificate("be/fedict/trust/belgiumrca.crt");
 		CertificateAuthorityEntity rootCa = this.trustDomainDAO
 				.addCertificateAuthority(getCrlUrl(rootCaCertificate),
@@ -103,7 +111,7 @@ public class InitializationServiceBean implements InitializationService {
 		}
 		rootCa2.setTrustPoint(rootCa2TrustPoint);
 
-		// Start default scheduling timer
+		// Belgian eID trust domain timer
 		LOG.debug("start timer for domain " + beidTrustDomain.getName());
 		try {
 			this.schedulingService.startTimer(beidTrustDomain, false);

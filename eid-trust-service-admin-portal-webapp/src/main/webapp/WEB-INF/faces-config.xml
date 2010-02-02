@@ -16,6 +16,17 @@
 		<view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
 	</application>
 
+	<!-- Configuration page navigation rules -->
+	<navigation-rule>
+		<from-view-id>/configuration.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/configuration.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+	<!-- END Administrator pages navigation rules -->
+
 	<!-- Administrator pages navigation rules -->
 	<navigation-rule>
 		<from-view-id>/admin.xhtml</from-view-id>
