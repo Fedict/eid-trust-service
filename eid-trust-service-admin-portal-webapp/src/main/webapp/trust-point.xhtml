@@ -9,6 +9,26 @@
 
 				<h2>#{msgs.trustPoint} : #{selectedTrustPoint.name}</h2>
 
+				<h:form>
+
+					<h:outputLabel for="cron" value="#{msgs.crlRefresh}" />
+					&nbsp;
+					<h:inputText id="cron" value="#{selectedTrustPoint.crlRefreshCron}"
+						required="true" styleClass="label" />
+
+					<h:outputLabel for="save" value="" />
+					<h:commandButton action="#{trustPoint.save}" id="save"
+						value="#{msgs.save}" styleClass="submit" />
+					<h:commandButton action="#{trustPoint.cancel}" id="cancel"
+						value="#{msgs.cancel}" immediate="true" styleClass="submit" />
+
+					<br />
+
+					<h:commandButton action="#{trustPoint.remove}" id="remove"
+						value="#{msgs.remove}" styleClass="submit" />
+					<h:commandButton action="back" id="back" value="#{msgs.back}"
+						immediate="true" styleClass="submit" />
+				</h:form>
 			</ui:define>
 		</ui:composition>
 	</body>

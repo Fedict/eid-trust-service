@@ -96,7 +96,7 @@ public class TrustServiceBean implements TrustService {
 		}
 
 		this.trustValidator = BelgianTrustValidatorFactory
-				.createTrustValidatorWithRepo(NETWORK_CONFIG, trustLinker,
+				.createTrustValidator(NETWORK_CONFIG, trustLinker,
 						certificateRepository);
 	}
 
