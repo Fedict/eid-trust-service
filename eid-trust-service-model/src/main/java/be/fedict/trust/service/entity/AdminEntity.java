@@ -30,14 +30,19 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
 @Table(name = "admin")
+@NamedQueries( { @NamedQuery(name = AdminEntity.QUERY_LIST_ALL, query = "FROM AdminEntity") })
 public class AdminEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	public static final String QUERY_LIST_ALL = "admin.all";
 
 	private String id;
 	private String name;

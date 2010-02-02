@@ -26,6 +26,7 @@ import javax.ejb.Local;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 /**
  * Trust Domain DAO.
@@ -50,12 +51,35 @@ public interface TrustDomainDAO {
 	TrustDomainEntity findTrustDomain(String name);
 
 	/**
+	 * Returns {@link TrustDomainEntity} from specified name. Throws
+	 * {@link TrustDomainNotFoundException} if not found.
+	 * 
+	 * @param name
+	 * 
+	 * @throws TrustDomainNotFoundException
+	 */
+	TrustDomainEntity getTrustDomain(String name)
+			throws TrustDomainNotFoundException;
+
+	/**
 	 * Create a new {@link TrustDomainEntity}.
 	 * 
 	 * @param name
 	 * @param crlRefreshCron
 	 */
 	TrustDomainEntity addTrustDomain(String name, String crlRefreshCron);
+
+	/**
+	 * Sets the {@link TrustDomainEntity} as default.
+	 * 
+	 * @param trustDomain
+	 */
+	void setDefaultTrustDomain(TrustDomainEntity trustDomain);
+
+	/**
+	 * Returns the default {@link TrustDomainEntity}.
+	 */
+	TrustDomainEntity getDefaultTrustDomain();
 
 	/**
 	 * Create a new {@link CertificateAuthorityEntity}.
@@ -95,6 +119,16 @@ public interface TrustDomainDAO {
 	List<TrustPointEntity> listTrustPoints(TrustDomainEntity trustDomain);
 
 	/**
+	 * Returns list of {@link TrustPointEntity}'s attached to the specified
+	 * {@link TrustDomainEntity} specified by trust domain name.
+	 * 
+	 * @param trustDomainName
+	 * @throws TrustDomainNotFoundException
+	 */
+	List<TrustPointEntity> listTrustPoints(String trustDomainName)
+			throws TrustDomainNotFoundException;
+
+	/**
 	 * Returns list of {@link CertificateAuthorityEntity}'s for the specified
 	 * {@link TrustPointEntity}.
 	 * 
@@ -102,4 +136,19 @@ public interface TrustDomainDAO {
 	 */
 	List<CertificateAuthorityEntity> listCertificateAuthorities(
 			TrustPointEntity trustPoint);
+
+	/**
+	 * Remove {@link CertificateAuthorityEntity}'s related to the specified
+	 * {@link TrustPointEntity}.
+	 * 
+	 * @param trustPoint
+	 */
+	void removeCertificateAuthorities(TrustPointEntity trustPoint);
+
+	/**
+	 * Removes the selected {@link TrustPointEntity}.
+	 * 
+	 * @param trustPoint
+	 */
+	void removeTrustPoint(TrustPointEntity trustPoint);
 }

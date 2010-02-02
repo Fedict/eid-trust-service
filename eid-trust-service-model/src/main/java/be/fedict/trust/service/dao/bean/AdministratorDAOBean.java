@@ -57,7 +57,8 @@ public class AdministratorDAOBean implements AdministratorDAO {
 	public List<AdminEntity> listAdmins() {
 
 		LOG.debug("list admins");
-		Query query = this.entityManager.createQuery("FROM AdminEntity");
+		Query query = this.entityManager
+				.createNamedQuery(AdminEntity.QUERY_LIST_ALL);
 		return (List<AdminEntity>) query.getResultList();
 	}
 

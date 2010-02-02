@@ -35,6 +35,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -42,9 +44,17 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "certificate_authorities")
+@NamedQueries( {
+		@NamedQuery(name = CertificateAuthorityEntity.QUERY_WHERE_TRUST_POINT, query = "SELECT ca FROM CertificateAuthorityEntity AS ca "
+				+ "WHERE ca.trustPoint = :trustPoint"),
+		@NamedQuery(name = CertificateAuthorityEntity.DELETE_WHERE_TRUST_POINT, query = "DELETE FROM CertificateAuthorityEntity AS ca "
+				+ "WHERE ca.trustPoint = :trustPoint") })
 public class CertificateAuthorityEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	public static final String QUERY_WHERE_TRUST_POINT = "ca.q.w.tp";
+	public static final String DELETE_WHERE_TRUST_POINT = "ca.d.w.tp";
 
 	private String name;
 

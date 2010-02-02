@@ -10,16 +10,15 @@
 
 				<h:form id="form">
 
-					<h:outputLabel for="cron" value="#{msgs.crlRefresh}" />
-					&nbsp;
-					<h:inputText id="cron" value="#{selectedTrustDomain.crlRefreshCron}"
-						required="true" styleClass="label" />
+					<h:panelGrid id="panel" columns="3" border="0">
+						<h:outputLabel for="cron" value="#{msgs.crlRefresh}" />
+						<h:inputText id="cron"
+							value="#{selectedTrustDomain.crlRefreshCron}" required="true" />
+						<h:commandButton action="#{trustDomain.save}" id="save"
+							value="#{msgs.save}" styleClass="submit" />
+					</h:panelGrid>
 
-					<h:outputLabel for="save" value="" />
-					<h:commandButton action="#{trustDomain.save}" id="save"
-						value="#{msgs.save}" styleClass="submit" />
-					<h:commandButton action="#{trustDomain.cancel}" id="cancel"
-						value="#{msgs.cancel}" immediate="true" styleClass="submit" />
+					<h2>#{msgs.trustPoints}</h2>
 
 					<rich:tree style="width:300px" value="#{trustPoint.treeNode}"
 						switchType="client" var="item" reRender="selectedNode"
@@ -28,6 +27,11 @@
 							<h:outputText value="#{item.name}" />
 						</rich:treeNode>
 					</rich:tree>
+
+					<br />
+
+					<h:commandButton action="back" id="back" value="#{msgs.back}"
+						immediate="true" styleClass="submit" />
 
 				</h:form>
 

@@ -71,6 +71,7 @@ public class InitializationServiceBean implements InitializationService {
 			beidTrustDomain = this.trustDomainDAO.addTrustDomain(
 					TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN,
 					TrustServiceConstants.DEFAULT_CRON);
+			this.trustDomainDAO.setDefaultTrustDomain(beidTrustDomain);
 		}
 
 		// add Root CA trust points
@@ -105,7 +106,7 @@ public class InitializationServiceBean implements InitializationService {
 		// Start default scheduling timer
 		LOG.debug("start timer for domain " + beidTrustDomain.getName());
 		try {
-			this.schedulingService.startTimer(beidTrustDomain);
+			this.schedulingService.startTimer(beidTrustDomain, false);
 		} catch (InvalidCronExpressionException e) {
 			LOG.error("Failed to start timer for domain: "
 					+ beidTrustDomain.getName(), e);

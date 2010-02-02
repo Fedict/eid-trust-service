@@ -20,6 +20,13 @@ package be.fedict.trust.service;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
+
 /**
  * Contains information for the {@link SchedulingService} as to for who the
  * timeout is.
@@ -39,9 +46,14 @@ public class TimerInfo implements Serializable {
 
 	private final String name;
 
-	public TimerInfo(Type type, String name) {
-		this.type = type;
-		this.name = name;
+	public TimerInfo(TrustPointEntity trustPoint) {
+		this.type = Type.TRUST_POINT;
+		this.name = trustPoint.getName();
+	}
+
+	public TimerInfo(TrustDomainEntity trustDomain) {
+		this.type = Type.TRUST_DOMAIN;
+		this.name = trustDomain.getName();
 	}
 
 	public Type getType() {
@@ -52,5 +64,37 @@ public class TimerInfo implements Serializable {
 	public String getName() {
 
 		return this.name;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+
+		if (this == obj) {
+			return true;
+		}
+		if (null == obj) {
+			return false;
+		}
+		if (false == obj instanceof TimerInfo) {
+			return false;
+		}
+		TimerInfo rhs = (TimerInfo) obj;
+		return new EqualsBuilder().append(this.type, rhs.type).append(
+				this.name, rhs.name).isEquals();
+
+	}
+
+	@Override
+	public int hashCode() {
+
+		return new HashCodeBuilder().append(this.type).append(this.name)
+				.toHashCode();
+	}
+
+	@Override
+	public String toString() {
+
+		return new ToStringBuilder(this).append("type", this.type).append(
+				"name", this.name).toString();
 	}
 }

@@ -9,17 +9,25 @@
 				<h2>#{msgs.manageTrustDomains}</h2>
 
 				<h:form id="form">
-					<rich:dataTable id="data" var="item"
-						value="#{trustDomainList}" rows="10"
-						rowClasses="listingTable_Row1,listingTable_Row2">
+					<rich:dataTable id="data" var="item" value="#{trustDomainList}"
+						rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
 
 						<h:column>
 							<f:facet name="header">#{msgs.trustDomain}</f:facet>
 							<h:outputText value="#{item.name}" />
 						</h:column>
 						<h:column>
-							<f:facet name="header">#{msgs.trustDomainCrlCron}</f:facet>
+							<f:facet name="header">#{msgs.crlRefresh}</f:facet>
 							<h:outputText value="#{item.crlRefreshCron}" />
+						</h:column>
+						<h:column>
+							<f:facet name="header">#{msgs.default}</f:facet>
+							<h:selectBooleanCheckbox disabled="true"
+								value="#{item.defaultDomain}" />
+						</h:column>
+						<h:column>
+							<h:commandButton id="setDefault" value="#{msgs.setDefault}"
+								action="#{trustDomain.setDefault}" />
 						</h:column>
 						<h:column>
 							<f:facet name="header">#{msgs.modify}</f:facet>

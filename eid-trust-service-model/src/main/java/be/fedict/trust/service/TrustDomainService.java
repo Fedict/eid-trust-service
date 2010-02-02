@@ -21,7 +21,9 @@ package be.fedict.trust.service;
 import java.util.List;
 
 import javax.ejb.Local;
+import javax.ejb.Timer;
 
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
@@ -57,4 +59,29 @@ public interface TrustDomainService {
 	 */
 	void save(TrustDomainEntity trustDomain)
 			throws InvalidCronExpressionException;
+
+	/**
+	 * Save the changes to the specified {@link TrustPointEntity}
+	 * 
+	 * @param trustPoint
+	 * 
+	 * @throws InvalidCronExpressionException
+	 */
+	void save(TrustPointEntity trustPoint)
+			throws InvalidCronExpressionException;
+
+	/**
+	 * Sets the specified {@link TrustDomainEntity} as default.
+	 * 
+	 * @param trustDomain
+	 */
+	void setDefault(TrustDomainEntity trustDomain);
+
+	/**
+	 * Removes the selected {@link TrustPointEntity} and all related
+	 * {@link CertificateAuthorityEntity}'s. Removes existing {@link Timer}'s.
+	 * 
+	 * @param trustPoint
+	 */
+	void remove(TrustPointEntity trustPoint);
 }

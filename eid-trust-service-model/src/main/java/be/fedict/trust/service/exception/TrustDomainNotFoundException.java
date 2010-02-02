@@ -16,29 +16,13 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.admin.portal;
+package be.fedict.trust.service.exception;
 
-import javax.ejb.Local;
+import javax.ejb.ApplicationException;
 
-@Local
-public interface TrustDomain {
+@ApplicationException(rollback = true)
+public class TrustDomainNotFoundException extends Exception {
 
-	/*
-	 * Factory
-	 */
-	void trustDomainListFactory();
+	private static final long serialVersionUID = 1L;
 
-	/*
-	 * Lifecycle.
-	 */
-	void destroyCallback();
-
-	/*
-	 * Actions
-	 */
-	String modify();
-
-	String save();
-
-	String setDefault();
 }

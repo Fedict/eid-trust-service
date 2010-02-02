@@ -25,15 +25,26 @@ import javax.ejb.TimerHandle;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "trust_domain")
+@NamedQueries( {
+		@NamedQuery(name = TrustDomainEntity.QUERY_LIST_ALL, query = "FROM TrustDomainEntity"),
+		@NamedQuery(name = TrustDomainEntity.QUERY_GET_DEFAULT, query = "SELECT td FROM TrustDomainEntity AS td "
+				+ "WHERE td.defaultDomain = true") })
 public class TrustDomainEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String QUERY_LIST_ALL = "td.list.all";
+	public static final String QUERY_GET_DEFAULT = "td.get.default";
+
 	private String name;
+
+	private boolean defaultDomain = false;
 
 	private String crlRefreshCron;
 	private TimerHandle timerHandle;
@@ -74,6 +85,16 @@ public class TrustDomainEntity implements Serializable {
 	public void setCrlRefreshCron(String crlRefreshCron) {
 
 		this.crlRefreshCron = crlRefreshCron;
+	}
+
+	public boolean isDefaultDomain() {
+
+		return this.defaultDomain;
+	}
+
+	public void setDefaultDomain(boolean defaultDomain) {
+
+		this.defaultDomain = defaultDomain;
 	}
 
 	@Lob

@@ -15,21 +15,23 @@
 		</locale-config>
 		<view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
 	</application>
+	
+	<!--  Trust domain / points navigation rules -->
 	<navigation-rule>
 		<from-view-id>/trust-domain.xhtml</from-view-id>
 		<navigation-case>
-			<from-outcome>success</from-outcome>
+			<from-outcome>modify</from-outcome>
 			<to-view-id>/trust-domain-edit.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/trust-domain.seam</to-view-id>
 			<redirect />
 		</navigation-case>
 	</navigation-rule>
 	<navigation-rule>
 		<from-view-id>/trust-domain-edit.xhtml</from-view-id>
-		<navigation-case>
-			<from-outcome>cancel</from-outcome>
-			<to-view-id>/trust-domain.seam</to-view-id>
-			<redirect />
-		</navigation-case>
 		<navigation-case>
 			<from-outcome>success</from-outcome>
 			<to-view-id>/trust-domain.seam</to-view-id>
@@ -40,5 +42,25 @@
 			<to-view-id>/trust-point.seam</to-view-id>
 			<redirect />
 		</navigation-case>
+		<navigation-case>
+			<from-outcome>back</from-outcome>
+			<to-view-id>/trust-domain.seam</to-view-id>
+			<redirect />
+		</navigation-case>
 	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>/trust-point.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>back</from-outcome>
+			<to-view-id>/trust-domain-edit.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/trust-domain-edit.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+	
+	<!--  END Trust domain / points navigation rules -->
 </faces-config>

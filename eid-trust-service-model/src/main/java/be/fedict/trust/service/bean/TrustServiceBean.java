@@ -25,6 +25,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.EJBException;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -44,8 +45,8 @@ import be.fedict.trust.TrustValidator;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.TrustDomainDAO;
-import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 /**
  * Trust Service Bean implementation.
@@ -84,10 +85,17 @@ public class TrustServiceBean implements TrustService {
 				this.entityManager, this.queueConnectionFactory, this.queue);
 
 		// Get Belgian eID trust points
-		TrustDomainEntity trustDomain = this.trustDomainDAO
-				.findTrustDomain(TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
-		List<TrustPointEntity> trustPoints = this.trustDomainDAO
-				.listTrustPoints(trustDomain);
+		List<TrustPointEntity> trustPoints;
+		try {
+			trustPoints = this.trustDomainDAO
+					.listTrustPoints(TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
+		} catch (TrustDomainNotFoundException e) {
+			LOG.error("Trust domain "
+					+ TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN
+					+ " not found");
+			// XXX: audit?
+			throw new EJBException(e);
+		}
 
 		MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
 		for (TrustPointEntity trustPoint : trustPoints) {

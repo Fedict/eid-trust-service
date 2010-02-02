@@ -26,13 +26,23 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Entity
 @Table(name = "trust_point")
+@NamedQueries( { @NamedQuery(name = TrustPointEntity.QUERY_WHERE_TRUST_DOMAIN, query = "SELECT tp FROM TrustPointEntity AS tp "
+		+ "WHERE tp.trustDomain = :trustDomain") })
 public class TrustPointEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	public static final String QUERY_WHERE_TRUST_DOMAIN = "tp.q.w.td";
 
 	private String name;
 
@@ -128,6 +138,37 @@ public class TrustPointEntity implements Serializable {
 	public void setFireDate(Date fireDate) {
 
 		this.fireDate = fireDate;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+
+		if (this == obj) {
+			return true;
+		}
+		if (null == obj) {
+			return false;
+		}
+		if (false == obj instanceof TrustPointEntity) {
+			return false;
+		}
+		TrustPointEntity rhs = (TrustPointEntity) obj;
+		return new EqualsBuilder().append(this.name, rhs.name).isEquals();
+
+	}
+
+	@Override
+	public int hashCode() {
+
+		return new HashCodeBuilder().append(this.name).toHashCode();
+	}
+
+	@Override
+	public String toString() {
+
+		return new ToStringBuilder(this).append("name", this.name).append(
+				"trustDomain", this.trustDomain.getName()).append("crlRefresh",
+				this.crlRefreshCron).toString();
 	}
 
 }

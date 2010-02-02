@@ -30,6 +30,7 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
 import org.richfaces.model.TreeNode;
 import org.richfaces.model.TreeNodeImpl;
@@ -38,6 +39,7 @@ import be.fedict.trust.admin.portal.TrustPoint;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 @Stateful
 @Name("trustPoint")
@@ -96,6 +98,33 @@ public class TrustPointBean implements TrustPoint {
 			nodeImpl.setData(trustPoint);
 			node.addChild(trustPoint.getName(), nodeImpl);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String remove() {
+
+		this.log.debug("remove trust point: " + selectedTrustPoint.getName());
+		this.trustDomainService.remove(selectedTrustPoint);
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String save() {
+
+		this.log
+				.debug("save trust point: " + this.selectedTrustPoint.getName());
+		try {
+			this.trustDomainService.save(selectedTrustPoint);
+		} catch (InvalidCronExpressionException e) {
+			this.facesMessages.addToControlFromResourceBundle("cron",
+					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
+			return null;
+		}
+		return "success";
 	}
 
 }

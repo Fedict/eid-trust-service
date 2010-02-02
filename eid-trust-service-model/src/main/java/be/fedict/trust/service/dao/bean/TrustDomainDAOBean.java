@@ -34,6 +34,7 @@ import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 /**
  * Trust Domain DAO Bean implementation.
@@ -56,7 +57,8 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	public List<TrustDomainEntity> listTrustDomains() {
 
 		LOG.debug("list trust domains");
-		Query query = this.entityManager.createQuery("FROM TrustDomainEntity");
+		Query query = this.entityManager
+				.createNamedQuery(TrustDomainEntity.QUERY_LIST_ALL);
 		return (List<TrustDomainEntity>) query.getResultList();
 	}
 
@@ -67,7 +69,18 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 
 		LOG.debug("find trust domain: " + name);
 		return this.entityManager.find(TrustDomainEntity.class, name);
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public TrustDomainEntity getTrustDomain(String name)
+			throws TrustDomainNotFoundException {
+		LOG.debug("get trust domain: " + name);
+		TrustDomainEntity trustDomain = findTrustDomain(name);
+		if (null == trustDomain)
+			throw new TrustDomainNotFoundException();
+		return trustDomain;
 	}
 
 	/**
@@ -90,6 +103,33 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 				crlRefreshCron);
 		this.entityManager.persist(trustDomain);
 		return trustDomain;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setDefaultTrustDomain(TrustDomainEntity trustDomain) {
+
+		LOG.debug("set trust domain name=" + trustDomain.getName()
+				+ " as default");
+		for (TrustDomainEntity t : listTrustDomains()) {
+			if (t.equals(trustDomain)) {
+				t.setDefaultDomain(true);
+			} else {
+				t.setDefaultDomain(false);
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public TrustDomainEntity getDefaultTrustDomain() {
+
+		LOG.debug("return the default trust domain");
+		Query query = this.entityManager
+				.createNamedQuery(TrustDomainEntity.QUERY_GET_DEFAULT);
+		return (TrustDomainEntity) query.getSingleResult();
 	}
 
 	/**
@@ -137,10 +177,22 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 
 		LOG.debug("list CA's for trust point " + trustPoint.getName());
 		Query query = this.entityManager
-				.createQuery("SELECT ca FROM CertificateAuthorityEntity AS ca "
-						+ "WHERE ca.trustPoint = :trustPoint");
+				.createNamedQuery(CertificateAuthorityEntity.QUERY_WHERE_TRUST_POINT);
 		query.setParameter("trustPoint", trustPoint);
 		return (List<CertificateAuthorityEntity>) query.getResultList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeCertificateAuthorities(TrustPointEntity trustPoint) {
+
+		LOG.debug("remove CA's for trust point " + trustPoint.getName());
+		Query query = this.entityManager
+				.createNamedQuery(CertificateAuthorityEntity.DELETE_WHERE_TRUST_POINT);
+		query.setParameter("trustPoint", trustPoint);
+		int result = query.executeUpdate();
+		LOG.debug("CA's removed: " + result);
 	}
 
 	/**
@@ -153,9 +205,30 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 				.debug("list trust points for trust domain "
 						+ trustDomain.getName());
 		Query query = this.entityManager
-				.createQuery("SELECT tp FROM TrustPointEntity AS tp "
-						+ "WHERE tp.trustDomain = :trustDomain");
+				.createNamedQuery(TrustPointEntity.QUERY_WHERE_TRUST_DOMAIN);
 		query.setParameter("trustDomain", trustDomain);
 		return (List<TrustPointEntity>) query.getResultList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<TrustPointEntity> listTrustPoints(String trustDomainName)
+			throws TrustDomainNotFoundException {
+
+		LOG.debug("list trust points for trust domain " + trustDomainName);
+		TrustDomainEntity trustDomain = getTrustDomain(trustDomainName);
+		return listTrustPoints(trustDomain);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeTrustPoint(TrustPointEntity trustPoint) {
+
+		LOG.debug("remove trust point " + trustPoint.getName());
+		TrustPointEntity attachedTrustPoint = this.entityManager.find(
+				TrustPointEntity.class, trustPoint.getName());
+		this.entityManager.remove(attachedTrustPoint);
 	}
 }

@@ -46,20 +46,35 @@ public interface SchedulingService {
 	/**
 	 * Start a new timer for the specified {@link TrustDomainEntity}.
 	 * 
+	 * If update is set to <code>false</code>, it will ignore a previously set
+	 * timer's fireDate
+	 * 
 	 * @param trustDomain
+	 * @param update
 	 * 
 	 * @throws InvalidCronExpressionException
 	 */
-	void startTimer(TrustDomainEntity trustDomain)
+	void startTimer(TrustDomainEntity trustDomain, boolean update)
 			throws InvalidCronExpressionException;
 
 	/**
 	 * Start a new timer for the specified {@link TrustPointEntity}.
 	 * 
+	 * If newTimer is set to <code>false</code>, it will ignore a previously set
+	 * timer's fireDate
+	 * 
 	 * @param trustPoint
+	 * @param update
 	 * 
 	 * @throws InvalidCronExpressionException
 	 */
-	void startTimer(TrustPointEntity trustPoint)
+	void startTimer(TrustPointEntity trustPoint, boolean update)
 			throws InvalidCronExpressionException;
+
+	/**
+	 * Cancel running {@link Timer}'s for the specified {@link TimerInfo}.
+	 * 
+	 * @param timerInfo
+	 */
+	void cancelTimers(TimerInfo timerInfo);
 }

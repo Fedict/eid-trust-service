@@ -72,6 +72,12 @@
 							<bundleDir>lib</bundleDir>
 						</jarModule>
 						<jarModule>
+							<groupId>commons-lang</groupId>
+							<artifactId>commons-lang</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+							<bundleDir>lib</bundleDir>
+						</jarModule>
+						<jarModule>
 							<groupId>org.richfaces.framework</groupId>
 							<artifactId>richfaces-api</artifactId>
 							<includeInApplicationXml>true</includeInApplicationXml>

@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.SecurityDomain;
 
 import be.fedict.trust.service.SchedulingService;
+import be.fedict.trust.service.TimerInfo;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.TrustDomainDAO;
@@ -76,7 +77,24 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		TrustDomainEntity attachedTrustDomain = this.trustDomainDAO
 				.findTrustDomain(trustDomain.getName());
 		attachedTrustDomain.setCrlRefreshCron(trustDomain.getCrlRefreshCron());
-		this.schedulingService.startTimer(attachedTrustDomain);
+		this.schedulingService.startTimer(attachedTrustDomain, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void save(TrustPointEntity trustPoint)
+			throws InvalidCronExpressionException {
+
+		LOG.debug("save trust point: " + trustPoint.getName());
+		TrustPointEntity attachedTrustPoint = this.trustDomainDAO
+				.findTrustPoint(trustPoint.getName());
+		attachedTrustPoint.setCrlRefreshCron(trustPoint.getCrlRefreshCron());
+		if (null != attachedTrustPoint.getCrlRefreshCron()
+				&& !attachedTrustPoint.getCrlRefreshCron().equals("")) {
+			this.schedulingService.startTimer(attachedTrustPoint, false);
+		}
 	}
 
 	/**
@@ -87,5 +105,34 @@ public class TrustDomainServiceBean implements TrustDomainService {
 
 		LOG.debug("list trust points for " + trustDomain.getName());
 		return this.trustDomainDAO.listTrustPoints(trustDomain);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void setDefault(TrustDomainEntity trustDomain) {
+
+		LOG.debug("set default trust domain: " + trustDomain.getName());
+		this.trustDomainDAO.setDefaultTrustDomain(trustDomain);
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void remove(TrustPointEntity trustPoint) {
+
+		LOG.debug("remove trust point: " + trustPoint.getName());
+
+		// remove timers
+		this.schedulingService.cancelTimers(new TimerInfo(trustPoint));
+
+		// remove CA's
+		this.trustDomainDAO.removeCertificateAuthorities(trustPoint);
+
+		// remove trust point
+		this.trustDomainDAO.removeTrustPoint(trustPoint);
 	}
 }

@@ -33,11 +33,14 @@ public interface TrustPoint {
 	TreeNode<TrustPointEntity> getTreeNode();
 
 	/*
-	 * Factory
-	 */
-
-	/*
 	 * Lifecycle.
 	 */
 	void destroyCallback();
+
+	/*
+	 * Actions
+	 */
+	String save();
+
+	String remove();
 }
