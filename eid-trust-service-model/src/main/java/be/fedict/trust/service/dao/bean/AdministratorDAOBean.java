@@ -105,8 +105,6 @@ public class AdministratorDAOBean implements AdministratorDAO {
 	private String getName(X500Principal x500Principal) {
 
 		return x500Principal.getName().substring(
-				x500Principal.getName().indexOf("CN=") + 3,
-				x500Principal.getName().indexOf("(Authentication)"));
+				x500Principal.getName().indexOf("CN="));
 	}
-
 }

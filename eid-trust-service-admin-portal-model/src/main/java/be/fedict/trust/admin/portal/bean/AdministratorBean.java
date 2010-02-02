@@ -124,6 +124,7 @@ public class AdministratorBean implements Administrator {
 			return null;
 		}
 
+		adminListFactory();
 		return "success";
 	}
 }

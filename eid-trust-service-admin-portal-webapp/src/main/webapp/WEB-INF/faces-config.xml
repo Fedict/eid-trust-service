@@ -15,7 +15,18 @@
 		</locale-config>
 		<view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
 	</application>
-	
+
+	<!-- Administrator pages navigation rules -->
+	<navigation-rule>
+		<from-view-id>/admin.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/admin.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+	<!-- END Administrator pages navigation rules -->
+
 	<!--  Trust domain / points navigation rules -->
 	<navigation-rule>
 		<from-view-id>/trust-domain.xhtml</from-view-id>
@@ -61,6 +72,6 @@
 			<redirect />
 		</navigation-case>
 	</navigation-rule>
-	
+
 	<!--  END Trust domain / points navigation rules -->
 </faces-config>
