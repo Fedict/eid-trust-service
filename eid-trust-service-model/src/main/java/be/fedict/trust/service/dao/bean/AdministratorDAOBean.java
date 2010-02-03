@@ -27,7 +27,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -85,7 +84,7 @@ public class AdministratorDAOBean implements AdministratorDAO {
 
 		LOG.debug("add admin");
 		AdminEntity admin = new AdminEntity(UUID.randomUUID().toString(),
-				getName(authnCertificate.getSubjectX500Principal()),
+				authnCertificate.getSubjectX500Principal().toString(),
 				authnCertificate.getPublicKey());
 		this.entityManager.persist(admin);
 		return admin;
@@ -100,11 +99,5 @@ public class AdministratorDAOBean implements AdministratorDAO {
 		AdminEntity attachedAdmin = this.entityManager.find(AdminEntity.class,
 				admin.getId());
 		this.entityManager.remove(attachedAdmin);
-	}
-
-	private String getName(X500Principal x500Principal) {
-
-		return x500Principal.getName().substring(
-				x500Principal.getName().indexOf("CN="));
 	}
 }
