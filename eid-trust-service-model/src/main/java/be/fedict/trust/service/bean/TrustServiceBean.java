@@ -42,7 +42,7 @@ import be.fedict.trust.TrustLinker;
 import be.fedict.trust.TrustValidator;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.TrustServiceConstants;
-import be.fedict.trust.service.dao.NetworkConfigDAO;
+import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
@@ -59,7 +59,7 @@ public class TrustServiceBean implements TrustService {
 	private static final Log LOG = LogFactory.getLog(TrustServiceBean.class);
 
 	@EJB
-	private NetworkConfigDAO networkConfigDAO;
+	private ConfigurationDAO configurationDAO;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -98,7 +98,7 @@ public class TrustServiceBean implements TrustService {
 		}
 
 		return BelgianTrustValidatorFactory.createTrustValidator(
-				networkConfigDAO.getNetworkConfig(), trustLinker,
+				configurationDAO.getNetworkConfig(), trustLinker,
 				certificateRepository);
 	}
 

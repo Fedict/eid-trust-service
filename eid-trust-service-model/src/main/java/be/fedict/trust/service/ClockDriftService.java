@@ -16,45 +16,21 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.service.dao;
+package be.fedict.trust.service;
 
 import javax.ejb.Local;
 
-import be.fedict.trust.NetworkConfig;
-import be.fedict.trust.service.entity.NetworkConfigEntity;
-
 /**
- * Network Config DAO.
+ * Clock drift detection service.
  * 
  * @author wvdhaute
  * 
  */
 @Local
-public interface NetworkConfigDAO {
+public interface ClockDriftService {
 
 	/**
-	 * Returns the {@link NetworkConfigEntity}.
+	 * Perform the clock drift detection task
 	 */
-	NetworkConfigEntity getNetworkConfigEntity();
-
-	/**
-	 * Returns the {@link NetworkConfig} if enabled. If not returns
-	 * <code>null</code>.
-	 */
-	NetworkConfig getNetworkConfig();
-
-	/**
-	 * Add/update the {@link NetworkConfigEntity}.
-	 * 
-	 * @param proxyHost
-	 * @param proxyPort
-	 */
-	NetworkConfigEntity setNetworkConfig(String proxyHost, int proxyPort);
-
-	/**
-	 * Enable/disable the {@link NetworkConfigEntity}.
-	 * 
-	 * @param enabled
-	 */
-	void setEnabled(boolean enabled);
+	void execute();
 }

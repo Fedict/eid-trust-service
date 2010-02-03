@@ -50,7 +50,7 @@ import org.bouncycastle.asn1.DEROctetString;
 
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.crl.OnlineCrlRepository;
-import be.fedict.trust.service.dao.NetworkConfigDAO;
+import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.Status;
@@ -66,7 +66,7 @@ public class HarvesterMDB implements MessageListener {
 	public static final String HARVESTER_QUEUE_NAME = "queue/trust/harvester";
 
 	@EJB
-	private NetworkConfigDAO networkConfigDAO;
+	private ConfigurationDAO configurationDAO;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -110,7 +110,7 @@ public class HarvesterMDB implements MessageListener {
 		}
 
 		OnlineCrlRepository onlineCrlRepository = new OnlineCrlRepository(
-				this.networkConfigDAO.getNetworkConfig());
+				this.configurationDAO.getNetworkConfig());
 		URI crlUri;
 		try {
 			crlUri = new URI(crlUrl);

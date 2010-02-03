@@ -12,15 +12,19 @@
 						<f:facet name="header">
 							<h:outputText value="#{msgs.networkConfig}" />
 						</f:facet>
+
 						<h:outputLabel for="host" value="#{msgs.proxyHost}" />
 						<h:inputText id="host" value="#{config.proxyHost}"
 							required="true" />
+
 						<h:outputLabel for="port" value="#{msgs.proxyPort}" />
 						<h:inputText id="port" value="#{config.proxyPort}"
 							required="true">
 						</h:inputText>
+
 						<h:outputLabel for="enabled" value="#{msgs.enabled}" />
 						<h:selectBooleanCheckbox value="#{config.enabled}" />
+
 						<f:facet name="footer">
 							<h:panelGroup style="display:block; text-align:center">
 								<h:commandButton id="submit" value="#{msgs.save}"
@@ -30,7 +34,48 @@
 					</h:panelGrid>
 				</h:form>
 
-				<h:messages styleClass="error" globalOnly="true" />
+				<br />
+
+				<h:form id="clockdrift_form">
+					<h:panelGrid id="panel" columns="2" border="1">
+						<f:facet name="header">
+							<h:outputText value="#{msgs.clockDriftDetection}" />
+						</f:facet>
+
+						<h:outputLabel for="protocol" value="#{msgs.protocol}" />
+						<h:selectOneMenu id="protocol" value="#{config.clockDriftProtocol}"
+							required="true">
+							<f:selectItems value="#{clockDriftProtocols}" />
+						</h:selectOneMenu>
+
+						<h:outputLabel for="server" value="#{msgs.server}" />
+						<h:inputText id="server" value="#{config.clockDriftServer}"
+							required="true" />
+
+						<h:outputLabel for="timeout" value="#{msgs.timeout}" />
+						<h:inputText id="timeout" value="#{config.clockDriftTimeout}"
+							required="true">
+						</h:inputText>
+
+						<h:outputLabel for="maxClockOffset" value="#{msgs.maxClockOffset}" />
+						<h:inputText id="maxClockOffset" value="#{config.clockDriftMaxClockOffset}"
+							required="true">
+						</h:inputText>
+
+						<h:outputLabel for="cron" value="#{msgs.cron}" />
+						<h:inputText id="cron" value="#{config.clockDriftCron}"
+							required="true" />
+
+						<f:facet name="footer">
+							<h:panelGroup style="display:block; text-align:center">
+								<h:commandButton id="submit" value="#{msgs.save}"
+									action="#{config.saveClockDriftConfig}" />
+							</h:panelGroup>
+						</f:facet>
+					</h:panelGrid>
+				</h:form>
+
+				<h:messages />
 
 			</ui:define>
 		</ui:composition>

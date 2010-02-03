@@ -32,6 +32,10 @@ public abstract class TrustServiceConstants {
 	public static final String ADMIN_ROLE = "admin";
 
 	public static final String NETWORK_CONFIG = "network-config";
+	public static final String CLOCK_DRIFT_CONFIG = "clock-drift-config";
+	public static final String CLOCK_DRIFT_NTP_SERVER = "0.pool.ntp.org";
+	public static final int CLOCK_DRIFT_TIMEOUT = 10 * 1000;
+	public static final int CLOCK_DRIFT_MAX_CLOCK_OFFSET = 1000;
 
 	public static final String BELGIAN_EID_TRUST_DOMAIN = "belgian.eid";
 	public static final String BELGIAN_EID_ROOT_CA_TRUST_POINT = "Belgian eID Root CA";

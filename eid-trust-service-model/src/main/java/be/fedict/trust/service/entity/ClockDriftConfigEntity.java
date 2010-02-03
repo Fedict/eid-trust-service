@@ -25,76 +25,108 @@ import javax.ejb.TimerHandle;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 @Entity
-@Table(name = "trust_domain")
-@NamedQueries( {
-		@NamedQuery(name = TrustDomainEntity.QUERY_LIST_ALL, query = "FROM TrustDomainEntity"),
-		@NamedQuery(name = TrustDomainEntity.QUERY_GET_DEFAULT, query = "SELECT td FROM TrustDomainEntity AS td "
-				+ "WHERE td.defaultDomain = true") })
-public class TrustDomainEntity implements Serializable {
+@Table(name = "clock_drift")
+public class ClockDriftConfigEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String QUERY_LIST_ALL = "td.list.all";
-	public static final String QUERY_GET_DEFAULT = "td.get.default";
-
 	private String name;
 
-	private boolean defaultDomain = false;
+	private TimeProtocol timeProtocol;
+	private String server;
+	private int timeout;
+	private int maxClockOffset;
 
-	private String crlRefreshCron;
+	private String cron;
 	private TimerHandle timerHandle;
 	private Date fireDate;
 
 	/**
 	 * Default constructor.
 	 */
-	public TrustDomainEntity() {
+	public ClockDriftConfigEntity() {
+
 		super();
 	}
 
 	/**
 	 * Main constructor.
-	 * 
-	 * @param name
-	 * @param crlRefreshCron
 	 */
-	public TrustDomainEntity(String name, String crlRefreshCron) {
+	public ClockDriftConfigEntity(String name, TimeProtocol timeProtocol,
+			String server, int timeout, int maxClockOffset, String cron) {
+
 		this.name = name;
-		this.crlRefreshCron = crlRefreshCron;
+		this.timeProtocol = timeProtocol;
+		this.server = server;
+		this.timeout = timeout;
+		this.maxClockOffset = maxClockOffset;
+		this.cron = cron;
 	}
 
 	@Id
 	public String getName() {
+
 		return this.name;
 	}
 
 	public void setName(String name) {
+
 		this.name = name;
 	}
 
-	public String getCrlRefreshCron() {
+	public TimeProtocol getTimeProtocol() {
 
-		return this.crlRefreshCron;
+		return this.timeProtocol;
 	}
 
-	public void setCrlRefreshCron(String crlRefreshCron) {
+	public void setTimeProtocol(TimeProtocol timeProtocol) {
 
-		this.crlRefreshCron = crlRefreshCron;
+		this.timeProtocol = timeProtocol;
 	}
 
-	public boolean isDefaultDomain() {
+	public String getServer() {
 
-		return this.defaultDomain;
+		return this.server;
 	}
 
-	public void setDefaultDomain(boolean defaultDomain) {
+	public void setServer(String server) {
 
-		this.defaultDomain = defaultDomain;
+		this.server = server;
+	}
+
+	public int getTimeout() {
+
+		return this.timeout;
+	}
+
+	public void setTimeout(int timeout) {
+
+		this.timeout = timeout;
+	}
+
+	public int getMaxClockOffset() {
+
+		return this.maxClockOffset;
+	}
+
+	public void setMaxClockOffset(int maxClockOffset) {
+
+		this.maxClockOffset = maxClockOffset;
+	}
+
+	public String getCron() {
+
+		return this.cron;
+	}
+
+	public void setCron(String cron) {
+
+		this.cron = cron;
 	}
 
 	@Lob
@@ -117,4 +149,14 @@ public class TrustDomainEntity implements Serializable {
 
 		this.fireDate = fireDate;
 	}
+
+	@Override
+	public String toString() {
+
+		return new ToStringBuilder(this).append("protocol",
+				this.timeProtocol.name()).append("server", this.server).append(
+				"timeout", this.timeout).append("maxClockOffset",
+				this.maxClockOffset).toString();
+	}
+
 }

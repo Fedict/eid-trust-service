@@ -35,9 +35,11 @@ import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.InitializationService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
-import be.fedict.trust.service.dao.NetworkConfigDAO;
+import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.TimeProtocol;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
@@ -55,7 +57,7 @@ public class InitializationServiceBean implements InitializationService {
 			.getLog(InitializationServiceBean.class);
 
 	@EJB
-	private NetworkConfigDAO networkConfigDAO;
+	private ConfigurationDAO configurationDAO;
 
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
@@ -68,8 +70,25 @@ public class InitializationServiceBean implements InitializationService {
 		LOG.debug("initialize");
 
 		// Default network config
-		networkConfigDAO.setNetworkConfig(null, 0);
-		networkConfigDAO.setEnabled(false);
+		configurationDAO.setNetworkConfig(null, 0);
+		configurationDAO.setNetworkConfigEnabled(false);
+
+		// Default clock drift config
+		ClockDriftConfigEntity clockDriftConfig = configurationDAO
+				.setClockDriftConfig(TimeProtocol.NTP,
+						TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER,
+						TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
+						TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET,
+						TrustServiceConstants.DEFAULT_CRON);
+
+		// Clock drift timer
+		LOG.debug("start timer for clock drift");
+		try {
+			this.schedulingService.startTimer(clockDriftConfig, false);
+		} catch (InvalidCronExpressionException e) {
+			LOG.error("Failed to start timer for clock drift", e);
+			throw new RuntimeException(e);
+		}
 
 		// Belgian eID trust domain
 		TrustDomainEntity beidTrustDomain = this.trustDomainDAO

@@ -27,20 +27,22 @@ import org.apache.commons.logging.LogFactory;
 
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.service.TrustServiceConstants;
-import be.fedict.trust.service.dao.NetworkConfigDAO;
+import be.fedict.trust.service.dao.ConfigurationDAO;
+import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.entity.NetworkConfigEntity;
+import be.fedict.trust.service.entity.TimeProtocol;
 
 /**
- * Network Config DAO Bean implementation.
+ * Configuration DAO Bean implementation.
  * 
  * @author wvdhaute
  * 
  */
 @Stateless
-public class NetworkConfigDAOBean implements NetworkConfigDAO {
+public class ConfigurationDAOBean implements ConfigurationDAO {
 
 	private static final Log LOG = LogFactory
-			.getLog(NetworkConfigDAOBean.class);
+			.getLog(ConfigurationDAOBean.class);
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -79,7 +81,7 @@ public class NetworkConfigDAOBean implements NetworkConfigDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setEnabled(boolean enabled) {
+	public void setNetworkConfigEnabled(boolean enabled) {
 
 		LOG.debug("set network config enabled: " + enabled);
 		NetworkConfigEntity networkConfig = getNetworkConfigEntity();
@@ -97,5 +99,45 @@ public class NetworkConfigDAOBean implements NetworkConfigDAO {
 		networkConfigEntity.setProxyHost(proxyHost);
 		networkConfigEntity.setProxyPort(proxyPort);
 		return networkConfigEntity;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ClockDriftConfigEntity getClockDriftConfig() {
+
+		LOG.debug("get clock drift configuration");
+		ClockDriftConfigEntity clockDriftConfig = this.entityManager.find(
+				ClockDriftConfigEntity.class,
+				TrustServiceConstants.CLOCK_DRIFT_CONFIG);
+		if (null == clockDriftConfig) {
+			clockDriftConfig = new ClockDriftConfigEntity(
+					TrustServiceConstants.CLOCK_DRIFT_CONFIG, TimeProtocol.NTP,
+					TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER,
+					TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
+					TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET,
+					TrustServiceConstants.DEFAULT_CRON);
+			this.entityManager.persist(clockDriftConfig);
+		}
+		return clockDriftConfig;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ClockDriftConfigEntity setClockDriftConfig(
+			TimeProtocol timeProtocol, String server, int timeout,
+			int maxClockOffset, String cron) {
+
+		LOG.debug("set clock drift detection config: protocol="
+				+ timeProtocol.name() + " server=" + server + " timeout="
+				+ timeout + " maxClockOffset=" + maxClockOffset);
+		ClockDriftConfigEntity clockDriftConfig = getClockDriftConfig();
+		clockDriftConfig.setTimeProtocol(timeProtocol);
+		clockDriftConfig.setServer(server);
+		clockDriftConfig.setTimeout(timeout);
+		clockDriftConfig.setMaxClockOffset(maxClockOffset);
+		clockDriftConfig.setCron(cron);
+		return clockDriftConfig;
 	}
 }

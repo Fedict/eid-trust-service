@@ -27,9 +27,13 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.SecurityDomain;
 
 import be.fedict.trust.service.ConfigurationService;
+import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
-import be.fedict.trust.service.dao.NetworkConfigDAO;
+import be.fedict.trust.service.dao.ConfigurationDAO;
+import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.entity.NetworkConfigEntity;
+import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
  * Configuration Service Bean implementation.
@@ -45,7 +49,10 @@ public class ConfigurationServiceBean implements ConfigurationService {
 			.getLog(ConfigurationServiceBean.class);
 
 	@EJB
-	private NetworkConfigDAO networkConfigDAO;
+	private ConfigurationDAO configurationDAO;
+
+	@EJB
+	private SchedulingService schedulingService;
 
 	/**
 	 * {@inheritDoc}
@@ -53,7 +60,7 @@ public class ConfigurationServiceBean implements ConfigurationService {
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public NetworkConfigEntity getNetworkConfig() {
 
-		return this.networkConfigDAO.getNetworkConfigEntity();
+		return this.configurationDAO.getNetworkConfigEntity();
 	}
 
 	/**
@@ -64,7 +71,31 @@ public class ConfigurationServiceBean implements ConfigurationService {
 			boolean enabled) {
 
 		LOG.debug("save network config");
-		this.networkConfigDAO.setNetworkConfig(proxyHost, proxyPort);
-		this.networkConfigDAO.setEnabled(enabled);
+		this.configurationDAO.setNetworkConfig(proxyHost, proxyPort);
+		this.configurationDAO.setNetworkConfigEnabled(enabled);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public ClockDriftConfigEntity getClockDriftDetectionConfig() {
+
+		return this.configurationDAO.getClockDriftConfig();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
+			int timeout, int maxClockOffset, String cron)
+			throws InvalidCronExpressionException {
+
+		LOG.debug("save clock drift detection config");
+		ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
+				.setClockDriftConfig(timeProtocol, server, timeout,
+						maxClockOffset, cron);
+		this.schedulingService.startTimer(clockDriftConfig, false);
 	}
 }

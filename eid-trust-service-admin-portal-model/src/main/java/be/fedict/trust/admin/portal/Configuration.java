@@ -18,7 +18,10 @@
 
 package be.fedict.trust.admin.portal;
 
+import java.util.List;
+
 import javax.ejb.Local;
+import javax.faces.model.SelectItem;
 
 @Local
 public interface Configuration {
@@ -29,6 +32,11 @@ public interface Configuration {
 	void destroyCallback();
 
 	void initialize();
+
+	/*
+	 * Factory
+	 */
+	List<SelectItem> clockDriftProtocolFactory();
 
 	/*
 	 * Accessors
@@ -45,9 +53,31 @@ public interface Configuration {
 
 	void setEnabled(boolean enabled);
 
+	String getClockDriftProtocol();
+
+	void setClockDriftProtocol(String clockDriftProtocol);
+
+	String getClockDriftServer();
+
+	void setClockDriftServer(String clockDriftServer);
+
+	int getClockDriftTimeout();
+
+	void setClockDriftTimeout(int clockDriftTimeout);
+
+	int getClockDriftMaxClockOffset();
+
+	void setClockDriftMaxClockOffset(int clockDriftMaxClockOffset);
+
+	String getClockDriftCron();
+
+	void setClockDriftCron(String clockDriftCron);
+
 	/*
 	 * Actions
 	 */
 	String saveNetworkConfig();
+
+	String saveClockDriftConfig();
 
 }

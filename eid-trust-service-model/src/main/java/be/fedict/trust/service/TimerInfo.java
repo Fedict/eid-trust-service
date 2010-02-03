@@ -24,6 +24,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 
@@ -39,7 +40,7 @@ public class TimerInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public enum Type {
-		TRUST_DOMAIN, TRUST_POINT;
+		TRUST_DOMAIN, TRUST_POINT, CLOCK_DRIFT;
 	}
 
 	private final Type type;
@@ -54,6 +55,11 @@ public class TimerInfo implements Serializable {
 	public TimerInfo(TrustDomainEntity trustDomain) {
 		this.type = Type.TRUST_DOMAIN;
 		this.name = trustDomain.getName();
+	}
+
+	public TimerInfo(ClockDriftConfigEntity clockDriftDetectionConfig) {
+		this.type = Type.CLOCK_DRIFT;
+		this.name = clockDriftDetectionConfig.getName();
 	}
 
 	public Type getType() {
