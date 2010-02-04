@@ -125,6 +125,7 @@ public class HarvesterMDB implements MessageListener {
 			LOG.error("failed to download CRL for CA " + caName);
 			throw new RuntimeException();
 		}
+
 		X509Certificate issuerCertificate = certificateAuthority
 				.getCertificate();
 
@@ -138,10 +139,6 @@ public class HarvesterMDB implements MessageListener {
 		LOG.debug("processing CRL... " + caName);
 		BigInteger crlNumber = getCrlNumber(crl);
 		LOG.debug("CRL number: " + crlNumber);
-
-		if (null != crlNumber) {
-			removeOldEntries(crlNumber, crl.getIssuerX500Principal().toString());
-		}
 
 		Set<? extends X509CRLEntry> revokedCertificates = crl
 				.getRevokedCertificates();
@@ -177,6 +174,12 @@ public class HarvesterMDB implements MessageListener {
 							issuerName, serialNumber, revocationDate, crlNumber);
 					this.entityManager.persist(revokedCertificateEntity);
 				}
+
+				if (null != crlNumber) {
+					removeOldEntries(crlNumber, crl.getIssuerX500Principal()
+							.toString());
+				}
+
 			}
 		}
 

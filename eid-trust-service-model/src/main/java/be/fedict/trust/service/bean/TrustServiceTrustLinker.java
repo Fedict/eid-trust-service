@@ -24,6 +24,7 @@ import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.List;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
@@ -33,6 +34,7 @@ import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 import javax.jms.Session;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +44,6 @@ import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
-import be.fedict.trust.service.entity.RevokedCertificatePK;
 import be.fedict.trust.service.entity.Status;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 
@@ -80,8 +81,9 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		if (null == certificateAuthority) {
 			LOG.debug("no data cache entry for CA: " + issuerName);
 			URI crlUri = CrlTrustLinker.getCrlUri(childCertificate);
+			String crlUrl;
 			try {
-				crlUri.toURL().toString();
+				crlUrl = crlUri.toURL().toString();
 			} catch (MalformedURLException e) {
 				LOG.warn("malformed URL: " + e.getMessage(), e);
 				return null;
@@ -121,7 +123,7 @@ public class TrustServiceTrustLinker implements TrustLinker {
 
 			// create new CA
 			try {
-				certificateAuthority = new CertificateAuthorityEntity(
+				certificateAuthority = new CertificateAuthorityEntity(crlUrl,
 						certificate);
 				certificateAuthority.setTrustPoint(parentCertificateAuthority
 						.getTrustPoint());
@@ -174,9 +176,8 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		}
 		LOG.debug("using cached CRL data");
 		BigInteger serialNumber = childCertificate.getSerialNumber();
-		RevokedCertificateEntity revokedCertificate = this.entityManager.find(
-				RevokedCertificateEntity.class, new RevokedCertificatePK(
-						issuerName, serialNumber));
+		RevokedCertificateEntity revokedCertificate = findRevokedCertificate(
+				issuerName, serialNumber);
 		if (null == revokedCertificate) {
 			LOG.debug("certificate valid: "
 					+ childCertificate.getSubjectX500Principal());
@@ -191,6 +192,23 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		LOG.debug("certificate invalid: "
 				+ childCertificate.getSubjectX500Principal());
 		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	private RevokedCertificateEntity findRevokedCertificate(String issuer,
+			BigInteger serialNumber) {
+
+		Query query = this.entityManager
+				.createNamedQuery(RevokedCertificateEntity.QUERY_WHERE_ISSUER_SERIAL);
+		query.setParameter("issuer", issuer);
+		query.setParameter("serialNumber", serialNumber.toString());
+		List<RevokedCertificateEntity> revokedCertificates = (List<RevokedCertificateEntity>) query
+				.getResultList();
+		if (revokedCertificates.isEmpty()) {
+			return null;
+		} else {
+			return revokedCertificates.get(0);
+		}
 	}
 
 	private void notifyHarvester(String issuerName) throws JMSException {

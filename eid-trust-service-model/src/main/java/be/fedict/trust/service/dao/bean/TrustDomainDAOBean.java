@@ -133,7 +133,8 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 				+ certificate.getSubjectX500Principal().toString());
 		CertificateAuthorityEntity certificateAuthority;
 		try {
-			certificateAuthority = new CertificateAuthorityEntity(certificate);
+			certificateAuthority = new CertificateAuthorityEntity(null,
+					certificate);
 		} catch (CertificateEncodingException e) {
 			LOG.error("Certificate encoding exception: " + e.getMessage());
 			return null;

@@ -36,14 +36,18 @@ public class RevokedCertificatePK implements Serializable {
 
 	private String serialNumber;
 
+	private String crlNumberString;
+
 	public RevokedCertificatePK() {
 
 		// empty
 	}
 
-	public RevokedCertificatePK(String issuer, BigInteger serialNumber) {
+	public RevokedCertificatePK(String issuer, BigInteger serialNumber,
+			BigInteger crlNumber) {
 		this.issuer = issuer;
 		this.serialNumber = serialNumber.toString();
+		this.crlNumberString = crlNumber.toString();
 	}
 
 	public String getIssuer() {
@@ -67,6 +71,14 @@ public class RevokedCertificatePK implements Serializable {
 		this.serialNumber = serialNumber;
 	}
 
+	public String getCrlNumberString() {
+		return this.crlNumberString;
+	}
+
+	public void setCrlNumberString(String crlNumberString) {
+		this.crlNumberString = crlNumberString;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 
@@ -81,21 +93,23 @@ public class RevokedCertificatePK implements Serializable {
 		}
 		RevokedCertificatePK rhs = (RevokedCertificatePK) obj;
 		return new EqualsBuilder().append(this.serialNumber, rhs.serialNumber)
-				.append(this.issuer, rhs.issuer).isEquals();
+				.append(this.issuer, rhs.issuer).append(this.crlNumberString,
+						rhs.crlNumberString).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 
 		return new HashCodeBuilder().append(this.serialNumber).append(
-				this.issuer).toHashCode();
+				this.issuer).append(this.crlNumberString).toHashCode();
 	}
 
 	@Override
 	public String toString() {
 
 		return new ToStringBuilder(this).append("serialNumber",
-				this.serialNumber).append("issuer", this.issuer).toString();
+				this.serialNumber).append("issuer", this.issuer).append(
+				"crlNumberString", this.crlNumberString).toString();
 	}
 
 }

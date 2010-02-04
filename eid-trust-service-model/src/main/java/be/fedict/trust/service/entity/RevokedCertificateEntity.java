@@ -24,6 +24,8 @@ import java.util.Date;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -35,9 +37,13 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 @Entity
 @Table(name = "revoked_certificates")
+@NamedQueries( { @NamedQuery(name = RevokedCertificateEntity.QUERY_WHERE_ISSUER_SERIAL, query = "SELECT rc FROM RevokedCertificateEntity "
+		+ "AS rc WHERE rc.pk.issuer = :issuer AND rc.pk.serialNumber = :serialNumber ORDER BY rc.crlNumber DESC") })
 public class RevokedCertificateEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	public static final String QUERY_WHERE_ISSUER_SERIAL = "rc.q.i.s";
 
 	private RevokedCertificatePK pk;
 
@@ -51,7 +57,7 @@ public class RevokedCertificateEntity implements Serializable {
 
 	public RevokedCertificateEntity(String issuerName, BigInteger serialNumber,
 			Date revocationDate, BigInteger crlNumber) {
-		this.pk = new RevokedCertificatePK(issuerName, serialNumber);
+		this.pk = new RevokedCertificatePK(issuerName, serialNumber, crlNumber);
 		this.revocationDate = revocationDate;
 		this.crlNumber = crlNumber;
 	}

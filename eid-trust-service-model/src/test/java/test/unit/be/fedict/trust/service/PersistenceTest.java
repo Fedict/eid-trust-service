@@ -90,8 +90,9 @@ public class PersistenceTest {
 		String issuerName = "CN=Test CA";
 		BigInteger serialNumber = new BigInteger(
 				"21267647932558966653497436382356969621");
+		BigInteger crlNumber = new BigInteger("123465789");
 		RevokedCertificateEntity revokedCertificateEntity = new RevokedCertificateEntity(
-				issuerName, serialNumber, new Date(), BigInteger.valueOf(1234));
+				issuerName, serialNumber, new Date(), crlNumber);
 		this.entityManager.persist(revokedCertificateEntity);
 
 		// we clear the hibernate cache
@@ -104,7 +105,7 @@ public class PersistenceTest {
 		// operate
 		RevokedCertificateEntity resultRevokedCertificateEntity = this.entityManager
 				.find(RevokedCertificateEntity.class, new RevokedCertificatePK(
-						issuerName, serialNumber));
+						issuerName, serialNumber, crlNumber));
 
 		// verify
 		assertNotNull(resultRevokedCertificateEntity);
