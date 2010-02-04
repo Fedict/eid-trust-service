@@ -105,8 +105,9 @@ public class ConfigurationBean implements Configuration {
 	 */
 	public String saveNetworkConfig() {
 
-		this.log.debug("save network config: proxyHost=" + this.proxyHost
-				+ " proxyPort=" + this.proxyPort + " enabled=" + this.enabled);
+		this.log.debug(
+				"save network config: proxyHost=#0  proxyPort=#1  enabled=#2",
+				this.proxyHost, this.proxyPort, this.enabled);
 
 		this.configurationService.saveNetworkConfig(proxyHost, proxyPort,
 				enabled);
@@ -118,11 +119,12 @@ public class ConfigurationBean implements Configuration {
 	 */
 	public String saveClockDriftConfig() {
 
-		this.log.debug("save clock drift config: protocol="
-				+ this.clockDriftProtocol + " server=" + this.clockDriftServer
-				+ " timeout=" + this.clockDriftTimeout + " maxClockOffset="
-				+ this.clockDriftMaxClockOffset + " cron="
-				+ this.clockDriftCron);
+		this.log
+				.debug(
+						"save clock drift config: protocol=#0 server=#1 timeout=#2 maxClockOffset=#3 cron=#4",
+						this.clockDriftProtocol, this.clockDriftServer,
+						this.clockDriftTimeout, this.clockDriftMaxClockOffset,
+						this.clockDriftCron);
 
 		try {
 			this.configurationService.saveClockDriftConfig(TimeProtocol

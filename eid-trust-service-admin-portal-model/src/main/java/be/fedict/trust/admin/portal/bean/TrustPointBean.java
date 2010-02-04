@@ -113,7 +113,7 @@ public class TrustPointBean implements TrustPoint {
 	 */
 	public String remove() {
 
-		this.log.debug("remove trust point: " + selectedTrustPoint.getName());
+		this.log.debug("remove trust point: #0", selectedTrustPoint.getName());
 		this.trustDomainService.remove(selectedTrustPoint);
 		return "success";
 	}
@@ -123,8 +123,8 @@ public class TrustPointBean implements TrustPoint {
 	 */
 	public String save() {
 
-		this.log
-				.debug("save trust point: " + this.selectedTrustPoint.getName());
+		this.log.debug("save trust point: #0", this.selectedTrustPoint
+				.getName());
 		try {
 			this.trustDomainService.save(selectedTrustPoint);
 		} catch (InvalidCronExpressionException e) {
@@ -140,8 +140,8 @@ public class TrustPointBean implements TrustPoint {
 	 */
 	public String add() {
 
-		this.log.debug("add trust point: name=" + this.name
-				+ " crlRefreshCron=" + this.crlRefreshCron);
+		this.log.debug("add trust point: name=#0 crlRefreshCron=#1", this.name,
+				this.crlRefreshCron);
 
 		byte[] certificateBytes = (byte[]) FacesContext.getCurrentInstance()
 				.getExternalContext().getSessionMap().get(

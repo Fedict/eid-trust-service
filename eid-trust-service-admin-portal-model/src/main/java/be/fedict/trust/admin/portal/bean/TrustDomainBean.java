@@ -94,7 +94,7 @@ public class TrustDomainBean implements TrustDomain {
 	 */
 	public String modify() {
 
-		this.log.debug("modify: " + this.selectedTrustDomain.getName());
+		this.log.debug("modify: #0", this.selectedTrustDomain.getName());
 		return "modify";
 	}
 
@@ -103,8 +103,8 @@ public class TrustDomainBean implements TrustDomain {
 	 */
 	public String save() {
 
-		this.log.debug("save trust domain: "
-				+ this.selectedTrustDomain.getName());
+		this.log.debug("save trust domain: #0 ", this.selectedTrustDomain
+				.getName());
 		try {
 			this.trustDomainService.save(selectedTrustDomain);
 		} catch (InvalidCronExpressionException e) {
@@ -120,8 +120,8 @@ public class TrustDomainBean implements TrustDomain {
 	 */
 	public String setDefault() {
 
-		this.log.debug("set default trust domain: "
-				+ this.selectedTrustDomain.getName());
+		this.log.debug("set default trust domain: #0", this.selectedTrustDomain
+				.getName());
 		trustDomainListFactory();
 		return "success";
 	}
