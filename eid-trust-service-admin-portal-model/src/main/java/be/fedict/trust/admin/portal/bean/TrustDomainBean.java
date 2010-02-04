@@ -57,7 +57,7 @@ public class TrustDomainBean implements TrustDomain {
 	@EJB
 	private TrustDomainService trustDomainService;
 
-	@In(create = true)
+	@In
 	FacesMessages facesMessages;
 
 	@SuppressWarnings("unused")

@@ -29,60 +29,68 @@
 				<div id="menu">
 					<ul>
 						<c:choose>
-							<c:when test="#{activeMenu == 'main'}">
-								<li class="selected">
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/main.seam">#{msgs.home}</a>
-								</li>
+							<c:when test="#{userId == null}">
+								<c:choose>
+									<c:when test="#{activeMenu == 'main'}">
+										<li class="selected">
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/main.seam">#{msgs.home}</a>
+										</li>
+									</c:when>
+									<c:otherwise>
+										<li>
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/main.seam">#{msgs.home}</a>
+										</li>
+									</c:otherwise>
+								</c:choose>
 							</c:when>
-							<c:otherwise>
-								<li>
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/main.seam">#{msgs.home}</a>
-								</li>
-							</c:otherwise>
 						</c:choose>
 						<c:choose>
-							<c:when test="#{activeMenu == 'config'}">
-								<li class="selected">
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{msgs.configuration}</a>
-								</li>
+							<c:when test="#{userId != null}">
+								<c:choose>
+									<c:when test="#{activeMenu == 'config'}">
+										<li class="selected">
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{msgs.configuration}</a>
+										</li>
+									</c:when>
+									<c:otherwise>
+										<li>
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{msgs.configuration}</a>
+										</li>
+									</c:otherwise>
+								</c:choose>
+								<c:choose>
+									<c:when test="#{activeMenu == 'admin'}">
+										<li class="selected">
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/admin.seam">#{msgs.admin}</a>
+										</li>
+									</c:when>
+									<c:otherwise>
+										<li>
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/admin.seam">#{msgs.admin}</a>
+										</li>
+									</c:otherwise>
+								</c:choose>
+								<c:choose>
+									<c:when test="#{activeMenu == 'domain'}">
+										<li class="selected">
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{msgs.trustDomains}</a>
+										</li>
+									</c:when>
+									<c:otherwise>
+										<li>
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{msgs.trustDomains}</a>
+										</li>
+									</c:otherwise>
+								</c:choose>
 							</c:when>
-							<c:otherwise>
-								<li>
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{msgs.configuration}</a>
-								</li>
-							</c:otherwise>
-						</c:choose>
-						<c:choose>
-							<c:when test="#{activeMenu == 'admin'}">
-								<li class="selected">
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/admin.seam">#{msgs.admin}</a>
-								</li>
-							</c:when>
-							<c:otherwise>
-								<li>
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/admin.seam">#{msgs.admin}</a>
-								</li>
-							</c:otherwise>
-						</c:choose>
-						<c:choose>
-							<c:when test="#{activeMenu == 'domain'}">
-								<li class="selected">
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{msgs.trustDomains}</a>
-								</li>
-							</c:when>
-							<c:otherwise>
-								<li>
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{msgs.trustDomains}</a>
-								</li>
-							</c:otherwise>
 						</c:choose>
 
 						<c:choose>

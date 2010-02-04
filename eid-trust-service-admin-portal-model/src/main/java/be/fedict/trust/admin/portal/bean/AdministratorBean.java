@@ -62,7 +62,7 @@ public class AdministratorBean implements Administrator {
 	@In
 	private SessionContext sessionContext;
 
-	@In(create = true)
+	@In
 	FacesMessages facesMessages;
 
 	@SuppressWarnings("unused")

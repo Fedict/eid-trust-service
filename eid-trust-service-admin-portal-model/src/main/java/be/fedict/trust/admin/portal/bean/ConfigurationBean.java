@@ -55,7 +55,7 @@ public class ConfigurationBean implements Configuration {
 	@EJB
 	private ConfigurationService configurationService;
 
-	@In(create = true)
+	@In
 	FacesMessages facesMessages;
 
 	private String proxyHost;

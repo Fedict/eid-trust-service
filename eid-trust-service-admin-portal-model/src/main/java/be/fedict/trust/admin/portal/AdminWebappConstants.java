@@ -18,42 +18,14 @@
 
 package be.fedict.trust.admin.portal;
 
-import javax.ejb.Local;
+/**
+ * Some admin webapp constants.
+ * 
+ * @author wvdhaute
+ * 
+ */
+public abstract class AdminWebappConstants {
 
-import org.richfaces.model.TreeNode;
-
-import be.fedict.trust.service.entity.TrustPointEntity;
-
-@Local
-public interface TrustPoint {
-
-	/*
-	 * Trust points tree
-	 */
-	TreeNode<TrustPointEntity> getTreeNode();
-
-	/*
-	 * Lifecycle.
-	 */
-	void destroyCallback();
-
-	/*
-	 * Accessors
-	 */
-	String getName();
-
-	void setName(String name);
-
-	String getCrlRefreshCron();
-
-	void setCrlRefreshCron(String crlRefreshCron);
-
-	/*
-	 * Actions
-	 */
-	String save();
-
-	String remove();
-
-	String add();
+	public static final String TRUST_POINT_SESSION_ATTRIBUTE = "selectedTrustPoint";
+	public static final String CERTIFICATE_SESSION_ATTRIBUTE = "selectedCertificate";
 }

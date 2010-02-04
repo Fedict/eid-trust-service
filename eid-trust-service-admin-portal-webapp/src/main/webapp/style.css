@@ -98,3 +98,22 @@ h3 {
 	margin: 0 auto;
 	color: #303030;
 }
+.text {
+    overflow:           auto;
+
+    font-family:        monospace;
+
+    white-space:        pre-wrap;                   /* css-3 */
+    white-space:        -moz-pre-wrap !important;   /* Mozilla, since 1999 */
+    white-space:        -pre-wrap;                  /* Opera 4-6 */
+    white-space:        -o-pre-wrap;                /* Opera 7 */
+    word-wrap:          break-word;
+}
+.text.block {
+    display:            block;
+}
+.error {
+    border:             1px solid red;
+    background:         pink;
+    text-align:         center;
+}

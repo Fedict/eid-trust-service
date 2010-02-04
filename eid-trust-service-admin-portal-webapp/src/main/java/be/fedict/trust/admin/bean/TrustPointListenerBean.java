@@ -23,16 +23,18 @@ import java.io.IOException;
 import javax.ejb.Remove;
 import javax.faces.context.FacesContext;
 
-import org.jboss.seam.ScopeType;
+import org.apache.commons.io.FileUtils;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.log.Log;
 import org.richfaces.component.html.HtmlTree;
 import org.richfaces.event.NodeSelectedEvent;
+import org.richfaces.event.UploadEvent;
 import org.richfaces.model.TreeNode;
+import org.richfaces.model.UploadItem;
 
+import be.fedict.trust.admin.portal.AdminWebappConstants;
 import be.fedict.trust.service.entity.TrustPointEntity;
 
 /**
@@ -44,9 +46,8 @@ import be.fedict.trust.service.entity.TrustPointEntity;
  * 
  * @author wvdhaute
  */
-@Name("trustPointTree")
-@Scope(ScopeType.SESSION)
-public class TrustPointTreeBean {
+@Name("trustPointListener")
+public class TrustPointListenerBean {
 
 	@Logger
 	private Log log;
@@ -59,10 +60,12 @@ public class TrustPointTreeBean {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * {@link TrustPointEntity} richfaces tree node listener.
+	 * 
+	 * @param event
 	 */
 	@SuppressWarnings("unchecked")
-	public void processSelection(NodeSelectedEvent event) {
+	public void processNodeSelection(NodeSelectedEvent event) {
 
 		HtmlTree tree = (HtmlTree) event.getComponent();
 		TreeNode<TrustPointEntity> currentNode = tree.getModelTreeNode(tree
@@ -71,7 +74,8 @@ public class TrustPointTreeBean {
 				.getData();
 		this.log.debug("view: " + selectedTrustPoint.getName());
 		FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
-				.put("selectedTrustPoint", selectedTrustPoint);
+				.put(AdminWebappConstants.TRUST_POINT_SESSION_ATTRIBUTE,
+						selectedTrustPoint);
 		try {
 			FacesContext.getCurrentInstance().getExternalContext().redirect(
 					"trust-point.seam");
@@ -79,5 +83,28 @@ public class TrustPointTreeBean {
 			this.log.error("IO Exception: " + e.getMessage(), e);
 			return;
 		}
+	}
+
+	/**
+	 * {@link TrustPointEntity} richfaces upload component listener
+	 * 
+	 * @param event
+	 * @throws IOException
+	 */
+	public void uploadListener(UploadEvent event) throws IOException {
+		UploadItem item = event.getUploadItem();
+		this.log.debug(item.getContentType());
+		this.log.debug(item.getFileSize());
+		this.log.debug(item.getFileName());
+		byte[] certBytes;
+		if (null == item.getData()) {
+			// meaning createTempFiles is set to true in the SeamFilter
+			certBytes = FileUtils.readFileToByteArray(item.getFile());
+		} else {
+			certBytes = item.getData();
+		}
+		FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+				.put(AdminWebappConstants.CERTIFICATE_SESSION_ATTRIBUTE,
+						certBytes);
 	}
 }

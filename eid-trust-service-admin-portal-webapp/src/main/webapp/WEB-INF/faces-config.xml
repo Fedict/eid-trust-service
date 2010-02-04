@@ -9,6 +9,7 @@
 			<base-name>messages.webapp</base-name>
 			<var>msgs</var>
 		</resource-bundle>
+		<message-bundle>messages.webapp</message-bundle>
 		<locale-config>
 			<default-locale>en</default-locale>
 			<!-- supported-locale>nl</supported-locale-->
@@ -67,6 +68,37 @@
 		<navigation-case>
 			<from-outcome>back</from-outcome>
 			<to-view-id>/trust-domain.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>add</from-outcome>
+			<to-view-id>/trust-point-add.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>/trust-point-add.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>back</from-outcome>
+			<to-view-id>/trust-domain-edit.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/trust-domain-edit.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>/trust-point-edit.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/trust-domain-edit.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>back</from-outcome>
+			<to-view-id>/trust-domain-edit.seam</to-view-id>
 			<redirect />
 		</navigation-case>
 	</navigation-rule>

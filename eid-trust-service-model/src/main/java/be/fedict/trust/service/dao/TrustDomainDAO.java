@@ -84,12 +84,21 @@ public interface TrustDomainDAO {
 	/**
 	 * Create a new {@link CertificateAuthorityEntity}.
 	 * 
-	 * @param crlUrl
 	 * @param rootCaCertificate
 	 * @param trustPoint
 	 */
-	CertificateAuthorityEntity addCertificateAuthority(String crlUrl,
+	CertificateAuthorityEntity addCertificateAuthority(
 			X509Certificate certificate, TrustPointEntity trustPoint);
+
+	/**
+	 * Returns {@link CertificateAuthorityEntity} from the specified
+	 * {@link X509Certificate}. Returns <code>null</code> if not found.
+	 * 
+	 * @param certificate
+	 * @return
+	 */
+	CertificateAuthorityEntity findCertificateAuthority(
+			X509Certificate certificate);
 
 	/**
 	 * Return {@link TrustPointEntity} from specified name. Returns

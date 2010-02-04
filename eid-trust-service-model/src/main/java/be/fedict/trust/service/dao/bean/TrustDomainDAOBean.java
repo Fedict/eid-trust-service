@@ -18,6 +18,8 @@
 
 package be.fedict.trust.service.dao.bean;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -30,6 +32,7 @@ import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -135,23 +138,48 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public CertificateAuthorityEntity addCertificateAuthority(String crlUrl,
+	public CertificateAuthorityEntity addCertificateAuthority(
 			X509Certificate certificate, TrustPointEntity trustPoint) {
 
-		LOG
-				.debug("add CA: "
-						+ certificate.getSubjectX500Principal().toString());
+		LOG.debug("add  CA: "
+				+ certificate.getSubjectX500Principal().toString());
 		CertificateAuthorityEntity certificateAuthority;
 		try {
 			certificateAuthority = new CertificateAuthorityEntity(certificate
-					.getSubjectX500Principal().toString(), crlUrl, certificate,
-					trustPoint);
+					.getSubjectX500Principal().toString(),
+					getCrlUrl(certificate), certificate, trustPoint);
 		} catch (CertificateEncodingException e) {
 			LOG.error("Certificate encoding exception: " + e.getMessage());
 			return null;
 		}
 		this.entityManager.persist(certificateAuthority);
 		return certificateAuthority;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public CertificateAuthorityEntity findCertificateAuthority(
+			X509Certificate certificate) {
+
+		LOG.debug("find CA: "
+				+ certificate.getSubjectX500Principal().toString());
+		return this.entityManager.find(CertificateAuthorityEntity.class,
+				certificate.getSubjectX500Principal().toString());
+
+	}
+
+	private String getCrlUrl(X509Certificate certificate) {
+
+		URI crlUri = CrlTrustLinker.getCrlUri(certificate);
+		if (null == crlUri)
+			return null;
+		try {
+			return crlUri.toURL().toString();
+		} catch (MalformedURLException e) {
+			LOG.warn("malformed URL: " + e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**

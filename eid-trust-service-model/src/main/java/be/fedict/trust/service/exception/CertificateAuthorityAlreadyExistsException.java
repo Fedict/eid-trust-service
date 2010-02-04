@@ -16,44 +16,13 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.admin.portal;
+package be.fedict.trust.service.exception;
 
-import javax.ejb.Local;
+import javax.ejb.ApplicationException;
 
-import org.richfaces.model.TreeNode;
+@ApplicationException(rollback = true)
+public class CertificateAuthorityAlreadyExistsException extends Exception {
 
-import be.fedict.trust.service.entity.TrustPointEntity;
+	private static final long serialVersionUID = 1L;
 
-@Local
-public interface TrustPoint {
-
-	/*
-	 * Trust points tree
-	 */
-	TreeNode<TrustPointEntity> getTreeNode();
-
-	/*
-	 * Lifecycle.
-	 */
-	void destroyCallback();
-
-	/*
-	 * Accessors
-	 */
-	String getName();
-
-	void setName(String name);
-
-	String getCrlRefreshCron();
-
-	void setCrlRefreshCron(String crlRefreshCron);
-
-	/*
-	 * Actions
-	 */
-	String save();
-
-	String remove();
-
-	String add();
 }

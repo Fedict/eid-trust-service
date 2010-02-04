@@ -8,7 +8,10 @@
 	<core:init jndi-pattern="fedict/eid/trust/admin/portal/#{ejbName}" />
 	<core:resource-loader>
 		<core:bundle-names>
-			<value>webapp</value>
+			<value>messages/webapp</value>
 		</core:bundle-names>
 	</core:resource-loader>
+	<component name="org.jboss.seam.transaction.facesTransactionEvents">
+		<property name="transactionFailedMessageEnabled">false</property>
+	</component>
 </components>

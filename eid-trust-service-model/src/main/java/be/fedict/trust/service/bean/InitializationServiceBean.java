@@ -19,8 +19,6 @@
 package be.fedict.trust.service.bean;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -31,7 +29,6 @@ import javax.ejb.Stateless;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.InitializationService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
@@ -104,8 +101,11 @@ public class InitializationServiceBean implements InitializationService {
 		// Belgian eID Root CA trust points
 		X509Certificate rootCaCertificate = loadCertificate("be/fedict/trust/belgiumrca.crt");
 		CertificateAuthorityEntity rootCa = this.trustDomainDAO
-				.addCertificateAuthority(getCrlUrl(rootCaCertificate),
-						rootCaCertificate, null);
+				.findCertificateAuthority(rootCaCertificate);
+		if (null == rootCa) {
+			rootCa = this.trustDomainDAO.addCertificateAuthority(
+					rootCaCertificate, null);
+		}
 
 		TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
 				.findTrustPoint(TrustServiceConstants.BELGIAN_EID_ROOT_CA_TRUST_POINT);
@@ -118,8 +118,11 @@ public class InitializationServiceBean implements InitializationService {
 
 		X509Certificate rootCa2Certificate = loadCertificate("be/fedict/trust/belgiumrca2.crt");
 		CertificateAuthorityEntity rootCa2 = this.trustDomainDAO
-				.addCertificateAuthority(getCrlUrl(rootCa2Certificate),
-						rootCa2Certificate, null);
+				.findCertificateAuthority(rootCa2Certificate);
+		if (null == rootCa2) {
+			rootCa2 = this.trustDomainDAO.addCertificateAuthority(
+					rootCa2Certificate, null);
+		}
 
 		TrustPointEntity rootCa2TrustPoint = this.trustDomainDAO
 				.findTrustPoint(TrustServiceConstants.BELGIAN_EID_ROOT_CA2_TRUST_POINT);
@@ -138,19 +141,6 @@ public class InitializationServiceBean implements InitializationService {
 			LOG.error("Failed to start timer for domain: "
 					+ beidTrustDomain.getName(), e);
 			throw new RuntimeException(e);
-		}
-	}
-
-	private String getCrlUrl(X509Certificate certificate) {
-
-		URI crlUri = CrlTrustLinker.getCrlUri(certificate);
-		if (null == crlUri)
-			return null;
-		try {
-			return crlUri.toURL().toString();
-		} catch (MalformedURLException e) {
-			LOG.warn("malformed URL: " + e.getMessage(), e);
-			return null;
 		}
 	}
 

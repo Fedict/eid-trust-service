@@ -18,6 +18,10 @@
 
 package be.fedict.trust.service.bean;
 
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -33,9 +37,12 @@ import be.fedict.trust.service.TimerInfo;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.TrustDomainDAO;
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.exception.CertificateAuthorityAlreadyExistsException;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 
 /**
  * Trust Domain Service Bean implementation.
@@ -134,5 +141,59 @@ public class TrustDomainServiceBean implements TrustDomainService {
 
 		// remove trust point
 		this.trustDomainDAO.removeTrustPoint(trustPoint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public TrustPointEntity addTrustPoint(String name, String crlRefreshCron,
+			TrustDomainEntity trustDomain, byte[] certificateBytes)
+			throws TrustPointAlreadyExistsException, CertificateException,
+			InvalidCronExpressionException,
+			CertificateAuthorityAlreadyExistsException {
+
+		LOG.debug("add trust point: " + name);
+
+		X509Certificate certificate = getCertificate(certificateBytes);
+
+		// check already exists
+		if (null != this.trustDomainDAO.findTrustPoint(name)) {
+			LOG.error("trust point already exist: " + name);
+			throw new TrustPointAlreadyExistsException();
+		} else if (null != this.trustDomainDAO
+				.findCertificateAuthority(certificate)) {
+			LOG.error("CA already exist: "
+					+ certificate.getSubjectX500Principal().toString());
+			throw new CertificateAuthorityAlreadyExistsException();
+		}
+
+		// add CA
+		CertificateAuthorityEntity certificateAuthority = this.trustDomainDAO
+				.addCertificateAuthority(certificate, null);
+
+		// add trust point
+		TrustPointEntity trustPoint = this.trustDomainDAO.addTrustPoint(name,
+				crlRefreshCron, trustDomain, certificateAuthority);
+
+		// manage relationship
+		certificateAuthority.setTrustPoint(trustPoint);
+
+		// start timer if needed
+		if (null != crlRefreshCron && !crlRefreshCron.isEmpty()) {
+			this.schedulingService.startTimer(trustPoint, false);
+		}
+
+		return trustPoint;
+	}
+
+	private X509Certificate getCertificate(byte[] certificateBytes)
+			throws CertificateException {
+
+		CertificateFactory certificateFactory = CertificateFactory
+				.getInstance("X.509");
+		X509Certificate certificate = (X509Certificate) certificateFactory
+				.generateCertificate(new ByteArrayInputStream(certificateBytes));
+		return certificate;
 	}
 }

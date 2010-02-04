@@ -18,11 +18,13 @@
 
 package be.fedict.trust.admin.portal.bean;
 
+import java.security.cert.CertificateException;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Remove;
 import javax.ejb.Stateful;
+import javax.faces.context.FacesContext;
 
 import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.seam.annotations.Destroy;
@@ -35,11 +37,14 @@ import org.jboss.seam.log.Log;
 import org.richfaces.model.TreeNode;
 import org.richfaces.model.TreeNodeImpl;
 
+import be.fedict.trust.admin.portal.AdminWebappConstants;
 import be.fedict.trust.admin.portal.TrustPoint;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.exception.CertificateAuthorityAlreadyExistsException;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 
 @Stateful
 @Name("trustPoint")
@@ -52,16 +57,19 @@ public class TrustPointBean implements TrustPoint {
 	@EJB
 	private TrustDomainService trustDomainService;
 
-	@In(create = true)
+	@In
 	FacesMessages facesMessages;
 
 	@In(value = TrustDomainBean.SELECTED_TRUST_DOMAIN)
 	private TrustDomainEntity selectedTrustDomain;
 
-	@In(value = "selectedTrustPoint", required = false)
+	@In(value = AdminWebappConstants.TRUST_POINT_SESSION_ATTRIBUTE, required = false)
 	private TrustPointEntity selectedTrustPoint;
 
 	private TreeNode<TrustPointEntity> rootNode = null;
+
+	private String name;
+	private String crlRefreshCron;
 
 	/**
 	 * {@inheritDoc}
@@ -127,4 +135,82 @@ public class TrustPointBean implements TrustPoint {
 		return "success";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public String add() {
+
+		this.log.debug("add trust point: name=" + this.name
+				+ " crlRefreshCron=" + this.crlRefreshCron);
+
+		byte[] certificateBytes = (byte[]) FacesContext.getCurrentInstance()
+				.getExternalContext().getSessionMap().get(
+						AdminWebappConstants.CERTIFICATE_SESSION_ATTRIBUTE);
+		if (null == certificateBytes) {
+			this.facesMessages.addFromResourceBundle(
+					StatusMessage.Severity.ERROR, "errorNoCertificate");
+			return null;
+		}
+
+		try {
+			this.trustDomainService.addTrustPoint(this.name,
+					this.crlRefreshCron, this.selectedTrustDomain,
+					certificateBytes);
+		} catch (CertificateException e) {
+			this.facesMessages.addFromResourceBundle(
+					StatusMessage.Severity.ERROR, "errorX509Encoding");
+			return null;
+		} catch (TrustPointAlreadyExistsException e) {
+			this.facesMessages.addFromResourceBundle(
+					StatusMessage.Severity.ERROR,
+					"errorTrustPointAlreadyExists");
+			return null;
+		} catch (InvalidCronExpressionException e) {
+			this.facesMessages.addFromResourceBundle(
+					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
+			return null;
+		} catch (CertificateAuthorityAlreadyExistsException e) {
+			this.facesMessages.addFromResourceBundle(
+					StatusMessage.Severity.ERROR, "errorCAAlreadyExists");
+			return null;
+		} finally {
+			FacesContext.getCurrentInstance().getExternalContext()
+					.getSessionMap().remove(
+							AdminWebappConstants.CERTIFICATE_SESSION_ATTRIBUTE);
+		}
+
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getName() {
+
+		return name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setName(String name) {
+
+		this.name = name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getCrlRefreshCron() {
+
+		return crlRefreshCron;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setCrlRefreshCron(String crlRefreshCron) {
+
+		this.crlRefreshCron = crlRefreshCron;
+	}
 }
