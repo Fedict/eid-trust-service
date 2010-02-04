@@ -6,22 +6,22 @@
 		<ui:composition template="/WEB-INF/template.xhtml">
 			<ui:param name="activeMenu" value="config" />
 			<ui:define name="body">
-				<h2>#{msgs.configuration}</h2>
+				<h2>#{messages.configuration}</h2>
 
 				<h:form id="network_form">
 					<h:panelGrid id="panel" columns="2" border="1">
 						<f:facet name="header">
-							<h:outputText value="#{msgs.networkConfig}" />
+							<h:outputText value="#{messages.networkConfig}" />
 						</f:facet>
 
-						<h:outputLabel for="host" value="#{msgs.proxyHost}" />
+						<h:outputLabel for="host" value="#{messages.proxyHost}" />
 						<s:decorate>
 							<h:inputText id="host" value="#{config.proxyHost}"
 								required="true" />
 							<h:message for="host" styleClass="error" />
 						</s:decorate>
 
-						<h:outputLabel for="port" value="#{msgs.proxyPort}" />
+						<h:outputLabel for="port" value="#{messages.proxyPort}" />
 						<s:decorate>
 							<h:inputText id="port" value="#{config.proxyPort}"
 								required="true">
@@ -29,12 +29,12 @@
 							<h:message for="port" styleClass="error" />
 						</s:decorate>
 
-						<h:outputLabel for="enabled" value="#{msgs.enabled}" />
+						<h:outputLabel for="enabled" value="#{messages.enabled}" />
 						<h:selectBooleanCheckbox value="#{config.enabled}" />
 
 						<f:facet name="footer">
 							<h:panelGroup style="display:block; text-align:center">
-								<h:commandButton id="submit" value="#{msgs.save}"
+								<h:commandButton id="submit" value="#{messages.save}"
 									action="#{config.saveNetworkConfig}" />
 							</h:panelGroup>
 						</f:facet>
@@ -46,10 +46,10 @@
 				<h:form id="clockdrift_form">
 					<h:panelGrid id="panel" columns="2" border="1">
 						<f:facet name="header">
-							<h:outputText value="#{msgs.clockDriftDetection}" />
+							<h:outputText value="#{messages.clockDriftDetection}" />
 						</f:facet>
 
-						<h:outputLabel for="protocol" value="#{msgs.protocol}" />
+						<h:outputLabel for="protocol" value="#{messages.protocol}" />
 						<s:decorate>
 							<h:selectOneMenu id="protocol"
 								value="#{config.clockDriftProtocol}" required="true">
@@ -58,14 +58,14 @@
 							</h:selectOneMenu>
 						</s:decorate>
 
-						<h:outputLabel for="server" value="#{msgs.server}" />
+						<h:outputLabel for="server" value="#{messages.server}" />
 						<s:decorate>
 							<h:inputText id="server" value="#{config.clockDriftServer}"
 								required="true" />
 							<h:message for="server" styleClass="error" />
 						</s:decorate>
 
-						<h:outputLabel for="timeout" value="#{msgs.timeout}" />
+						<h:outputLabel for="timeout" value="#{messages.timeout}" />
 						<s:decorate>
 							<h:inputText id="timeout" value="#{config.clockDriftTimeout}"
 								required="true">
@@ -73,7 +73,7 @@
 							<h:message for="timeout" styleClass="error" />
 						</s:decorate>
 
-						<h:outputLabel for="maxClockOffset" value="#{msgs.maxClockOffset}" />
+						<h:outputLabel for="maxClockOffset" value="#{messages.maxClockOffset}" />
 						<s:decorate>
 							<h:inputText id="maxClockOffset" value="#{config.clockDriftMaxClockOffset}"
 								required="true">
@@ -81,7 +81,7 @@
 							<h:message for="maxClockOffset" styleClass="error" />
 						</s:decorate>
 
-						<h:outputLabel for="cron" value="#{msgs.cron}" />
+						<h:outputLabel for="cron" value="#{messages.cron}" />
 						<s:decorate>
 							<h:inputText id="cron" value="#{config.clockDriftCron}"
 								required="true" />
@@ -90,7 +90,7 @@
 
 						<f:facet name="footer">
 							<h:panelGroup style="display:block; text-align:center">
-								<h:commandButton id="submit" value="#{msgs.save}"
+								<h:commandButton id="submit" value="#{messages.save}"
 									action="#{config.saveClockDriftConfig}" />
 							</h:panelGroup>
 						</f:facet>

@@ -9,7 +9,7 @@
 		<meta http-equiv="expires" content="0" />
 		<meta http-equiv="cache-control" content="no-cache, no-store" />
 		<meta http-equiv="pragma" content="no-cache" />
-		<title>#{msgs.title}</title>
+		<title>#{messages.title}</title>
 		<link rel="stylesheet" type="text/css"
 			href="#{facesContext.externalContext.requestContextPath}/style.css" />
 	</head>
@@ -21,7 +21,7 @@
 				<div id="ict">ict</div>
 				<div id="egov">e-gov</div>
 			</div>
-			<h1>#{msgs.title}</h1>
+			<h1>#{messages.title}</h1>
 		</div>
 
 		<f:view>
@@ -34,13 +34,13 @@
 									<c:when test="#{activeMenu == 'main'}">
 										<li class="selected">
 											<a
-												href="#{facesContext.externalContext.requestContextPath}/main.seam">#{msgs.home}</a>
+												href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
 										</li>
 									</c:when>
 									<c:otherwise>
 										<li>
 											<a
-												href="#{facesContext.externalContext.requestContextPath}/main.seam">#{msgs.home}</a>
+												href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
 										</li>
 									</c:otherwise>
 								</c:choose>
@@ -52,13 +52,13 @@
 									<c:when test="#{activeMenu == 'config'}">
 										<li class="selected">
 											<a
-												href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{msgs.configuration}</a>
+												href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{messages.configuration}</a>
 										</li>
 									</c:when>
 									<c:otherwise>
 										<li>
 											<a
-												href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{msgs.configuration}</a>
+												href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{messages.configuration}</a>
 										</li>
 									</c:otherwise>
 								</c:choose>
@@ -66,13 +66,13 @@
 									<c:when test="#{activeMenu == 'admin'}">
 										<li class="selected">
 											<a
-												href="#{facesContext.externalContext.requestContextPath}/admin.seam">#{msgs.admin}</a>
+												href="#{facesContext.externalContext.requestContextPath}/admin.seam">#{messages.admin}</a>
 										</li>
 									</c:when>
 									<c:otherwise>
 										<li>
 											<a
-												href="#{facesContext.externalContext.requestContextPath}/admin.seam">#{msgs.admin}</a>
+												href="#{facesContext.externalContext.requestContextPath}/admin.seam">#{messages.admin}</a>
 										</li>
 									</c:otherwise>
 								</c:choose>
@@ -80,13 +80,13 @@
 									<c:when test="#{activeMenu == 'domain'}">
 										<li class="selected">
 											<a
-												href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{msgs.trustDomains}</a>
+												href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{messages.trustDomains}</a>
 										</li>
 									</c:when>
 									<c:otherwise>
 										<li>
 											<a
-												href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{msgs.trustDomains}</a>
+												href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{messages.trustDomains}</a>
 										</li>
 									</c:otherwise>
 								</c:choose>
@@ -96,12 +96,12 @@
 						<c:choose>
 							<c:when test="#{userId == null}">
 								<li>
-									<a href="./login.seam">#{msgs.login}</a>
+									<a href="./login.seam">#{messages.login}</a>
 								</li>
 							</c:when>
 							<c:otherwise>
 								<li>
-									<a href="./logout">#{msgs.logout}</a>
+									<a href="./logout">#{messages.logout}</a>
 								</li>
 							</c:otherwise>
 						</c:choose>

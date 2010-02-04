@@ -8,31 +8,31 @@
 			<ui:param name="activeMenu" value="domain" />
 			<ui:define name="body">
 
-				<h2>#{msgs.trustPoint} : #{selectedTrustPoint.name}</h2>
+				<h2>#{messages.trustPoint} : #{selectedTrustPoint.name}</h2>
 
 				<h:form>
 
 					<h:panelGrid id="panel" columns="3" border="0">
-						<h:outputLabel for="cron" value="#{msgs.crlRefresh}" />
+						<h:outputLabel for="cron" value="#{messages.crlRefresh}" />
 						<s:decorate>
 							<h:inputText id="cron"
 								value="#{selectedTrustPoint.crlRefreshCron}" />
 							<h:message for="cron" styleClass="error" />
 						</s:decorate>
 						<h:commandButton action="#{trustPoint.save}" id="save"
-							value="#{msgs.save}" />
+							value="#{messages.save}" />
 					</h:panelGrid>
 
 					<h:panelGrid id="panel2" columns="2" border="0">
 						<h:commandButton action="#{trustPoint.remove}" id="remove"
-							value="#{msgs.remove}" immediate="true" />
-						<h:commandButton action="back" id="back" value="#{msgs.back}"
-							immediate="true" />
+							value="#{messages.remove}" immediate="true" />
+						<h:commandButton action="back" id="back"
+							value="#{messages.back}" immediate="true" />
 					</h:panelGrid>
 
 					<h:messages globalOnly="true" styleClass="error" />
 
-					<h3>#{msgs.certificate}</h3>
+					<h3>#{messages.certificate}</h3>
 					<p>
 						<h:outputText id="certificate" styleClass="text block"
 							value="#{selectedTrustPoint.certificateAuthority.certificate}" />

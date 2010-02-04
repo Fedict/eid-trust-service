@@ -6,19 +6,19 @@
 		<ui:composition template="/WEB-INF/template.xhtml">
 			<ui:param name="activeMenu" value="admin" />
 			<ui:define name="body">
-				<h2>#{msgs.manageAdmin}</h2>
+				<h2>#{messages.manageAdmin}</h2>
 
 				<h:form id="form">
 					<rich:dataTable id="data" var="item" value="#{adminList}"
 						rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
 
 						<h:column>
-							<f:facet name="header">#{msgs.admin}</f:facet>
+							<f:facet name="header">#{messages.admin}</f:facet>
 							<h:outputText value="#{item.name}" />
 						</h:column>
 						<h:column>
-							<f:facet name="header">#{msgs.remove}</f:facet>
-							<h:commandLink id="remove" value="#{msgs.remove}"
+							<f:facet name="header">#{messages.remove}</f:facet>
+							<h:commandLink id="remove" value="#{messages.remove}"
 								action="#{admin.remove}" />
 						</h:column>
 						<f:facet name="footer">
@@ -30,7 +30,8 @@
 
 					<h:messages styleClass="error" globalOnly="true" />
 					<p>
-						<a href="./register.seam">#{msgs.registerAdmin}</a>
+						<a href="./register.seam">
+							#{messages.registerAdmin}</a>
 					</p>
 
 				</h:form>
