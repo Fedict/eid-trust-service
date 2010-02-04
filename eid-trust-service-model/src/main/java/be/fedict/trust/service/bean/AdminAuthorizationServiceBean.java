@@ -19,7 +19,6 @@
 package be.fedict.trust.service.bean;
 
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -72,25 +71,5 @@ public class AdminAuthorizationServiceBean implements AdminAuthorizationService 
 
 		LOG.error("administrator not found");
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void validateCertificateChain(List<X509Certificate> authnCertChain)
-			throws SecurityException {
-
-		LOG.debug("validateCertificateChain");
-		if (authnCertChain.size() < 2) {
-			LOG.error("no root certificate found");
-			throw new SecurityException("No root certificate found");
-		}
-		try {
-			authnCertChain.get(0).verify(authnCertChain.get(1).getPublicKey());
-		} catch (Exception e) {
-			LOG.error("verification error: " + e.getMessage());
-			throw new SecurityException(e);
-		}
-
 	}
 }

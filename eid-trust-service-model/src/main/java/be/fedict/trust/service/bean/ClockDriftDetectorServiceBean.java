@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -96,30 +99,29 @@ public class ClockDriftDetectorServiceBean implements ClockDriftService {
 		try {
 			NTPUDPClient client = new NTPUDPClient();
 			if (null != networkConfig) {
-				final InetAddress proxyAddress = InetAddress
-						.getByName(networkConfig.getProxyHost());
+
+				SocketAddress addr = new InetSocketAddress(networkConfig
+						.getProxyHost(), networkConfig.getProxyPort());
+				final Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
 
 				client.setDatagramSocketFactory(new DatagramSocketFactory() {
 
 					public DatagramSocket createDatagramSocket(int port,
 							InetAddress laddr) throws SocketException {
 
-						return new DatagramSocket(networkConfig.getProxyPort(),
-								proxyAddress);
+						return new DatagramSocket(proxy.address());
 					}
 
 					public DatagramSocket createDatagramSocket(int port)
 							throws SocketException {
 
-						return new DatagramSocket(networkConfig.getProxyPort(),
-								proxyAddress);
+						return new DatagramSocket(proxy.address());
 					}
 
 					public DatagramSocket createDatagramSocket()
 							throws SocketException {
 
-						return new DatagramSocket(networkConfig.getProxyPort(),
-								proxyAddress);
+						return new DatagramSocket(proxy.address());
 					}
 				});
 			}
