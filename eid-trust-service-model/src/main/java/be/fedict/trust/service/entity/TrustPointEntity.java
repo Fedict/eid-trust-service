@@ -64,15 +64,14 @@ public class TrustPointEntity implements Serializable {
 	/**
 	 * Main constructor.
 	 * 
-	 * @param name
 	 * @param crlRefreshCron
 	 * @param trustDomain
 	 * @param certificateAuthority
 	 */
-	public TrustPointEntity(String name, String crlRefreshCron,
+	public TrustPointEntity(String crlRefreshCron,
 			TrustDomainEntity trustDomain,
 			CertificateAuthorityEntity certificateAuthority) {
-		this.name = name;
+		this.name = certificateAuthority.getName();
 		this.trustDomain = trustDomain;
 		this.certificateAuthority = certificateAuthority;
 		this.crlRefreshCron = crlRefreshCron;

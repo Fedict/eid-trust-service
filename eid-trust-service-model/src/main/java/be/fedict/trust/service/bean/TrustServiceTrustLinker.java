@@ -80,9 +80,8 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		if (null == certificateAuthority) {
 			LOG.debug("no data cache entry for CA: " + issuerName);
 			URI crlUri = CrlTrustLinker.getCrlUri(childCertificate);
-			String crlUrl;
 			try {
-				crlUrl = crlUri.toURL().toString();
+				crlUri.toURL().toString();
 			} catch (MalformedURLException e) {
 				LOG.warn("malformed URL: " + e.getMessage(), e);
 				return null;
@@ -123,8 +122,9 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			// create new CA
 			try {
 				certificateAuthority = new CertificateAuthorityEntity(
-						issuerName, crlUrl, certificate,
-						parentCertificateAuthority.getTrustPoint());
+						certificate);
+				certificateAuthority.setTrustPoint(parentCertificateAuthority
+						.getTrustPoint());
 			} catch (CertificateEncodingException e) {
 				LOG.error("certificate encoding error: " + e.getMessage(), e);
 				return null;

@@ -18,8 +18,6 @@
 
 package be.fedict.trust.service.dao.bean;
 
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -32,7 +30,6 @@ import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -89,15 +86,6 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public TrustPointEntity findTrustPoint(String name) {
-
-		LOG.debug("find trust point: " + name);
-		return this.entityManager.find(TrustPointEntity.class, name);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public TrustDomainEntity addTrustDomain(String name, String crlRefreshCron) {
 
 		LOG.debug("add trust domain name=" + name + " crlRefreshCron="
@@ -139,15 +127,13 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	 * {@inheritDoc}
 	 */
 	public CertificateAuthorityEntity addCertificateAuthority(
-			X509Certificate certificate, TrustPointEntity trustPoint) {
+			X509Certificate certificate) {
 
 		LOG.debug("add  CA: "
 				+ certificate.getSubjectX500Principal().toString());
 		CertificateAuthorityEntity certificateAuthority;
 		try {
-			certificateAuthority = new CertificateAuthorityEntity(certificate
-					.getSubjectX500Principal().toString(),
-					getCrlUrl(certificate), certificate, trustPoint);
+			certificateAuthority = new CertificateAuthorityEntity(certificate);
 		} catch (CertificateEncodingException e) {
 			LOG.error("Certificate encoding exception: " + e.getMessage());
 			return null;
@@ -169,29 +155,16 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 
 	}
 
-	private String getCrlUrl(X509Certificate certificate) {
-
-		URI crlUri = CrlTrustLinker.getCrlUri(certificate);
-		if (null == crlUri)
-			return null;
-		try {
-			return crlUri.toURL().toString();
-		} catch (MalformedURLException e) {
-			LOG.warn("malformed URL: " + e.getMessage(), e);
-			return null;
-		}
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
-	public TrustPointEntity addTrustPoint(String name, String crlRefreshCron,
+	public TrustPointEntity addTrustPoint(String crlRefreshCron,
 			TrustDomainEntity trustDomain, CertificateAuthorityEntity ca) {
 
-		LOG.debug("add trust point name=" + name + " crlRefreshCron="
+		LOG.debug("add trust point " + ca.getName() + " crlRefreshCron="
 				+ crlRefreshCron);
-		TrustPointEntity trustPoint = new TrustPointEntity(name,
-				crlRefreshCron, trustDomain, ca);
+		TrustPointEntity trustPoint = new TrustPointEntity(crlRefreshCron,
+				trustDomain, ca);
 		this.entityManager.persist(trustPoint);
 		return trustPoint;
 	}
@@ -255,8 +228,16 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	public void removeTrustPoint(TrustPointEntity trustPoint) {
 
 		LOG.debug("remove trust point " + trustPoint.getName());
-		TrustPointEntity attachedTrustPoint = this.entityManager.find(
-				TrustPointEntity.class, trustPoint.getName());
+		TrustPointEntity attachedTrustPoint = attachTrustPoint(trustPoint);
 		this.entityManager.remove(attachedTrustPoint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public TrustPointEntity attachTrustPoint(TrustPointEntity trustPoint) {
+
+		return this.entityManager.find(TrustPointEntity.class, trustPoint
+				.getName());
 	}
 }

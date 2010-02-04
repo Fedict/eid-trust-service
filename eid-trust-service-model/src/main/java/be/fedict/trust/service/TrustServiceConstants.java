@@ -38,8 +38,6 @@ public abstract class TrustServiceConstants {
 	public static final int CLOCK_DRIFT_MAX_CLOCK_OFFSET = 5 * 1000;
 
 	public static final String BELGIAN_EID_TRUST_DOMAIN = "BE";
-	public static final String BELGIAN_EID_ROOT_CA_TRUST_POINT = "Belgian eID Root CA";
-	public static final String BELGIAN_EID_ROOT_CA2_TRUST_POINT = "Belgian eID Root CA2";
 
 	public static final String DEFAULT_CRON = "0 0 0/3 * * ?";
 }

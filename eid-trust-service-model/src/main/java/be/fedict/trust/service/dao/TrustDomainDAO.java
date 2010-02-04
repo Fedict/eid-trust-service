@@ -85,10 +85,9 @@ public interface TrustDomainDAO {
 	 * Create a new {@link CertificateAuthorityEntity}.
 	 * 
 	 * @param rootCaCertificate
-	 * @param trustPoint
 	 */
 	CertificateAuthorityEntity addCertificateAuthority(
-			X509Certificate certificate, TrustPointEntity trustPoint);
+			X509Certificate certificate);
 
 	/**
 	 * Returns {@link CertificateAuthorityEntity} from the specified
@@ -101,22 +100,13 @@ public interface TrustDomainDAO {
 			X509Certificate certificate);
 
 	/**
-	 * Return {@link TrustPointEntity} from specified name. Returns
-	 * <code>null</code> if not found.
-	 * 
-	 * @param name
-	 */
-	TrustPointEntity findTrustPoint(String name);
-
-	/**
 	 * Create a new {@link TrustPointEntity}.
 	 * 
-	 * @param name
 	 * @param crlRefreshCron
 	 * @param trustDomain
 	 * @param ca
 	 */
-	TrustPointEntity addTrustPoint(String name, String crlRefreshCron,
+	TrustPointEntity addTrustPoint(String crlRefreshCron,
 			TrustDomainEntity trustDomain, CertificateAuthorityEntity ca);
 
 	/**
@@ -160,4 +150,12 @@ public interface TrustDomainDAO {
 	 * @param trustPoint
 	 */
 	void removeTrustPoint(TrustPointEntity trustPoint);
+
+	/**
+	 * Returns the attached {@link TrustPointEntity}.
+	 * 
+	 * @param trustPoint
+	 * @return
+	 */
+	TrustPointEntity attachTrustPoint(TrustPointEntity trustPoint);
 }

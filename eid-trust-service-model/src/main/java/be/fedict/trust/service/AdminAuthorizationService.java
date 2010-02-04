@@ -22,6 +22,7 @@ import java.security.cert.X509Certificate;
 
 import javax.ejb.Local;
 
+import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.trust.service.entity.AdminEntity;
 
 /**
@@ -31,7 +32,7 @@ import be.fedict.trust.service.entity.AdminEntity;
  * 
  */
 @Local
-public interface AdminAuthorizationService {
+public interface AdminAuthorizationService extends AuthenticationService {
 
 	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
 			+ "/AdminAuthorizationServiceBean";

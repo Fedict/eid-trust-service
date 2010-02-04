@@ -103,35 +103,29 @@ public class InitializationServiceBean implements InitializationService {
 		CertificateAuthorityEntity rootCa = this.trustDomainDAO
 				.findCertificateAuthority(rootCaCertificate);
 		if (null == rootCa) {
-			rootCa = this.trustDomainDAO.addCertificateAuthority(
-					rootCaCertificate, null);
+			rootCa = this.trustDomainDAO
+					.addCertificateAuthority(rootCaCertificate);
 		}
 
-		TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
-				.findTrustPoint(TrustServiceConstants.BELGIAN_EID_ROOT_CA_TRUST_POINT);
-		if (null == rootCaTrustPoint) {
-			rootCaTrustPoint = this.trustDomainDAO.addTrustPoint(
-					TrustServiceConstants.BELGIAN_EID_ROOT_CA_TRUST_POINT,
-					null, beidTrustDomain, rootCa);
+		if (null == rootCa.getTrustPoint()) {
+			TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
+					.addTrustPoint(null, beidTrustDomain, rootCa);
+			rootCa.setTrustPoint(rootCaTrustPoint);
 		}
-		rootCa.setTrustPoint(rootCaTrustPoint);
 
 		X509Certificate rootCa2Certificate = loadCertificate("be/fedict/trust/belgiumrca2.crt");
 		CertificateAuthorityEntity rootCa2 = this.trustDomainDAO
 				.findCertificateAuthority(rootCa2Certificate);
 		if (null == rootCa2) {
-			rootCa2 = this.trustDomainDAO.addCertificateAuthority(
-					rootCa2Certificate, null);
+			rootCa2 = this.trustDomainDAO
+					.addCertificateAuthority(rootCa2Certificate);
 		}
 
-		TrustPointEntity rootCa2TrustPoint = this.trustDomainDAO
-				.findTrustPoint(TrustServiceConstants.BELGIAN_EID_ROOT_CA2_TRUST_POINT);
-		if (null == rootCa2TrustPoint) {
-			rootCa2TrustPoint = this.trustDomainDAO.addTrustPoint(
-					TrustServiceConstants.BELGIAN_EID_ROOT_CA2_TRUST_POINT,
-					null, beidTrustDomain, rootCa2);
+		if (null == rootCa2.getTrustPoint()) {
+			TrustPointEntity rootCa2TrustPoint = this.trustDomainDAO
+					.addTrustPoint(null, beidTrustDomain, rootCa2);
+			rootCa2.setTrustPoint(rootCa2TrustPoint);
 		}
-		rootCa2.setTrustPoint(rootCa2TrustPoint);
 
 		// Belgian eID trust domain timer
 		LOG.debug("start timer for domain " + beidTrustDomain.getName());

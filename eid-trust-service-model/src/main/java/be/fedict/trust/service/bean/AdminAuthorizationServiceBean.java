@@ -19,6 +19,7 @@
 package be.fedict.trust.service.bean;
 
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -71,5 +72,12 @@ public class AdminAuthorizationServiceBean implements AdminAuthorizationService 
 
 		LOG.error("administrator not found");
 		return null;
+	}
+
+	public void validateCertificateChain(List<X509Certificate> arg0)
+			throws SecurityException {
+
+		// do nothing
+		return;
 	}
 }

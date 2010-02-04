@@ -27,7 +27,6 @@ import javax.ejb.Timer;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
-import be.fedict.trust.service.exception.CertificateAuthorityAlreadyExistsException;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 
@@ -76,7 +75,6 @@ public interface TrustDomainService {
 	/**
 	 * Add a new {@link TrustPointEntity}.
 	 * 
-	 * @param name
 	 * @param crlRefreshCron
 	 * @param trustDomain
 	 * @param certificateBytes
@@ -84,13 +82,11 @@ public interface TrustDomainService {
 	 * @throws TrustPointAlreadyExistsException
 	 * @throws CertificateException
 	 * @throws InvalidCronExpressionException
-	 * @throws CertificateAuthorityAlreadyExistsException
 	 */
-	TrustPointEntity addTrustPoint(String name, String crlRefreshCron,
+	TrustPointEntity addTrustPoint(String crlRefreshCron,
 			TrustDomainEntity trustDomain, byte[] certificateBytes)
 			throws TrustPointAlreadyExistsException, CertificateException,
-			InvalidCronExpressionException,
-			CertificateAuthorityAlreadyExistsException;
+			InvalidCronExpressionException;
 
 	/**
 	 * Sets the specified {@link TrustDomainEntity} as default.

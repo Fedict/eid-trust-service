@@ -42,7 +42,6 @@ import be.fedict.trust.admin.portal.TrustPoint;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
-import be.fedict.trust.service.exception.CertificateAuthorityAlreadyExistsException;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 
@@ -68,7 +67,6 @@ public class TrustPointBean implements TrustPoint {
 
 	private TreeNode<TrustPointEntity> rootNode = null;
 
-	private String name;
 	private String crlRefreshCron;
 
 	/**
@@ -140,7 +138,7 @@ public class TrustPointBean implements TrustPoint {
 	 */
 	public String add() {
 
-		this.log.debug("add trust point: name=#0 crlRefreshCron=#1", this.name,
+		this.log.debug("add trust point: crlRefreshCron=#0",
 				this.crlRefreshCron);
 
 		byte[] certificateBytes = (byte[]) FacesContext.getCurrentInstance()
@@ -153,9 +151,8 @@ public class TrustPointBean implements TrustPoint {
 		}
 
 		try {
-			this.trustDomainService.addTrustPoint(this.name,
-					this.crlRefreshCron, this.selectedTrustDomain,
-					certificateBytes);
+			this.trustDomainService.addTrustPoint(this.crlRefreshCron,
+					this.selectedTrustDomain, certificateBytes);
 		} catch (CertificateException e) {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorX509Encoding");
@@ -169,10 +166,6 @@ public class TrustPointBean implements TrustPoint {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
 			return null;
-		} catch (CertificateAuthorityAlreadyExistsException e) {
-			this.facesMessages.addFromResourceBundle(
-					StatusMessage.Severity.ERROR, "errorCAAlreadyExists");
-			return null;
 		} finally {
 			FacesContext.getCurrentInstance().getExternalContext()
 					.getSessionMap().remove(
@@ -180,22 +173,6 @@ public class TrustPointBean implements TrustPoint {
 		}
 
 		return "success";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getName() {
-
-		return name;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setName(String name) {
-
-		this.name = name;
 	}
 
 	/**

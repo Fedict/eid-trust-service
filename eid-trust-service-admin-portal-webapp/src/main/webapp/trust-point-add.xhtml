@@ -14,13 +14,6 @@
 
 					<h:panelGrid id="panel" columns="2" border="0">
 
-						<h:outputLabel for="name" value="#{messages.name}" />
-						<s:decorate>
-							<h:inputText id="name" value="#{trustPoint.name}"
-								required="true" />
-							<h:message for="name" styleClass="error" />
-						</s:decorate>
-
 						<h:outputLabel for="cron" value="#{messages.crlRefresh}" />
 						<s:decorate>
 							<h:inputText id="cron" value="#{trustPoint.crlRefreshCron}" />

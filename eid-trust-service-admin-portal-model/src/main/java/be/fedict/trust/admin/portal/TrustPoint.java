@@ -40,10 +40,6 @@ public interface TrustPoint {
 	/*
 	 * Accessors
 	 */
-	String getName();
-
-	void setName(String name);
-
 	String getCrlRefreshCron();
 
 	void setCrlRefreshCron(String crlRefreshCron);

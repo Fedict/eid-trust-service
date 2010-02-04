@@ -21,6 +21,8 @@ package be.fedict.trust.service.entity;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -42,6 +44,11 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import be.fedict.trust.crl.CrlTrustLinker;
+
 @Entity
 @Table(name = "certificate_authorities")
 @NamedQueries( {
@@ -52,6 +59,9 @@ import javax.persistence.Transient;
 public class CertificateAuthorityEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final Log LOG = LogFactory
+			.getLog(CertificateAuthorityEntity.class);
 
 	public static final String QUERY_WHERE_TRUST_POINT = "ca.q.w.tp";
 	public static final String DELETE_WHERE_TRUST_POINT = "ca.d.w.tp";
@@ -80,22 +90,20 @@ public class CertificateAuthorityEntity implements Serializable {
 	/**
 	 * Main constructor.
 	 * 
-	 * @param name
 	 * @param crlUrl
 	 * @param certificate
 	 * @param trustPoint
 	 * @throws CertificateEncodingException
 	 */
-	public CertificateAuthorityEntity(String name, String crlUrl,
-			X509Certificate certificate, TrustPointEntity trustPoint)
+	public CertificateAuthorityEntity(X509Certificate certificate)
 			throws CertificateEncodingException {
-		this.crlUrl = crlUrl;
-		this.name = name;
+		this.name = certificate.getSubjectX500Principal().toString();
+		this.crlUrl = getCrlUrl(certificate);
 		this.status = Status.INACTIVE;
 		this.encodedCertificate = certificate.getEncoded();
 		this.thisUpdate = null;
 		this.nextUpdate = null;
-		this.trustPoint = trustPoint;
+		this.trustPoint = null;
 	}
 
 	@Id
@@ -178,4 +186,18 @@ public class CertificateAuthorityEntity implements Serializable {
 			throw new RuntimeException("cert factory error: " + e.getMessage());
 		}
 	}
+
+	private String getCrlUrl(X509Certificate certificate) {
+
+		URI crlUri = CrlTrustLinker.getCrlUri(certificate);
+		if (null == crlUri)
+			return null;
+		try {
+			return crlUri.toURL().toString();
+		} catch (MalformedURLException e) {
+			LOG.warn("malformed URL: " + e.getMessage(), e);
+			return null;
+		}
+	}
+
 }
