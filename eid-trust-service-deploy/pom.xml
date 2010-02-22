@@ -101,12 +101,6 @@
 							<includeInApplicationXml>true</includeInApplicationXml>
 							<bundleDir>lib</bundleDir>
 						</jarModule>
-						<jarModule>
-							<groupId>commons-net</groupId>
-							<artifactId>commons-net</artifactId>
-							<includeInApplicationXml>true</includeInApplicationXml>
-							<bundleDir>lib</bundleDir>
-						</jarModule>
 					</modules>
 					<version>5</version>
 				</configuration>

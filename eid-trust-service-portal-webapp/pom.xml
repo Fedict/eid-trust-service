@@ -31,7 +31,8 @@
 									<groupId>be.fedict.eid-applet</groupId>
 									<artifactId>eid-applet-package</artifactId>
 									<type>jar</type>
-									<outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
+									<outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
+									</outputDirectory>
 									<destFileName>eid-applet.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
@@ -121,14 +122,17 @@
 		<dependency>
 			<groupId>org.richfaces.framework</groupId>
 			<artifactId>richfaces-impl-jsf2</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.richfaces.ui</groupId>
 			<artifactId>richfaces-ui</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.facelets</groupId>
 			<artifactId>jsf-facelets</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-collections</groupId>

@@ -74,6 +74,7 @@
 		<dependency>
 			<groupId>org.jboss.security</groupId>
 			<artifactId>jbosssx-client</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
