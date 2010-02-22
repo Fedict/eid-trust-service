@@ -20,31 +20,48 @@ package be.fedict.trust.service.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.ejb.TimerHandle;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 
 @Entity
 @Table(name = "trust_domain")
 @NamedQueries( {
 		@NamedQuery(name = TrustDomainEntity.QUERY_LIST_ALL, query = "FROM TrustDomainEntity"),
 		@NamedQuery(name = TrustDomainEntity.QUERY_GET_DEFAULT, query = "SELECT td FROM TrustDomainEntity AS td "
-				+ "WHERE td.defaultDomain = true") })
+				+ "WHERE td.defaultDomain = true"),
+		@NamedQuery(name = TrustDomainEntity.QUERY_LIST_TRUST_POINTS, query = "SELECT td.trustPoints FROM TrustDomainEntity AS td "
+				+ "WHERE td.name = :name") })
 public class TrustDomainEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	public static final String QUERY_LIST_ALL = "td.list.all";
 	public static final String QUERY_GET_DEFAULT = "td.get.default";
+	public static final String QUERY_LIST_TRUST_POINTS = "td.list.tp";
 
 	private String name;
 
 	private boolean defaultDomain = false;
+
+	// trust points
+	private List<TrustPointEntity> trustPoints;
+
+	// certificate constraints
+	private List<CertificateConstraintEntity> certificateConstraints;
 
 	private String crlRefreshCron;
 	private TimerHandle timerHandle;
@@ -55,6 +72,8 @@ public class TrustDomainEntity implements Serializable {
 	 */
 	public TrustDomainEntity() {
 		super();
+		this.certificateConstraints = new LinkedList<CertificateConstraintEntity>();
+		this.trustPoints = new LinkedList<TrustPointEntity>();
 	}
 
 	/**
@@ -64,8 +83,11 @@ public class TrustDomainEntity implements Serializable {
 	 * @param crlRefreshCron
 	 */
 	public TrustDomainEntity(String name, String crlRefreshCron) {
+
 		this.name = name;
 		this.crlRefreshCron = crlRefreshCron;
+		this.certificateConstraints = new LinkedList<CertificateConstraintEntity>();
+		this.trustPoints = new LinkedList<TrustPointEntity>();
 	}
 
 	@Id
@@ -95,6 +117,29 @@ public class TrustDomainEntity implements Serializable {
 	public void setDefaultDomain(boolean defaultDomain) {
 
 		this.defaultDomain = defaultDomain;
+	}
+
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+	public List<CertificateConstraintEntity> getCertificateConstraints() {
+
+		return this.certificateConstraints;
+	}
+
+	public void setCertificateConstraints(
+			List<CertificateConstraintEntity> certificateConstraints) {
+
+		this.certificateConstraints = certificateConstraints;
+	}
+
+	@ManyToMany
+	public List<TrustPointEntity> getTrustPoints() {
+
+		return this.trustPoints;
+	}
+
+	public void setTrustPoints(List<TrustPointEntity> trustPoints) {
+
+		this.trustPoints = trustPoints;
 	}
 
 	@Lob

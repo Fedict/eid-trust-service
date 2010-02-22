@@ -44,6 +44,7 @@ import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
+import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
@@ -78,21 +79,21 @@ public class TrustServiceBean implements TrustService {
 		TrustLinker trustLinker = new TrustServiceTrustLinker(
 				this.entityManager, this.queueConnectionFactory, this.queue);
 
-		// Get Belgian eID trust points
-		List<TrustPointEntity> trustPoints;
+		// XXX: for now just get the auth eid domain as default
+		TrustDomainEntity trustDomain;
 		try {
-			trustPoints = this.trustDomainDAO
-					.listTrustPoints(TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
+			trustDomain = this.trustDomainDAO
+					.getTrustDomain(TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN);
 		} catch (TrustDomainNotFoundException e) {
 			LOG.error("Trust domain "
-					+ TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN
+					+ TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN
 					+ " not found");
 			// XXX: audit?
 			throw new EJBException(e);
 		}
 
 		MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
-		for (TrustPointEntity trustPoint : trustPoints) {
+		for (TrustPointEntity trustPoint : trustDomain.getTrustPoints()) {
 			certificateRepository.addTrustPoint(trustPoint
 					.getCertificateAuthority().getCertificate());
 		}

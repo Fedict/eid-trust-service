@@ -41,11 +41,9 @@ import org.apache.commons.logging.LogFactory;
 
 import be.fedict.trust.TrustLinker;
 import be.fedict.trust.crl.CrlTrustLinker;
-import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.Status;
-import be.fedict.trust.service.entity.TrustDomainEntity;
 
 /**
  * Implementation of a trust linker based on the trust service infrastructure.
@@ -98,25 +96,6 @@ public class TrustServiceTrustLinker implements TrustLinker {
 					.find(CertificateAuthorityEntity.class, parentIssuerName);
 			if (null == parentCertificateAuthority) {
 				LOG.error("CA not found for " + parentIssuerName + " ?!");
-				// XXX: audit?
-				return null;
-			}
-
-			// check that we are dealing with correct trust domain
-			// XXX: for now just default to Belgian eID trust domain
-			TrustDomainEntity trustDomain = this.entityManager.find(
-					TrustDomainEntity.class,
-					TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
-			if (null == trustDomain) {
-				LOG.error("Trust domain not found");
-				return null;
-			}
-			if (!trustDomain.equals(parentCertificateAuthority.getTrustPoint()
-					.getTrustDomain())) {
-				LOG.error("Invalid trust domain: "
-						+ parentCertificateAuthority.getTrustPoint()
-								.getTrustDomain().getName() + " expected: "
-						+ trustDomain.getName());
 				// XXX: audit?
 				return null;
 			}

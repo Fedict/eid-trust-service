@@ -39,6 +39,12 @@ import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.RevokedCertificatePK;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
+import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
+import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
+import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
+import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 
 public class PersistenceTest {
 
@@ -60,6 +66,12 @@ public class PersistenceTest {
 		configuration.addAnnotatedClass(CertificateAuthorityEntity.class);
 		configuration.addAnnotatedClass(RevokedCertificateEntity.class);
 		configuration.addAnnotatedClass(TrustDomainEntity.class);
+		configuration.addAnnotatedClass(CertificateConstraintEntity.class);
+		configuration.addAnnotatedClass(PolicyConstraintEntity.class);
+		configuration.addAnnotatedClass(DNConstraintEntity.class);
+		configuration.addAnnotatedClass(EndEntityConstraintEntity.class);
+		configuration.addAnnotatedClass(KeyUsageConstraintEntity.class);
+		configuration.addAnnotatedClass(QCStatementsConstraintEntity.class);
 		configuration.addAnnotatedClass(TrustPointEntity.class);
 		EntityManagerFactory entityManagerFactory = configuration
 				.buildEntityManagerFactory();

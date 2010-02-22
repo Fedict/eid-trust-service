@@ -18,6 +18,7 @@
 
 package be.fedict.trust.service.dao.bean;
 
+import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -34,6 +35,8 @@ import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 /**
@@ -160,12 +163,11 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	 * {@inheritDoc}
 	 */
 	public TrustPointEntity addTrustPoint(String crlRefreshCron,
-			TrustDomainEntity trustDomain, CertificateAuthorityEntity ca) {
+			CertificateAuthorityEntity ca) {
 
 		LOG.debug("add trust point " + ca.getName() + " crlRefreshCron="
 				+ crlRefreshCron);
-		TrustPointEntity trustPoint = new TrustPointEntity(crlRefreshCron,
-				trustDomain, ca);
+		TrustPointEntity trustPoint = new TrustPointEntity(crlRefreshCron, ca);
 		this.entityManager.persist(trustPoint);
 		return trustPoint;
 	}
@@ -207,8 +209,8 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 				.debug("list trust points for trust domain "
 						+ trustDomain.getName());
 		Query query = this.entityManager
-				.createNamedQuery(TrustPointEntity.QUERY_WHERE_TRUST_DOMAIN);
-		query.setParameter("trustDomain", trustDomain);
+				.createNamedQuery(TrustDomainEntity.QUERY_LIST_TRUST_POINTS);
+		query.setParameter("name", trustDomain.getName());
 		return (List<TrustPointEntity>) query.getResultList();
 	}
 
@@ -240,5 +242,33 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 
 		return this.entityManager.find(TrustPointEntity.class, trustPoint
 				.getName());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addCertificatePolicy(TrustDomainEntity trustDomain,
+			String policy) {
+
+		PolicyConstraintEntity certificatePolicyCertificateConstraint = new PolicyConstraintEntity(
+				trustDomain, policy);
+		this.entityManager.persist(certificatePolicyCertificateConstraint);
+		trustDomain.getCertificateConstraints().add(
+				certificatePolicyCertificateConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addEndEntityConstraint(TrustDomainEntity trustDomain,
+			X509Certificate certificate) {
+
+		String issuerName = certificate.getIssuerX500Principal().getName();
+		BigInteger serialNumber = certificate.getSerialNumber();
+		EndEntityConstraintEntity endEntityCertificateConstraint = new EndEntityConstraintEntity(
+				trustDomain, issuerName, serialNumber);
+		this.entityManager.persist(endEntityCertificateConstraint);
+		trustDomain.getCertificateConstraints().add(
+				endEntityCertificateConstraint);
 	}
 }

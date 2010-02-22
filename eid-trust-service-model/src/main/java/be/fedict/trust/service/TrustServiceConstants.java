@@ -37,7 +37,9 @@ public abstract class TrustServiceConstants {
 	public static final int CLOCK_DRIFT_TIMEOUT = 10 * 1000;
 	public static final int CLOCK_DRIFT_MAX_CLOCK_OFFSET = 5 * 1000;
 
-	public static final String BELGIAN_EID_TRUST_DOMAIN = "BE";
+	public static final String BELGIAN_EID_AUTH_TRUST_DOMAIN = "BE-AUTH";
+	public static final String BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN = "BE";
+	public static final String BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN = "BE-NAT-REG";
 
 	public static final String DEFAULT_CRON = "0 0 0/3 * * ?";
 }

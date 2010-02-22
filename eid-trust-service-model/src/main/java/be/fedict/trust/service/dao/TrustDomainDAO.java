@@ -23,9 +23,11 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import be.fedict.trust.constraints.CertificatePoliciesCertificateConstraint;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 /**
@@ -103,11 +105,10 @@ public interface TrustDomainDAO {
 	 * Create a new {@link TrustPointEntity}.
 	 * 
 	 * @param crlRefreshCron
-	 * @param trustDomain
 	 * @param ca
 	 */
 	TrustPointEntity addTrustPoint(String crlRefreshCron,
-			TrustDomainEntity trustDomain, CertificateAuthorityEntity ca);
+			CertificateAuthorityEntity ca);
 
 	/**
 	 * Returns list of {@link TrustPointEntity}'s attached to the specified
@@ -158,4 +159,23 @@ public interface TrustDomainDAO {
 	 * @return
 	 */
 	TrustPointEntity attachTrustPoint(TrustPointEntity trustPoint);
+
+	/**
+	 * Add a new {@link CertificatePoliciesCertificateConstraint} to the
+	 * {@link TrustDomainEntity}'s list of certificate contraints.
+	 * 
+	 * @param trustDomain
+	 * @param policy
+	 */
+	void addCertificatePolicy(TrustDomainEntity trustDomain, String policy);
+
+	/**
+	 * Add a new {@link EndEntityConstraintEntity} to the
+	 * {@link TrustDomainEntity}'s list of certificate contraints.
+	 * 
+	 * @param trustDomain
+	 * @param certificate
+	 */
+	void addEndEntityConstraint(TrustDomainEntity trustDomain,
+			X509Certificate certificate);
 }

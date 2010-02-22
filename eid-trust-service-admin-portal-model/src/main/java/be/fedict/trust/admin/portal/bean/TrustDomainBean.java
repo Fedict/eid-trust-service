@@ -122,6 +122,7 @@ public class TrustDomainBean implements TrustDomain {
 
 		this.log.debug("set default trust domain: #0", this.selectedTrustDomain
 				.getName());
+		this.trustDomainService.setDefault(this.selectedTrustDomain);
 		trustDomainListFactory();
 		return "success";
 	}

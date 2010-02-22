@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -66,9 +68,25 @@ public class InitializationServiceBean implements InitializationService {
 
 		LOG.debug("initialize");
 
+		initNetworkConfig();
+		initClockDrift();
+
+		List<TrustPointEntity> trustPoints = initBelgianEidTrustPoints();
+
+		initBelgianEidAuthTrustDomain(trustPoints);
+		initBelgianEidNonRepudiationDomain(trustPoints);
+		initBelgianEidNationalRegistryTrustDomain(trustPoints);
+
+	}
+
+	private void initNetworkConfig() {
+
 		// Default network config
 		configurationDAO.setNetworkConfig(null, 0);
 		configurationDAO.setNetworkConfigEnabled(false);
+	}
+
+	private void initClockDrift() {
 
 		// Default clock drift config
 		ClockDriftConfigEntity clockDriftConfig = configurationDAO
@@ -87,16 +105,14 @@ public class InitializationServiceBean implements InitializationService {
 			throw new RuntimeException(e);
 		}
 
-		// Belgian eID trust domain
-		TrustDomainEntity beidTrustDomain = this.trustDomainDAO
-				.findTrustDomain(TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN);
-		if (null == beidTrustDomain) {
-			LOG.debug("create Belgian eID trust domain");
-			beidTrustDomain = this.trustDomainDAO.addTrustDomain(
-					TrustServiceConstants.BELGIAN_EID_TRUST_DOMAIN,
-					TrustServiceConstants.DEFAULT_CRON);
-			this.trustDomainDAO.setDefaultTrustDomain(beidTrustDomain);
-		}
+	}
+
+	/**
+	 * Initialize the Belgian eID trust points.
+	 */
+	private List<TrustPointEntity> initBelgianEidTrustPoints() {
+
+		List<TrustPointEntity> trustPoints = new LinkedList<TrustPointEntity>();
 
 		// Belgian eID Root CA trust points
 		X509Certificate rootCaCertificate = loadCertificate("be/fedict/trust/belgiumrca.crt");
@@ -109,9 +125,10 @@ public class InitializationServiceBean implements InitializationService {
 
 		if (null == rootCa.getTrustPoint()) {
 			TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
-					.addTrustPoint(null, beidTrustDomain, rootCa);
+					.addTrustPoint(null, rootCa);
 			rootCa.setTrustPoint(rootCaTrustPoint);
 		}
+		trustPoints.add(rootCa.getTrustPoint());
 
 		X509Certificate rootCa2Certificate = loadCertificate("be/fedict/trust/belgiumrca2.crt");
 		CertificateAuthorityEntity rootCa2 = this.trustDomainDAO
@@ -123,17 +140,79 @@ public class InitializationServiceBean implements InitializationService {
 
 		if (null == rootCa2.getTrustPoint()) {
 			TrustPointEntity rootCa2TrustPoint = this.trustDomainDAO
-					.addTrustPoint(null, beidTrustDomain, rootCa2);
+					.addTrustPoint(null, rootCa2);
 			rootCa2.setTrustPoint(rootCa2TrustPoint);
 		}
+		trustPoints.add(rootCa2.getTrustPoint());
+		return trustPoints;
+	}
+
+	/**
+	 * Initialize the Belgian eID authentication trust domain.
+	 */
+	private void initBelgianEidAuthTrustDomain(
+			List<TrustPointEntity> trustPoints) {
+
+		TrustDomainEntity trustDomain = this.trustDomainDAO
+				.findTrustDomain(TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN);
+		if (null == trustDomain) {
+			LOG.debug("create Belgian eID authentication trust domain");
+			trustDomain = this.trustDomainDAO.addTrustDomain(
+					TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN,
+					TrustServiceConstants.DEFAULT_CRON);
+			this.trustDomainDAO.setDefaultTrustDomain(trustDomain);
+		}
+		trustDomain.setTrustPoints(trustPoints);
+
+		// start timer
+		initTrustDomainScheduling(trustDomain);
+	}
+
+	private void initBelgianEidNonRepudiationDomain(
+			List<TrustPointEntity> trustPoints) {
+
+		TrustDomainEntity trustDomain = this.trustDomainDAO
+				.findTrustDomain(TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN);
+		if (null == trustDomain) {
+			LOG.debug("create Belgian eID Non Repudiation trust domain");
+			trustDomain = this.trustDomainDAO
+					.addTrustDomain(
+							TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+							TrustServiceConstants.DEFAULT_CRON);
+		}
+		trustDomain.setTrustPoints(trustPoints);
+
+		// start timer
+		initTrustDomainScheduling(trustDomain);
+	}
+
+	private void initBelgianEidNationalRegistryTrustDomain(
+			List<TrustPointEntity> trustPoints) {
+
+		TrustDomainEntity trustDomain = this.trustDomainDAO
+				.findTrustDomain(TrustServiceConstants.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN);
+		if (null == trustDomain) {
+			LOG.debug("create Belgian eID national registry trust domain");
+			trustDomain = this.trustDomainDAO
+					.addTrustDomain(
+							TrustServiceConstants.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN,
+							TrustServiceConstants.DEFAULT_CRON);
+		}
+		trustDomain.setTrustPoints(trustPoints);
+
+		// start timer
+		initTrustDomainScheduling(trustDomain);
+	}
+
+	private void initTrustDomainScheduling(TrustDomainEntity trustDomain) {
 
 		// Belgian eID trust domain timer
-		LOG.debug("start timer for domain " + beidTrustDomain.getName());
+		LOG.debug("start timer for domain " + trustDomain.getName());
 		try {
-			this.schedulingService.startTimer(beidTrustDomain, false);
+			this.schedulingService.startTimer(trustDomain, false);
 		} catch (InvalidCronExpressionException e) {
 			LOG.error("Failed to start timer for domain: "
-					+ beidTrustDomain.getName(), e);
+					+ trustDomain.getName(), e);
 			throw new RuntimeException(e);
 		}
 	}

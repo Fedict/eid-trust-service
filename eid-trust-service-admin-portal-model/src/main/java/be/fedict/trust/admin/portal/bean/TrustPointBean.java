@@ -166,7 +166,7 @@ public class TrustPointBean implements TrustPoint {
 
 		try {
 			this.trustDomainService.addTrustPoint(this.crlRefreshCron,
-					this.selectedTrustDomain, this.certificateBytes);
+					this.certificateBytes);
 		} catch (CertificateException e) {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorX509Encoding");

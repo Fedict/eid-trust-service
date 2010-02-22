@@ -25,7 +25,6 @@ import javax.ejb.TimerHandle;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -36,21 +35,18 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Entity
 @Table(name = "trust_point")
-@NamedQueries( { @NamedQuery(name = TrustPointEntity.QUERY_WHERE_TRUST_DOMAIN, query = "SELECT tp FROM TrustPointEntity AS tp "
-		+ "WHERE tp.trustDomain = :trustDomain") })
+@NamedQueries( { @NamedQuery(name = TrustPointEntity.QUERY_ALL, query = "FROM TrustPointEntity") })
 public class TrustPointEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String QUERY_WHERE_TRUST_DOMAIN = "tp.q.w.td";
+	public static final String QUERY_ALL = "tp.q.all";
 
 	private String name;
 
 	private String crlRefreshCron;
 	private TimerHandle timerHandle;
 	private Date fireDate;
-
-	private TrustDomainEntity trustDomain;
 
 	private CertificateAuthorityEntity certificateAuthority;
 
@@ -69,10 +65,8 @@ public class TrustPointEntity implements Serializable {
 	 * @param certificateAuthority
 	 */
 	public TrustPointEntity(String crlRefreshCron,
-			TrustDomainEntity trustDomain,
 			CertificateAuthorityEntity certificateAuthority) {
 		this.name = certificateAuthority.getName();
-		this.trustDomain = trustDomain;
 		this.certificateAuthority = certificateAuthority;
 		this.crlRefreshCron = crlRefreshCron;
 	}
@@ -84,17 +78,6 @@ public class TrustPointEntity implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	@ManyToOne(optional = false)
-	public TrustDomainEntity getTrustDomain() {
-
-		return this.trustDomain;
-	}
-
-	public void setTrustDomain(TrustDomainEntity trustDomain) {
-
-		this.trustDomain = trustDomain;
 	}
 
 	public CertificateAuthorityEntity getCertificateAuthority() {
@@ -166,8 +149,7 @@ public class TrustPointEntity implements Serializable {
 	public String toString() {
 
 		return new ToStringBuilder(this).append("name", this.name).append(
-				"trustDomain", this.trustDomain.getName()).append("crlRefresh",
-				this.crlRefreshCron).toString();
+				"crlRefresh", this.crlRefreshCron).toString();
 	}
 
 }

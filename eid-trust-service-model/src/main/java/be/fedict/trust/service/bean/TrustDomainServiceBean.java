@@ -147,9 +147,8 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public TrustPointEntity addTrustPoint(String crlRefreshCron,
-			TrustDomainEntity trustDomain, byte[] certificateBytes)
-			throws TrustPointAlreadyExistsException, CertificateException,
-			InvalidCronExpressionException {
+			byte[] certificateBytes) throws TrustPointAlreadyExistsException,
+			CertificateException, InvalidCronExpressionException {
 
 		LOG.debug("add trust point");
 
@@ -166,7 +165,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 
 		// add trust point
 		TrustPointEntity trustPoint = this.trustDomainDAO.addTrustPoint(
-				crlRefreshCron, trustDomain, certificateAuthority);
+				crlRefreshCron, certificateAuthority);
 
 		// manage relationship
 		certificateAuthority.setTrustPoint(trustPoint);
