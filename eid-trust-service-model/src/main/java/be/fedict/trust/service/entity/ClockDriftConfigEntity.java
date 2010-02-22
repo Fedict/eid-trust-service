@@ -23,6 +23,8 @@ import java.util.Date;
 
 import javax.ejb.TimerHandle;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
@@ -79,6 +81,7 @@ public class ClockDriftConfigEntity implements Serializable {
 		this.name = name;
 	}
 
+	@Enumerated(EnumType.STRING)
 	public TimeProtocol getTimeProtocol() {
 
 		return this.timeProtocol;
