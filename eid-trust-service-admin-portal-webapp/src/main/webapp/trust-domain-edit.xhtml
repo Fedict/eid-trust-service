@@ -26,9 +26,12 @@
 
 					<rich:tree style="width:300px" value="#{trustPoint.treeNode}"
 						switchType="client" var="item" reRender="selectedNode"
-						ajaxSubmitSelection="true" nodeSelectListener="#{trustPointListener.processNodeSelection}">
+						ajaxSubmitSelection="true" nodeSelectListener="#{trustPoint.processNodeSelection}">
 						<rich:treeNode>
-							<h:outputText value="#{item.name}" />
+							<h:commandLink action="select">
+								<h:outputText value="#{item.name}" />
+							</h:commandLink>
+
 						</rich:treeNode>
 					</rich:tree>
 

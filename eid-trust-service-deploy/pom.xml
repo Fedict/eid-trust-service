@@ -84,6 +84,24 @@
 							<bundleDir>lib</bundleDir>
 						</jarModule>
 						<jarModule>
+							<groupId>org.richfaces.framework</groupId>
+							<artifactId>richfaces-impl-jsf2</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+							<bundleDir>lib</bundleDir>
+						</jarModule>
+						<jarModule>
+							<groupId>org.richfaces.ui</groupId>
+							<artifactId>richfaces-ui</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+							<bundleDir>lib</bundleDir>
+						</jarModule>
+						<jarModule>
+							<groupId>com.sun.facelets</groupId>
+							<artifactId>jsf-facelets</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+							<bundleDir>lib</bundleDir>
+						</jarModule>
+						<jarModule>
 							<groupId>commons-net</groupId>
 							<artifactId>commons-net</artifactId>
 							<includeInApplicationXml>true</includeInApplicationXml>
@@ -162,6 +180,11 @@
 			<groupId>be.fedict</groupId>
 			<artifactId>jtrust</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.facelets</groupId>
+			<artifactId>jsf-facelets</artifactId>
+		</dependency>
+
 		<!--
 			The following dependencies are all provided by the Java EE runtime.
 		-->

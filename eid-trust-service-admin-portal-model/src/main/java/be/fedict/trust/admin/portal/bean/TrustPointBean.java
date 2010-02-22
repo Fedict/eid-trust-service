@@ -18,26 +18,32 @@
 
 package be.fedict.trust.admin.portal.bean;
 
+import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Remove;
 import javax.ejb.Stateful;
-import javax.faces.context.FacesContext;
 
+import org.apache.commons.io.FileUtils;
 import org.jboss.ejb3.annotation.LocalBinding;
+import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Out;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
+import org.richfaces.component.html.HtmlTree;
+import org.richfaces.event.NodeSelectedEvent;
+import org.richfaces.event.UploadEvent;
 import org.richfaces.model.TreeNode;
 import org.richfaces.model.TreeNodeImpl;
+import org.richfaces.model.UploadItem;
 
-import be.fedict.trust.admin.portal.AdminWebappConstants;
 import be.fedict.trust.admin.portal.TrustPoint;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -49,6 +55,9 @@ import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 @Name("trustPoint")
 @LocalBinding(jndiBinding = "fedict/eid/trust/admin/portal/TrustPointBean")
 public class TrustPointBean implements TrustPoint {
+
+	public static final String SELECTED_TRUST_POINT = "selectedTrustPoint";
+	public static final String UPLOADED_CERTIFICATE = "uploadedCertificate";
 
 	@Logger
 	private Log log;
@@ -62,8 +71,13 @@ public class TrustPointBean implements TrustPoint {
 	@In(value = TrustDomainBean.SELECTED_TRUST_DOMAIN)
 	private TrustDomainEntity selectedTrustDomain;
 
-	@In(value = AdminWebappConstants.TRUST_POINT_SESSION_ATTRIBUTE, required = false)
+	@In(value = SELECTED_TRUST_POINT, required = false)
+	@Out(value = SELECTED_TRUST_POINT, required = false, scope = ScopeType.SESSION)
 	private TrustPointEntity selectedTrustPoint;
+
+	@In(value = UPLOADED_CERTIFICATE, required = false)
+	@Out(value = UPLOADED_CERTIFICATE, required = false, scope = ScopeType.SESSION)
+	private byte[] certificateBytes;
 
 	private TreeNode<TrustPointEntity> rootNode = null;
 
@@ -141,10 +155,10 @@ public class TrustPointBean implements TrustPoint {
 		this.log.debug("add trust point: crlRefreshCron=#0",
 				this.crlRefreshCron);
 
-		byte[] certificateBytes = (byte[]) FacesContext.getCurrentInstance()
-				.getExternalContext().getSessionMap().get(
-						AdminWebappConstants.CERTIFICATE_SESSION_ATTRIBUTE);
-		if (null == certificateBytes) {
+		// byte[] certificateBytes = (byte[]) FacesContext.getCurrentInstance()
+		// .getExternalContext().getSessionMap().get(
+		// AdminWebappConstants.CERTIFICATE_SESSION_ATTRIBUTE);
+		if (null == this.certificateBytes) {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorNoCertificate");
 			return null;
@@ -152,7 +166,7 @@ public class TrustPointBean implements TrustPoint {
 
 		try {
 			this.trustDomainService.addTrustPoint(this.crlRefreshCron,
-					this.selectedTrustDomain, certificateBytes);
+					this.selectedTrustDomain, this.certificateBytes);
 		} catch (CertificateException e) {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorX509Encoding");
@@ -166,10 +180,6 @@ public class TrustPointBean implements TrustPoint {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
 			return null;
-		} finally {
-			FacesContext.getCurrentInstance().getExternalContext()
-					.getSessionMap().remove(
-							AdminWebappConstants.CERTIFICATE_SESSION_ATTRIBUTE);
 		}
 
 		return "success";
@@ -190,4 +200,45 @@ public class TrustPointBean implements TrustPoint {
 
 		this.crlRefreshCron = crlRefreshCron;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public void processNodeSelection(NodeSelectedEvent event) {
+
+		HtmlTree tree = (HtmlTree) event.getComponent();
+		TreeNode<TrustPointEntity> currentNode = tree.getModelTreeNode(tree
+				.getRowKey());
+		this.selectedTrustPoint = (TrustPointEntity) currentNode.getData();
+		this.log.debug("view: " + selectedTrustPoint.getName());
+		// try {
+		// FacesContext.getCurrentInstance().getExternalContext().redirect(
+		// "trust-point.seam");
+		// } catch (IOException e) {
+		// this.log.error("IO Exception: " + e.getMessage(), e);
+		// return;
+		// }
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void uploadListener(UploadEvent event) throws IOException {
+		UploadItem item = event.getUploadItem();
+		this.log.debug(item.getContentType());
+		this.log.debug(item.getFileSize());
+		this.log.debug(item.getFileName());
+		if (null == item.getData()) {
+			// meaning createTempFiles is set to true in the SeamFilter
+			this.certificateBytes = FileUtils.readFileToByteArray(item
+					.getFile());
+		} else {
+			this.certificateBytes = item.getData();
+		}
+		// FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+		// .put(AdminWebappConstants.CERTIFICATE_SESSION_ATTRIBUTE,
+		// certBytes);
+	}
+
 }

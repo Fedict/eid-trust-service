@@ -18,8 +18,12 @@
 
 package be.fedict.trust.admin.portal;
 
+import java.io.IOException;
+
 import javax.ejb.Local;
 
+import org.richfaces.event.NodeSelectedEvent;
+import org.richfaces.event.UploadEvent;
 import org.richfaces.model.TreeNode;
 
 import be.fedict.trust.service.entity.TrustPointEntity;
@@ -52,4 +56,11 @@ public interface TrustPoint {
 	String remove();
 
 	String add();
+
+	/*
+	 * Richfaces component callbacks
+	 */
+	void processNodeSelection(NodeSelectedEvent event);
+
+	public void uploadListener(UploadEvent event) throws IOException;
 }

@@ -66,6 +66,11 @@
 			<to-view-id>/trust-point-add.seam</to-view-id>
 			<redirect />
 		</navigation-case>
+		<navigation-case>
+			<from-outcome>select</from-outcome>
+			<to-view-id>/trust-point.seam</to-view-id>
+			<redirect />
+		</navigation-case>
 	</navigation-rule>
 	<navigation-rule>
 		<from-view-id>/trust-point-add.xhtml</from-view-id>
