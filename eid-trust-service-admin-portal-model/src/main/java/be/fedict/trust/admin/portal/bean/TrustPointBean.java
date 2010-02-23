@@ -30,18 +30,17 @@ import org.apache.commons.io.FileUtils;
 import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Destroy;
+import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Out;
+import org.jboss.seam.annotations.datamodel.DataModel;
+import org.jboss.seam.annotations.datamodel.DataModelSelection;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
-import org.richfaces.component.html.HtmlTree;
-import org.richfaces.event.NodeSelectedEvent;
 import org.richfaces.event.UploadEvent;
-import org.richfaces.model.TreeNode;
-import org.richfaces.model.TreeNodeImpl;
 import org.richfaces.model.UploadItem;
 
 import be.fedict.trust.admin.portal.TrustPoint;
@@ -57,7 +56,8 @@ import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 public class TrustPointBean implements TrustPoint {
 
 	public static final String SELECTED_TRUST_POINT = "selectedTrustPoint";
-	public static final String UPLOADED_CERTIFICATE = "uploadedCertificate";
+	private static final String UPLOADED_CERTIFICATE = "uploadedCertificate";
+	private static final String TRUST_POINT_LIST_NAME = "trustPointList";
 
 	@Logger
 	private Log log;
@@ -68,9 +68,11 @@ public class TrustPointBean implements TrustPoint {
 	@In
 	FacesMessages facesMessages;
 
-	@In(value = TrustDomainBean.SELECTED_TRUST_DOMAIN)
-	private TrustDomainEntity selectedTrustDomain;
+	@SuppressWarnings("unused")
+	@DataModel(TRUST_POINT_LIST_NAME)
+	private List<TrustPointEntity> trustPointList;
 
+	@DataModelSelection(TRUST_POINT_LIST_NAME)
 	@In(value = SELECTED_TRUST_POINT, required = false)
 	@Out(value = SELECTED_TRUST_POINT, required = false, scope = ScopeType.SESSION)
 	private TrustPointEntity selectedTrustPoint;
@@ -79,7 +81,8 @@ public class TrustPointBean implements TrustPoint {
 	@Out(value = UPLOADED_CERTIFICATE, required = false, scope = ScopeType.SESSION)
 	private byte[] certificateBytes;
 
-	private TreeNode<TrustPointEntity> rootNode = null;
+	@In(value = TrustDomainBean.SELECTED_TRUST_DOMAIN, required = false)
+	private TrustDomainEntity selectedTrustDomain;
 
 	private String crlRefreshCron;
 
@@ -96,28 +99,20 @@ public class TrustPointBean implements TrustPoint {
 	/**
 	 * {@inheritDoc}
 	 */
-	public TreeNode<TrustPointEntity> getTreeNode() {
-		if (this.rootNode == null) {
-			loadTree();
-		}
-		return this.rootNode;
+	@Factory(TRUST_POINT_LIST_NAME)
+	public void trustDomainListFactory() {
+
+		this.log.debug("trust point list factory");
+		this.trustPointList = this.trustDomainService.listTrustPoints();
 	}
 
-	private void loadTree() {
-		this.rootNode = new TreeNodeImpl<TrustPointEntity>();
-		addNodes(null, this.rootNode);
-	}
+	/**
+	 * {@inheritDoc}
+	 */
+	public String modify() {
 
-	private void addNodes(String path, TreeNode<TrustPointEntity> node) {
-
-		List<TrustPointEntity> trustPoints = this.trustDomainService
-				.listTrustPoints(this.selectedTrustDomain);
-
-		for (TrustPointEntity trustPoint : trustPoints) {
-			TreeNodeImpl<TrustPointEntity> nodeImpl = new TreeNodeImpl<TrustPointEntity>();
-			nodeImpl.setData(trustPoint);
-			node.addChild(trustPoint.getName(), nodeImpl);
-		}
+		this.log.debug("modify: #0", this.selectedTrustPoint.getName());
+		return "modify";
 	}
 
 	/**
@@ -125,8 +120,12 @@ public class TrustPointBean implements TrustPoint {
 	 */
 	public String remove() {
 
-		this.log.debug("remove trust point: #0", selectedTrustPoint.getName());
-		this.trustDomainService.remove(selectedTrustPoint);
+		this.log.debug("remove trust point: #0", this.selectedTrustPoint
+				.getName());
+		this.trustDomainService.remove(this.selectedTrustPoint);
+		if (null != this.selectedTrustDomain) {
+			return "success_trustdomain";
+		}
 		return "success";
 	}
 
@@ -138,13 +137,28 @@ public class TrustPointBean implements TrustPoint {
 		this.log.debug("save trust point: #0", this.selectedTrustPoint
 				.getName());
 		try {
-			this.trustDomainService.save(selectedTrustPoint);
+			this.trustDomainService.save(this.selectedTrustPoint);
 		} catch (InvalidCronExpressionException e) {
 			this.facesMessages.addToControlFromResourceBundle("cron",
 					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
 			return null;
 		}
+		if (null != this.selectedTrustDomain) {
+			return "success_trustdomain";
+		}
 		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String back() {
+
+		if (null != this.selectedTrustDomain) {
+			return "back_trustdomain";
+		}
+		return "back";
+
 	}
 
 	/**
@@ -155,9 +169,6 @@ public class TrustPointBean implements TrustPoint {
 		this.log.debug("add trust point: crlRefreshCron=#0",
 				this.crlRefreshCron);
 
-		// byte[] certificateBytes = (byte[]) FacesContext.getCurrentInstance()
-		// .getExternalContext().getSessionMap().get(
-		// AdminWebappConstants.CERTIFICATE_SESSION_ATTRIBUTE);
 		if (null == this.certificateBytes) {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorNoCertificate");
@@ -190,7 +201,7 @@ public class TrustPointBean implements TrustPoint {
 	 */
 	public String getCrlRefreshCron() {
 
-		return crlRefreshCron;
+		return this.crlRefreshCron;
 	}
 
 	/**
@@ -199,26 +210,6 @@ public class TrustPointBean implements TrustPoint {
 	public void setCrlRefreshCron(String crlRefreshCron) {
 
 		this.crlRefreshCron = crlRefreshCron;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@SuppressWarnings("unchecked")
-	public void processNodeSelection(NodeSelectedEvent event) {
-
-		HtmlTree tree = (HtmlTree) event.getComponent();
-		TreeNode<TrustPointEntity> currentNode = tree.getModelTreeNode(tree
-				.getRowKey());
-		this.selectedTrustPoint = (TrustPointEntity) currentNode.getData();
-		this.log.debug("view: " + selectedTrustPoint.getName());
-		// try {
-		// FacesContext.getCurrentInstance().getExternalContext().redirect(
-		// "trust-point.seam");
-		// } catch (IOException e) {
-		// this.log.error("IO Exception: " + e.getMessage(), e);
-		// return;
-		// }
 	}
 
 	/**
@@ -236,9 +227,5 @@ public class TrustPointBean implements TrustPoint {
 		} else {
 			this.certificateBytes = item.getData();
 		}
-		// FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
-		// .put(AdminWebappConstants.CERTIFICATE_SESSION_ATTRIBUTE,
-		// certBytes);
 	}
-
 }

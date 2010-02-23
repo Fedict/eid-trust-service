@@ -203,6 +203,18 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
+	public List<TrustPointEntity> listTrustPoints() {
+
+		LOG.debug("list all trust points");
+		Query query = this.entityManager
+				.createNamedQuery(TrustPointEntity.QUERY_ALL);
+		return (List<TrustPointEntity>) query.getResultList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
 	public List<TrustPointEntity> listTrustPoints(TrustDomainEntity trustDomain) {
 
 		LOG
@@ -223,6 +235,20 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 		LOG.debug("list trust points for trust domain " + trustDomainName);
 		TrustDomainEntity trustDomain = getTrustDomain(trustDomainName);
 		return listTrustPoints(trustDomain);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<TrustDomainEntity> listTrustDomains(TrustPointEntity trustPoint) {
+
+		LOG.debug("list trust domains containing trust point "
+				+ trustPoint.getName());
+		Query query = this.entityManager
+				.createNamedQuery(TrustDomainEntity.QUERY_LIST_WHERE_TRUST_POINT);
+		query.setParameter("trustPoint", trustPoint);
+		return (List<TrustDomainEntity>) query.getResultList();
 	}
 
 	/**
@@ -270,5 +296,14 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 		this.entityManager.persist(endEntityCertificateConstraint);
 		trustDomain.getCertificateConstraints().add(
 				endEntityCertificateConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public TrustPointEntity findTrustPoint(String name) {
+
+		LOG.debug("find trust point: " + name);
+		return this.entityManager.find(TrustPointEntity.class, name);
 	}
 }

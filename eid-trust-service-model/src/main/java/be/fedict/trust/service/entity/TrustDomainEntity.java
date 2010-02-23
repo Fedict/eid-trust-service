@@ -44,7 +44,9 @@ import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 		@NamedQuery(name = TrustDomainEntity.QUERY_GET_DEFAULT, query = "SELECT td FROM TrustDomainEntity AS td "
 				+ "WHERE td.defaultDomain = true"),
 		@NamedQuery(name = TrustDomainEntity.QUERY_LIST_TRUST_POINTS, query = "SELECT td.trustPoints FROM TrustDomainEntity AS td "
-				+ "WHERE td.name = :name") })
+				+ "WHERE td.name = :name"),
+		@NamedQuery(name = TrustDomainEntity.QUERY_LIST_WHERE_TRUST_POINT, query = "SELECT td FROM TrustDomainEntity AS td "
+				+ "WHERE :trustPoint MEMBER OF td.trustPoints") })
 public class TrustDomainEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -52,6 +54,7 @@ public class TrustDomainEntity implements Serializable {
 	public static final String QUERY_LIST_ALL = "td.list.all";
 	public static final String QUERY_GET_DEFAULT = "td.get.default";
 	public static final String QUERY_LIST_TRUST_POINTS = "td.list.tp";
+	public static final String QUERY_LIST_WHERE_TRUST_POINT = "td.list.w.tp";
 
 	private String name;
 

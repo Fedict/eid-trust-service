@@ -90,6 +90,20 @@
 										</li>
 									</c:otherwise>
 								</c:choose>
+								<c:choose>
+									<c:when test="#{activeMenu == 'trustpoint'}">
+										<li class="selected">
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/trust-points.seam">#{messages.trustPoints}</a>
+										</li>
+									</c:when>
+									<c:otherwise>
+										<li>
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/trust-points.seam">#{messages.trustPoints}</a>
+										</li>
+									</c:otherwise>
+								</c:choose>
 							</c:when>
 						</c:choose>
 

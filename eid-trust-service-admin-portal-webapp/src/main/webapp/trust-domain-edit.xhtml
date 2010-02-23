@@ -15,7 +15,7 @@
 						<h:outputLabel for="cron" value="#{messages.crlRefresh}" />
 						<s:decorate>
 							<h:inputText id="cron"
-								value="#{selectedTrustDomain.crlRefreshCron}" required="true" />
+								value="#{selectedTrustDomain.crlRefreshCron}" />
 							<h:message for="cron" styleClass="error" />
 						</s:decorate>
 						<h:commandButton action="#{trustDomain.save}" id="save"
@@ -24,11 +24,11 @@
 
 					<h3>#{messages.trustPoints}</h3>
 
-					<rich:tree style="width:300px" value="#{trustPoint.treeNode}"
+					<rich:tree style="width:300px" value="#{trustDomain.treeNode}"
 						switchType="client" var="item" reRender="selectedNode"
-						ajaxSubmitSelection="true" nodeSelectListener="#{trustPoint.processNodeSelection}">
+						ajaxSubmitSelection="true" nodeSelectListener="#{trustDomain.processNodeSelection}">
 						<rich:treeNode>
-							<h:commandLink action="select">
+							<h:commandLink action="view">
 								<h:outputText value="#{item.name}" />
 							</h:commandLink>
 
@@ -37,9 +37,9 @@
 
 					<br />
 
-					<h:commandButton action="add" id="add" value="#{messages.add}"
-						immediate="true" styleClass="submit" />
-					<h:commandButton action="back" id="back"
+					<h:commandButton action="#{trustDomain.selectTrustPoints}" id="select"
+						value="#{messages.select}" immediate="true" styleClass="submit" />
+					<h:commandButton action="#{trustDomain.back}" id="back"
 						value="#{messages.back}" immediate="true" styleClass="submit" />
 
 					<h:messages globalOnly="true" styleClass="error" />

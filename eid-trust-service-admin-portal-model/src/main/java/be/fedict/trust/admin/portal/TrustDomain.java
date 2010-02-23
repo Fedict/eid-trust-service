@@ -18,7 +18,14 @@
 
 package be.fedict.trust.admin.portal;
 
+import java.util.List;
+
 import javax.ejb.Local;
+
+import org.richfaces.event.NodeSelectedEvent;
+import org.richfaces.model.TreeNode;
+
+import be.fedict.trust.service.entity.TrustPointEntity;
 
 @Local
 public interface TrustDomain {
@@ -34,6 +41,17 @@ public interface TrustDomain {
 	void destroyCallback();
 
 	/*
+	 * Accessors
+	 */
+	List<String> getSourceTrustPoints();
+
+	void setSourceTrustPoints(List<String> sourceTrustPoints);
+
+	List<String> getSelectedTrustPoints();
+
+	void setSelectedTrustPoints(List<String> selectedTrustPoints);
+
+	/*
 	 * Actions
 	 */
 	String modify();
@@ -41,4 +59,23 @@ public interface TrustDomain {
 	String save();
 
 	String setDefault();
+
+	String selectTrustPoints();
+
+	void initSelect();
+
+	String saveSelect();
+
+	String back();
+
+	/*
+	 * Trust points tree
+	 */
+	TreeNode<TrustPointEntity> getTreeNode();
+
+	/*
+	 * Richfaces component callbacks
+	 */
+	void processNodeSelection(NodeSelectedEvent event);
+
 }

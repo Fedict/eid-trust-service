@@ -178,12 +178,9 @@ public class InitializationServiceBean implements InitializationService {
 			trustDomain = this.trustDomainDAO
 					.addTrustDomain(
 							TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
-							TrustServiceConstants.DEFAULT_CRON);
+							null);
 		}
 		trustDomain.setTrustPoints(trustPoints);
-
-		// start timer
-		initTrustDomainScheduling(trustDomain);
 	}
 
 	private void initBelgianEidNationalRegistryTrustDomain(
@@ -196,12 +193,9 @@ public class InitializationServiceBean implements InitializationService {
 			trustDomain = this.trustDomainDAO
 					.addTrustDomain(
 							TrustServiceConstants.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN,
-							TrustServiceConstants.DEFAULT_CRON);
+							null);
 		}
 		trustDomain.setTrustPoints(trustPoints);
-
-		// start timer
-		initTrustDomainScheduling(trustDomain);
 	}
 
 	private void initTrustDomainScheduling(TrustDomainEntity trustDomain) {

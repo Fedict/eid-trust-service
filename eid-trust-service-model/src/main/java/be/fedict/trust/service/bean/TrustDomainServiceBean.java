@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -41,6 +42,7 @@ import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 
 /**
@@ -70,6 +72,16 @@ public class TrustDomainServiceBean implements TrustDomainService {
 
 		LOG.debug("list trust domains");
 		return this.trustDomainDAO.listTrustDomains();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public List<TrustPointEntity> listTrustPoints() {
+
+		LOG.debug("list trust points");
+		return this.trustDomainDAO.listTrustPoints();
 	}
 
 	/**
@@ -138,6 +150,15 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		// remove CA's
 		this.trustDomainDAO.removeCertificateAuthorities(trustPoint);
 
+		// remove trust point from all trustdomains
+		List<TrustDomainEntity> trustDomains = this.trustDomainDAO
+				.listTrustDomains(trustPoint);
+		for (TrustDomainEntity trustDomain : trustDomains) {
+			LOG.debug("remove trust point " + trustPoint.getName()
+					+ " from trust domain " + trustDomain.getName());
+			trustDomain.getTrustPoints().remove(trustPoint);
+		}
+
 		// remove trust point
 		this.trustDomainDAO.removeTrustPoint(trustPoint);
 	}
@@ -186,5 +207,32 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		X509Certificate certificate = (X509Certificate) certificateFactory
 				.generateCertificate(new ByteArrayInputStream(certificateBytes));
 		return certificate;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public TrustPointEntity findTrustPoint(String name) {
+
+		return this.trustDomainDAO.findTrustPoint(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void setTrustPoints(TrustDomainEntity trustDomain,
+			List<String> trustPointNames) throws TrustDomainNotFoundException {
+
+		LOG.debug("set selected trust points for domain: "
+				+ trustDomain.getName());
+		TrustDomainEntity attachedTrustDomain = this.trustDomainDAO
+				.getTrustDomain(trustDomain.getName());
+		List<TrustPointEntity> trustPoints = new LinkedList<TrustPointEntity>();
+		for (String trustPointName : trustPointNames) {
+			trustPoints.add(this.trustDomainDAO.findTrustPoint(trustPointName));
+		}
+		attachedTrustDomain.setTrustPoints(trustPoints);
 	}
 }

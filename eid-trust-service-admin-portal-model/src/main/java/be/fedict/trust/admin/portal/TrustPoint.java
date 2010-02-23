@@ -22,19 +22,15 @@ import java.io.IOException;
 
 import javax.ejb.Local;
 
-import org.richfaces.event.NodeSelectedEvent;
 import org.richfaces.event.UploadEvent;
-import org.richfaces.model.TreeNode;
-
-import be.fedict.trust.service.entity.TrustPointEntity;
 
 @Local
 public interface TrustPoint {
 
 	/*
-	 * Trust points tree
+	 * Factory
 	 */
-	TreeNode<TrustPointEntity> getTreeNode();
+	void trustDomainListFactory();
 
 	/*
 	 * Lifecycle.
@@ -51,16 +47,18 @@ public interface TrustPoint {
 	/*
 	 * Actions
 	 */
+	String modify();
+
 	String save();
 
 	String remove();
 
 	String add();
 
+	String back();
+
 	/*
 	 * Richfaces component callbacks
 	 */
-	void processNodeSelection(NodeSelectedEvent event);
-
-	public void uploadListener(UploadEvent event) throws IOException;
+	void uploadListener(UploadEvent event) throws IOException;
 }

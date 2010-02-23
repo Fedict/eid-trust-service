@@ -28,6 +28,7 @@ import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 
 /**
@@ -43,6 +44,11 @@ public interface TrustDomainService {
 	 * List all {@link TrustDomainEntity}'s.
 	 */
 	List<TrustDomainEntity> listTrustDomains();
+
+	/**
+	 * List all {@link TrustPointEntity}'s.
+	 */
+	List<TrustPointEntity> listTrustPoints();
 
 	/**
 	 * List all {@link TrustPointEntity}'s for the specified
@@ -100,4 +106,24 @@ public interface TrustDomainService {
 	 * @param trustPoint
 	 */
 	void remove(TrustPointEntity trustPoint);
+
+	/**
+	 * Finds the {@link TrustPointEntity} from the specified name. Returns
+	 * <code>null</code> if not found.
+	 * 
+	 * @param name
+	 */
+	TrustPointEntity findTrustPoint(String name);
+
+	/**
+	 * Sets the {@link TrustPointEntity}'s for the specified
+	 * {@link TrustDomainEntity}.
+	 * 
+	 * @param trustDomain
+	 * @param trustPointNames
+	 * 
+	 * @throws TrustDomainNotFoundException
+	 */
+	void setTrustPoints(TrustDomainEntity trustDomain,
+			List<String> trustPointNames) throws TrustDomainNotFoundException;
 }

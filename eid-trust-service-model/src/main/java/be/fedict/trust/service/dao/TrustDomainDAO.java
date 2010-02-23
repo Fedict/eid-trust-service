@@ -45,6 +45,14 @@ public interface TrustDomainDAO {
 	List<TrustDomainEntity> listTrustDomains();
 
 	/**
+	 * Returns list of {@link TrustDomainEntity}'s containing the specified
+	 * {@link TrustPointEntity}.
+	 * 
+	 * @param trustPoint
+	 */
+	List<TrustDomainEntity> listTrustDomains(TrustPointEntity trustPoint);
+
+	/**
 	 * Return {@link TrustDomainEntity} from specified name. Returns
 	 * <code>null</code> if not found.
 	 * 
@@ -109,6 +117,11 @@ public interface TrustDomainDAO {
 	 */
 	TrustPointEntity addTrustPoint(String crlRefreshCron,
 			CertificateAuthorityEntity ca);
+
+	/**
+	 * Returns list of all {@link TrustPointEntity}'s.
+	 */
+	List<TrustPointEntity> listTrustPoints();
 
 	/**
 	 * Returns list of {@link TrustPointEntity}'s attached to the specified
@@ -178,4 +191,12 @@ public interface TrustDomainDAO {
 	 */
 	void addEndEntityConstraint(TrustDomainEntity trustDomain,
 			X509Certificate certificate);
+
+	/**
+	 * Returns the {@link TrustPointEntity} from the specified name. Returns
+	 * <code>null</code> if not found.
+	 * 
+	 * @param name
+	 */
+	TrustPointEntity findTrustPoint(String name);
 }

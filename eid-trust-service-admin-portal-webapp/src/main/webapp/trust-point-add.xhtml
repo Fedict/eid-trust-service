@@ -5,10 +5,9 @@
 	xmlns:s="http://jboss.com/products/seam/taglib">
 	<body>
 		<ui:composition template="/WEB-INF/template.xhtml">
-			<ui:param name="activeMenu" value="domain" />
+			<ui:param name="activeMenu" value="trustpoint" />
 			<ui:define name="body">
-				<h2>#{messages.trustDomain} #{selectedTrustDomain.name}:
-					#{messages.addTrustPoint}</h2>
+				<h2>#{messages.addTrustPoint}</h2>
 
 				<h:form id="form" enctype="multipart/form-data">
 

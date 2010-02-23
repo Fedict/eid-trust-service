@@ -257,7 +257,11 @@ public class SchedulingServiceBean implements SchedulingService {
 			throws InvalidCronExpressionException {
 		LOG.debug("start timer for " + trustDomain.getName());
 
-		if (null == trustDomain.getCrlRefreshCron()) {
+		// remove old timers
+		cancelTimers(new TimerInfo(trustDomain));
+
+		if (null == trustDomain.getCrlRefreshCron()
+				|| trustDomain.getCrlRefreshCron().equals("")) {
 			LOG.debug("no CRL refresh set for trust domain "
 					+ trustDomain.getName() + " ignoring...");
 			return;
@@ -265,9 +269,6 @@ public class SchedulingServiceBean implements SchedulingService {
 
 		Date fireDate = getFireDate(trustDomain.getCrlRefreshCron(), update,
 				trustDomain.getFireDate());
-
-		// remove old timers
-		cancelTimers(new TimerInfo(trustDomain));
 
 		Timer timer = this.timerService.createTimer(fireDate, new TimerInfo(
 				trustDomain));
