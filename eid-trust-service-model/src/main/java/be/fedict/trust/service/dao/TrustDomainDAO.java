@@ -24,10 +24,14 @@ import java.util.List;
 import javax.ejb.Local;
 
 import be.fedict.trust.constraints.CertificatePoliciesCertificateConstraint;
+import be.fedict.trust.constraints.KeyUsageCertificateConstraint;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageType;
+import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 /**
@@ -193,10 +197,41 @@ public interface TrustDomainDAO {
 			X509Certificate certificate);
 
 	/**
+	 * Add a new {@link KeyUsageCertificateConstraint} to the
+	 * {@link TrustDomainEntity}'s list of certificate contraints.
+	 * 
+	 * @param trustDomain
+	 * @param keyUsageType
+	 * @param allowed
+	 */
+	void addKeyUsageConstraint(TrustDomainEntity trustDomain,
+			KeyUsageType keyUsageType, boolean allowed);
+
+	/**
+	 * Add a new {@link QCStatementsConstraintEntity} to the
+	 * {@link TrustDomainEntity}'s list of certificate contraints.
+	 * 
+	 * @param trustDomain
+	 * @param qcComplianceFilter
+	 */
+	void addQCStatementsConstraint(TrustDomainEntity trustDomain,
+			boolean qcComplianceFilter);
+
+	/**
+	 * Add a new {@link DNConstraintEntity} to the {@link TrustDomainEntity}'s
+	 * list of certificate contraints.
+	 * 
+	 * @param trustDomain
+	 * @param dn
+	 */
+	void addDNConstraint(TrustDomainEntity trustDomain, String dn);
+
+	/**
 	 * Returns the {@link TrustPointEntity} from the specified name. Returns
 	 * <code>null</code> if not found.
 	 * 
 	 * @param name
 	 */
 	TrustPointEntity findTrustPoint(String name);
+
 }

@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
-import javax.ejb.EJBException;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -36,17 +35,33 @@ import javax.persistence.PersistenceContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import be.fedict.trust.BelgianTrustValidatorFactory;
+import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.MemoryCertificateRepository;
+import be.fedict.trust.NetworkConfig;
+import be.fedict.trust.PublicKeyTrustLinker;
 import be.fedict.trust.TrustLinker;
 import be.fedict.trust.TrustValidator;
+import be.fedict.trust.constraints.CertificatePoliciesCertificateConstraint;
+import be.fedict.trust.constraints.DistinguishedNameCertificateConstraint;
+import be.fedict.trust.constraints.EndEntityCertificateConstraint;
+import be.fedict.trust.constraints.KeyUsageCertificateConstraint;
+import be.fedict.trust.constraints.QCStatementsCertificateConstraint;
+import be.fedict.trust.crl.CachedCrlRepository;
+import be.fedict.trust.crl.CrlTrustLinker;
+import be.fedict.trust.crl.OnlineCrlRepository;
+import be.fedict.trust.ocsp.OcspTrustLinker;
+import be.fedict.trust.ocsp.OnlineOcspRepository;
 import be.fedict.trust.service.TrustService;
-import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
-import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
+import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
+import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
+import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
+import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 
 /**
  * Trust Service Bean implementation.
@@ -79,18 +94,17 @@ public class TrustServiceBean implements TrustService {
 		TrustLinker trustLinker = new TrustServiceTrustLinker(
 				this.entityManager, this.queueConnectionFactory, this.queue);
 
-		// XXX: for now just get the auth eid domain as default
-		TrustDomainEntity trustDomain;
-		try {
-			trustDomain = this.trustDomainDAO
-					.getTrustDomain(TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN);
-		} catch (TrustDomainNotFoundException e) {
-			LOG.error("Trust domain "
-					+ TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN
-					+ " not found");
-			// XXX: audit?
-			throw new EJBException(e);
-		}
+		// XXX: for now just get the default domain
+		TrustDomainEntity trustDomain = this.trustDomainDAO
+				.getDefaultTrustDomain();
+
+		return getTrustValidator(trustDomain, trustLinker);
+	}
+
+	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain,
+			TrustLinker trustLinker) {
+
+		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
 
 		MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
 		for (TrustPointEntity trustPoint : trustDomain.getTrustPoints()) {
@@ -98,9 +112,106 @@ public class TrustServiceBean implements TrustService {
 					.getCertificateAuthority().getCertificate());
 		}
 
-		return BelgianTrustValidatorFactory.createTrustValidator(
-				configurationDAO.getNetworkConfig(), trustLinker,
+		TrustValidator trustValidator = new TrustValidator(
 				certificateRepository);
+		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
+
+		OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
+				networkConfig);
+
+		OnlineCrlRepository crlRepository = new OnlineCrlRepository(
+				networkConfig);
+		CachedCrlRepository cachedCrlRepository = new CachedCrlRepository(
+				crlRepository);
+
+		FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
+		if (null != trustLinker) {
+			fallbackTrustLinker.addTrustLinker(trustLinker);
+		}
+		fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(ocspRepository));
+		fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(
+				cachedCrlRepository));
+
+		trustValidator.addTrustLinker(fallbackTrustLinker);
+
+		// add certificate constraints
+		CertificatePoliciesCertificateConstraint certificatePoliciesCertificateConstraint = null;
+		KeyUsageCertificateConstraint keyUsageCertificateConstraint = null;
+		EndEntityCertificateConstraint endEntityCertificateConstraint = null;
+		for (CertificateConstraintEntity certificateConstraint : trustDomain
+				.getCertificateConstraints()) {
+
+			if (certificateConstraint instanceof PolicyConstraintEntity) {
+
+				PolicyConstraintEntity policyConstraint = (PolicyConstraintEntity) certificateConstraint;
+				if (null == certificatePoliciesCertificateConstraint) {
+					certificatePoliciesCertificateConstraint = new CertificatePoliciesCertificateConstraint();
+				}
+				certificatePoliciesCertificateConstraint
+						.addCertificatePolicy(policyConstraint.getPolicy());
+
+			} else if (certificateConstraint instanceof KeyUsageConstraintEntity) {
+
+				KeyUsageConstraintEntity keyUsageConstraint = (KeyUsageConstraintEntity) certificateConstraint;
+				if (null == keyUsageCertificateConstraint) {
+					keyUsageCertificateConstraint = new KeyUsageCertificateConstraint();
+				}
+				switch (keyUsageConstraint.getKeyUsage()) {
+				// XXX: complete after jtrust is updated for all KeyUsages
+				case DIGITAL_SIGNATURE_IDX: {
+					keyUsageCertificateConstraint
+							.setDigitalSignatureFilter(keyUsageConstraint
+									.getAllowed());
+					break;
+				}
+				case NON_REPUDIATION_IDX: {
+					keyUsageCertificateConstraint
+							.setNonRepudiationFilter(keyUsageConstraint
+									.getAllowed());
+					break;
+				}
+				}
+
+			} else if (certificateConstraint instanceof QCStatementsConstraintEntity) {
+
+				QCStatementsConstraintEntity qcStatementsConstraint = (QCStatementsConstraintEntity) certificateConstraint;
+				trustValidator
+						.addCertificateConstrain(new QCStatementsCertificateConstraint(
+								qcStatementsConstraint.getQcComplianceFilter()));
+
+			} else if (certificateConstraint instanceof DNConstraintEntity) {
+
+				DNConstraintEntity dnConstraint = (DNConstraintEntity) certificateConstraint;
+				trustValidator
+						.addCertificateConstrain(new DistinguishedNameCertificateConstraint(
+								dnConstraint.getDn()));
+
+			} else if (certificateConstraint instanceof EndEntityConstraintEntity) {
+
+				EndEntityConstraintEntity endEntityConstraint = (EndEntityConstraintEntity) certificateConstraint;
+				if (null == endEntityCertificateConstraint) {
+					endEntityCertificateConstraint = new EndEntityCertificateConstraint();
+				}
+				endEntityCertificateConstraint
+						.addEndEntity(endEntityConstraint.getIssuerName(),
+								endEntityConstraint.getSerialNumber());
+			}
+		}
+
+		if (null != certificatePoliciesCertificateConstraint) {
+			trustValidator
+					.addCertificateConstrain(certificatePoliciesCertificateConstraint);
+		}
+		if (null != keyUsageCertificateConstraint) {
+			trustValidator
+					.addCertificateConstrain(keyUsageCertificateConstraint);
+		}
+		if (null != endEntityCertificateConstraint) {
+			trustValidator
+					.addCertificateConstrain(endEntityCertificateConstraint);
+		}
+
+		return trustValidator;
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)

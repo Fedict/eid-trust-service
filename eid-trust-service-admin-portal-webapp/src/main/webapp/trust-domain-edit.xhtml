@@ -37,10 +37,38 @@
 
 					<br />
 
-					<h:commandButton action="#{trustDomain.selectTrustPoints}" id="select"
-						value="#{messages.select}" immediate="true" styleClass="submit" />
+					<h:commandButton action="#{trustDomain.selectTrustPoints}"
+						id="select" value="#{messages.select}" immediate="true"
+						styleClass="submit" />
 					<h:commandButton action="#{trustDomain.back}" id="back"
 						value="#{messages.back}" immediate="true" styleClass="submit" />
+
+					<h3>#{messages.certificateConstraints}</h3>
+
+					<h4>#{messages.certificateConstraintPolicy}</h4>
+
+					<a4j:form id="policy_form" ajaxSubmit="true" reRender="policy_data">
+						<rich:dataTable id="policy_data" var="item"
+							value="#{constraintsPolicies}">
+							<h:column>
+								<f:facet name="header">#{messages.certificateConstraintPolicy}</f:facet>
+								<h:outputText value="#{item.policy}" />
+							</h:column>
+							<h:column>
+								<f:facet name="header">#{messages.remove}</f:facet>
+								<a4j:commandLink value="#{messages.remove}"
+									action="#{trustDomain.removeConstraint}" />
+							</h:column>
+						</rich:dataTable>
+					</a4j:form>
+
+					<h4>#{messages.certificateConstraintKeyUsage}</h4>
+
+					<h4>#{messages.certificateConstraintDN}</h4>
+
+					<h4>#{messages.certificateConstraintEndEntity}</h4>
+
+					<h4>#{messages.certificateConstraintQCStatements}</h4>
 
 					<h:messages globalOnly="true" styleClass="error" />
 

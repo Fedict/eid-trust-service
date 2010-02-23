@@ -49,6 +49,8 @@ import be.fedict.trust.admin.portal.TrustDomain;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
+import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
@@ -59,6 +61,8 @@ public class TrustDomainBean implements TrustDomain {
 
 	public static final String SELECTED_TRUST_DOMAIN = "selectedTrustDomain";
 	private static final String TRUST_DOMAIN_LIST_NAME = "trustDomainList";
+
+	private static final String CONSTRAINTS_POLICY_LIST = "constraintsPolicies";
 
 	@Logger
 	private Log log;
@@ -85,6 +89,12 @@ public class TrustDomainBean implements TrustDomain {
 
 	private List<String> sourceTrustPoints;
 	private List<String> selectedTrustPoints;
+
+	@DataModel(CONSTRAINTS_POLICY_LIST)
+	private List<PolicyConstraintEntity> policyConstraints;
+
+	@DataModelSelection(CONSTRAINTS_POLICY_LIST)
+	private PolicyConstraintEntity selectedPolicyConstraint;
 
 	/**
 	 * {@inheritDoc}
@@ -275,6 +285,35 @@ public class TrustDomainBean implements TrustDomain {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorTrustDomainNotFound");
 			return null;
+		}
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Factory(CONSTRAINTS_POLICY_LIST)
+	public void constraintsPolicyFactory() {
+
+		this.log.debug("certificate policy constraints factory");
+		this.policyConstraints = new LinkedList<PolicyConstraintEntity>();
+		for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
+				.getCertificateConstraints()) {
+			if (certificateConstraint instanceof PolicyConstraintEntity) {
+				this.policyConstraints
+						.add((PolicyConstraintEntity) certificateConstraint);
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String removeConstraint() {
+
+		if (null != this.selectedPolicyConstraint) {
+			this.log.debug("remove policy constraint: #0",
+					this.selectedPolicyConstraint.getPolicy());
 		}
 		return "success";
 	}

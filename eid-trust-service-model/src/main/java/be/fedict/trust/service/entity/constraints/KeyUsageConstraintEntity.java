@@ -23,12 +23,13 @@ import javax.persistence.Entity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 
 @Entity
-public class KeyUsageConstraintEntity extends
-		CertificateConstraintEntity {
+public class KeyUsageConstraintEntity extends CertificateConstraintEntity {
 
 	private static final long serialVersionUID = 1L;
 
 	private KeyUsageType keyUsage;
+
+	private boolean allowed;
 
 	/**
 	 * Default constructor.
@@ -42,10 +43,11 @@ public class KeyUsageConstraintEntity extends
 	 * Main constructor.
 	 */
 	public KeyUsageConstraintEntity(TrustDomainEntity trustDomain,
-			KeyUsageType keyUsage) {
+			KeyUsageType keyUsage, boolean allowed) {
 
 		super(trustDomain);
 		this.keyUsage = keyUsage;
+		this.allowed = allowed;
 	}
 
 	public KeyUsageType getKeyUsage() {
@@ -56,5 +58,15 @@ public class KeyUsageConstraintEntity extends
 	public void setKeyUsage(KeyUsageType keyUsage) {
 
 		this.keyUsage = keyUsage;
+	}
+
+	public boolean getAllowed() {
+
+		return this.allowed;
+	}
+
+	public void setAllowed(boolean allowed) {
+
+		this.allowed = allowed;
 	}
 }

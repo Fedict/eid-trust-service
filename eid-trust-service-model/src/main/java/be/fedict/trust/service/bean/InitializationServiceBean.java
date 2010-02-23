@@ -41,6 +41,7 @@ import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 /**
@@ -164,6 +165,21 @@ public class InitializationServiceBean implements InitializationService {
 		}
 		trustDomain.setTrustPoints(trustPoints);
 
+		// initialize certificate constraints
+		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+				KeyUsageType.DIGITAL_SIGNATURE_IDX, true);
+		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+				KeyUsageType.NON_REPUDIATION_IDX, false);
+
+		this.trustDomainDAO.addCertificatePolicy(trustDomain,
+				"2.16.56.1.1.1.2.2");
+		this.trustDomainDAO.addCertificatePolicy(trustDomain,
+				"2.16.56.1.1.1.7.2");
+		this.trustDomainDAO.addCertificatePolicy(trustDomain,
+				"2.16.56.9.1.1.2.2");
+		this.trustDomainDAO.addCertificatePolicy(trustDomain,
+				"2.16.56.9.1.1.7.2");
+
 		// start timer
 		initTrustDomainScheduling(trustDomain);
 	}
@@ -181,6 +197,24 @@ public class InitializationServiceBean implements InitializationService {
 							null);
 		}
 		trustDomain.setTrustPoints(trustPoints);
+
+		// initialize certificate constraints
+		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+				KeyUsageType.DIGITAL_SIGNATURE_IDX, false);
+		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+				KeyUsageType.NON_REPUDIATION_IDX, true);
+
+		this.trustDomainDAO.addCertificatePolicy(trustDomain,
+				"2.16.56.1.1.1.2.1");
+		this.trustDomainDAO.addCertificatePolicy(trustDomain,
+				"2.16.56.1.1.1.7.1");
+		this.trustDomainDAO.addCertificatePolicy(trustDomain,
+				"2.16.56.9.1.1.2.1");
+		this.trustDomainDAO.addCertificatePolicy(trustDomain,
+				"2.16.56.9.1.1.7.1");
+
+		this.trustDomainDAO.addQCStatementsConstraint(trustDomain, true);
+
 	}
 
 	private void initBelgianEidNationalRegistryTrustDomain(
@@ -196,6 +230,18 @@ public class InitializationServiceBean implements InitializationService {
 							null);
 		}
 		trustDomain.setTrustPoints(trustPoints);
+
+		// initialize certificate constraints
+		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+				KeyUsageType.DIGITAL_SIGNATURE_IDX, true);
+		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+				KeyUsageType.NON_REPUDIATION_IDX, true);
+
+		this.trustDomainDAO
+				.addCertificatePolicy(trustDomain, "2.16.56.1.1.1.4");
+
+		this.trustDomainDAO.addDNConstraint(trustDomain, "CN=RRN, O=RRN, C=BE");
+
 	}
 
 	private void initTrustDomainScheduling(TrustDomainEntity trustDomain) {

@@ -35,6 +35,8 @@ public interface TrustDomain {
 	 */
 	void trustDomainListFactory();
 
+	void constraintsPolicyFactory();
+
 	/*
 	 * Lifecycle.
 	 */
@@ -67,6 +69,8 @@ public interface TrustDomain {
 	String saveSelect();
 
 	String back();
+
+	String removeConstraint();
 
 	/*
 	 * Trust points tree

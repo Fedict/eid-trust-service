@@ -35,8 +35,12 @@ import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
+import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 /**
@@ -296,6 +300,41 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 		this.entityManager.persist(endEntityCertificateConstraint);
 		trustDomain.getCertificateConstraints().add(
 				endEntityCertificateConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addKeyUsageConstraint(TrustDomainEntity trustDomain,
+			KeyUsageType keyUsageType, boolean allowed) {
+
+		KeyUsageConstraintEntity keyUsageConstraint = new KeyUsageConstraintEntity(
+				trustDomain, keyUsageType, allowed);
+		this.entityManager.persist(keyUsageConstraint);
+		trustDomain.getCertificateConstraints().add(keyUsageConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addQCStatementsConstraint(TrustDomainEntity trustDomain,
+			boolean qcComplianceFilter) {
+
+		QCStatementsConstraintEntity qcStatementsConstraint = new QCStatementsConstraintEntity(
+				trustDomain, qcComplianceFilter);
+		this.entityManager.persist(qcStatementsConstraint);
+		trustDomain.getCertificateConstraints().add(qcStatementsConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addDNConstraint(TrustDomainEntity trustDomain, String dn) {
+
+		DNConstraintEntity dnConstraint = new DNConstraintEntity(trustDomain,
+				dn);
+		this.entityManager.persist(dnConstraint);
+		trustDomain.getCertificateConstraints().add(dnConstraint);
 	}
 
 	/**
