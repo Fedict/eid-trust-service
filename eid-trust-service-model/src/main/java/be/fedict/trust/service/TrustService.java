@@ -23,6 +23,8 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+
 /**
  * Trust Service interface.
  * 
@@ -39,4 +41,17 @@ public interface TrustService {
 	 * @return
 	 */
 	boolean isValid(List<X509Certificate> authenticationCertificateChain);
+
+	/**
+	 * Checks whether the given authentication certificate chain is valid.
+	 * 
+	 * @param trustDomain
+	 *            optional, can be null. If so default trust domain is taken.
+	 * @param authenticationCertificateChain
+	 * @return
+	 * @throws TrustDomainNotFoundException
+	 */
+	boolean isValid(String trustDomain,
+			List<X509Certificate> authenticationCertificateChain)
+			throws TrustDomainNotFoundException;
 }

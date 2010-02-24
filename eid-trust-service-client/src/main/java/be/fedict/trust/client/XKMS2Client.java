@@ -20,6 +20,7 @@ package be.fedict.trust.client;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.text.MessageFormat;
 import java.util.List;
 
 import javax.xml.ws.Binding;
@@ -39,6 +40,7 @@ import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 import org.w3._2002._03.xkms_wsdl.XKMSService;
 
+import be.fedict.trust.xkms.extensions.TrustDomainMessageExtensionType;
 import be.fedict.trust.xkms2.XKMSServiceFactory;
 
 /**
@@ -51,23 +53,60 @@ public class XKMS2Client {
 
 	private static final Log LOG = LogFactory.getLog(XKMS2Client.class);
 
-	public boolean validate(List<X509Certificate> authnCertificateChain)
-			throws CertificateEncodingException {
-		LOG.debug("validate: "
-				+ authnCertificateChain.get(0).getSubjectX500Principal());
+	private final XKMSPortType port;
+
+	private final String location;
+
+	/**
+	 * Main constructor
+	 * 
+	 * @param location
+	 *            the location (host:port) of the XKMS2 web service
+	 */
+	public XKMS2Client(String location) {
 
 		XKMSService xkmsService = XKMSServiceFactory.getInstance();
-		XKMSPortType xkmsPort = xkmsService.getXKMSPort();
+		port = xkmsService.getXKMSPort();
+		this.location = MessageFormat.format("{0}/eid-trust-service-ws/xkms2",
+				location);
 
-		BindingProvider bindingProvider = (BindingProvider) xkmsPort;
+		setEndpointAddress();
+	}
+
+	private void setEndpointAddress() {
+
+		BindingProvider bindingProvider = (BindingProvider) port;
 		bindingProvider.getRequestContext().put(
-				BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-				"http://localhost:8080/eid-trust-service-ws/xkms2");
+				BindingProvider.ENDPOINT_ADDRESS_PROPERTY, location);
+	}
+
+	/**
+	 * Registers the logging SOAP handler on the given JAX-WS port component.
+	 * 
+	 * @param port
+	 */
+	protected void registerLoggerHandler(Object port) {
+
+		BindingProvider bindingProvider = (BindingProvider) port;
 
 		Binding binding = bindingProvider.getBinding();
+		@SuppressWarnings("unchecked")
 		List<Handler> handlerChain = binding.getHandlerChain();
 		handlerChain.add(new LoggingSoapHandler());
 		binding.setHandlerChain(handlerChain);
+	}
+
+	public boolean validate(List<X509Certificate> authnCertificateChain)
+			throws CertificateEncodingException {
+
+		return validate(null, authnCertificateChain);
+	}
+
+	public boolean validate(String trustDomain,
+			List<X509Certificate> authnCertificateChain)
+			throws CertificateEncodingException {
+		LOG.debug("validate: "
+				+ authnCertificateChain.get(0).getSubjectX500Principal());
 
 		ObjectFactory objectFactory = new ObjectFactory();
 		org.w3._2000._09.xmldsig_.ObjectFactory xmldsigObjectFactory = new org.w3._2000._09.xmldsig_.ObjectFactory();
@@ -90,9 +129,21 @@ public class XKMS2Client {
 		keyInfo.getContent().add(xmldsigObjectFactory.createX509Data(x509Data));
 		validateRequest.setQueryKeyBinding(queryKeyBinding);
 
+		/*
+		 * Set optional trust domain message extension
+		 */
+		if (null != trustDomain) {
+			be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
+			TrustDomainMessageExtensionType trustDomainMessageExtension = extensionsObjectFactory
+					.createTrustDomainMessageExtensionType();
+			trustDomainMessageExtension.setTrustDomain(trustDomain);
+			validateRequest.getMessageExtension().add(
+					trustDomainMessageExtension);
+		}
+
 		// TODO: WS trust via unilateral TLS trust model based on public key
 
-		ValidateResultType validateResult = xkmsPort.validate(validateRequest);
+		ValidateResultType validateResult = port.validate(validateRequest);
 
 		if (null == validateResult) {
 			throw new RuntimeException("missing ValidateResult element");

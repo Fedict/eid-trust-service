@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.X509DataType;
 import org.w3._2002._03.xkms_.KeyBindingType;
+import org.w3._2002._03.xkms_.MessageExtensionAbstractType;
 import org.w3._2002._03.xkms_.ObjectFactory;
 import org.w3._2002._03.xkms_.QueryKeyBindingType;
 import org.w3._2002._03.xkms_.StatusType;
@@ -43,6 +44,8 @@ import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 import be.fedict.trust.service.TrustService;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.xkms.extensions.TrustDomainMessageExtensionType;
 
 /**
  * Implementation of XKMS2 Web Service JAX-WS Port.
@@ -99,7 +102,25 @@ public class XKMSPortImpl implements XKMSPortType {
 			}
 		}
 
-		boolean validationResult = this.trustService.isValid(certificateChain);
+		// look for a trust domain message extension
+		String trustDomain = null;
+		for (MessageExtensionAbstractType messageExtension : body
+				.getMessageExtension()) {
+			if (messageExtension instanceof TrustDomainMessageExtensionType) {
+				TrustDomainMessageExtensionType trustDomainExtension = (TrustDomainMessageExtensionType) messageExtension;
+				trustDomain = trustDomainExtension.getTrustDomain();
+			}
+		}
+
+		boolean validationResult;
+		try {
+			validationResult = this.trustService.isValid(trustDomain,
+					certificateChain);
+		} catch (TrustDomainNotFoundException e) {
+			// XXX: handle properly and return invalid trust domain status
+			LOG.error("invalid trust domain");
+			validationResult = false;
+		}
 
 		// return the result
 		ObjectFactory objectFactory = new ObjectFactory();

@@ -62,6 +62,7 @@ import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 /**
  * Trust Service Bean implementation.
@@ -89,14 +90,18 @@ public class TrustServiceBean implements TrustService {
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
 
-	private TrustValidator getTrustValidator() {
+	private TrustValidator getTrustValidator(String trustDomainName)
+			throws TrustDomainNotFoundException {
 
 		TrustLinker trustLinker = new TrustServiceTrustLinker(
 				this.entityManager, this.queueConnectionFactory, this.queue);
 
 		// XXX: for now just get the default domain
-		TrustDomainEntity trustDomain = this.trustDomainDAO
-				.getDefaultTrustDomain();
+		TrustDomainEntity trustDomain;
+		if (null == trustDomainName)
+			trustDomain = this.trustDomainDAO.getDefaultTrustDomain();
+		else
+			trustDomain = this.trustDomainDAO.getTrustDomain(trustDomainName);
 
 		return getTrustValidator(trustDomain, trustLinker);
 	}
@@ -214,14 +219,32 @@ public class TrustServiceBean implements TrustService {
 		return trustValidator;
 	}
 
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean isValid(List<X509Certificate> authenticationCertificateChain) {
+		try {
+			return isValid(null, authenticationCertificateChain);
+		} catch (TrustDomainNotFoundException e) {
+			LOG.error("Default trust domain not set ?!");
+			return false;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public boolean isValid(String trustDomain,
+			List<X509Certificate> authenticationCertificateChain)
+			throws TrustDomainNotFoundException {
 		LOG.debug("isValid: "
 				+ authenticationCertificateChain.get(0)
 						.getSubjectX500Principal());
 
 		try {
-			getTrustValidator().isTrusted(authenticationCertificateChain);
+			getTrustValidator(trustDomain).isTrusted(
+					authenticationCertificateChain);
 		} catch (CertPathValidatorException e) {
 			LOG.debug("certificate path validation error: " + e.getMessage());
 			return false;
