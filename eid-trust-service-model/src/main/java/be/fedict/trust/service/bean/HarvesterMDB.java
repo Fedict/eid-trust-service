@@ -37,9 +37,6 @@ import javax.ejb.MessageDriven;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.logging.Log;
@@ -50,6 +47,7 @@ import org.bouncycastle.asn1.DEROctetString;
 
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.crl.OnlineCrlRepository;
+import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
@@ -68,8 +66,8 @@ public class HarvesterMDB implements MessageListener {
 	@EJB
 	private ConfigurationDAO configurationDAO;
 
-	@PersistenceContext
-	private EntityManager entityManager;
+	@EJB
+	private CertificateAuthorityDAO certificateAuthorityDAO;
 
 	@PostConstruct
 	public void postConstructCallback() {
@@ -89,8 +87,8 @@ public class HarvesterMDB implements MessageListener {
 		boolean update = harvestMessage.isUpdate();
 
 		LOG.debug("issuer: " + caName);
-		CertificateAuthorityEntity certificateAuthority = this.entityManager
-				.find(CertificateAuthorityEntity.class, caName);
+		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
+				.findCertificateAuthority(caName);
 		if (null == certificateAuthority) {
 			LOG.warn("unknown certificate authority: " + caName);
 			return;
@@ -170,14 +168,14 @@ public class HarvesterMDB implements MessageListener {
 					Date revocationDate = revokedCertificate
 							.getRevocationDate();
 
-					RevokedCertificateEntity revokedCertificateEntity = new RevokedCertificateEntity(
-							issuerName, serialNumber, revocationDate, crlNumber);
-					this.entityManager.persist(revokedCertificateEntity);
+					this.certificateAuthorityDAO
+							.addRevokedCertificate(issuerName, serialNumber,
+									revocationDate, crlNumber);
 				}
 
 				if (null != crlNumber) {
-					removeOldEntries(crlNumber, crl.getIssuerX500Principal()
-							.toString());
+					this.certificateAuthorityDAO.removeOldRevokedCertificates(
+							crlNumber, crl.getIssuerX500Principal().toString());
 				}
 
 			}
@@ -191,33 +189,13 @@ public class HarvesterMDB implements MessageListener {
 		LOG.debug("cache activated for CA: " + crl.getIssuerX500Principal());
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean entriesFound(BigInteger crlNumber, String issuerName) {
 		LOG.debug("find existing CRL entries in the cache with crlNumber="
 				+ crlNumber);
 
-		Query findQuery = this.entityManager
-				.createQuery("SELECT cert FROM RevokedCertificateEntity AS cert"
-						+ " WHERE cert.crlNumber = :crlNumber AND cert.pk.issuer = :issuerName");
-		findQuery.setParameter("crlNumber", crlNumber);
-		findQuery.setParameter("issuerName", issuerName);
-		List<RevokedCertificateEntity> revokedCerts = findQuery.getResultList();
-		if (null == revokedCerts || revokedCerts.isEmpty())
-			return false;
-		return true;
-	}
-
-	private int removeOldEntries(BigInteger crlNumber, String issuerName) {
-		LOG.debug("deleting old CRL entries from the cache");
-		Query deleteQuery = this.entityManager
-				.createQuery("DELETE FROM RevokedCertificateEntity cert "
-						+ "WHERE cert.crlNumber < :crlNumber AND cert.pk.issuer = :issuerName");
-		deleteQuery.setParameter("crlNumber", crlNumber);
-		deleteQuery.setParameter("issuerName", issuerName);
-		int deleteResult = deleteQuery.executeUpdate();
-		LOG.debug("delete result: " + deleteResult);
-		this.entityManager.flush();
-		return deleteResult;
+		List<RevokedCertificateEntity> revokedCertificates = this.certificateAuthorityDAO
+				.listRevokedCertificates(crlNumber, issuerName);
+		return !revokedCertificates.isEmpty();
 	}
 
 	private BigInteger getCrlNumber(X509CRL crl) {

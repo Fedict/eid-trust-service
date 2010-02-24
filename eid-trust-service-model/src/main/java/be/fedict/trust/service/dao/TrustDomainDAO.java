@@ -96,24 +96,6 @@ public interface TrustDomainDAO {
 	TrustDomainEntity getDefaultTrustDomain();
 
 	/**
-	 * Create a new {@link CertificateAuthorityEntity}.
-	 * 
-	 * @param rootCaCertificate
-	 */
-	CertificateAuthorityEntity addCertificateAuthority(
-			X509Certificate certificate);
-
-	/**
-	 * Returns {@link CertificateAuthorityEntity} from the specified
-	 * {@link X509Certificate}. Returns <code>null</code> if not found.
-	 * 
-	 * @param certificate
-	 * @return
-	 */
-	CertificateAuthorityEntity findCertificateAuthority(
-			X509Certificate certificate);
-
-	/**
 	 * Create a new {@link TrustPointEntity}.
 	 * 
 	 * @param crlRefreshCron
@@ -153,14 +135,6 @@ public interface TrustDomainDAO {
 	 */
 	List<CertificateAuthorityEntity> listCertificateAuthorities(
 			TrustPointEntity trustPoint);
-
-	/**
-	 * Remove {@link CertificateAuthorityEntity}'s related to the specified
-	 * {@link TrustPointEntity}.
-	 * 
-	 * @param trustPoint
-	 */
-	void removeCertificateAuthorities(TrustPointEntity trustPoint);
 
 	/**
 	 * Removes the selected {@link TrustPointEntity}.

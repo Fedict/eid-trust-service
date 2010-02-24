@@ -19,7 +19,6 @@
 package be.fedict.trust.service.dao.bean;
 
 import java.math.BigInteger;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -133,39 +132,6 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public CertificateAuthorityEntity addCertificateAuthority(
-			X509Certificate certificate) {
-
-		LOG.debug("add  CA: "
-				+ certificate.getSubjectX500Principal().toString());
-		CertificateAuthorityEntity certificateAuthority;
-		try {
-			certificateAuthority = new CertificateAuthorityEntity(null,
-					certificate);
-		} catch (CertificateEncodingException e) {
-			LOG.error("Certificate encoding exception: " + e.getMessage());
-			return null;
-		}
-		this.entityManager.persist(certificateAuthority);
-		return certificateAuthority;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public CertificateAuthorityEntity findCertificateAuthority(
-			X509Certificate certificate) {
-
-		LOG.debug("find CA: "
-				+ certificate.getSubjectX500Principal().toString());
-		return this.entityManager.find(CertificateAuthorityEntity.class,
-				certificate.getSubjectX500Principal().toString());
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public TrustPointEntity addTrustPoint(String crlRefreshCron,
 			CertificateAuthorityEntity ca) {
 
@@ -188,19 +154,6 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 				.createNamedQuery(CertificateAuthorityEntity.QUERY_WHERE_TRUST_POINT);
 		query.setParameter("trustPoint", trustPoint);
 		return (List<CertificateAuthorityEntity>) query.getResultList();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void removeCertificateAuthorities(TrustPointEntity trustPoint) {
-
-		LOG.debug("remove CA's for trust point " + trustPoint.getName());
-		Query query = this.entityManager
-				.createNamedQuery(CertificateAuthorityEntity.DELETE_WHERE_TRUST_POINT);
-		query.setParameter("trustPoint", trustPoint);
-		int result = query.executeUpdate();
-		LOG.debug("CA's removed: " + result);
 	}
 
 	/**

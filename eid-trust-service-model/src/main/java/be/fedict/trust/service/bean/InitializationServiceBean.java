@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import be.fedict.trust.service.InitializationService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
@@ -61,6 +62,9 @@ public class InitializationServiceBean implements InitializationService {
 
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
+
+	@EJB
+	private CertificateAuthorityDAO certificateAuthorityDAO;
 
 	@EJB
 	private SchedulingService schedulingService;
@@ -117,10 +121,10 @@ public class InitializationServiceBean implements InitializationService {
 
 		// Belgian eID Root CA trust points
 		X509Certificate rootCaCertificate = loadCertificate("be/fedict/trust/belgiumrca.crt");
-		CertificateAuthorityEntity rootCa = this.trustDomainDAO
+		CertificateAuthorityEntity rootCa = this.certificateAuthorityDAO
 				.findCertificateAuthority(rootCaCertificate);
 		if (null == rootCa) {
-			rootCa = this.trustDomainDAO
+			rootCa = this.certificateAuthorityDAO
 					.addCertificateAuthority(rootCaCertificate);
 		}
 
@@ -132,10 +136,10 @@ public class InitializationServiceBean implements InitializationService {
 		trustPoints.add(rootCa.getTrustPoint());
 
 		X509Certificate rootCa2Certificate = loadCertificate("be/fedict/trust/belgiumrca2.crt");
-		CertificateAuthorityEntity rootCa2 = this.trustDomainDAO
+		CertificateAuthorityEntity rootCa2 = this.certificateAuthorityDAO
 				.findCertificateAuthority(rootCa2Certificate);
 		if (null == rootCa2) {
-			rootCa2 = this.trustDomainDAO
+			rootCa2 = this.certificateAuthorityDAO
 					.addCertificateAuthority(rootCa2Certificate);
 		}
 

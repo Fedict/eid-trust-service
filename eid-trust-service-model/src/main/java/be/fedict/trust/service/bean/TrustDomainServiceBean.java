@@ -37,6 +37,7 @@ import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TimerInfo;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -60,6 +61,9 @@ public class TrustDomainServiceBean implements TrustDomainService {
 
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
+
+	@EJB
+	private CertificateAuthorityDAO certificateAuthorityDAO;
 
 	@EJB
 	private SchedulingService schedulingService;
@@ -148,7 +152,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		this.schedulingService.cancelTimers(new TimerInfo(trustPoint));
 
 		// remove CA's
-		this.trustDomainDAO.removeCertificateAuthorities(trustPoint);
+		this.certificateAuthorityDAO.removeCertificateAuthorities(trustPoint);
 
 		// remove trust point from all trustdomains
 		List<TrustDomainEntity> trustDomains = this.trustDomainDAO
@@ -176,12 +180,13 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		X509Certificate certificate = getCertificate(certificateBytes);
 
 		// add CA
-		if (null != this.trustDomainDAO.findCertificateAuthority(certificate)) {
+		if (null != this.certificateAuthorityDAO
+				.findCertificateAuthority(certificate)) {
 			LOG.error("trust point already exist: "
 					+ certificate.getSubjectX500Principal().toString());
 			throw new TrustPointAlreadyExistsException();
 		}
-		CertificateAuthorityEntity certificateAuthority = this.trustDomainDAO
+		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
 				.addCertificateAuthority(certificate);
 
 		// add trust point
