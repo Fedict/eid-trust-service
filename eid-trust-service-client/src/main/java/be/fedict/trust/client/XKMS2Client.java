@@ -40,6 +40,7 @@ import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 import org.w3._2002._03.xkms_wsdl.XKMSService;
 
+import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.xkms.extensions.TrustDomainMessageExtensionType;
 import be.fedict.trust.xkms2.XKMSServiceFactory;
 
@@ -97,14 +98,14 @@ public class XKMS2Client {
 	}
 
 	public boolean validate(List<X509Certificate> authnCertificateChain)
-			throws CertificateEncodingException {
+			throws CertificateEncodingException, TrustDomainNotFoundException {
 
 		return validate(null, authnCertificateChain);
 	}
 
 	public boolean validate(String trustDomain,
 			List<X509Certificate> authnCertificateChain)
-			throws CertificateEncodingException {
+			throws CertificateEncodingException, TrustDomainNotFoundException {
 		LOG.debug("validate: "
 				+ authnCertificateChain.get(0).getSubjectX500Principal());
 
@@ -148,6 +149,9 @@ public class XKMS2Client {
 		if (null == validateResult) {
 			throw new RuntimeException("missing ValidateResult element");
 		}
+
+		checkResponse(validateResult);
+
 		List<KeyBindingType> keyBindings = validateResult.getKeyBinding();
 		for (KeyBindingType keyBinding : keyBindings) {
 			// TODO better result verification
@@ -159,5 +163,26 @@ public class XKMS2Client {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Checks the ResultMajor and ResultMinor code.
+	 * 
+	 * @param validateResult
+	 * @throws TrustDomainNotFoundException
+	 */
+	private void checkResponse(ValidateResultType validateResult)
+			throws TrustDomainNotFoundException {
+
+		if (!validateResult.getResultMajor().equals(
+				ResultMajorCode.SUCCESS.getErrorCode())) {
+
+			if (validateResult.getResultMinor().equals(
+					ResultMinorCode.TRUST_DOMAIN_NOT_FOUND.getErrorCode())) {
+				throw new TrustDomainNotFoundException();
+			}
+
+		}
+
 	}
 }

@@ -43,6 +43,8 @@ import org.w3._2002._03.xkms_.ValidateRequestType;
 import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
+import be.fedict.trust.client.ResultMajorCode;
+import be.fedict.trust.client.ResultMinorCode;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.xkms.extensions.TrustDomainMessageExtensionType;
@@ -109,6 +111,11 @@ public class XKMSPortImpl implements XKMSPortType {
 			if (messageExtension instanceof TrustDomainMessageExtensionType) {
 				TrustDomainMessageExtensionType trustDomainExtension = (TrustDomainMessageExtensionType) messageExtension;
 				trustDomain = trustDomainExtension.getTrustDomain();
+			} else {
+				LOG.error("Invalid message extension element: "
+						+ messageExtension.getClass());
+				return createResultResponse(ResultMajorCode.SENDER,
+						ResultMinorCode.OPTIONAL_ELEMENT_NOT_SUPPORTED);
 			}
 		}
 
@@ -117,15 +124,16 @@ public class XKMSPortImpl implements XKMSPortType {
 			validationResult = this.trustService.isValid(trustDomain,
 					certificateChain);
 		} catch (TrustDomainNotFoundException e) {
-			// XXX: handle properly and return invalid trust domain status
 			LOG.error("invalid trust domain");
-			validationResult = false;
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.TRUST_DOMAIN_NOT_FOUND);
 		}
 
 		// return the result
+		ValidateResultType validateResult = createResultResponse(
+				ResultMajorCode.SUCCESS, null);
+
 		ObjectFactory objectFactory = new ObjectFactory();
-		ValidateResultType validateResult = objectFactory
-				.createValidateResultType();
 		List<KeyBindingType> keyBindings = validateResult.getKeyBinding();
 		KeyBindingType keyBinding = objectFactory.createKeyBindingType();
 		keyBindings.add(keyBinding);
@@ -138,6 +146,24 @@ public class XKMSPortImpl implements XKMSPortType {
 			statusValue = "http://www.w3.org/2002/03/xkms#Invalid";
 		}
 		status.setStatusValue(statusValue);
+
+		return validateResult;
+	}
+
+	private ValidateResultType createResultResponse(
+			ResultMajorCode resultMajorCode, ResultMinorCode resultMinorCode) {
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		ValidateResultType validateResult = objectFactory
+				.createValidateResultType();
+		if (null != resultMajorCode)
+			validateResult.setResultMajor(resultMajorCode.getErrorCode());
+		else
+			validateResult.setResultMajor(ResultMajorCode.SUCCESS
+					.getErrorCode());
+		if (null != resultMinorCode)
+			validateResult.setResultMinor(resultMinorCode.getErrorCode());
+
 		return validateResult;
 	}
 
