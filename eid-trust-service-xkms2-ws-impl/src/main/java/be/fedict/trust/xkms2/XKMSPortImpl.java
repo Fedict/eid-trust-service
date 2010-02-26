@@ -43,8 +43,6 @@ import org.w3._2002._03.xkms_.ValidateRequestType;
 import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
-import be.fedict.trust.client.ResultMajorCode;
-import be.fedict.trust.client.ResultMinorCode;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.xkms.extensions.TrustDomainMessageExtensionType;
