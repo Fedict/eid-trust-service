@@ -35,17 +35,16 @@ import org.apache.commons.logging.LogFactory;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.X509DataType;
 import org.w3._2002._03.xkms_.KeyBindingType;
-import org.w3._2002._03.xkms_.MessageExtensionAbstractType;
 import org.w3._2002._03.xkms_.ObjectFactory;
 import org.w3._2002._03.xkms_.QueryKeyBindingType;
 import org.w3._2002._03.xkms_.StatusType;
+import org.w3._2002._03.xkms_.UseKeyWithType;
 import org.w3._2002._03.xkms_.ValidateRequestType;
 import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
-import be.fedict.trust.xkms.extensions.TrustDomainMessageExtensionType;
 
 /**
  * Implementation of XKMS2 Web Service JAX-WS Port.
@@ -104,16 +103,13 @@ public class XKMSPortImpl implements XKMSPortType {
 
 		// look for a trust domain message extension
 		String trustDomain = null;
-		for (MessageExtensionAbstractType messageExtension : body
-				.getMessageExtension()) {
-			if (messageExtension instanceof TrustDomainMessageExtensionType) {
-				TrustDomainMessageExtensionType trustDomainExtension = (TrustDomainMessageExtensionType) messageExtension;
-				trustDomain = trustDomainExtension.getTrustDomain();
-			} else {
-				LOG.error("Invalid message extension element: "
-						+ messageExtension.getClass());
-				return createResultResponse(ResultMajorCode.SENDER,
-						ResultMinorCode.OPTIONAL_ELEMENT_NOT_SUPPORTED);
+		if (body.getQueryKeyBinding().getUseKeyWith().size() > 0) {
+			for (UseKeyWithType useKeyWith : body.getQueryKeyBinding()
+					.getUseKeyWith()) {
+				if (useKeyWith.getApplication().equals(
+						XKMSConstants.TRUST_DOMAIN_APPLICATION_URI)) {
+					trustDomain = useKeyWith.getIdentifier();
+				}
 			}
 		}
 

@@ -35,15 +35,16 @@ import org.w3._2002._03.xkms_.KeyBindingType;
 import org.w3._2002._03.xkms_.ObjectFactory;
 import org.w3._2002._03.xkms_.QueryKeyBindingType;
 import org.w3._2002._03.xkms_.StatusType;
+import org.w3._2002._03.xkms_.UseKeyWithType;
 import org.w3._2002._03.xkms_.ValidateRequestType;
 import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 import org.w3._2002._03.xkms_wsdl.XKMSService;
 
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
-import be.fedict.trust.xkms.extensions.TrustDomainMessageExtensionType;
 import be.fedict.trust.xkms2.ResultMajorCode;
 import be.fedict.trust.xkms2.ResultMinorCode;
+import be.fedict.trust.xkms2.XKMSConstants;
 import be.fedict.trust.xkms2.XKMSServiceFactory;
 
 /**
@@ -133,15 +134,14 @@ public class XKMS2Client {
 		validateRequest.setQueryKeyBinding(queryKeyBinding);
 
 		/*
-		 * Set optional trust domain message extension
+		 * Set optional trust domain
 		 */
 		if (null != trustDomain) {
-			be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
-			TrustDomainMessageExtensionType trustDomainMessageExtension = extensionsObjectFactory
-					.createTrustDomainMessageExtensionType();
-			trustDomainMessageExtension.setTrustDomain(trustDomain);
-			validateRequest.getMessageExtension().add(
-					trustDomainMessageExtension);
+			UseKeyWithType useKeyWith = objectFactory.createUseKeyWithType();
+			useKeyWith
+					.setApplication(XKMSConstants.TRUST_DOMAIN_APPLICATION_URI);
+			useKeyWith.setIdentifier(trustDomain);
+			queryKeyBinding.getUseKeyWith().add(useKeyWith);
 		}
 
 		// TODO: WS trust via unilateral TLS trust model based on public key

@@ -9,8 +9,6 @@
 		<schema xmlns="http://www.w3.org/2001/XMLSchema">
 			<import namespace="http://www.w3.org/2002/03/xkms#"
 				schemaLocation="xkms.xsd" />
-			<import namespace="urn:be:fedict:trust:xkms:extensions"
-				schemaLocation="xkms-extensions.xsd" />
 		</schema>
 	</types>
 
