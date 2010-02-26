@@ -42,6 +42,8 @@ import org.w3._2002._03.xkms_wsdl.XKMSService;
 
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.xkms.extensions.TrustDomainMessageExtensionType;
+import be.fedict.trust.xkms2.ResultMajorCode;
+import be.fedict.trust.xkms2.ResultMinorCode;
 import be.fedict.trust.xkms2.XKMSServiceFactory;
 
 /**

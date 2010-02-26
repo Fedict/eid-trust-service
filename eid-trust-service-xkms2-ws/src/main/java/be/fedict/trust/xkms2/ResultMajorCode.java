@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.client;
+package be.fedict.trust.xkms2;
 
 import java.util.HashMap;
 import java.util.Map;
