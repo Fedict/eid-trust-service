@@ -43,36 +43,176 @@
 					<h:commandButton action="#{trustDomain.back}" id="back"
 						value="#{messages.back}" immediate="true" styleClass="submit" />
 
-					<h3>#{messages.certificateConstraints}</h3>
-
-					<h4>#{messages.certificateConstraintPolicy}</h4>
-
-					<a4j:form id="policy_form" ajaxSubmit="true" reRender="policy_data">
-						<rich:dataTable id="policy_data" var="item"
-							value="#{constraintsPolicies}">
-							<h:column>
-								<f:facet name="header">#{messages.certificateConstraintPolicy}</f:facet>
-								<h:outputText value="#{item.policy}" />
-							</h:column>
-							<h:column>
-								<f:facet name="header">#{messages.remove}</f:facet>
-								<a4j:commandLink value="#{messages.remove}"
-									action="#{trustDomain.removeConstraint}" />
-							</h:column>
-						</rich:dataTable>
-					</a4j:form>
-
-					<h4>#{messages.certificateConstraintKeyUsage}</h4>
-
-					<h4>#{messages.certificateConstraintDN}</h4>
-
-					<h4>#{messages.certificateConstraintEndEntity}</h4>
-
-					<h4>#{messages.certificateConstraintQCStatements}</h4>
-
-					<h:messages globalOnly="true" styleClass="error" />
-
 				</h:form>
+
+				<h3>#{messages.certificateConstraints}</h3>
+
+				<rich:tabPanel switchType="client">
+					<rich:tab label="#{messages.certificateConstraintPolicy}">
+
+						<h:form id="policy_form">
+							<rich:dataTable id="policy_data" var="item"
+								value="#{constraintsPolicies}">
+								<h:column>
+									<f:facet name="header">#{messages.certificateConstraintPolicy}</f:facet>
+									<h:outputText value="#{item.policy}" />
+								</h:column>
+								<h:column>
+									<f:facet name="header">#{messages.remove}</f:facet>
+									<h:commandLink value="#{messages.remove}"
+										action="#{trustDomain.removeConstraintPolicy}" immediate="true" />
+								</h:column>
+							</rich:dataTable>
+
+							<br />
+
+							<h:panelGrid columns="3" border="0">
+								<h:outputLabel for="policy"
+									value="#{messages.certificateConstraintPolicy}" />
+								<s:decorate>
+									<h:inputText id="policy" value="#{trustDomain.certificatePolicy}"
+										required="true" />
+									<h:message for="policy" styleClass="error" />
+								</s:decorate>
+								<h:commandButton action="#{trustDomain.addConstraintPolicy}"
+									id="add_cert_policy" value="#{messages.add}" />
+							</h:panelGrid>
+
+						</h:form>
+
+					</rich:tab>
+					<rich:tab label="#{messages.certificateConstraintKeyUsage}">
+
+						<h:form id="key_usage_form">
+							<rich:dataTable id="key_usage_data" var="item"
+								value="#{constraintsKeyUsage}">
+								<h:column>
+									<f:facet name="header">#{messages.certificateConstraintKeyUsage}</f:facet>
+									<h:outputText value="#{item.keyUsage}" />
+								</h:column>
+								<h:column>
+									<f:facet name="header">#{messages.allowed}</f:facet>
+									<h:selectBooleanCheckbox value="#{item.allowed}" />
+								</h:column>
+								<h:column>
+									<f:facet name="header">#{messages.remove}</f:facet>
+									<h:commandLink value="#{messages.remove}"
+										action="#{trustDomain.removeConstraintKeyUsage}" immediate="true" />
+								</h:column>
+							</rich:dataTable>
+							<h:commandLink value="#{messages.save}"
+								action="#{trustDomain.saveConstraintKeyUsage}" />
+
+							<br />
+
+							<h:panelGrid columns="2" border="0">
+								<h:outputLabel for="key_usage"
+									value="#{messages.certificateConstraintKeyUsage}" />
+								<s:decorate>
+									<h:selectOneMenu id="key_usage" value="#{trustDomain.keyUsage}"
+										required="true">
+										<f:selectItems value="#{keyUsageTypes}" />
+									</h:selectOneMenu>
+									<h:message for="key_usage" styleClass="error" />
+								</s:decorate>
+
+								<h:outputLabel for="allowed" value="#{messages.allowed}" />
+								<h:selectBooleanCheckbox value="#{trustDomain.allowed}"
+									id="allowed" />
+
+								<h:commandButton action="#{trustDomain.addConstraintKeyUsage}"
+									id="add_key_usage" value="#{messages.add}" />
+							</h:panelGrid>
+
+						</h:form>
+
+					</rich:tab>
+					<rich:tab label="#{messages.certificateConstraintDN}">
+
+						<h:form id="dn_form">
+							<h:panelGrid columns="3" border="0">
+								<h:outputLabel for="dn"
+									value="#{messages.certificateConstraintDN}" />
+								<s:decorate>
+									<h:inputText id="dn" value="#{trustDomain.dn}"
+										required="true" />
+									<h:message for="dn" styleClass="error" />
+								</s:decorate>
+								<h:commandButton action="#{trustDomain.addConstraintDn}"
+									id="add_dn" value="#{messages.add}" rendered="#{empty trustDomain.dnConstraint}" />
+								<h:commandButton action="#{trustDomain.saveConstraintDn}"
+									id="save_dn" value="#{messages.save}" rendered="#{!empty trustDomain.dnConstraint}" />
+								<h:commandButton action="#{trustDomain.removeConstraintDn}"
+									id="remove_dnc" value="#{messages.remove}" rendered="#{!empty trustDomain.dnConstraint}"
+									immediate="true" />
+							</h:panelGrid>
+						</h:form>
+
+					</rich:tab>
+					<rich:tab label="#{messages.certificateConstraintEndEntity}">
+
+						<h:form id="end_entity_form">
+
+							<rich:dataTable id="end_entity_data" var="item"
+								value="#{constraintsEndEntity}">
+								<h:column>
+									<f:facet name="header">#{messages.issuer}</f:facet>
+									<h:outputText value="#{item.issuerName}" />
+								</h:column>
+								<h:column>
+									<f:facet name="header">#{messages.serialNumber}</f:facet>
+									<h:outputText value="#{item.serialNumber}" />
+								</h:column>
+								<h:column>
+									<f:facet name="header">#{messages.remove}</f:facet>
+									<h:commandLink value="#{messages.remove}"
+										action="#{trustDomain.removeConstraintEndEntity}" immediate="true" />
+								</h:column>
+							</rich:dataTable>
+
+							<h:panelGrid columns="2" border="0">
+
+								<h:outputLabel for="certificate" value="#{messages.certificate}" />
+
+								<rich:fileUpload fileUploadListener="#{trustDomain.uploadListener}"
+									maxFilesQuantity="1" id="upload" immediateUpload="true">
+								</rich:fileUpload>
+
+							</h:panelGrid>
+							<h:commandButton action="#{trustDomain.addConstraintEndEntity}"
+								value="#{messages.add}" />
+
+						</h:form>
+
+					</rich:tab>
+
+					<rich:tab label="#{messages.certificateConstraintQCStatements}">
+
+						<h:form id="qc_form">
+							<h:panelGrid columns="3" border="0">
+								<h:outputLabel for="qc"
+									value="#{messages.certificateConstraintQCStatements}" />
+								<s:decorate>
+									<h:selectBooleanCheckbox value="#{trustDomain.qc}"
+										id="qc" />
+									<h:message for="qc" styleClass="error" />
+								</s:decorate>
+								<h:commandButton action="#{trustDomain.addConstraintQc}"
+									id="add_qc" value="#{messages.add}" rendered="#{empty trustDomain.qcConstraint}" />
+								<h:commandButton action="#{trustDomain.saveConstraintQc}"
+									id="save_qc" value="#{messages.save}" rendered="#{!empty trustDomain.qcConstraint}" />
+								<h:commandButton action="#{trustDomain.removeConstraintQc}"
+									id="remove_qc" value="#{messages.remove}" rendered="#{!empty trustDomain.qcConstraint}"
+									immediate="true" />
+							</h:panelGrid>
+						</h:form>
+
+					</rich:tab>
+
+				</rich:tabPanel>
+
+				<h:messages globalOnly="true" styleClass="error" />
+
 
 
 			</ui:define>

@@ -18,13 +18,17 @@
 
 package be.fedict.trust.admin.portal.bean;
 
+import java.io.IOException;
+import java.security.cert.CertificateException;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Remove;
 import javax.ejb.Stateful;
+import javax.faces.model.SelectItem;
 
+import org.apache.commons.io.FileUtils;
 import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Begin;
@@ -42,15 +46,22 @@ import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
 import org.richfaces.component.html.HtmlTree;
 import org.richfaces.event.NodeSelectedEvent;
+import org.richfaces.event.UploadEvent;
 import org.richfaces.model.TreeNode;
 import org.richfaces.model.TreeNodeImpl;
+import org.richfaces.model.UploadItem;
 
 import be.fedict.trust.admin.portal.TrustDomain;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
+import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
+import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
+import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
@@ -63,6 +74,9 @@ public class TrustDomainBean implements TrustDomain {
 	private static final String TRUST_DOMAIN_LIST_NAME = "trustDomainList";
 
 	private static final String CONSTRAINTS_POLICY_LIST = "constraintsPolicies";
+	private static final String CONSTRAINTS_KEY_USAGE_LIST = "constraintsKeyUsage";
+	private static final String KEY_USAGE_TYPE_LIST = "keyUsageTypes";
+	private static final String CONSTRAINTS_END_ENTITY_LIST = "constraintsEndEntity";
 
 	@Logger
 	private Log log;
@@ -96,6 +110,27 @@ public class TrustDomainBean implements TrustDomain {
 	@DataModelSelection(CONSTRAINTS_POLICY_LIST)
 	private PolicyConstraintEntity selectedPolicyConstraint;
 
+	@DataModel(CONSTRAINTS_KEY_USAGE_LIST)
+	private List<KeyUsageConstraintEntity> keyUsageConstraints;
+
+	@DataModelSelection(CONSTRAINTS_KEY_USAGE_LIST)
+	private KeyUsageConstraintEntity selectedKeyUsageConstraint;
+
+	@DataModel(CONSTRAINTS_END_ENTITY_LIST)
+	private List<EndEntityConstraintEntity> endEntityConstraints;
+
+	@DataModelSelection(CONSTRAINTS_END_ENTITY_LIST)
+	private EndEntityConstraintEntity selectedEndEntityConstraint;
+
+	private String certificatePolicy;
+	private String keyUsage;
+	private boolean allowed;
+	private DNConstraintEntity dnConstraint;
+	private String dn;
+	private byte[] certificateBytes;
+	private QCStatementsConstraintEntity qcConstraint;
+	private boolean qc;
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -106,6 +141,13 @@ public class TrustDomainBean implements TrustDomain {
 		this.log.debug("#destroy");
 		this.sourceTrustPoints = null;
 		this.selectedTrustPoints = null;
+		this.certificatePolicy = null;
+		this.keyUsage = null;
+		this.allowed = false;
+		this.dnConstraint = null;
+		this.dn = null;
+		this.certificateBytes = null;
+		this.qcConstraint = null;
 	}
 
 	/**
@@ -125,6 +167,16 @@ public class TrustDomainBean implements TrustDomain {
 	public String modify() {
 
 		this.log.debug("modify: #0", this.selectedTrustDomain.getName());
+		for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
+				.getCertificateConstraints()) {
+			if (certificateConstraint instanceof DNConstraintEntity) {
+				this.dnConstraint = (DNConstraintEntity) certificateConstraint;
+				this.dn = this.dnConstraint.getDn();
+			} else if (certificateConstraint instanceof QCStatementsConstraintEntity) {
+				this.qcConstraint = (QCStatementsConstraintEntity) certificateConstraint;
+				this.qc = this.qcConstraint.getQcComplianceFilter();
+			}
+		}
 		return "modify";
 	}
 
@@ -309,12 +361,351 @@ public class TrustDomainBean implements TrustDomain {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String removeConstraint() {
+	@End
+	public String removeConstraintPolicy() {
 
 		if (null != this.selectedPolicyConstraint) {
 			this.log.debug("remove policy constraint: #0",
 					this.selectedPolicyConstraint.getPolicy());
+			this.trustDomainService
+					.removeCertificatePolicy(this.selectedPolicyConstraint);
+			this.selectedTrustDomain.getCertificateConstraints().remove(
+					this.selectedPolicyConstraint);
+			constraintsPolicyFactory();
 		}
 		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String addConstraintPolicy() {
+
+		if (null != this.certificatePolicy) {
+			PolicyConstraintEntity policyConstraint = this.trustDomainService
+					.addCertificatePolicy(this.selectedTrustDomain,
+							this.certificatePolicy);
+			this.selectedTrustDomain.getCertificateConstraints().add(
+					policyConstraint);
+			constraintsPolicyFactory();
+		}
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Factory(KEY_USAGE_TYPE_LIST)
+	public List<SelectItem> keyUsageTypeFactory() {
+
+		List<SelectItem> keyUsageTypes = new LinkedList<SelectItem>();
+		for (KeyUsageType keyUsageType : KeyUsageType.values()) {
+			keyUsageTypes.add(new SelectItem(keyUsageType.name(), keyUsageType
+					.toString()));
+		}
+		return keyUsageTypes;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Factory(CONSTRAINTS_KEY_USAGE_LIST)
+	public void constraintsKeyUsageFactory() {
+
+		this.log.debug("key usage constraints factory");
+		this.keyUsageConstraints = new LinkedList<KeyUsageConstraintEntity>();
+		for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
+				.getCertificateConstraints()) {
+			if (certificateConstraint instanceof KeyUsageConstraintEntity) {
+				this.keyUsageConstraints
+						.add((KeyUsageConstraintEntity) certificateConstraint);
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String addConstraintKeyUsage() {
+
+		if (null != this.keyUsage) {
+			KeyUsageConstraintEntity keyUsageConstraint = this.trustDomainService
+					.addKeyUsageConstraint(this.selectedTrustDomain,
+							KeyUsageType.valueOf(this.keyUsage), this.allowed);
+			this.selectedTrustDomain.getCertificateConstraints().add(
+					keyUsageConstraint);
+			constraintsKeyUsageFactory();
+		}
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String removeConstraintKeyUsage() {
+
+		if (null != this.selectedKeyUsageConstraint) {
+			this.log.debug("remove key usage constraint: #0",
+					this.selectedKeyUsageConstraint.getKeyUsage());
+			this.trustDomainService
+					.removeKeyUsageConstraint(this.selectedKeyUsageConstraint);
+			this.selectedTrustDomain.getCertificateConstraints().remove(
+					this.selectedKeyUsageConstraint);
+			constraintsKeyUsageFactory();
+		}
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String saveConstraintKeyUsage() {
+
+		this.log.debug("save key usage constraints");
+		this.trustDomainService
+				.saveKeyUsageConstraints(this.keyUsageConstraints);
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String addConstraintDn() {
+
+		this.log.debug("Add DN Statements constraint: #0", this.dn);
+		this.dnConstraint = this.trustDomainService.addDNConstraint(
+				this.selectedTrustDomain, this.dn);
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String removeConstraintDn() {
+
+		if (null != this.dnConstraint) {
+			this.log.debug("Remove DN Statements constraint");
+			this.trustDomainService.removeDNConstraint(this.dnConstraint);
+			this.dnConstraint = null;
+			this.dn = null;
+		}
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String saveConstraintDn() {
+
+		this.log.debug("Save DN Statements constraint: #0", this.dn);
+		this.dnConstraint.setDn(this.dn);
+		this.trustDomainService.saveDNConstraint(this.dnConstraint);
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Factory(CONSTRAINTS_END_ENTITY_LIST)
+	public void constraintsEndEntityFactory() {
+
+		this.log.debug("end entity constraints factory");
+		this.endEntityConstraints = new LinkedList<EndEntityConstraintEntity>();
+		for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
+				.getCertificateConstraints()) {
+			if (certificateConstraint instanceof EndEntityConstraintEntity) {
+				this.endEntityConstraints
+						.add((EndEntityConstraintEntity) certificateConstraint);
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String addConstraintEndEntity() {
+
+		if (null != this.certificateBytes) {
+			EndEntityConstraintEntity endEntityConstraint;
+			try {
+				endEntityConstraint = this.trustDomainService
+						.addEndEntityConstraint(this.selectedTrustDomain,
+								this.certificateBytes);
+			} catch (CertificateException e) {
+				this.facesMessages.addFromResourceBundle(
+						StatusMessage.Severity.ERROR, "errorX509Encoding");
+				return null;
+			}
+			this.selectedTrustDomain.getCertificateConstraints().add(
+					endEntityConstraint);
+			constraintsEndEntityFactory();
+		}
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String removeConstraintEndEntity() {
+
+		if (null != this.selectedEndEntityConstraint) {
+			this.log.debug("remove end entity constraint: #0 #1",
+					this.selectedEndEntityConstraint.getIssuerName(),
+					this.selectedEndEntityConstraint.getSerialNumber());
+			this.trustDomainService
+					.removeEndEntityConstraint(this.selectedEndEntityConstraint);
+			this.selectedTrustDomain.getCertificateConstraints().remove(
+					this.selectedEndEntityConstraint);
+			constraintsEndEntityFactory();
+		}
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String addConstraintQc() {
+
+		this.log.debug("Add QC Statements constraint: #0", this.qc);
+		this.qcConstraint = this.trustDomainService.addQCConstraint(
+				this.selectedTrustDomain, this.qc);
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String removeConstraintQc() {
+
+		if (null != this.qcConstraint) {
+			this.log.debug("Remove QC Statements constraint");
+			this.trustDomainService.removeQCConstraint(this.qcConstraint);
+			this.qcConstraint = null;
+		}
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String saveConstraintQc() {
+
+		this.log.debug("Save QC Statements constraint: #0", this.qc);
+		this.qcConstraint.setQcComplianceFilter(this.qc);
+		this.trustDomainService.saveQCConstraint(this.qcConstraint);
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getCertificatePolicy() {
+
+		return this.certificatePolicy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setCertificatePolicy(String certificatePolicy) {
+
+		this.certificatePolicy = certificatePolicy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getKeyUsage() {
+
+		return this.keyUsage;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setKeyUsage(String keyUsage) {
+
+		this.keyUsage = keyUsage;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isAllowed() {
+
+		return this.allowed;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setAllowed(boolean allowed) {
+
+		this.allowed = allowed;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getDn() {
+
+		return this.dn;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setDn(String dn) {
+
+		this.dn = dn;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public DNConstraintEntity getDnConstraint() {
+
+		return this.dnConstraint;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isQc() {
+
+		return this.qc;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setQc(boolean qc) {
+
+		this.qc = qc;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public QCStatementsConstraintEntity getQcConstraint() {
+
+		return this.qcConstraint;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void uploadListener(UploadEvent event) throws IOException {
+		UploadItem item = event.getUploadItem();
+		this.log.debug(item.getContentType());
+		this.log.debug(item.getFileSize());
+		this.log.debug(item.getFileName());
+		if (null == item.getData()) {
+			// meaning createTempFiles is set to true in the SeamFilter
+			this.certificateBytes = FileUtils.readFileToByteArray(item
+					.getFile());
+		} else {
+			this.certificateBytes = item.getData();
+		}
 	}
 }

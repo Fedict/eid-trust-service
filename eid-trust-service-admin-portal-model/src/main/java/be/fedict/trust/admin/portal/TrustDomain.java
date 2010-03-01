@@ -18,14 +18,19 @@
 
 package be.fedict.trust.admin.portal;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.ejb.Local;
+import javax.faces.model.SelectItem;
 
 import org.richfaces.event.NodeSelectedEvent;
+import org.richfaces.event.UploadEvent;
 import org.richfaces.model.TreeNode;
 
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
+import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 
 @Local
 public interface TrustDomain {
@@ -36,6 +41,12 @@ public interface TrustDomain {
 	void trustDomainListFactory();
 
 	void constraintsPolicyFactory();
+
+	void constraintsKeyUsageFactory();
+
+	List<SelectItem> keyUsageTypeFactory();
+
+	void constraintsEndEntityFactory();
 
 	/*
 	 * Lifecycle.
@@ -52,6 +63,30 @@ public interface TrustDomain {
 	List<String> getSelectedTrustPoints();
 
 	void setSelectedTrustPoints(List<String> selectedTrustPoints);
+
+	String getCertificatePolicy();
+
+	void setCertificatePolicy(String certificatePolicy);
+
+	String getKeyUsage();
+
+	void setKeyUsage(String keyUsage);
+
+	boolean isAllowed();
+
+	void setAllowed(boolean allowed);
+
+	String getDn();
+
+	void setDn(String dn);
+
+	DNConstraintEntity getDnConstraint();
+
+	boolean isQc();
+
+	void setQc(boolean qc);
+
+	QCStatementsConstraintEntity getQcConstraint();
 
 	/*
 	 * Actions
@@ -70,7 +105,31 @@ public interface TrustDomain {
 
 	String back();
 
-	String removeConstraint();
+	String removeConstraintPolicy();
+
+	String addConstraintPolicy();
+
+	String removeConstraintKeyUsage();
+
+	String saveConstraintKeyUsage();
+
+	String addConstraintKeyUsage();
+
+	String addConstraintDn();
+
+	String saveConstraintDn();
+
+	String removeConstraintDn();
+
+	String removeConstraintEndEntity();
+
+	String addConstraintEndEntity();
+
+	String addConstraintQc();
+
+	String saveConstraintQc();
+
+	String removeConstraintQc();
 
 	/*
 	 * Trust points tree
@@ -81,5 +140,7 @@ public interface TrustDomain {
 	 * Richfaces component callbacks
 	 */
 	void processNodeSelection(NodeSelectedEvent event);
+
+	void uploadListener(UploadEvent event) throws IOException;
 
 }

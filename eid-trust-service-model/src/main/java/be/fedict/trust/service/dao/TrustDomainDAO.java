@@ -23,14 +23,15 @@ import java.util.List;
 
 import javax.ejb.Local;
 
-import be.fedict.trust.constraints.CertificatePoliciesCertificateConstraint;
-import be.fedict.trust.constraints.KeyUsageCertificateConstraint;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageType;
+import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
@@ -152,13 +153,22 @@ public interface TrustDomainDAO {
 	TrustPointEntity attachTrustPoint(TrustPointEntity trustPoint);
 
 	/**
-	 * Add a new {@link CertificatePoliciesCertificateConstraint} to the
-	 * {@link TrustDomainEntity}'s list of certificate contraints.
+	 * Add a new {@link PolicyConstraintEntity} to the {@link TrustDomainEntity}
+	 * 's list of certificate contraints.
 	 * 
 	 * @param trustDomain
 	 * @param policy
 	 */
-	void addCertificatePolicy(TrustDomainEntity trustDomain, String policy);
+	PolicyConstraintEntity addCertificatePolicy(TrustDomainEntity trustDomain,
+			String policy);
+
+	/**
+	 * Removes the specified {@link CertificateConstraintEntity}.
+	 * 
+	 * @param certificateConstraint
+	 */
+	void removeCertificateConstraint(
+			CertificateConstraintEntity certificateConstraint);
 
 	/**
 	 * Add a new {@link EndEntityConstraintEntity} to the
@@ -167,19 +177,20 @@ public interface TrustDomainDAO {
 	 * @param trustDomain
 	 * @param certificate
 	 */
-	void addEndEntityConstraint(TrustDomainEntity trustDomain,
-			X509Certificate certificate);
+	EndEntityConstraintEntity addEndEntityConstraint(
+			TrustDomainEntity trustDomain, X509Certificate certificate);
 
 	/**
-	 * Add a new {@link KeyUsageCertificateConstraint} to the
+	 * Add a new {@link KeyUsageConstraintEntity} to the
 	 * {@link TrustDomainEntity}'s list of certificate contraints.
 	 * 
 	 * @param trustDomain
 	 * @param keyUsageType
 	 * @param allowed
 	 */
-	void addKeyUsageConstraint(TrustDomainEntity trustDomain,
-			KeyUsageType keyUsageType, boolean allowed);
+	KeyUsageConstraintEntity addKeyUsageConstraint(
+			TrustDomainEntity trustDomain, KeyUsageType keyUsageType,
+			boolean allowed);
 
 	/**
 	 * Add a new {@link QCStatementsConstraintEntity} to the
@@ -188,8 +199,8 @@ public interface TrustDomainDAO {
 	 * @param trustDomain
 	 * @param qcComplianceFilter
 	 */
-	void addQCStatementsConstraint(TrustDomainEntity trustDomain,
-			boolean qcComplianceFilter);
+	QCStatementsConstraintEntity addQCStatementsConstraint(
+			TrustDomainEntity trustDomain, boolean qcComplianceFilter);
 
 	/**
 	 * Add a new {@link DNConstraintEntity} to the {@link TrustDomainEntity}'s
@@ -198,7 +209,7 @@ public interface TrustDomainDAO {
 	 * @param trustDomain
 	 * @param dn
 	 */
-	void addDNConstraint(TrustDomainEntity trustDomain, String dn);
+	DNConstraintEntity addDNConstraint(TrustDomainEntity trustDomain, String dn);
 
 	/**
 	 * Returns the {@link TrustPointEntity} from the specified name. Returns
@@ -208,4 +219,19 @@ public interface TrustDomainDAO {
 	 */
 	TrustPointEntity findTrustPoint(String name);
 
+	/**
+	 * Remove the possible {@link DNConstraintEntity} attached to the specified
+	 * {@link TrustDomainEntity}.
+	 * 
+	 * @param trustDomain
+	 */
+	void removeDNConstraint(TrustDomainEntity trustDomain);
+
+	/**
+	 * Returns the attached {@link CertificateConstraintEntity}.
+	 * 
+	 * @param certificateConstraint
+	 */
+	CertificateConstraintEntity findCertificateConstraint(
+			CertificateConstraintEntity certificateConstraint);
 }

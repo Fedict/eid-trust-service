@@ -171,9 +171,9 @@ public class InitializationServiceBean implements InitializationService {
 
 		// initialize certificate constraints
 		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.DIGITAL_SIGNATURE_IDX, true);
+				KeyUsageType.DIGITAL_SIGNATURE, true);
 		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.NON_REPUDIATION_IDX, false);
+				KeyUsageType.NON_REPUDIATION, false);
 
 		this.trustDomainDAO.addCertificatePolicy(trustDomain,
 				"2.16.56.1.1.1.2.2");
@@ -204,9 +204,9 @@ public class InitializationServiceBean implements InitializationService {
 
 		// initialize certificate constraints
 		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.DIGITAL_SIGNATURE_IDX, false);
+				KeyUsageType.DIGITAL_SIGNATURE, false);
 		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.NON_REPUDIATION_IDX, true);
+				KeyUsageType.NON_REPUDIATION, true);
 
 		this.trustDomainDAO.addCertificatePolicy(trustDomain,
 				"2.16.56.1.1.1.2.1");
@@ -237,9 +237,9 @@ public class InitializationServiceBean implements InitializationService {
 
 		// initialize certificate constraints
 		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.DIGITAL_SIGNATURE_IDX, true);
+				KeyUsageType.DIGITAL_SIGNATURE, true);
 		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.NON_REPUDIATION_IDX, true);
+				KeyUsageType.NON_REPUDIATION, true);
 
 		this.trustDomainDAO
 				.addCertificatePolicy(trustDomain, "2.16.56.1.1.1.4");

@@ -27,6 +27,12 @@ import javax.ejb.Timer;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
+import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageType;
+import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
+import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
@@ -126,4 +132,84 @@ public interface TrustDomainService {
 	 */
 	void setTrustPoints(TrustDomainEntity trustDomain,
 			List<String> trustPointNames) throws TrustDomainNotFoundException;
+
+	/**
+	 * Add a new {@link PolicyConstraintEntity} to the specified
+	 * {@link TrustDomainEntity}.
+	 * 
+	 * @param trustDomain
+	 * @param policy
+	 * @return the persisted {@link PolicyConstraintEntity}
+	 */
+	PolicyConstraintEntity addCertificatePolicy(TrustDomainEntity trustDomain,
+			String policy);
+
+	/**
+	 * Remove the specified {@link PolicyConstraintEntity}.
+	 * 
+	 * @param certificatePolicy
+	 */
+	void removeCertificatePolicy(PolicyConstraintEntity certificatePolicy);
+
+	/**
+	 * Add a new {@link KeyUsageConstraintEntity} to the specified
+	 * {@link TrustDomainEntity}.
+	 * 
+	 * @param trustDomain
+	 * @param keyUsage
+	 * @param allowed
+	 * @return the persisted {@link KeyUsageConstraintEntity}
+	 */
+	KeyUsageConstraintEntity addKeyUsageConstraint(
+			TrustDomainEntity trustDomain, KeyUsageType keyUsage,
+			boolean allowed);
+
+	/**
+	 * Remove the specified {@link KeyUsageConstraintEntity}.
+	 * 
+	 * @param keyUsageConstraint
+	 */
+	void removeKeyUsageConstraint(KeyUsageConstraintEntity keyUsageConstraint);
+
+	/**
+	 * Save the specified {@link KeyUsageConstraintEntity}'s.
+	 * 
+	 * @param keyUsageConstraints
+	 */
+	void saveKeyUsageConstraints(
+			List<KeyUsageConstraintEntity> keyUsageConstraints);
+
+	/**
+	 * Add a new {@link EndEntityConstraintEntity} to the specified
+	 * {@link TrustDomainEntity}.
+	 * 
+	 * @param trustDomain
+	 * @param certificateBytes
+	 * @return the persisted {@link EndEntityConstraintEntity}
+	 * @throws CertificateException
+	 */
+	EndEntityConstraintEntity addEndEntityConstraint(
+			TrustDomainEntity trustDomain, byte[] certificateBytes)
+			throws CertificateException;
+
+	/**
+	 * Remove the specified {@link EndEntityConstraintEntity}.
+	 * 
+	 * @param keyUsageConstraint
+	 */
+	void removeEndEntityConstraint(EndEntityConstraintEntity endEntityConstraint);
+
+	QCStatementsConstraintEntity addQCConstraint(TrustDomainEntity trustDomain,
+			boolean qc);
+
+	void removeQCConstraint(QCStatementsConstraintEntity qcConstraint);
+
+	void saveQCConstraint(QCStatementsConstraintEntity qcConstraint);
+
+	DNConstraintEntity addDNConstraint(TrustDomainEntity trustDomain, String dn);
+
+	void removeDNConstraint(DNConstraintEntity dnConstraint);
+
+	void saveDNConstraint(DNConstraintEntity dnConstraint);
+
 }

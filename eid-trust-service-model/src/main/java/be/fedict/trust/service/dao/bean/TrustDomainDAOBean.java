@@ -34,6 +34,7 @@ import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
@@ -230,64 +231,112 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addCertificatePolicy(TrustDomainEntity trustDomain,
-			String policy) {
+	public PolicyConstraintEntity addCertificatePolicy(
+			TrustDomainEntity trustDomain, String policy) {
 
-		PolicyConstraintEntity certificatePolicyCertificateConstraint = new PolicyConstraintEntity(
+		PolicyConstraintEntity certificatePolicy = new PolicyConstraintEntity(
 				trustDomain, policy);
-		this.entityManager.persist(certificatePolicyCertificateConstraint);
-		trustDomain.getCertificateConstraints().add(
-				certificatePolicyCertificateConstraint);
+		this.entityManager.persist(certificatePolicy);
+		TrustDomainEntity attachedTrustDomain = findTrustDomain(trustDomain
+				.getName());
+		attachedTrustDomain.getCertificateConstraints().add(certificatePolicy);
+		return certificatePolicy;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addEndEntityConstraint(TrustDomainEntity trustDomain,
-			X509Certificate certificate) {
+	public void removeCertificateConstraint(
+			CertificateConstraintEntity certificateConstraint) {
+		CertificateConstraintEntity attachedCertificateConstraint = this.entityManager
+				.find(CertificateConstraintEntity.class, certificateConstraint
+						.getId());
+		attachedCertificateConstraint.getTrustDomain()
+				.getCertificateConstraints().remove(certificateConstraint);
+		attachedCertificateConstraint.setTrustDomain(null);
+		this.entityManager.flush();
+		this.entityManager.remove(attachedCertificateConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public EndEntityConstraintEntity addEndEntityConstraint(
+			TrustDomainEntity trustDomain, X509Certificate certificate) {
 
 		String issuerName = certificate.getIssuerX500Principal().getName();
 		BigInteger serialNumber = certificate.getSerialNumber();
 		EndEntityConstraintEntity endEntityCertificateConstraint = new EndEntityConstraintEntity(
 				trustDomain, issuerName, serialNumber);
 		this.entityManager.persist(endEntityCertificateConstraint);
-		trustDomain.getCertificateConstraints().add(
+		TrustDomainEntity attachedTrustDomain = findTrustDomain(trustDomain
+				.getName());
+		attachedTrustDomain.getCertificateConstraints().add(
 				endEntityCertificateConstraint);
+		return endEntityCertificateConstraint;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addKeyUsageConstraint(TrustDomainEntity trustDomain,
-			KeyUsageType keyUsageType, boolean allowed) {
+	public KeyUsageConstraintEntity addKeyUsageConstraint(
+			TrustDomainEntity trustDomain, KeyUsageType keyUsageType,
+			boolean allowed) {
 
 		KeyUsageConstraintEntity keyUsageConstraint = new KeyUsageConstraintEntity(
 				trustDomain, keyUsageType, allowed);
 		this.entityManager.persist(keyUsageConstraint);
-		trustDomain.getCertificateConstraints().add(keyUsageConstraint);
+		TrustDomainEntity attachedTrustDomain = findTrustDomain(trustDomain
+				.getName());
+		attachedTrustDomain.getCertificateConstraints().add(keyUsageConstraint);
+		return keyUsageConstraint;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addQCStatementsConstraint(TrustDomainEntity trustDomain,
-			boolean qcComplianceFilter) {
+	public void removeKeyUsageConstraint(
+			KeyUsageConstraintEntity keyUsageConstraint) {
+
+		KeyUsageConstraintEntity attachedKeyUsageConstraint = this.entityManager
+				.find(KeyUsageConstraintEntity.class, keyUsageConstraint
+						.getId());
+		attachedKeyUsageConstraint.getTrustDomain().getCertificateConstraints()
+				.remove(keyUsageConstraint);
+		attachedKeyUsageConstraint.setTrustDomain(null);
+		this.entityManager.flush();
+		this.entityManager.remove(attachedKeyUsageConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public QCStatementsConstraintEntity addQCStatementsConstraint(
+			TrustDomainEntity trustDomain, boolean qcComplianceFilter) {
 
 		QCStatementsConstraintEntity qcStatementsConstraint = new QCStatementsConstraintEntity(
 				trustDomain, qcComplianceFilter);
 		this.entityManager.persist(qcStatementsConstraint);
-		trustDomain.getCertificateConstraints().add(qcStatementsConstraint);
+		TrustDomainEntity attachedTrustDomain = findTrustDomain(trustDomain
+				.getName());
+		attachedTrustDomain.getCertificateConstraints().add(
+				qcStatementsConstraint);
+		return qcStatementsConstraint;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addDNConstraint(TrustDomainEntity trustDomain, String dn) {
+	public DNConstraintEntity addDNConstraint(TrustDomainEntity trustDomain,
+			String dn) {
 
 		DNConstraintEntity dnConstraint = new DNConstraintEntity(trustDomain,
 				dn);
 		this.entityManager.persist(dnConstraint);
-		trustDomain.getCertificateConstraints().add(dnConstraint);
+		TrustDomainEntity attachedTrustDomain = findTrustDomain(trustDomain
+				.getName());
+		attachedTrustDomain.getCertificateConstraints().add(dnConstraint);
+		return dnConstraint;
 	}
 
 	/**
@@ -297,5 +346,39 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 
 		LOG.debug("find trust point: " + name);
 		return this.entityManager.find(TrustPointEntity.class, name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeDNConstraint(TrustDomainEntity trustDomain) {
+
+		TrustDomainEntity attachedTrustDomain = findTrustDomain(trustDomain
+				.getName());
+		DNConstraintEntity dnConstraint = null;
+		for (CertificateConstraintEntity certificateConstraint : attachedTrustDomain
+				.getCertificateConstraints()) {
+			if (certificateConstraint instanceof DNConstraintEntity) {
+				dnConstraint = (DNConstraintEntity) certificateConstraint;
+			}
+		}
+		if (null != dnConstraint) {
+			LOG.debug("remove DN constraint: " + dnConstraint.getDn());
+			dnConstraint.getTrustDomain().getCertificateConstraints().remove(
+					dnConstraint);
+			dnConstraint.setTrustDomain(null);
+			this.entityManager.flush();
+			this.entityManager.remove(dnConstraint);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public CertificateConstraintEntity findCertificateConstraint(
+			CertificateConstraintEntity certificateConstraint) {
+
+		return this.entityManager.find(CertificateConstraintEntity.class,
+				certificateConstraint.getId());
 	}
 }

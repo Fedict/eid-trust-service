@@ -60,7 +60,7 @@ public class KeyUsageConstraintEntity extends CertificateConstraintEntity {
 		this.keyUsage = keyUsage;
 	}
 
-	public boolean getAllowed() {
+	public boolean isAllowed() {
 
 		return this.allowed;
 	}

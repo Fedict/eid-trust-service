@@ -29,6 +29,9 @@ import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import be.fedict.trust.service.entity.TrustDomainEntity;
 
 /**
@@ -84,4 +87,24 @@ public class CertificateConstraintEntity implements Serializable {
 
 		this.trustDomain = trustDomain;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+
+		if (null == obj)
+			return false;
+		if (this == obj)
+			return true;
+		if (false == obj instanceof CertificateConstraintEntity)
+			return false;
+		CertificateConstraintEntity rhs = (CertificateConstraintEntity) obj;
+		return new EqualsBuilder().append(id, rhs.id).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+
+		return new HashCodeBuilder().append(this.id).hashCode();
+	}
+
 }

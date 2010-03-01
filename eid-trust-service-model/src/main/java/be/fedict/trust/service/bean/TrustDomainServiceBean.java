@@ -42,6 +42,12 @@ import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
+import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageType;
+import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
+import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
@@ -240,4 +246,161 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		}
 		attachedTrustDomain.setTrustPoints(trustPoints);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public PolicyConstraintEntity addCertificatePolicy(
+			TrustDomainEntity trustDomain, String policy) {
+
+		LOG.debug("add certificate policy \"" + policy + "\" to trust domain "
+				+ trustDomain.getName());
+		return this.trustDomainDAO.addCertificatePolicy(trustDomain, policy);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void removeCertificatePolicy(PolicyConstraintEntity certificatePolicy) {
+
+		LOG.debug("remove certificate policy \""
+				+ certificatePolicy.getPolicy() + "\"");
+		this.trustDomainDAO.removeCertificateConstraint(certificatePolicy);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public KeyUsageConstraintEntity addKeyUsageConstraint(
+			TrustDomainEntity trustDomain, KeyUsageType keyUsage,
+			boolean allowed) {
+
+		LOG.debug("add key usage constraint " + keyUsage + " allowed="
+				+ allowed);
+		return this.trustDomainDAO.addKeyUsageConstraint(trustDomain, keyUsage,
+				allowed);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void removeKeyUsageConstraint(
+			KeyUsageConstraintEntity keyUsageConstraint) {
+
+		LOG.debug("remove key usage constraint "
+				+ keyUsageConstraint.getKeyUsage());
+		this.trustDomainDAO.removeCertificateConstraint(keyUsageConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void saveKeyUsageConstraints(
+			List<KeyUsageConstraintEntity> keyUsageConstraints) {
+
+		LOG.debug("save key usage constraints");
+		for (KeyUsageConstraintEntity keyUsageConstraint : keyUsageConstraints) {
+			KeyUsageConstraintEntity attachedKeyUsageConstraint = (KeyUsageConstraintEntity) this.trustDomainDAO
+					.findCertificateConstraint(keyUsageConstraint);
+			attachedKeyUsageConstraint.setAllowed(keyUsageConstraint
+					.isAllowed());
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public DNConstraintEntity addDNConstraint(TrustDomainEntity trustDomain,
+			String dn) {
+
+		LOG.debug("Add DN constraint: " + dn);
+		return this.trustDomainDAO.addDNConstraint(trustDomain, dn);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void removeDNConstraint(DNConstraintEntity dnConstraint) {
+
+		LOG.debug("Remove DN constraint");
+		this.trustDomainDAO.removeCertificateConstraint(dnConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void saveDNConstraint(DNConstraintEntity dnConstraint) {
+
+		LOG.debug("Save DN constraint: " + dnConstraint);
+		DNConstraintEntity attachedDNConstraint = (DNConstraintEntity) this.trustDomainDAO
+				.findCertificateConstraint(dnConstraint);
+		attachedDNConstraint.setDn(dnConstraint.getDn());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public EndEntityConstraintEntity addEndEntityConstraint(
+			TrustDomainEntity trustDomain, byte[] certificateBytes)
+			throws CertificateException {
+
+		LOG.debug("add end entity constraint");
+		return this.trustDomainDAO.addEndEntityConstraint(trustDomain,
+				getCertificate(certificateBytes));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void removeEndEntityConstraint(
+			EndEntityConstraintEntity endEntityConstraint) {
+
+		LOG.debug("remove end entity constraint");
+		this.trustDomainDAO.removeCertificateConstraint(endEntityConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public QCStatementsConstraintEntity addQCConstraint(
+			TrustDomainEntity trustDomain, boolean qc) {
+
+		LOG.debug("Add QC constraint: " + qc);
+		return this.trustDomainDAO.addQCStatementsConstraint(trustDomain, qc);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void removeQCConstraint(QCStatementsConstraintEntity qcConstraint) {
+
+		LOG.debug("Remove QC constraint");
+		this.trustDomainDAO.removeCertificateConstraint(qcConstraint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void saveQCConstraint(QCStatementsConstraintEntity qcConstraint) {
+
+		LOG.debug("Save QC constraint: " + qcConstraint);
+		QCStatementsConstraintEntity attachedQcStatementsConstraint = (QCStatementsConstraintEntity) this.trustDomainDAO
+				.findCertificateConstraint(qcConstraint);
+		attachedQcStatementsConstraint.setQcComplianceFilter(qcConstraint
+				.getQcComplianceFilter());
+	}
+
 }

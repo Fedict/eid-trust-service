@@ -163,16 +163,16 @@ public class TrustServiceBean implements TrustService {
 				}
 				switch (keyUsageConstraint.getKeyUsage()) {
 				// XXX: complete after jtrust is updated for all KeyUsages
-				case DIGITAL_SIGNATURE_IDX: {
+				case DIGITAL_SIGNATURE: {
 					keyUsageCertificateConstraint
 							.setDigitalSignatureFilter(keyUsageConstraint
-									.getAllowed());
+									.isAllowed());
 					break;
 				}
-				case NON_REPUDIATION_IDX: {
+				case NON_REPUDIATION: {
 					keyUsageCertificateConstraint
 							.setNonRepudiationFilter(keyUsageConstraint
-									.getAllowed());
+									.isAllowed());
 					break;
 				}
 				}
