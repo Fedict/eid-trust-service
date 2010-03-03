@@ -52,6 +52,7 @@ import be.fedict.trust.crl.OnlineCrlRepository;
 import be.fedict.trust.ocsp.OcspTrustLinker;
 import be.fedict.trust.ocsp.OnlineOcspRepository;
 import be.fedict.trust.service.TrustService;
+import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -90,13 +91,15 @@ public class TrustServiceBean implements TrustService {
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
 
-	private TrustValidator getTrustValidator(String trustDomainName)
-			throws TrustDomainNotFoundException {
+	private TrustValidator getTrustValidator(String trustDomainName,
+			boolean returnRevocationData) throws TrustDomainNotFoundException {
 
-		TrustLinker trustLinker = new TrustServiceTrustLinker(
-				this.entityManager, this.queueConnectionFactory, this.queue);
+		TrustLinker trustLinker = null;
+		if (!returnRevocationData)
+			// if returnRevocationData set, don't use cached revocation data
+			trustLinker = new TrustServiceTrustLinker(this.entityManager,
+					this.queueConnectionFactory, this.queue);
 
-		// XXX: for now just get the default domain
 		TrustDomainEntity trustDomain;
 		if (null == trustDomainName)
 			trustDomain = this.trustDomainDAO.getDefaultTrustDomain();
@@ -222,12 +225,13 @@ public class TrustServiceBean implements TrustService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isValid(List<X509Certificate> authenticationCertificateChain) {
+	public ValidationResult validate(
+			List<X509Certificate> authenticationCertificateChain) {
 		try {
-			return isValid(null, authenticationCertificateChain);
+			return validate(null, authenticationCertificateChain, false);
 		} catch (TrustDomainNotFoundException e) {
 			LOG.error("Default trust domain not set ?!");
-			return false;
+			return new ValidationResult(false, null);
 		}
 	}
 
@@ -235,20 +239,21 @@ public class TrustServiceBean implements TrustService {
 	 * {@inheritDoc}
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public boolean isValid(String trustDomain,
-			List<X509Certificate> authenticationCertificateChain)
-			throws TrustDomainNotFoundException {
+	public ValidationResult validate(String trustDomain,
+			List<X509Certificate> authenticationCertificateChain,
+			boolean returnRevocationData) throws TrustDomainNotFoundException {
 		LOG.debug("isValid: "
 				+ authenticationCertificateChain.get(0)
 						.getSubjectX500Principal());
 
+		TrustValidator trustValidator = getTrustValidator(trustDomain,
+				returnRevocationData);
 		try {
-			getTrustValidator(trustDomain).isTrusted(
-					authenticationCertificateChain);
+			trustValidator.isTrusted(authenticationCertificateChain);
 		} catch (CertPathValidatorException e) {
 			LOG.debug("certificate path validation error: " + e.getMessage());
-			return false;
+			return new ValidationResult(false, null);
 		}
-		return true;
+		return new ValidationResult(true, trustValidator.getRevocationData());
 	}
 }

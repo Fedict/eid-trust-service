@@ -16,11 +16,11 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.xkms2;
+package be.fedict.trust.client.exception;
 
-public abstract class XKMSConstants {
 
-	public static final String TRUST_DOMAIN_APPLICATION_URI = "urn:be:fedict:trust:trust-domain";
+public class RevocationDataNotFoundException extends Exception {
 
-	public static final String RETURN_REVOCATION_DATA_URI = "urn:be:fedict:trust:revocation-data";
+	private static final long serialVersionUID = 1L;
+
 }

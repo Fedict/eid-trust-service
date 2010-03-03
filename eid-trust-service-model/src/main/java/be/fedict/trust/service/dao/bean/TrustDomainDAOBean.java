@@ -106,6 +106,17 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void removeTrustDomain(TrustDomainEntity trustDomain) {
+
+		LOG.debug("remove trust domain " + trustDomain.getName());
+		TrustDomainEntity attachedTrustDomain = findTrustDomain(trustDomain
+				.getName());
+		this.entityManager.remove(attachedTrustDomain);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setDefaultTrustDomain(TrustDomainEntity trustDomain) {
 
 		LOG.debug("set trust domain name=" + trustDomain.getName()

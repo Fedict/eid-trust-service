@@ -39,6 +39,7 @@ import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import be.fedict.trust.RevocationData;
 import be.fedict.trust.TrustLinker;
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
@@ -70,7 +71,8 @@ public class TrustServiceTrustLinker implements TrustLinker {
 	}
 
 	public Boolean hasTrustLink(X509Certificate childCertificate,
-			X509Certificate certificate, Date validationDate) {
+			X509Certificate certificate, Date validationDate,
+			RevocationData revocationData) {
 		LOG.debug("certificate: " + childCertificate.getSubjectX500Principal());
 		String issuerName = childCertificate.getIssuerX500Principal()
 				.toString();

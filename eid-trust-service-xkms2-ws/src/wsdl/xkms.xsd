@@ -14,7 +14,8 @@
 		schemaLocation="xenc-schema.xsd"></import>
 	<annotation>
 		<documentation xml:lang="en">
-			XML Schema for XKMS 2.0 Recommendation
+			XML Schema for XKMS 2.0
+			Recommendation
 </documentation>
 	</annotation>
 	<!-- /Namespace -->

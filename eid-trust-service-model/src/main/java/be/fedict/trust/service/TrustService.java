@@ -38,9 +38,9 @@ public interface TrustService {
 	 * Checks whether the given authentication certificate chain is valid.
 	 * 
 	 * @param authenticationCertificateChain
-	 * @return
 	 */
-	boolean isValid(List<X509Certificate> authenticationCertificateChain);
+	ValidationResult validate(
+			List<X509Certificate> authenticationCertificateChain);
 
 	/**
 	 * Checks whether the given authentication certificate chain is valid.
@@ -48,10 +48,13 @@ public interface TrustService {
 	 * @param trustDomain
 	 *            optional, can be null. If so default trust domain is taken.
 	 * @param authenticationCertificateChain
-	 * @return
+	 * @param returnRevocationData
+	 *            if true, used revocation data will be filled in in the
+	 *            {@link ValidationResult} and no caching will be used.
+	 * 
 	 * @throws TrustDomainNotFoundException
 	 */
-	boolean isValid(String trustDomain,
-			List<X509Certificate> authenticationCertificateChain)
-			throws TrustDomainNotFoundException;
+	ValidationResult validate(String trustDomain,
+			List<X509Certificate> authenticationCertificateChain,
+			boolean returnRevocationData) throws TrustDomainNotFoundException;
 }

@@ -29,9 +29,11 @@ import javax.xml.ws.handler.Handler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.etsi.uri._01903.v1_3.RevocationValuesType;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.X509DataType;
 import org.w3._2002._03.xkms_.KeyBindingType;
+import org.w3._2002._03.xkms_.MessageExtensionAbstractType;
 import org.w3._2002._03.xkms_.ObjectFactory;
 import org.w3._2002._03.xkms_.QueryKeyBindingType;
 import org.w3._2002._03.xkms_.StatusType;
@@ -41,7 +43,9 @@ import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 import org.w3._2002._03.xkms_wsdl.XKMSService;
 
+import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
+import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
 import be.fedict.trust.xkms2.ResultMajorCode;
 import be.fedict.trust.xkms2.ResultMinorCode;
 import be.fedict.trust.xkms2.XKMSConstants;
@@ -60,6 +64,8 @@ public class XKMS2Client {
 	private final XKMSPortType port;
 
 	private final String location;
+
+	private RevocationValuesType revocationValues;
 
 	/**
 	 * Main constructor
@@ -100,15 +106,85 @@ public class XKMS2Client {
 		binding.setHandlerChain(handlerChain);
 	}
 
+	/**
+	 * Validate the specified certificate chain against the default trust domain
+	 * configured at the trust service we are connecting to.
+	 * 
+	 * @param authnCertificateChain
+	 * 
+	 * @throws CertificateEncodingException
+	 * @throws TrustDomainNotFoundException
+	 * @throws RevocationDataNotFoundException
+	 */
 	public boolean validate(List<X509Certificate> authnCertificateChain)
-			throws CertificateEncodingException, TrustDomainNotFoundException {
+			throws CertificateEncodingException, TrustDomainNotFoundException,
+			RevocationDataNotFoundException {
 
 		return validate(null, authnCertificateChain);
 	}
 
+	/**
+	 * Validate the specified certificate chain against the default trust domain
+	 * configured at the trust service we are connecting to.
+	 * 
+	 * The used revocation data can be retrieved using
+	 * {@link #getRevocationValues()}.
+	 * 
+	 * @param authnCertificateChain
+	 * @param returnRevocationData
+	 *            whether or not the used revocation data should be returned.
+	 * 
+	 * @throws CertificateEncodingException
+	 * @throws TrustDomainNotFoundException
+	 * @throws RevocationDataNotFoundException
+	 */
+	public boolean validate(List<X509Certificate> authnCertificateChain,
+			boolean returnRevocationData) throws CertificateEncodingException,
+			TrustDomainNotFoundException, RevocationDataNotFoundException {
+
+		return validate(null, authnCertificateChain, returnRevocationData);
+	}
+
+	/**
+	 * Validate the specified certificate chain against the specified trust
+	 * domain.
+	 * 
+	 * @param trustDomain
+	 * @param authnCertificateChain
+	 * 
+	 * @throws CertificateEncodingException
+	 * @throws TrustDomainNotFoundException
+	 * @throws RevocationDataNotFoundException
+	 */
 	public boolean validate(String trustDomain,
 			List<X509Certificate> authnCertificateChain)
-			throws CertificateEncodingException, TrustDomainNotFoundException {
+			throws CertificateEncodingException, TrustDomainNotFoundException,
+			RevocationDataNotFoundException {
+
+		return validate(trustDomain, authnCertificateChain, false);
+	}
+
+	/**
+	 * Validate the specified certificate chain against the specified trust
+	 * domain.
+	 * 
+	 * The used revocation data can be retrieved using
+	 * {@link #getRevocationValues()}.
+	 * 
+	 * @param trustDomain
+	 * @param authnCertificateChain
+	 * @param returnRevocationData
+	 *            whether or not the used revocation data should be returned.
+	 * 
+	 * @throws CertificateEncodingException
+	 * @throws TrustDomainNotFoundException
+	 * @throws RevocationDataNotFoundException
+	 */
+	public boolean validate(String trustDomain,
+			List<X509Certificate> authnCertificateChain,
+			boolean returnRevocationData) throws CertificateEncodingException,
+			TrustDomainNotFoundException, RevocationDataNotFoundException {
+
 		LOG.debug("validate: "
 				+ authnCertificateChain.get(0).getSubjectX500Principal());
 
@@ -144,6 +220,14 @@ public class XKMS2Client {
 			queryKeyBinding.getUseKeyWith().add(useKeyWith);
 		}
 
+		/*
+		 * Set if used revocation data should be returned or not
+		 */
+		if (returnRevocationData) {
+			validateRequest.getRespondWith().add(
+					XKMSConstants.RETURN_REVOCATION_DATA_URI);
+		}
+
 		// TODO: WS trust via unilateral TLS trust model based on public key
 
 		ValidateResultType validateResult = port.validate(validateRequest);
@@ -153,6 +237,21 @@ public class XKMS2Client {
 		}
 
 		checkResponse(validateResult);
+
+		// set the optionally requested revocation data
+		if (returnRevocationData) {
+			for (MessageExtensionAbstractType messageExtension : validateResult
+					.getMessageExtension()) {
+				if (messageExtension instanceof RevocationDataMessageExtensionType) {
+					this.revocationValues = ((RevocationDataMessageExtensionType) messageExtension)
+							.getRevocationValues();
+				}
+			}
+			if (null == this.revocationValues) {
+				LOG.error("no revocation data found");
+				throw new RevocationDataNotFoundException();
+			}
+		}
 
 		List<KeyBindingType> keyBindings = validateResult.getKeyBinding();
 		for (KeyBindingType keyBinding : keyBindings) {
@@ -185,6 +284,14 @@ public class XKMS2Client {
 			}
 
 		}
+	}
 
+	/**
+	 * Return the optionally filled {@link RevocationValuesType}. Returns
+	 * <code>null</code> if this was not specified.
+	 */
+	public RevocationValuesType getRevocationValues() {
+
+		return this.revocationValues;
 	}
 }

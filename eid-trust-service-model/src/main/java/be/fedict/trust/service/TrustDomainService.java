@@ -212,4 +212,18 @@ public interface TrustDomainService {
 
 	void saveDNConstraint(DNConstraintEntity dnConstraint);
 
+	/**
+	 * Add a new {@link TrustDomainEntity}.
+	 * 
+	 * @param name
+	 */
+	TrustDomainEntity addTrustDomain(String name);
+
+	/**
+	 * Remove the specified {@link TrustDomainEntity}.
+	 * 
+	 * @param trustDomain
+	 */
+	void removeTrustDomain(TrustDomainEntity trustDomain);
+
 }

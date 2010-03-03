@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:be:fedict:trust:xkms:extensions"
+	xmlns:tns="urn:be:fedict:trust:xkms:extensions" xmlns:xkms="http://www.w3.org/2002/03/xkms#"
+	xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" elementFormDefault="qualified">
+
+	<annotation>
+		<documentation>
+			Document identifier: Trust Service XKMS2 extensions
+			Revision
+			history: V1.0 (February, 2010):
+			Initial Standard Schema.
+		</documentation>
+	</annotation>
+
+	<import namespace="http://www.w3.org/2002/03/xkms#"
+		schemaLocation="xkms.xsd" />
+	<import namespace="http://uri.etsi.org/01903/v1.3.2#"
+		schemaLocation="xades.xsd" />
+
+	<element name="RevocationDataMessageExtension" type="tns:RevocationDataMessageExtensionType" />
+	<complexType name="RevocationDataMessageExtensionType">
+		<complexContent>
+			<extension base="xkms:MessageExtensionAbstractType">
+				<sequence>
+					<element name="RevocationValues" type="xades:RevocationValuesType" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+</schema>

@@ -51,6 +51,7 @@ public class ServiceConsumerServletContextListener implements
 		LOG.debug("context destroyed");
 	}
 
+	@SuppressWarnings("unchecked")
 	public void contextInitialized(ServletContextEvent event) {
 		LOG.debug("context initialized");
 		ServletContext servletContext = event.getServletContext();

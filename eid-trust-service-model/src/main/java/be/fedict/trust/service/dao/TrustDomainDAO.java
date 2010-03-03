@@ -85,6 +85,13 @@ public interface TrustDomainDAO {
 	TrustDomainEntity addTrustDomain(String name, String crlRefreshCron);
 
 	/**
+	 * Remove the specified {@link TrustDomainEntity}.
+	 * 
+	 * @param trustDomain
+	 */
+	void removeTrustDomain(TrustDomainEntity trustDomain);
+
+	/**
 	 * Sets the {@link TrustDomainEntity} as default.
 	 * 
 	 * @param trustDomain

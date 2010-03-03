@@ -56,6 +56,10 @@ public interface TrustDomain {
 	/*
 	 * Accessors
 	 */
+	String getName();
+
+	void setName(String name);
+
 	List<String> getSourceTrustPoints();
 
 	void setSourceTrustPoints(List<String> sourceTrustPoints);
@@ -92,6 +96,10 @@ public interface TrustDomain {
 	 * Actions
 	 */
 	String modify();
+
+	String remove();
+
+	String add();
 
 	String save();
 

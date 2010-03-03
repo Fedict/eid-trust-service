@@ -32,6 +32,11 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.util.encoders.Base64;
+import org.etsi.uri._01903.v1_3.CRLValuesType;
+import org.etsi.uri._01903.v1_3.EncapsulatedPKIDataType;
+import org.etsi.uri._01903.v1_3.OCSPValuesType;
+import org.etsi.uri._01903.v1_3.RevocationValuesType;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.X509DataType;
 import org.w3._2002._03.xkms_.KeyBindingType;
@@ -43,8 +48,12 @@ import org.w3._2002._03.xkms_.ValidateRequestType;
 import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
+import be.fedict.trust.CRLRevocationData;
+import be.fedict.trust.OCSPRevocationData;
 import be.fedict.trust.service.TrustService;
+import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
 
 /**
  * Implementation of XKMS2 Web Service JAX-WS Port.
@@ -64,6 +73,7 @@ public class XKMSPortImpl implements XKMSPortType {
 	@EJB
 	private TrustService trustService;
 
+	@SuppressWarnings("unchecked")
 	public ValidateResultType validate(ValidateRequestType body) {
 		LOG.debug("validate");
 
@@ -109,14 +119,23 @@ public class XKMSPortImpl implements XKMSPortType {
 				if (useKeyWith.getApplication().equals(
 						XKMSConstants.TRUST_DOMAIN_APPLICATION_URI)) {
 					trustDomain = useKeyWith.getIdentifier();
+					LOG.debug("validate against trust domain " + trustDomain);
 				}
 			}
 		}
 
-		boolean validationResult;
+		// look if revocation data should be returned
+		boolean returnRevocationData = false;
+		if (body.getRespondWith().contains(
+				XKMSConstants.RETURN_REVOCATION_DATA_URI)) {
+			LOG.debug("will return used revocation data...");
+			returnRevocationData = true;
+		}
+
+		ValidationResult validationResult;
 		try {
-			validationResult = this.trustService.isValid(trustDomain,
-					certificateChain);
+			validationResult = this.trustService.validate(trustDomain,
+					certificateChain, returnRevocationData);
 		} catch (TrustDomainNotFoundException e) {
 			LOG.error("invalid trust domain");
 			return createResultResponse(ResultMajorCode.SENDER,
@@ -134,12 +153,52 @@ public class XKMSPortImpl implements XKMSPortType {
 		StatusType status = objectFactory.createStatusType();
 		keyBinding.setStatus(status);
 		String statusValue;
-		if (true == validationResult) {
+		if (validationResult.isValid()) {
 			statusValue = "http://www.w3.org/2002/03/xkms#Valid";
 		} else {
 			statusValue = "http://www.w3.org/2002/03/xkms#Invalid";
 		}
 		status.setStatusValue(statusValue);
+
+		// optionally append used revocation data if specified
+		if (returnRevocationData) {
+			be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
+			RevocationDataMessageExtensionType revocationDataMessageExtension = extensionsObjectFactory
+					.createRevocationDataMessageExtensionType();
+			org.etsi.uri._01903.v1_3.ObjectFactory xadesObjectFactory = new org.etsi.uri._01903.v1_3.ObjectFactory();
+			RevocationValuesType revocationValues = xadesObjectFactory
+					.createRevocationValuesType();
+
+			// Add OCSP responses
+			OCSPValuesType ocspValues = xadesObjectFactory
+					.createOCSPValuesType();
+			for (OCSPRevocationData ocspRevocationData : validationResult
+					.getRevocationData().getOcspRevocationData()) {
+				EncapsulatedPKIDataType encapsulatedPKIData = xadesObjectFactory
+						.createEncapsulatedPKIDataType();
+				encapsulatedPKIData.setValue(Base64.encode(ocspRevocationData
+						.getData()));
+				ocspValues.getEncapsulatedOCSPValue().add(encapsulatedPKIData);
+			}
+			revocationValues.setOCSPValues(ocspValues);
+
+			// Add CRL's
+			CRLValuesType crlValues = xadesObjectFactory.createCRLValuesType();
+			for (CRLRevocationData crlRevocationData : validationResult
+					.getRevocationData().getCrlRevocationData()) {
+				EncapsulatedPKIDataType encapsulatedPKIData = xadesObjectFactory
+						.createEncapsulatedPKIDataType();
+				encapsulatedPKIData.setValue(Base64.encode(crlRevocationData
+						.getData()));
+				crlValues.getEncapsulatedCRLValue().add(encapsulatedPKIData);
+			}
+			revocationValues.setCRLValues(crlValues);
+
+			revocationDataMessageExtension
+					.setRevocationValues(revocationValues);
+			validateResult.getMessageExtension().add(
+					revocationDataMessageExtension);
+		}
 
 		return validateResult;
 	}

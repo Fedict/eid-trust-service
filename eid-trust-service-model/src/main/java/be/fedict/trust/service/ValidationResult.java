@@ -16,11 +16,36 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.xkms2;
+package be.fedict.trust.service;
 
-public abstract class XKMSConstants {
+import be.fedict.trust.RevocationData;
 
-	public static final String TRUST_DOMAIN_APPLICATION_URI = "urn:be:fedict:trust:trust-domain";
+/**
+ * Validation result wrapper.
+ * 
+ * Contains the result and the optional {@link RevocationData} if requested.
+ * 
+ * @author wvdhaute
+ * 
+ */
+public class ValidationResult {
 
-	public static final String RETURN_REVOCATION_DATA_URI = "urn:be:fedict:trust:revocation-data";
+	private final boolean valid;
+	private final RevocationData revocationData;
+
+	public ValidationResult(boolean valid, RevocationData revocationData) {
+
+		this.valid = valid;
+		this.revocationData = revocationData;
+	}
+
+	public boolean isValid() {
+
+		return this.valid;
+	}
+
+	public RevocationData getRevocationData() {
+
+		return this.revocationData;
+	}
 }

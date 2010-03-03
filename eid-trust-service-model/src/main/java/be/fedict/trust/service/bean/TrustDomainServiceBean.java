@@ -78,6 +78,26 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 * {@inheritDoc}
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public TrustDomainEntity addTrustDomain(String name) {
+
+		LOG.debug("add trust domain: " + name);
+		return this.trustDomainDAO.addTrustDomain(name, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void removeTrustDomain(TrustDomainEntity trustDomain) {
+
+		LOG.debug("remove trust domain: " + trustDomain.getName());
+		this.trustDomainDAO.removeTrustDomain(trustDomain);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public List<TrustDomainEntity> listTrustDomains() {
 
 		LOG.debug("list trust domains");

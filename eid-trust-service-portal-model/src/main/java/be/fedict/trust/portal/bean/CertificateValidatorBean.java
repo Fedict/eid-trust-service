@@ -36,6 +36,7 @@ import org.jboss.seam.log.Log;
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 import be.fedict.trust.portal.CertificateValidator;
 import be.fedict.trust.service.TrustService;
+import be.fedict.trust.service.ValidationResult;
 
 @Stateless
 @Name("certificateValidator")
@@ -77,8 +78,9 @@ public class CertificateValidatorBean implements CertificateValidator {
 		signCertChain.add(caCert);
 		signCertChain.add(rootCert);
 
-		boolean authnCertValid = this.trustService.isValid(authnCertChain);
-		if (true == authnCertValid) {
+		ValidationResult validationResult = this.trustService
+				.validate(authnCertChain);
+		if (validationResult.isValid()) {
 			this.authnCertStatus = "Certificate valid.";
 		} else {
 			this.authnCertStatus = "Certificate invalid.";

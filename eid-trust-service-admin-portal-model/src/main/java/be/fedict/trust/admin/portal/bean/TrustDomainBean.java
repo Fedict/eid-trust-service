@@ -122,6 +122,7 @@ public class TrustDomainBean implements TrustDomain {
 	@DataModelSelection(CONSTRAINTS_END_ENTITY_LIST)
 	private EndEntityConstraintEntity selectedEndEntityConstraint;
 
+	private String name;
 	private String certificatePolicy;
 	private String keyUsage;
 	private boolean allowed;
@@ -178,6 +179,29 @@ public class TrustDomainBean implements TrustDomain {
 			}
 		}
 		return "modify";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Begin(join = true)
+	public String add() {
+
+		this.log.debug("add trust domain #0", this.name);
+		this.selectedTrustDomain = this.trustDomainService
+				.addTrustDomain(this.name);
+		return "modify";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String remove() {
+
+		this.log.debug("remove: #0", this.selectedTrustDomain.getName());
+		this.trustDomainService.removeTrustDomain(this.selectedTrustDomain);
+		trustDomainListFactory();
+		return "success";
 	}
 
 	/**
@@ -707,5 +731,21 @@ public class TrustDomainBean implements TrustDomain {
 		} else {
 			this.certificateBytes = item.getData();
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getName() {
+
+		return this.name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setName(String name) {
+
+		this.name = name;
 	}
 }
