@@ -19,6 +19,7 @@
 package test.integ.be.fedict.trust;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +27,9 @@ import static org.junit.Assert.assertTrue;
 import java.security.Security;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -63,18 +67,25 @@ public class XKMSRevocationTest {
 	}
 
 	@Test
-	public void testValidateNonRepudiationEIDCertificateReturnRevocationData()
+	public void testValidateNonRepudiationEIDCertificateReturnRevocationDataThenValidateHistorically()
 			throws Exception {
 		LOG
 				.debug("validate eID non repudiation certificate and return revocation data.");
 
+		// setup
 		List<X509Certificate> signCertificateChain = XKMSTest
 				.getSignCertificateChain();
-
 		XKMS2Client client = new XKMS2Client(location);
+		Date validationDate = new Date();
+
+		/*
+		 * Operate: validate non repudiation and return used revocation data
+		 */
 		boolean result = client.validate(
 				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
 				signCertificateChain, true);
+
+		// verify
 		assertTrue(result);
 		RevocationValuesType revocationValues = client.getRevocationValues();
 		assertNotNull(revocationValues);
@@ -104,5 +115,48 @@ public class XKMSRevocationTest {
 				.getEncapsulatedCRLValue().get(0);
 		X509CRL crl = new X509CRLImpl(Base64.decode(crlData.getValue()));
 		assertNotNull(crl);
+
+		/*
+		 * Operate: historical validation of non repudiation with just returned
+		 * used revocation data (indirect, use list of ocsp resonses and crls )
+		 */
+		result = client.validate(
+				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+				signCertificateChain, validationDate, revocationValues);
+
+		// verify
+		assertTrue(result);
+
+		/*
+		 * Operate: historical validation of non repudiation with just returned
+		 * used revocation data (direct, append the RevocationValuesType object
+		 * returned by earlier call)
+		 */
+		result = client.validate(
+				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+				signCertificateChain, validationDate, Collections
+						.singletonList(ocspResp), Collections
+						.singletonList(crl));
+
+		// verify
+		assertTrue(result);
+
+		// setup
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(validationDate);
+		calendar.add(Calendar.YEAR, -1);
+
+		/*
+		 * Operate: historical validation of non repudiation with just returned
+		 * used revocation data and year old validation date
+		 */
+		result = client.validate(
+				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+				signCertificateChain, calendar.getTime(), Collections
+						.singletonList(ocspResp), Collections
+						.singletonList(crl));
+
+		// verify
+		assertFalse(result);
 	}
 }

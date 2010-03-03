@@ -18,10 +18,14 @@
 
 package be.fedict.trust.service;
 
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.Local;
+
+import org.bouncycastle.ocsp.OCSPResp;
 
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
@@ -37,17 +41,16 @@ public interface TrustService {
 	/**
 	 * Checks whether the given authentication certificate chain is valid.
 	 * 
-	 * @param authenticationCertificateChain
+	 * @param certificateChain
 	 */
-	ValidationResult validate(
-			List<X509Certificate> authenticationCertificateChain);
+	ValidationResult validate(List<X509Certificate> certificateChain);
 
 	/**
-	 * Checks whether the given authentication certificate chain is valid.
+	 * Checks whether the given certificate chain is valid.
 	 * 
 	 * @param trustDomain
 	 *            optional, can be null. If so default trust domain is taken.
-	 * @param authenticationCertificateChain
+	 * @param certificateChain
 	 * @param returnRevocationData
 	 *            if true, used revocation data will be filled in in the
 	 *            {@link ValidationResult} and no caching will be used.
@@ -55,6 +58,23 @@ public interface TrustService {
 	 * @throws TrustDomainNotFoundException
 	 */
 	ValidationResult validate(String trustDomain,
-			List<X509Certificate> authenticationCertificateChain,
-			boolean returnRevocationData) throws TrustDomainNotFoundException;
+			List<X509Certificate> certificateChain, boolean returnRevocationDate)
+			throws TrustDomainNotFoundException;
+
+	/**
+	 * Checks whether the given certificate chain was valid at the specified
+	 * {@link Date}, using the specified revocation data.
+	 * 
+	 * @param trustDomain
+	 * @param certificateChain
+	 * @param validationDate
+	 * @param ocspResponses
+	 * @param crls
+	 * 
+	 * @throws TrustDomainNotFoundException
+	 */
+	ValidationResult validate(String trustDomain,
+			List<X509Certificate> certificateChain, Date validationDate,
+			List<OCSPResp> ocspResponses, List<X509CRL> crls)
+			throws TrustDomainNotFoundException;
 }

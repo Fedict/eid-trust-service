@@ -18,17 +18,30 @@
 
 package be.fedict.trust.client;
 
+import java.io.IOException;
+import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.ocsp.OCSPResp;
+import org.bouncycastle.util.encoders.Base64;
+import org.etsi.uri._01903.v1_3.CRLValuesType;
+import org.etsi.uri._01903.v1_3.EncapsulatedPKIDataType;
+import org.etsi.uri._01903.v1_3.OCSPValuesType;
 import org.etsi.uri._01903.v1_3.RevocationValuesType;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.X509DataType;
@@ -37,6 +50,7 @@ import org.w3._2002._03.xkms_.MessageExtensionAbstractType;
 import org.w3._2002._03.xkms_.ObjectFactory;
 import org.w3._2002._03.xkms_.QueryKeyBindingType;
 import org.w3._2002._03.xkms_.StatusType;
+import org.w3._2002._03.xkms_.TimeInstantType;
 import org.w3._2002._03.xkms_.UseKeyWithType;
 import org.w3._2002._03.xkms_.ValidateRequestType;
 import org.w3._2002._03.xkms_.ValidateResultType;
@@ -110,17 +124,17 @@ public class XKMS2Client {
 	 * Validate the specified certificate chain against the default trust domain
 	 * configured at the trust service we are connecting to.
 	 * 
-	 * @param authnCertificateChain
+	 * @param certificateChain
 	 * 
 	 * @throws CertificateEncodingException
 	 * @throws TrustDomainNotFoundException
 	 * @throws RevocationDataNotFoundException
 	 */
-	public boolean validate(List<X509Certificate> authnCertificateChain)
+	public boolean validate(List<X509Certificate> certificateChain)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException {
 
-		return validate(null, authnCertificateChain);
+		return validate(null, certificateChain);
 	}
 
 	/**
@@ -130,7 +144,7 @@ public class XKMS2Client {
 	 * The used revocation data can be retrieved using
 	 * {@link #getRevocationValues()}.
 	 * 
-	 * @param authnCertificateChain
+	 * @param certificateChain
 	 * @param returnRevocationData
 	 *            whether or not the used revocation data should be returned.
 	 * 
@@ -138,11 +152,11 @@ public class XKMS2Client {
 	 * @throws TrustDomainNotFoundException
 	 * @throws RevocationDataNotFoundException
 	 */
-	public boolean validate(List<X509Certificate> authnCertificateChain,
+	public boolean validate(List<X509Certificate> certificateChain,
 			boolean returnRevocationData) throws CertificateEncodingException,
 			TrustDomainNotFoundException, RevocationDataNotFoundException {
 
-		return validate(null, authnCertificateChain, returnRevocationData);
+		return validate(null, certificateChain, returnRevocationData);
 	}
 
 	/**
@@ -150,18 +164,66 @@ public class XKMS2Client {
 	 * domain.
 	 * 
 	 * @param trustDomain
-	 * @param authnCertificateChain
+	 * @param certificateChain
 	 * 
 	 * @throws CertificateEncodingException
 	 * @throws TrustDomainNotFoundException
 	 * @throws RevocationDataNotFoundException
 	 */
 	public boolean validate(String trustDomain,
-			List<X509Certificate> authnCertificateChain)
+			List<X509Certificate> certificateChain)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException {
 
-		return validate(trustDomain, authnCertificateChain, false);
+		return validate(trustDomain, certificateChain, false);
+	}
+
+	/**
+	 * Validate the specified certificate chain against the specified trust
+	 * domain using historical validation using the specified revocation data.
+	 * 
+	 * @param trustDomain
+	 * @param certificateChain
+	 * @param validationDate
+	 * @param ocspResponses
+	 * @param crls
+	 * 
+	 * @throws RevocationDataNotFoundException
+	 * @throws TrustDomainNotFoundException
+	 * @throws CertificateEncodingException
+	 */
+	public boolean validate(String trustDomain,
+			List<X509Certificate> certificateChain, Date validationDate,
+			List<OCSPResp> ocspResponses, List<X509CRL> crls)
+			throws CertificateEncodingException, TrustDomainNotFoundException,
+			RevocationDataNotFoundException {
+
+		return validate(trustDomain, certificateChain, false, validationDate,
+				ocspResponses, crls, null);
+	}
+
+	/**
+	 * Validate the specified certificate chain against the specified trust
+	 * domain using historical validation using the specified revocation data.
+	 * 
+	 * @param trustDomain
+	 * @param certificateChain
+	 * @param validationDate
+	 * @param ocspResponses
+	 * @param crls
+	 * 
+	 * @throws RevocationDataNotFoundException
+	 * @throws TrustDomainNotFoundException
+	 * @throws CertificateEncodingException
+	 */
+	public boolean validate(String trustDomain,
+			List<X509Certificate> certificateChain, Date validationDate,
+			RevocationValuesType revocationValues)
+			throws CertificateEncodingException, TrustDomainNotFoundException,
+			RevocationDataNotFoundException {
+
+		return validate(trustDomain, certificateChain, false, validationDate,
+				null, null, revocationValues);
 	}
 
 	/**
@@ -172,7 +234,7 @@ public class XKMS2Client {
 	 * {@link #getRevocationValues()}.
 	 * 
 	 * @param trustDomain
-	 * @param authnCertificateChain
+	 * @param certificateChain
 	 * @param returnRevocationData
 	 *            whether or not the used revocation data should be returned.
 	 * 
@@ -181,9 +243,21 @@ public class XKMS2Client {
 	 * @throws RevocationDataNotFoundException
 	 */
 	public boolean validate(String trustDomain,
+			List<X509Certificate> certificateChain, boolean returnRevocationData)
+			throws CertificateEncodingException, TrustDomainNotFoundException,
+			RevocationDataNotFoundException {
+
+		return validate(trustDomain, certificateChain, returnRevocationData,
+				null, null, null, null);
+	}
+
+	private boolean validate(String trustDomain,
 			List<X509Certificate> authnCertificateChain,
-			boolean returnRevocationData) throws CertificateEncodingException,
-			TrustDomainNotFoundException, RevocationDataNotFoundException {
+			boolean returnRevocationData, Date validationDate,
+			List<OCSPResp> ocspResponses, List<X509CRL> crls,
+			RevocationValuesType revocationValues)
+			throws CertificateEncodingException, TrustDomainNotFoundException,
+			RevocationDataNotFoundException {
 
 		LOG.debug("validate: "
 				+ authnCertificateChain.get(0).getSubjectX500Principal());
@@ -228,6 +302,20 @@ public class XKMS2Client {
 					XKMSConstants.RETURN_REVOCATION_DATA_URI);
 		}
 
+		/*
+		 * Historical validation, add the revocation data to the request
+		 */
+		if (null != validationDate) {
+
+			TimeInstantType timeInstant = objectFactory.createTimeInstantType();
+			timeInstant.setTime(getXmlGregorianCalendar(validationDate));
+			queryKeyBinding.setTimeInstant(timeInstant);
+
+			addRevocationData(validateRequest, ocspResponses, crls,
+					revocationValues);
+
+		}
+
 		// TODO: WS trust via unilateral TLS trust model based on public key
 
 		ValidateResultType validateResult = port.validate(validateRequest);
@@ -267,6 +355,69 @@ public class XKMS2Client {
 	}
 
 	/**
+	 * Add revocation data either from list of {@link OCSPResp} objects and
+	 * {@link X509CRL} objects or from specified {@link RevocationValuesType}.
+	 * 
+	 * @param validateRequest
+	 * @param ocspResponses
+	 * @param crls
+	 * @param revocationData
+	 */
+	private void addRevocationData(ValidateRequestType validateRequest,
+			List<OCSPResp> ocspResponses, List<X509CRL> crls,
+			RevocationValuesType revocationData) {
+
+		be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
+		RevocationDataMessageExtensionType revocationDataMessageExtension = extensionsObjectFactory
+				.createRevocationDataMessageExtensionType();
+
+		if (null != revocationData) {
+			revocationDataMessageExtension.setRevocationValues(revocationData);
+		} else {
+			org.etsi.uri._01903.v1_3.ObjectFactory xadesObjectFactory = new org.etsi.uri._01903.v1_3.ObjectFactory();
+			RevocationValuesType revocationValues = xadesObjectFactory
+					.createRevocationValuesType();
+
+			// OCSP
+			OCSPValuesType ocspValues = xadesObjectFactory
+					.createOCSPValuesType();
+			for (OCSPResp ocspResponse : ocspResponses) {
+				EncapsulatedPKIDataType ocspValue = xadesObjectFactory
+						.createEncapsulatedPKIDataType();
+				try {
+					ocspValue
+							.setValue(Base64.encode(ocspResponse.getEncoded()));
+				} catch (IOException e) {
+					LOG.error("IOException: " + e.getMessage(), e);
+					throw new RuntimeException(e);
+				}
+				ocspValues.getEncapsulatedOCSPValue().add(ocspValue);
+			}
+			revocationValues.setOCSPValues(ocspValues);
+
+			// CRL
+			CRLValuesType crlValues = xadesObjectFactory.createCRLValuesType();
+			for (X509CRL crl : crls) {
+				EncapsulatedPKIDataType crlValue = xadesObjectFactory
+						.createEncapsulatedPKIDataType();
+				try {
+					crlValue.setValue(Base64.encode(crl.getEncoded()));
+				} catch (CRLException e) {
+					LOG.error("CRLException: " + e.getMessage(), e);
+					throw new RuntimeException(e);
+				}
+				crlValues.getEncapsulatedCRLValue().add(crlValue);
+			}
+			revocationValues.setCRLValues(crlValues);
+			revocationDataMessageExtension
+					.setRevocationValues(revocationValues);
+		}
+
+		validateRequest.getMessageExtension().add(
+				revocationDataMessageExtension);
+	}
+
+	/**
 	 * Checks the ResultMajor and ResultMinor code.
 	 * 
 	 * @param validateResult
@@ -294,4 +445,21 @@ public class XKMS2Client {
 
 		return this.revocationValues;
 	}
+
+	private XMLGregorianCalendar getXmlGregorianCalendar(Date date) {
+
+		try {
+			DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
+
+			GregorianCalendar gregorianCalendar = new GregorianCalendar();
+			gregorianCalendar.setTime(date);
+			XMLGregorianCalendar currentXmlGregorianCalendar = datatypeFactory
+					.newXMLGregorianCalendar(gregorianCalendar);
+			return currentXmlGregorianCalendar;
+
+		} catch (DatatypeConfigurationException e) {
+			throw new RuntimeException("datatype config error");
+		}
+	}
+
 }
