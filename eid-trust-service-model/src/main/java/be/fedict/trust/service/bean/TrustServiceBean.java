@@ -335,6 +335,40 @@ public class TrustServiceBean implements TrustService {
 									.isAllowed());
 					break;
 				}
+				case KEY_ENCIPHERMENT: {
+					keyUsageCertificateConstraint
+							.setKeyEnciphermentFilter(keyUsageConstraint
+									.isAllowed());
+				}
+				case DATA_ENCIPHERMENT: {
+					keyUsageCertificateConstraint
+							.setDataEnciphermentFilter(keyUsageConstraint
+									.isAllowed());
+				}
+				case KEY_AGREEMENT: {
+					keyUsageCertificateConstraint
+							.setKeyAgreementFilter(keyUsageConstraint
+									.isAllowed());
+				}
+				case KEY_CERT_SIGN: {
+					keyUsageCertificateConstraint
+							.setKeyCertificateSigningFilter(keyUsageConstraint
+									.isAllowed());
+				}
+				case CRL_SIGN: {
+					keyUsageCertificateConstraint
+							.setCRLSigningFilter(keyUsageConstraint.isAllowed());
+				}
+				case ENCIPHER_ONLY: {
+					keyUsageCertificateConstraint
+							.setEncipherOnlyFilter(keyUsageConstraint
+									.isAllowed());
+				}
+				case DECIPHER_ONLY: {
+					keyUsageCertificateConstraint
+							.setDecipherOnlyFilter(keyUsageConstraint
+									.isAllowed());
+				}
 				}
 
 			} else if (certificateConstraint instanceof QCStatementsConstraintEntity) {
