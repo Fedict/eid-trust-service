@@ -207,11 +207,8 @@ public class TrustServiceBean implements TrustService {
 
 		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
 
-		MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
-		for (TrustPointEntity trustPoint : trustDomain.getTrustPoints()) {
-			certificateRepository.addTrustPoint(trustPoint
-					.getCertificateAuthority().getCertificate());
-		}
+		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(
+				trustDomain);
 
 		TrustValidator trustValidator;
 		if (returnRevocationData) {
