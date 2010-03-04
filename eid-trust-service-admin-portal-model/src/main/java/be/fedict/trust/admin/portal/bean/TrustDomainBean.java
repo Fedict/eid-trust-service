@@ -396,7 +396,6 @@ public class TrustDomainBean implements TrustDomain {
 	/**
 	 * {@inheritDoc}
 	 */
-	@End
 	public String removeConstraintPolicy() {
 
 		if (null != this.selectedPolicyConstraint) {
