@@ -42,6 +42,7 @@ import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.MemoryCertificateRepository;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.PublicKeyTrustLinker;
+import be.fedict.trust.RevocationData;
 import be.fedict.trust.TrustLinker;
 import be.fedict.trust.TrustValidator;
 import be.fedict.trust.constraints.CertificatePoliciesCertificateConstraint;
@@ -126,7 +127,8 @@ public class TrustServiceBean implements TrustService {
 			trustValidator.isTrusted(certificateChain);
 		} catch (CertPathValidatorException e) {
 			LOG.debug("certificate path validation error: " + e.getMessage());
-			return new ValidationResult(false, null);
+			return new ValidationResult(false, trustValidator
+					.getRevocationData());
 		}
 		return new ValidationResult(true, trustValidator.getRevocationData());
 	}
@@ -150,9 +152,10 @@ public class TrustServiceBean implements TrustService {
 			trustValidator.isTrusted(certificateChain, validationDate);
 		} catch (CertPathValidatorException e) {
 			LOG.debug("certificate path validation error: " + e.getMessage());
-			return new ValidationResult(false, null);
+			return new ValidationResult(false, trustValidator
+					.getRevocationData());
 		}
-		return new ValidationResult(true, null);
+		return new ValidationResult(true, trustValidator.getRevocationData());
 	}
 
 	/**
@@ -172,10 +175,11 @@ public class TrustServiceBean implements TrustService {
 			boolean returnRevocationData) throws TrustDomainNotFoundException {
 
 		TrustLinker trustLinker = null;
-		if (!returnRevocationData)
+		if (!returnRevocationData) {
 			// if returnRevocationData set, don't use cached revocation data
 			trustLinker = new TrustServiceTrustLinker(this.entityManager,
 					this.queueConnectionFactory, this.queue);
+		}
 
 		TrustDomainEntity trustDomain;
 		if (null == trustDomainName)
@@ -183,7 +187,7 @@ public class TrustServiceBean implements TrustService {
 		else
 			trustDomain = this.trustDomainDAO.getTrustDomain(trustDomainName);
 
-		return getTrustValidator(trustDomain, trustLinker);
+		return getTrustValidator(trustDomain, trustLinker, returnRevocationData);
 	}
 
 	/**
@@ -194,9 +198,12 @@ public class TrustServiceBean implements TrustService {
 	 * @param trustLinker
 	 *            optional customized {@link TrustLinker}. Can be
 	 *            <code>null</code>.
+	 * @param returnRevocationData
+	 *            if <code>true</code> the used revocation data will be filled
+	 *            in the returned {@link TrustValidator}.
 	 */
 	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain,
-			TrustLinker trustLinker) {
+			TrustLinker trustLinker, boolean returnRevocationData) {
 
 		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
 
@@ -206,8 +213,13 @@ public class TrustServiceBean implements TrustService {
 					.getCertificateAuthority().getCertificate());
 		}
 
-		TrustValidator trustValidator = new TrustValidator(
-				certificateRepository);
+		TrustValidator trustValidator;
+		if (returnRevocationData) {
+			trustValidator = new TrustValidator(certificateRepository,
+					new RevocationData());
+		} else {
+			trustValidator = new TrustValidator(certificateRepository);
+		}
 		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
 
 		OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
