@@ -25,12 +25,35 @@
 							<h:commandLink id="modify" value="#{messages.modify}"
 								action="#{trustPoint.modify}" />
 						</h:column>
+
+						<h:column>
+							<f:facet name="header">#{messages.remove}</f:facet>
+							<a4j:commandLink action="#{trustPoint.select}" immediate="true"
+								id="remove" value="#{messages.remove}"
+								onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
+						</h:column>
 						<f:facet name="footer">
 							<rich:datascroller for="data" pageIndexVar="pageIndex"
 								pagesVar="pages" fastControls="hide">
 							</rich:datascroller>
 						</f:facet>
 					</rich:dataTable>
+
+					<rich:modalPanel id="removeConfirm">
+						<div class="center">
+							<h:outputText value="#{messages.removeTrustPointConfirmation}" />
+							<p>
+								<h:panelGrid id="confirmPanel" columns="2" border="0"
+									styleClass="center">
+									<a4j:commandButton id="remove2" value="#{messages.remove}"
+										action="#{trustPoint.remove}" immediate="true"
+										oncomplete="Richfaces.hideModalPanel('removeConfirm');" />
+									<a4j:commandButton id="cancel" value="#{messages.cancel}"
+										onclick="Richfaces.hideModalPanel('removeConfirm');" />
+								</h:panelGrid>
+							</p>
+						</div>
+					</rich:modalPanel>
 
 					<h:commandButton action="add" id="add" value="#{messages.add}"
 						immediate="true" styleClass="submit" />

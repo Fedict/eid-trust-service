@@ -196,6 +196,17 @@ public class TrustDomainBean implements TrustDomain {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Begin(join = true)
+	public void select() {
+
+		this.log.debug("selected trust domain: #0", this.selectedTrustDomain
+				.getName());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@End
 	public String remove() {
 
 		this.log.debug("remove: #0", this.selectedTrustDomain.getName());

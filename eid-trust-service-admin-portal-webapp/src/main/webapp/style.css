@@ -117,3 +117,8 @@ h3 {
     background:         pink;
     text-align:         center;
 }
+div.center, div.center table {
+	text-align:			center;
+	margin-left:		auto;
+	margin-right:		auto;
+}

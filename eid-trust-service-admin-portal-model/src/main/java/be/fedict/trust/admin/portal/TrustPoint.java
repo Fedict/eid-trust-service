@@ -30,7 +30,7 @@ public interface TrustPoint {
 	/*
 	 * Factory
 	 */
-	void trustDomainListFactory();
+	void trustPointListFactory();
 
 	/*
 	 * Lifecycle.
@@ -50,6 +50,8 @@ public interface TrustPoint {
 	String modify();
 
 	String save();
+
+	void select();
 
 	String remove();
 

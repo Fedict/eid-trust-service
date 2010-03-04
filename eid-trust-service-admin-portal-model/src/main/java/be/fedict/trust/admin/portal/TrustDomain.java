@@ -97,6 +97,8 @@ public interface TrustDomain {
 	 */
 	String modify();
 
+	void select();
+
 	String remove();
 
 	String add();

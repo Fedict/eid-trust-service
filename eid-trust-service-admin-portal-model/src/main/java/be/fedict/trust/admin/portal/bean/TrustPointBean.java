@@ -100,7 +100,7 @@ public class TrustPointBean implements TrustPoint {
 	 * {@inheritDoc}
 	 */
 	@Factory(TRUST_POINT_LIST_NAME)
-	public void trustDomainListFactory() {
+	public void trustPointListFactory() {
 
 		this.log.debug("trust point list factory");
 		this.trustPointList = this.trustDomainService.listTrustPoints();
@@ -118,11 +118,20 @@ public class TrustPointBean implements TrustPoint {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void select() {
+
+		this.log.debug("selected trust point: #0", this.selectedTrustPoint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public String remove() {
 
 		this.log.debug("remove trust point: #0", this.selectedTrustPoint
 				.getName());
 		this.trustDomainService.remove(this.selectedTrustPoint);
+		trustPointListFactory();
 		if (null != this.selectedTrustDomain) {
 			return "success_trustdomain";
 		}

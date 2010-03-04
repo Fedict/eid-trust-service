@@ -65,7 +65,7 @@ public class XKMSTest {
 
 	private static final Log LOG = LogFactory.getLog(XKMSTest.class);
 
-	private static final String location = "http://sebeco-dev-11:8080";
+	private static final String location = "http://localhost:8080";
 
 	// private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
 	// "proxy.yourict.net", 8080);

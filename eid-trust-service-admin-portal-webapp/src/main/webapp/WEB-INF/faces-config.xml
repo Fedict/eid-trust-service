@@ -133,6 +133,11 @@
 			<to-view-id>/trust-point.seam</to-view-id>
 			<redirect />
 		</navigation-case>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/trust-points.seam</to-view-id>
+			<redirect />
+		</navigation-case>
 	</navigation-rule>
 	<navigation-rule>
 		<from-view-id>/trust-point-select.xhtml</from-view-id>
