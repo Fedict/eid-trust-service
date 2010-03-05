@@ -93,12 +93,10 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public TrustDomainEntity addTrustDomain(String name, String crlRefreshCron) {
+	public TrustDomainEntity addTrustDomain(String name) {
 
-		LOG.debug("add trust domain name=" + name + " crlRefreshCron="
-				+ crlRefreshCron);
-		TrustDomainEntity trustDomain = new TrustDomainEntity(name,
-				crlRefreshCron);
+		LOG.debug("add trust domain name=" + name);
+		TrustDomainEntity trustDomain = new TrustDomainEntity(name);
 		this.entityManager.persist(trustDomain);
 		return trustDomain;
 	}

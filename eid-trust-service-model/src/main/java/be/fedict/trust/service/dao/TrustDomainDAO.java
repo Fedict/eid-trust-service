@@ -80,9 +80,8 @@ public interface TrustDomainDAO {
 	 * Create a new {@link TrustDomainEntity}.
 	 * 
 	 * @param name
-	 * @param crlRefreshCron
 	 */
-	TrustDomainEntity addTrustDomain(String name, String crlRefreshCron);
+	TrustDomainEntity addTrustDomain(String name);
 
 	/**
 	 * Remove the specified {@link TrustDomainEntity}.

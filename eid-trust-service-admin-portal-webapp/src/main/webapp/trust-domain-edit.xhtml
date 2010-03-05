@@ -12,11 +12,11 @@
 				<h:form id="form">
 
 					<h:panelGrid id="panel" columns="3" border="0">
-						<h:outputLabel for="cron" value="#{messages.crlRefresh}" />
+						<h:outputLabel for="cache" value="#{messages.useCaching}" />
 						<s:decorate>
-							<h:inputText id="cron"
-								value="#{selectedTrustDomain.crlRefreshCron}" />
-							<h:message for="cron" styleClass="error" />
+							<h:selectBooleanCheckbox id="cache"
+								value="#{selectedTrustDomain.useCaching}" />
+							<h:message for="cache" styleClass="error" />
 						</s:decorate>
 						<h:commandButton action="#{trustDomain.save}" id="save"
 							value="#{messages.save}" />

@@ -81,7 +81,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	public TrustDomainEntity addTrustDomain(String name) {
 
 		LOG.debug("add trust domain: " + name);
-		return this.trustDomainDAO.addTrustDomain(name, null);
+		return this.trustDomainDAO.addTrustDomain(name);
 	}
 
 	/**
@@ -124,8 +124,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		LOG.debug("save trust domain: " + trustDomain.getName());
 		TrustDomainEntity attachedTrustDomain = this.trustDomainDAO
 				.findTrustDomain(trustDomain.getName());
-		attachedTrustDomain.setCrlRefreshCron(trustDomain.getCrlRefreshCron());
-		this.schedulingService.startTimer(attachedTrustDomain, false);
+		attachedTrustDomain.setUseCaching(trustDomain.isUseCaching());
 	}
 
 	/**

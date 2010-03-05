@@ -149,6 +149,12 @@ public class InitializationServiceBean implements InitializationService {
 			rootCa2.setTrustPoint(rootCa2TrustPoint);
 		}
 		trustPoints.add(rootCa2.getTrustPoint());
+
+		for (TrustPointEntity trustPoint : trustPoints) {
+			// start timer
+			initTrustPointScheduling(trustPoint);
+		}
+
 		return trustPoints;
 	}
 
@@ -162,9 +168,8 @@ public class InitializationServiceBean implements InitializationService {
 				.findTrustDomain(TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN);
 		if (null == trustDomain) {
 			LOG.debug("create Belgian eID authentication trust domain");
-			trustDomain = this.trustDomainDAO.addTrustDomain(
-					TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN,
-					TrustServiceConstants.DEFAULT_CRON);
+			trustDomain = this.trustDomainDAO
+					.addTrustDomain(TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN);
 			this.trustDomainDAO.setDefaultTrustDomain(trustDomain);
 		}
 		trustDomain.setTrustPoints(trustPoints);
@@ -183,9 +188,6 @@ public class InitializationServiceBean implements InitializationService {
 				"2.16.56.9.1.1.2.2");
 		this.trustDomainDAO.addCertificatePolicy(trustDomain,
 				"2.16.56.9.1.1.7.2");
-
-		// start timer
-		initTrustDomainScheduling(trustDomain);
 	}
 
 	private void initBelgianEidNonRepudiationDomain(
@@ -196,9 +198,7 @@ public class InitializationServiceBean implements InitializationService {
 		if (null == trustDomain) {
 			LOG.debug("create Belgian eID Non Repudiation trust domain");
 			trustDomain = this.trustDomainDAO
-					.addTrustDomain(
-							TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
-							null);
+					.addTrustDomain(TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN);
 		}
 		trustDomain.setTrustPoints(trustPoints);
 
@@ -229,9 +229,7 @@ public class InitializationServiceBean implements InitializationService {
 		if (null == trustDomain) {
 			LOG.debug("create Belgian eID national registry trust domain");
 			trustDomain = this.trustDomainDAO
-					.addTrustDomain(
-							TrustServiceConstants.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN,
-							null);
+					.addTrustDomain(TrustServiceConstants.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN);
 		}
 		trustDomain.setTrustPoints(trustPoints);
 
@@ -248,15 +246,15 @@ public class InitializationServiceBean implements InitializationService {
 
 	}
 
-	private void initTrustDomainScheduling(TrustDomainEntity trustDomain) {
+	private void initTrustPointScheduling(TrustPointEntity trustPoint) {
 
 		// Belgian eID trust domain timer
-		LOG.debug("start timer for domain " + trustDomain.getName());
+		LOG.debug("start timer for trust point " + trustPoint.getName());
 		try {
-			this.schedulingService.startTimer(trustDomain, false);
+			this.schedulingService.startTimer(trustPoint, false);
 		} catch (InvalidCronExpressionException e) {
-			LOG.error("Failed to start timer for domain: "
-					+ trustDomain.getName(), e);
+			LOG.error("Failed to start timer for trust point: "
+					+ trustPoint.getName(), e);
 			throw new RuntimeException(e);
 		}
 	}

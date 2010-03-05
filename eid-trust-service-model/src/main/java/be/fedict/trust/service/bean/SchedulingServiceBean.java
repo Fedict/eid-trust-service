@@ -48,7 +48,6 @@ import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
-import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
@@ -102,10 +101,6 @@ public class SchedulingServiceBean implements SchedulingService {
 				+ timerInfo.getName());
 
 		switch (timerInfo.getType()) {
-		case TRUST_DOMAIN: {
-			handleTrustDomainTimeout(timerInfo.getName(), timer);
-			break;
-		}
 		case TRUST_POINT: {
 			handleTrustPointTimeout(timerInfo.getName(), timer);
 			break;
@@ -137,49 +132,6 @@ public class SchedulingServiceBean implements SchedulingService {
 			startTimer(clockDriftConfig, true);
 		} catch (InvalidCronExpressionException e) {
 			LOG.error("Exception starting timer for clock drift");
-			return;
-			// XXX: audit ?
-		}
-	}
-
-	private void handleTrustDomainTimeout(String name, Timer timer) {
-
-		TrustDomainEntity trustDomain = this.entityManager.find(
-				TrustDomainEntity.class, name);
-		if (null == trustDomain) {
-			LOG.warn("unknown trustDomain: " + name);
-			return;
-		}
-
-		// the trustDomain apparently has another timer still running
-		// we just return without setting this timer again
-		if (!trustDomain.getTimerHandle().equals(timer.getHandle())) {
-			LOG.debug("Ignoring duplicate timer for: " + trustDomain.getName());
-			return;
-		}
-
-		// notify harvester
-		for (TrustPointEntity trustPoint : this.trustDomainDAO
-				.listTrustPoints(trustDomain)) {
-			for (CertificateAuthorityEntity certificateAuthority : this.trustDomainDAO
-					.listCertificateAuthorities(trustPoint)) {
-				try {
-					notifyHarvester(certificateAuthority.getName());
-					LOG.debug("harvester notified for"
-							+ certificateAuthority.getName());
-				} catch (JMSException e) {
-					LOG.error("Failed to notify harvester", e);
-					// XXX: audit
-				}
-			}
-		}
-
-		// start timer
-		try {
-			startTimer(trustDomain, true);
-		} catch (InvalidCronExpressionException e) {
-			LOG.error("Exception starting timer for trust domain: "
-					+ trustDomain.getName());
 			return;
 			// XXX: audit ?
 		}
@@ -248,34 +200,6 @@ public class SchedulingServiceBean implements SchedulingService {
 		LOG.debug("created timer for clock drift at " + fireDate.toString());
 		clockDriftConfig.setFireDate(fireDate);
 		clockDriftConfig.setTimerHandle(timer.getHandle());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void startTimer(TrustDomainEntity trustDomain, boolean update)
-			throws InvalidCronExpressionException {
-		LOG.debug("start timer for " + trustDomain.getName());
-
-		// remove old timers
-		cancelTimers(new TimerInfo(trustDomain));
-
-		if (null == trustDomain.getCrlRefreshCron()
-				|| trustDomain.getCrlRefreshCron().equals("")) {
-			LOG.debug("no CRL refresh set for trust domain "
-					+ trustDomain.getName() + " ignoring...");
-			return;
-		}
-
-		Date fireDate = getFireDate(trustDomain.getCrlRefreshCron(), update,
-				trustDomain.getFireDate());
-
-		Timer timer = this.timerService.createTimer(fireDate, new TimerInfo(
-				trustDomain));
-		LOG.debug("created timer for " + trustDomain.getName() + " at "
-				+ fireDate.toString());
-		trustDomain.setFireDate(fireDate);
-		trustDomain.setTimerHandle(timer.getHandle());
 	}
 
 	/**

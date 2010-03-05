@@ -18,10 +18,6 @@
 							<h:outputText value="#{item.name}" />
 						</h:column>
 						<h:column>
-							<f:facet name="header">#{messages.crlRefresh}</f:facet>
-							<h:outputText value="#{item.crlRefreshCron}" />
-						</h:column>
-						<h:column>
 							<f:facet name="header">#{messages.default}</f:facet>
 							<h:selectBooleanCheckbox disabled="true"
 								value="#{item.defaultDomain}" />

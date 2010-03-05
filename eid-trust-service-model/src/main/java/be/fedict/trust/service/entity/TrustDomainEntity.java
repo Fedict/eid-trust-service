@@ -19,16 +19,13 @@
 package be.fedict.trust.service.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.ejb.TimerHandle;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -60,15 +57,13 @@ public class TrustDomainEntity implements Serializable {
 
 	private boolean defaultDomain = false;
 
+	private boolean useCaching;
+
 	// trust points
 	private List<TrustPointEntity> trustPoints;
 
 	// certificate constraints
 	private List<CertificateConstraintEntity> certificateConstraints;
-
-	private String crlRefreshCron;
-	private TimerHandle timerHandle;
-	private Date fireDate;
 
 	/**
 	 * Default constructor.
@@ -77,6 +72,7 @@ public class TrustDomainEntity implements Serializable {
 		super();
 		this.certificateConstraints = new LinkedList<CertificateConstraintEntity>();
 		this.trustPoints = new LinkedList<TrustPointEntity>();
+		this.useCaching = true;
 	}
 
 	/**
@@ -85,12 +81,12 @@ public class TrustDomainEntity implements Serializable {
 	 * @param name
 	 * @param crlRefreshCron
 	 */
-	public TrustDomainEntity(String name, String crlRefreshCron) {
+	public TrustDomainEntity(String name) {
 
 		this.name = name;
-		this.crlRefreshCron = crlRefreshCron;
 		this.certificateConstraints = new LinkedList<CertificateConstraintEntity>();
 		this.trustPoints = new LinkedList<TrustPointEntity>();
+		this.useCaching = true;
 	}
 
 	@Id
@@ -102,16 +98,6 @@ public class TrustDomainEntity implements Serializable {
 		this.name = name;
 	}
 
-	public String getCrlRefreshCron() {
-
-		return this.crlRefreshCron;
-	}
-
-	public void setCrlRefreshCron(String crlRefreshCron) {
-
-		this.crlRefreshCron = crlRefreshCron;
-	}
-
 	public boolean isDefaultDomain() {
 
 		return this.defaultDomain;
@@ -120,6 +106,16 @@ public class TrustDomainEntity implements Serializable {
 	public void setDefaultDomain(boolean defaultDomain) {
 
 		this.defaultDomain = defaultDomain;
+	}
+
+	public boolean isUseCaching() {
+
+		return this.useCaching;
+	}
+
+	public void setUseCaching(boolean useCaching) {
+
+		this.useCaching = useCaching;
 	}
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
@@ -143,26 +139,5 @@ public class TrustDomainEntity implements Serializable {
 	public void setTrustPoints(List<TrustPointEntity> trustPoints) {
 
 		this.trustPoints = trustPoints;
-	}
-
-	@Lob
-	public TimerHandle getTimerHandle() {
-
-		return this.timerHandle;
-	}
-
-	public void setTimerHandle(TimerHandle timerHandle) {
-
-		this.timerHandle = timerHandle;
-	}
-
-	public Date getFireDate() {
-
-		return this.fireDate;
-	}
-
-	public void setFireDate(Date fireDate) {
-
-		this.fireDate = fireDate;
 	}
 }

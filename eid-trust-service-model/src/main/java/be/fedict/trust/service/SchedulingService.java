@@ -23,7 +23,6 @@ import javax.ejb.Timer;
 
 import be.fedict.trust.service.bean.HarvesterMDB;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
-import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
@@ -45,20 +44,6 @@ public interface SchedulingService {
 	void timeOut(Timer timer);
 
 	/**
-	 * Start a new timer for the specified {@link TrustDomainEntity}.
-	 * 
-	 * If update is set to <code>false</code>, it will ignore a previously set
-	 * timer's fireDate
-	 * 
-	 * @param trustDomain
-	 * @param update
-	 * 
-	 * @throws InvalidCronExpressionException
-	 */
-	void startTimer(TrustDomainEntity trustDomain, boolean update)
-			throws InvalidCronExpressionException;
-
-	/**
 	 * Start a new timer for the specified {@link TrustPointEntity}.
 	 * 
 	 * If update is set to <code>false</code>, it will ignore a previously set
@@ -73,8 +58,7 @@ public interface SchedulingService {
 			throws InvalidCronExpressionException;
 
 	/**
-	 * Start a new timer for the specified
-	 * {@link ClockDriftConfigEntity}.
+	 * Start a new timer for the specified {@link ClockDriftConfigEntity}.
 	 * 
 	 * If update is set to <code>false</code>, it will ignore a previously set
 	 * timer's fireDate
