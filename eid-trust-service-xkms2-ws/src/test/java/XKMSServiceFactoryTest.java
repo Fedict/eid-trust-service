@@ -1,13 +1,6 @@
-import static org.junit.Assert.assertNotNull;
-
-import org.junit.Test;
-import org.w3._2002._03.xkms_wsdl.XKMSService;
-
-import be.fedict.trust.xkms2.XKMSServiceFactory;
-
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009-2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -22,6 +15,13 @@ import be.fedict.trust.xkms2.XKMSServiceFactory;
  * License along with this software; if not, see 
  * http://www.gnu.org/licenses/.
  */
+
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.Test;
+import org.w3._2002._03.xkms_wsdl.XKMSService;
+
+import be.fedict.trust.xkms2.XKMSServiceFactory;
 
 public class XKMSServiceFactoryTest {
 

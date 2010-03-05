@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009-2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -40,8 +40,7 @@ public class DNConstraintEntity extends CertificateConstraintEntity {
 	/**
 	 * Main constructor.
 	 */
-	public DNConstraintEntity(TrustDomainEntity trustDomain,
-			String dn) {
+	public DNConstraintEntity(TrustDomainEntity trustDomain, String dn) {
 
 		super(trustDomain);
 		this.dn = dn;

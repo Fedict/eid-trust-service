@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009-2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -17,7 +17,6 @@
  */
 
 package be.fedict.trust.client.exception;
-
 
 public class RevocationDataNotFoundException extends Exception {
 

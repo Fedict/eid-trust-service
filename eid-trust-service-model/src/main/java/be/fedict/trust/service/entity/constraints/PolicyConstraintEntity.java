@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009-2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -23,8 +23,7 @@ import javax.persistence.Entity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 
 @Entity
-public class PolicyConstraintEntity extends
-		CertificateConstraintEntity {
+public class PolicyConstraintEntity extends CertificateConstraintEntity {
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,8 +40,7 @@ public class PolicyConstraintEntity extends
 	/**
 	 * Main constructor.
 	 */
-	public PolicyConstraintEntity(
-			TrustDomainEntity trustDomain, String policy) {
+	public PolicyConstraintEntity(TrustDomainEntity trustDomain, String policy) {
 
 		super(trustDomain);
 		this.policy = policy;

@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009-2010 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -78,7 +78,6 @@ public interface ConfigurationDAO {
 	 *            maximum clock offset accepted, in ms
 	 * @return
 	 */
-	ClockDriftConfigEntity setClockDriftConfig(
-			TimeProtocol timeProtocol, String server, int timeout,
-			int maxClockOffset, String cron);
+	ClockDriftConfigEntity setClockDriftConfig(TimeProtocol timeProtocol,
+			String server, int timeout, int maxClockOffset, String cron);
 }
