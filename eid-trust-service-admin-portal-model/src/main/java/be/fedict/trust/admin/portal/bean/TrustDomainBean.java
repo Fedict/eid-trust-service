@@ -51,6 +51,7 @@ import org.richfaces.model.TreeNode;
 import org.richfaces.model.TreeNodeImpl;
 import org.richfaces.model.UploadItem;
 
+import be.fedict.trust.admin.portal.AdminConstants;
 import be.fedict.trust.admin.portal.TrustDomain;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -66,8 +67,9 @@ import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 @Stateful
-@Name("trustDomain")
-@LocalBinding(jndiBinding = "fedict/eid/trust/admin/portal/TrustDomainBean")
+@Name(AdminConstants.ADMIN_SEAM_PREFIX + "trustDomain")
+@LocalBinding(jndiBinding = AdminConstants.ADMIN_JNDI_CONTEXT
+		+ "TrustDomainBean")
 public class TrustDomainBean implements TrustDomain {
 
 	public static final String SELECTED_TRUST_DOMAIN = "selectedTrustDomain";

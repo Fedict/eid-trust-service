@@ -35,12 +35,14 @@ import org.jboss.seam.log.Log;
 
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 import be.fedict.trust.portal.CertificateValidator;
+import be.fedict.trust.portal.PortalConstants;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.ValidationResult;
 
 @Stateless
-@Name("certificateValidator")
-@LocalBinding(jndiBinding = "fedict/eid/trust/portal/CertificateValidatorBean")
+@Name(PortalConstants.PORTAL_SEAM_PREFIX + "certificateValidator")
+@LocalBinding(jndiBinding = PortalConstants.PORTAL_JNDI_CONTEXT
+		+ "CertificateValidatorBean")
 public class CertificateValidatorBean implements CertificateValidator {
 
 	@Logger

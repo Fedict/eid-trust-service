@@ -16,26 +16,26 @@
 
 						<h:outputLabel for="host" value="#{messages.proxyHost}" />
 						<s:decorate>
-							<h:inputText id="host" value="#{config.proxyHost}"
+							<h:inputText id="host" value="#{ts_config.proxyHost}"
 								required="true" />
 							<h:message for="host" styleClass="error" />
 						</s:decorate>
 
 						<h:outputLabel for="port" value="#{messages.proxyPort}" />
 						<s:decorate>
-							<h:inputText id="port" value="#{config.proxyPort}"
+							<h:inputText id="port" value="#{ts_config.proxyPort}"
 								required="true">
 							</h:inputText>
 							<h:message for="port" styleClass="error" />
 						</s:decorate>
 
 						<h:outputLabel for="enabled" value="#{messages.enabled}" />
-						<h:selectBooleanCheckbox value="#{config.enabled}" />
+						<h:selectBooleanCheckbox value="#{ts_config.enabled}" />
 
 						<f:facet name="footer">
 							<h:panelGroup style="display:block; text-align:center">
 								<h:commandButton id="submit" value="#{messages.save}"
-									action="#{config.saveNetworkConfig}" />
+									action="#{ts_config.saveNetworkConfig}" />
 							</h:panelGroup>
 						</f:facet>
 					</h:panelGrid>
@@ -52,7 +52,7 @@
 						<h:outputLabel for="protocol" value="#{messages.protocol}" />
 						<s:decorate>
 							<h:selectOneMenu id="protocol"
-								value="#{config.clockDriftProtocol}" required="true">
+								value="#{ts_config.clockDriftProtocol}" required="true">
 								<f:selectItems value="#{clockDriftProtocols}" />
 								<h:message for="protocol" styleClass="error" />
 							</h:selectOneMenu>
@@ -60,14 +60,14 @@
 
 						<h:outputLabel for="server" value="#{messages.server}" />
 						<s:decorate>
-							<h:inputText id="server" value="#{config.clockDriftServer}"
+							<h:inputText id="server" value="#{ts_config.clockDriftServer}"
 								required="true" />
 							<h:message for="server" styleClass="error" />
 						</s:decorate>
 
 						<h:outputLabel for="timeout" value="#{messages.timeout}" />
 						<s:decorate>
-							<h:inputText id="timeout" value="#{config.clockDriftTimeout}"
+							<h:inputText id="timeout" value="#{ts_config.clockDriftTimeout}"
 								required="true">
 							</h:inputText>
 							<h:message for="timeout" styleClass="error" />
@@ -75,7 +75,7 @@
 
 						<h:outputLabel for="maxClockOffset" value="#{messages.maxClockOffset}" />
 						<s:decorate>
-							<h:inputText id="maxClockOffset" value="#{config.clockDriftMaxClockOffset}"
+							<h:inputText id="maxClockOffset" value="#{ts_config.clockDriftMaxClockOffset}"
 								required="true">
 							</h:inputText>
 							<h:message for="maxClockOffset" styleClass="error" />
@@ -83,7 +83,7 @@
 
 						<h:outputLabel for="cron" value="#{messages.cron}" />
 						<s:decorate>
-							<h:inputText id="cron" value="#{config.clockDriftCron}"
+							<h:inputText id="cron" value="#{ts_config.clockDriftCron}"
 								required="true" />
 							<h:message for="cron" styleClass="error" />
 						</s:decorate>
@@ -91,7 +91,7 @@
 						<f:facet name="footer">
 							<h:panelGroup style="display:block; text-align:center">
 								<h:commandButton id="submit" value="#{messages.save}"
-									action="#{config.saveClockDriftConfig}" />
+									action="#{ts_config.saveClockDriftConfig}" />
 							</h:panelGroup>
 						</f:facet>
 					</h:panelGrid>

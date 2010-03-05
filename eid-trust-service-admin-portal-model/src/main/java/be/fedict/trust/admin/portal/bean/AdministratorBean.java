@@ -41,14 +41,16 @@ import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
 
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
+import be.fedict.trust.admin.portal.AdminConstants;
 import be.fedict.trust.admin.portal.Administrator;
 import be.fedict.trust.service.AdministratorService;
 import be.fedict.trust.service.entity.AdminEntity;
 import be.fedict.trust.service.exception.RemoveLastAdminException;
 
 @Stateful
-@Name("admin")
-@LocalBinding(jndiBinding = "fedict/eid/trust/admin/portal/AdministratorBean")
+@Name(AdminConstants.ADMIN_SEAM_PREFIX + "admin")
+@LocalBinding(jndiBinding = AdminConstants.ADMIN_JNDI_CONTEXT
+		+ "AdministratorBean")
 public class AdministratorBean implements Administrator {
 
 	private static final String ADMIN_LIST_NAME = "adminList";

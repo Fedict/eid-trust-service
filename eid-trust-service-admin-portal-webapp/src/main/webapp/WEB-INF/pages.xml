@@ -2,9 +2,9 @@
 <pages xmlns="http://jboss.com/products/seam/pages" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.0.xsd">
 	<page view-id="/register-results.xhtml">
-		<action execute="#{admin.register}" />
+		<action execute="#{ts_admin.register}" />
 	</page>
 	<page view-id="/trust-point-select.xhtml">
-		<action execute="#{trustDomain.initSelect}" />
+		<action execute="#{ts_trustDomain.initSelect}" />
 	</page>
 </pages>

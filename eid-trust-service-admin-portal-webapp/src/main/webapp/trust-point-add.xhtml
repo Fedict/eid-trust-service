@@ -15,19 +15,19 @@
 
 						<h:outputLabel for="cron" value="#{messages.crlRefresh}" />
 						<s:decorate>
-							<h:inputText id="cron" value="#{trustPoint.crlRefreshCron}" />
+							<h:inputText id="cron" value="#{ts_trustPoint.crlRefreshCron}" />
 							<h:message for="cron" styleClass="error" />
 						</s:decorate>
 
 						<h:outputLabel for="certificate" value="#{messages.certificate}" />
 
-						<rich:fileUpload fileUploadListener="#{trustPoint.uploadListener}"
+						<rich:fileUpload fileUploadListener="#{ts_trustPoint.uploadListener}"
 							maxFilesQuantity="1" id="upload" immediateUpload="true">
 						</rich:fileUpload>
 
 					</h:panelGrid>
 
-					<h:commandButton action="#{trustPoint.add}" id="addTrustPoint"
+					<h:commandButton action="#{ts_trustPoint.add}" id="addTrustPoint"
 						value="#{messages.add}" />
 					<h:commandButton action="back" id="back"
 						value="#{messages.back}" immediate="true" styleClass="submit" />

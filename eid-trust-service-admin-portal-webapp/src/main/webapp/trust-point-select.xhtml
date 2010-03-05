@@ -12,8 +12,8 @@
 
 				<h:form id="form">
 
-					<rich:listShuttle sourceValue="#{trustDomain.sourceTrustPoints}"
-						targetValue="#{trustDomain.selectedTrustPoints}" var="item"
+					<rich:listShuttle sourceValue="#{ts_trustDomain.sourceTrustPoints}"
+						targetValue="#{ts_trustDomain.selectedTrustPoints}" var="item"
 						sourceCaptionLabel="#{messages.trustPoints}" targetCaptionLabel="#{messages.selectedTrustPoints}">
 
 						<rich:column>
@@ -21,7 +21,7 @@
 						</rich:column>
 					</rich:listShuttle>
 
-					<h:commandButton action="#{trustDomain.saveSelect}"
+					<h:commandButton action="#{ts_trustDomain.saveSelect}"
 						id="save" value="#{messages.save}" />
 					<h:commandButton action="back" id="back"
 						value="#{messages.back}" immediate="true" styleClass="submit" />

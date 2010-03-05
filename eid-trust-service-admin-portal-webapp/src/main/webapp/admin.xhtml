@@ -18,14 +18,14 @@
 						</h:column>
 						<h:column>
 							<f:facet name="header">#{messages.remove}</f:facet>
-							<a4j:commandLink action="#{admin.select}"
+							<a4j:commandLink action="#{ts_admin.select}"
 								immediate="true" id="remove" value="#{messages.remove}"
 								onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
 						</h:column>
 						<h:column>
 							<f:facet name="header">#{messages.approve}</f:facet>
 							<h:commandLink id="register" value="#{messages.approve}"
-								action="#{admin.registerPending}" rendered="#{item.pending}" />
+								action="#{ts_admin.registerPending}" rendered="#{item.pending}" />
 						</h:column>
 						<f:facet name="footer">
 							<rich:datascroller for="data" pageIndexVar="pageIndex"
@@ -41,7 +41,7 @@
 								<h:panelGrid id="confirmPanel" columns="2" border="0"
 									styleClass="center">
 									<a4j:commandButton id="remove2" value="#{messages.remove}"
-										action="#{admin.remove}" immediate="true"
+										action="#{ts_admin.remove}" immediate="true"
 										oncomplete="Richfaces.hideModalPanel('removeConfirm');" />
 									<a4j:commandButton id="cancel" value="#{messages.cancel}"
 										onclick="Richfaces.hideModalPanel('removeConfirm');" />

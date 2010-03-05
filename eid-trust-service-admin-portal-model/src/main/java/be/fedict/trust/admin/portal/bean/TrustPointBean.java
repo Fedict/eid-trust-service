@@ -43,6 +43,7 @@ import org.jboss.seam.log.Log;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 
+import be.fedict.trust.admin.portal.AdminConstants;
 import be.fedict.trust.admin.portal.TrustPoint;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -51,8 +52,9 @@ import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 
 @Stateful
-@Name("trustPoint")
-@LocalBinding(jndiBinding = "fedict/eid/trust/admin/portal/TrustPointBean")
+@Name(AdminConstants.ADMIN_SEAM_PREFIX + "trustPoint")
+@LocalBinding(jndiBinding = AdminConstants.ADMIN_JNDI_CONTEXT
+		+ "TrustPointBean")
 public class TrustPointBean implements TrustPoint {
 
 	public static final String SELECTED_TRUST_POINT = "selectedTrustPoint";

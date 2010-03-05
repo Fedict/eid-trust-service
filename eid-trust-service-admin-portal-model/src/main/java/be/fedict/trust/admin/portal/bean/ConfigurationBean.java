@@ -21,8 +21,8 @@ package be.fedict.trust.admin.portal.bean;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.ejb.Init;
 import javax.ejb.Remove;
 import javax.ejb.Stateful;
 import javax.faces.model.SelectItem;
@@ -37,6 +37,7 @@ import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
 
+import be.fedict.trust.admin.portal.AdminConstants;
 import be.fedict.trust.admin.portal.Configuration;
 import be.fedict.trust.service.ConfigurationService;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
@@ -45,8 +46,9 @@ import be.fedict.trust.service.entity.TimeProtocol;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
 @Stateful
-@Name("config")
-@LocalBinding(jndiBinding = "fedict/eid/trust/admin/portal/ConfigurationBean")
+@Name(AdminConstants.ADMIN_SEAM_PREFIX + "config")
+@LocalBinding(jndiBinding = AdminConstants.ADMIN_JNDI_CONTEXT
+		+ "ConfigurationBean")
 public class ConfigurationBean implements Configuration {
 
 	@Logger
@@ -81,7 +83,7 @@ public class ConfigurationBean implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Init
+	@PostConstruct
 	public void initialize() {
 
 		this.log.debug("#initialize");
