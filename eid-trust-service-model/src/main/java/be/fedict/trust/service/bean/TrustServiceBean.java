@@ -174,18 +174,18 @@ public class TrustServiceBean implements TrustService {
 	private TrustValidator getTrustValidator(String trustDomainName,
 			boolean returnRevocationData) throws TrustDomainNotFoundException {
 
-		TrustLinker trustLinker = null;
-		if (!returnRevocationData) {
-			// if returnRevocationData set, don't use cached revocation data
-			trustLinker = new TrustServiceTrustLinker(this.entityManager,
-					this.queueConnectionFactory, this.queue);
-		}
-
 		TrustDomainEntity trustDomain;
 		if (null == trustDomainName)
 			trustDomain = this.trustDomainDAO.getDefaultTrustDomain();
 		else
 			trustDomain = this.trustDomainDAO.getTrustDomain(trustDomainName);
+
+		TrustLinker trustLinker = null;
+		if (!returnRevocationData && trustDomain.isUseCaching()) {
+			// if returnRevocationData set, don't use cached revocation data
+			trustLinker = new TrustServiceTrustLinker(this.entityManager,
+					this.queueConnectionFactory, this.queue);
+		}
 
 		return getTrustValidator(trustDomain, trustLinker, returnRevocationData);
 	}
