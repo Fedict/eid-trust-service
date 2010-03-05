@@ -22,8 +22,10 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -39,11 +41,11 @@ import org.apache.commons.lang.builder.ToStringStyle;
 @Table(name = "revoked_certificates")
 @NamedQueries( {
 		@NamedQuery(name = RevokedCertificateEntity.QUERY_WHERE_ISSUER_SERIAL, query = "SELECT rc FROM RevokedCertificateEntity "
-				+ "AS rc WHERE rc.pk.issuer = :issuer AND rc.pk.serialNumber = :serialNumber ORDER BY rc.crlNumber DESC"),
+				+ "AS rc WHERE rc.issuer = :issuer AND rc.serialNumber = :serialNumber ORDER BY rc.crlNumber DESC"),
 		@NamedQuery(name = RevokedCertificateEntity.QUERY_WHERE_ISSUER_CRL_NUMBER, query = "SELECT rc FROM RevokedCertificateEntity "
-				+ "AS rc WHERE rc.pk.issuer = :issuer AND rc.crlNumber = :crlNumber"),
+				+ "AS rc WHERE rc.issuer = :issuer AND rc.crlNumber = :crlNumber"),
 		@NamedQuery(name = RevokedCertificateEntity.DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER, query = "DELETE FROM RevokedCertificateEntity rc "
-				+ "WHERE rc.crlNumber < :crlNumber AND rc.pk.issuer = :issuer") })
+				+ "WHERE rc.crlNumber < :crlNumber AND rc.issuer = :issuer") })
 public class RevokedCertificateEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -52,30 +54,57 @@ public class RevokedCertificateEntity implements Serializable {
 	public static final String QUERY_WHERE_ISSUER_CRL_NUMBER = "rc.q.i.c";
 	public static final String DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER = "rc.d.i.old.c";
 
-	private RevokedCertificatePK pk;
+	private long id;
 
+	private String issuer;
+	private BigInteger serialNumber;
 	private Date revocationDate;
-
 	private BigInteger crlNumber;
 
 	public RevokedCertificateEntity() {
+
 		super();
 	}
 
-	public RevokedCertificateEntity(String issuerName, BigInteger serialNumber,
+	public RevokedCertificateEntity(String issuer, BigInteger serialNumber,
 			Date revocationDate, BigInteger crlNumber) {
-		this.pk = new RevokedCertificatePK(issuerName, serialNumber, crlNumber);
+
+		this.issuer = issuer;
+		this.serialNumber = serialNumber;
 		this.revocationDate = revocationDate;
 		this.crlNumber = crlNumber;
 	}
 
-	@EmbeddedId
-	public RevokedCertificatePK getPk() {
-		return this.pk;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	public long getId() {
+
+		return this.id;
 	}
 
-	public void setPk(RevokedCertificatePK pk) {
-		this.pk = pk;
+	public void setId(long id) {
+
+		this.id = id;
+	}
+
+	public String getIssuer() {
+
+		return this.issuer;
+	}
+
+	public void setIssuer(String issuer) {
+
+		this.issuer = issuer;
+	}
+
+	public BigInteger getSerialNumber() {
+
+		return this.serialNumber;
+	}
+
+	public void setSerialNumber(BigInteger serialNumber) {
+
+		this.serialNumber = serialNumber;
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -108,22 +137,23 @@ public class RevokedCertificateEntity implements Serializable {
 			return false;
 		}
 		RevokedCertificateEntity rhs = (RevokedCertificateEntity) obj;
-		return new EqualsBuilder().append(this.pk, rhs.pk).isEquals();
+		return new EqualsBuilder().append(this.id, rhs.id).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 
-		return new HashCodeBuilder().append(pk).toHashCode();
+		return new HashCodeBuilder().append(this.id).toHashCode();
 	}
 
 	@Override
 	public String toString() {
 
 		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-				.append("pk", this.pk).append("revocationDate",
+				.append("id", this.id).append("issuer", this.issuer).append(
+						"serialNumber", this.serialNumber).append("crlNumber",
+						this.crlNumber).append("revocationDate",
 						this.revocationDate)
 				.append("crlNumber", this.crlNumber).toString();
 	}
-
 }

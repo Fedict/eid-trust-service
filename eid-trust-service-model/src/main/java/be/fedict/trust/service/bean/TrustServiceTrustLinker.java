@@ -182,7 +182,7 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		Query query = this.entityManager
 				.createNamedQuery(RevokedCertificateEntity.QUERY_WHERE_ISSUER_SERIAL);
 		query.setParameter("issuer", issuer);
-		query.setParameter("serialNumber", serialNumber.toString());
+		query.setParameter("serialNumber", serialNumber);
 		List<RevokedCertificateEntity> revokedCertificates = (List<RevokedCertificateEntity>) query
 				.getResultList();
 		if (revokedCertificates.isEmpty()) {

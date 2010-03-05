@@ -18,14 +18,17 @@
 
 package test.unit.be.fedict.trust.service;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +39,6 @@ import org.junit.Test;
 
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
-import be.fedict.trust.service.entity.RevokedCertificatePK;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
@@ -96,6 +98,7 @@ public class PersistenceTest {
 		this.entityManager.close();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testFindRevokedCertificate() throws Exception {
 		// setup
@@ -115,11 +118,15 @@ public class PersistenceTest {
 		entityTransaction.begin();
 
 		// operate
-		RevokedCertificateEntity resultRevokedCertificateEntity = this.entityManager
-				.find(RevokedCertificateEntity.class, new RevokedCertificatePK(
-						issuerName, serialNumber, crlNumber));
+		Query query = this.entityManager
+				.createNamedQuery(RevokedCertificateEntity.QUERY_WHERE_ISSUER_SERIAL);
+		query.setParameter("issuer", issuerName);
+		query.setParameter("serialNumber", serialNumber);
+		List<RevokedCertificateEntity> resultRevokedCertificates = (List<RevokedCertificateEntity>) query
+				.getResultList();
 
 		// verify
-		assertNotNull(resultRevokedCertificateEntity);
+		assertNotNull(resultRevokedCertificates);
+		assertEquals(1, resultRevokedCertificates.size());
 	}
 }
