@@ -52,6 +52,7 @@ import be.fedict.trust.service.exception.RemoveLastAdminException;
 public class AdministratorBean implements Administrator {
 
 	private static final String ADMIN_LIST_NAME = "adminList";
+	private static final String SELECTED_ADMIN = "selectedAdmin";
 
 	@Logger
 	private Log log;
@@ -70,8 +71,8 @@ public class AdministratorBean implements Administrator {
 	private List<AdminEntity> adminList;
 
 	@DataModelSelection(ADMIN_LIST_NAME)
-	@Out(value = "selectedAdmin", required = false, scope = ScopeType.SESSION)
-	@In(required = false)
+	@In(value = SELECTED_ADMIN, required = false)
+	@Out(value = SELECTED_ADMIN, required = false, scope = ScopeType.SESSION)
 	private AdminEntity selectedAdmin;
 
 	/**
@@ -82,7 +83,6 @@ public class AdministratorBean implements Administrator {
 	public void destroyCallback() {
 
 		this.log.debug("#destroy");
-		this.selectedAdmin = null;
 	}
 
 	/**
@@ -106,6 +106,25 @@ public class AdministratorBean implements Administrator {
 				.get(IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE);
 
 		this.selectedAdmin = this.administratorService.register(authnCert);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String registerPending() {
+
+		this.log.debug("register pending admin");
+		this.administratorService.register(this.selectedAdmin);
+		adminListFactory();
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void select() {
+
+		this.log.debug("selected admin: #0", this.selectedAdmin);
 	}
 
 	/**

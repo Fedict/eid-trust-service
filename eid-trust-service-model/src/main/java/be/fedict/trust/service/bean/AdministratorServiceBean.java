@@ -66,11 +66,23 @@ public class AdministratorServiceBean implements AdministratorService {
 		LOG.debug("register");
 
 		if (null == this.administratorDAO.findAdmin(authnCert.getPublicKey())) {
-			return this.administratorDAO.addAdmin(authnCert);
+			return this.administratorDAO.addAdmin(authnCert, false);
 		}
 
 		LOG.error("failed to register administrator");
 		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void register(AdminEntity admin) {
+
+		LOG.debug("register pending admin");
+		AdminEntity attachedAdminEntity = this.administratorDAO
+				.attachAdmin(admin);
+		attachedAdminEntity.setPending(false);
 	}
 
 	/**

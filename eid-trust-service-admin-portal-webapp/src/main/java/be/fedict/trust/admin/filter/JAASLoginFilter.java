@@ -66,6 +66,7 @@ public class JAASLoginFilter implements Filter {
 
 	public static final String LOGIN_PATH_PARAM = "LoginPath";
 	public static final String MAIN_PATH_PARAM = "MainPath";
+	public static final String REGISTER_PATH_PARAM = "RegisterPath";
 
 	/**
 	 * The default JAAS login context is 'client-login'. This is what JBoss AS
@@ -77,6 +78,7 @@ public class JAASLoginFilter implements Filter {
 
 	private String loginPath;
 	private String mainPath;
+	private String registerPath;
 
 	@EJB
 	private AdminAuthorizationService adminAuthorizationService;
@@ -90,6 +92,8 @@ public class JAASLoginFilter implements Filter {
 		LOG.debug("LoginPath: " + this.loginPath);
 		this.mainPath = getInitParameter(config, MAIN_PATH_PARAM, null);
 		LOG.debug("MainPath: " + this.mainPath);
+		this.registerPath = getInitParameter(config, REGISTER_PATH_PARAM, null);
+		LOG.debug("RegisterPath: " + this.registerPath);
 	}
 
 	private String getInitParameter(FilterConfig config, String param,
@@ -134,23 +138,24 @@ public class JAASLoginFilter implements Filter {
 
 		if (null == userId && null == authnCertificate) {
 			LOG.debug("not authenticated yet");
-			String requestPath = request.getContextPath()
-					+ request.getServletPath();
+			String requestPath = request.getServletPath();
 			if (null != this.mainPath && !this.loginPath.equals(requestPath)
-					&& !this.mainPath.equals(requestPath)) {
+					&& !this.mainPath.equals(requestPath)
+					&& !this.registerPath.equals(requestPath)) {
 				LOG.debug("redirect to " + this.mainPath + ", requestPath: "
 						+ requestPath);
-				response.sendRedirect(this.mainPath);
+				response.sendRedirect(request.getContextPath() + this.mainPath);
 				return false;
 			}
 			return true;
 		}
 
-		login(request, this.loginContextName);
-		return true;
+		return login(request, response, this.loginContextName);
 	}
 
-	private void login(HttpServletRequest request, String loginContextName) {
+	private boolean login(HttpServletRequest request,
+			HttpServletResponse response, String loginContextName)
+			throws IOException {
 
 		try {
 			String userId = (String) request.getSession().getAttribute(
@@ -166,6 +171,20 @@ public class JAASLoginFilter implements Filter {
 
 				userId = this.adminAuthorizationService.authenticate(authnCert);
 
+				if (null == userId) {
+					// pending admin generated, redirect
+					request.getSession().removeAttribute(AUTHN_CERT_ATTRIBUTE);
+					request
+							.getSession()
+							.removeAttribute(
+									IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE);
+
+					LOG.debug("redirect to: " + this.registerPath);
+					response.sendRedirect(request.getContextPath()
+							+ this.registerPath);
+					return false;
+				}
+
 				request.getSession().setAttribute(USERID_ATTRIBUTE, userId);
 				request.getSession().setAttribute(AUTHN_CERT_ATTRIBUTE,
 						authnCert);
@@ -180,10 +199,13 @@ public class JAASLoginFilter implements Filter {
 					+ " for " + request.getRequestURL());
 			loginContext.login();
 			request.setAttribute(JAAS_LOGIN_CONTEXT_ATTRIBUTE, loginContext);
+			return true;
 		} catch (LoginException e) {
 			LOG.error("login error: " + e.getMessage(), e);
+			return false;
 		} catch (CertificateEncodingException e) {
 			LOG.error("login error: " + e.getMessage(), e);
+			return false;
 		}
 	}
 

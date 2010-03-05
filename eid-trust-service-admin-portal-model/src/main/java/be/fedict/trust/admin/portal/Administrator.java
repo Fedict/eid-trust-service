@@ -42,6 +42,10 @@ public interface Administrator {
 	 */
 	void register();
 
+	String registerPending();
+
+	void select();
+
 	String remove();
 
 }

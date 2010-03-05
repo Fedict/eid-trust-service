@@ -50,6 +50,13 @@ public interface AdministratorService {
 	AdminEntity register(X509Certificate authnCert);
 
 	/**
+	 * Register the pending {@link AdminEntity}
+	 * 
+	 * @param admin
+	 */
+	void register(AdminEntity admin);
+
+	/**
 	 * Removes the selected administrator. If only 1 administrator remains,
 	 * throws {@link RemoveLastAdminException}.
 	 * 

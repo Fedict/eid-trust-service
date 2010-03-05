@@ -68,7 +68,7 @@ public class LogoutServlet extends HttpServlet {
 
 		LOG.debug("handle request");
 		request.getSession().invalidate();
-		response.sendRedirect(this.mainPath);
+		response.sendRedirect(request.getContextPath() + this.mainPath);
 	}
 
 }

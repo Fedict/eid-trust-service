@@ -21,7 +21,6 @@ package be.fedict.trust.service.dao.bean;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.UUID;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -80,12 +79,11 @@ public class AdministratorDAOBean implements AdministratorDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public AdminEntity addAdmin(X509Certificate authnCertificate) {
+	public AdminEntity addAdmin(X509Certificate authnCertificate,
+			boolean pending) {
 
-		LOG.debug("add admin");
-		AdminEntity admin = new AdminEntity(UUID.randomUUID().toString(),
-				authnCertificate.getSubjectX500Principal().toString(),
-				authnCertificate.getPublicKey());
+		LOG.debug("add admin pending=" + pending);
+		AdminEntity admin = new AdminEntity(authnCertificate, pending);
 		this.entityManager.persist(admin);
 		return admin;
 	}
@@ -99,5 +97,13 @@ public class AdministratorDAOBean implements AdministratorDAO {
 		AdminEntity attachedAdmin = this.entityManager.find(AdminEntity.class,
 				admin.getId());
 		this.entityManager.remove(attachedAdmin);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public AdminEntity attachAdmin(AdminEntity admin) {
+
+		return this.entityManager.find(AdminEntity.class, admin.getId());
 	}
 }

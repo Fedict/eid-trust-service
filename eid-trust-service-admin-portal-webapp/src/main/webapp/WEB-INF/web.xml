@@ -9,11 +9,15 @@
 		<filter-class>be.fedict.trust.admin.filter.JAASLoginFilter</filter-class>
 		<init-param>
 			<param-name>LoginPath</param-name>
-			<param-value>/eid-trust-service-admin-portal/login.seam</param-value>
+			<param-value>/login.seam</param-value>
 		</init-param>
 		<init-param>
 			<param-name>MainPath</param-name>
-			<param-value>/eid-trust-service-admin-portal/main.seam</param-value>
+			<param-value>/main.seam</param-value>
+		</init-param>
+		<init-param>
+			<param-name>RegisterPath</param-name>
+			<param-value>/register-pending.seam</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
@@ -27,7 +31,7 @@
 		<servlet-class>be.fedict.trust.admin.servlet.LogoutServlet</servlet-class>
 		<init-param>
 			<param-name>MainPath</param-name>
-			<param-value>/eid-trust-service-admin-portal/main.seam</param-value>
+			<param-value>/main.seam</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>

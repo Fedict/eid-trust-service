@@ -62,12 +62,19 @@ public class AdminAuthorizationServiceBean implements AdminAuthorizationService 
 			if (this.administratorDAO.listAdmins().isEmpty()) {
 				// register initial administrator
 				LOG.debug("register initial admin");
-				admin = this.administratorDAO.addAdmin(authnCert);
+				admin = this.administratorDAO.addAdmin(authnCert, false);
 				LOG.debug("initial admin: " + admin.getId());
 				return admin.getId();
+			} else {
+				// add pending administrator
+				LOG.debug("register pending admin");
+				this.administratorDAO.addAdmin(authnCert, true);
+				return null;
 			}
 		} else {
-			return admin.getId();
+			if (!admin.isPending()) {
+				return admin.getId();
+			}
 		}
 
 		LOG.error("administrator not found");

@@ -52,8 +52,10 @@ public interface AdministratorDAO {
 	 * Add new {@link AdminEntity}
 	 * 
 	 * @param authnCertificate
+	 * @param pending
+	 *            pending dministrator or not
 	 */
-	AdminEntity addAdmin(X509Certificate authnCertificate);
+	AdminEntity addAdmin(X509Certificate authnCertificate, boolean pending);
 
 	/**
 	 * Remove the specified {@link AdminEntity}.
@@ -61,4 +63,11 @@ public interface AdministratorDAO {
 	 * @param admin
 	 */
 	void removeAdmin(AdminEntity admin);
+
+	/**
+	 * Return the attached {@link AdminEntity}.
+	 * 
+	 * @param admin
+	 */
+	AdminEntity attachAdmin(AdminEntity admin);
 }

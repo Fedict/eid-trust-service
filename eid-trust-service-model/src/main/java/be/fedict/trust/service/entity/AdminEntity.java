@@ -22,8 +22,10 @@ import java.io.Serializable;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.UUID;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -47,6 +49,7 @@ public class AdminEntity implements Serializable {
 	private String id;
 	private String name;
 	private byte[] encodedPublicKey;
+	private boolean pending;
 
 	/**
 	 * Default constructor.
@@ -58,12 +61,15 @@ public class AdminEntity implements Serializable {
 	/**
 	 * Main constructor.
 	 * 
-	 * @param publicKey
+	 * @param authnCertificate
+	 * @param pending
 	 */
-	public AdminEntity(String id, String name, PublicKey publicKey) {
-		this.id = id;
-		this.name = name;
-		this.encodedPublicKey = publicKey.getEncoded();
+	public AdminEntity(X509Certificate authnCertificate, boolean pending) {
+
+		this.id = UUID.randomUUID().toString();
+		this.name = authnCertificate.getSubjectX500Principal().toString();
+		this.encodedPublicKey = authnCertificate.getPublicKey().getEncoded();
+		this.pending = pending;
 	}
 
 	@Id
@@ -81,6 +87,16 @@ public class AdminEntity implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public boolean isPending() {
+
+		return this.pending;
+	}
+
+	public void setPending(boolean pending) {
+
+		this.pending = pending;
 	}
 
 	@Lob
