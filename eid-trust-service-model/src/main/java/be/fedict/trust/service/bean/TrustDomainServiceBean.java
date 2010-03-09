@@ -34,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.SecurityDomain;
 
 import be.fedict.trust.service.SchedulingService;
-import be.fedict.trust.service.TimerInfo;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
@@ -174,7 +173,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		LOG.debug("remove trust point: " + trustPoint.getName());
 
 		// remove timers
-		this.schedulingService.cancelTimers(new TimerInfo(trustPoint));
+		this.schedulingService.cancelTimers(trustPoint.getName());
 
 		// remove CA's
 		this.certificateAuthorityDAO.removeCertificateAuthorities(trustPoint);

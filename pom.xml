@@ -27,6 +27,8 @@
 		<module>eid-trust-service-xkms2-ws</module>
 		<module>eid-trust-service-xkms2-ws-impl</module>
 		<module>eid-trust-service-ws</module>
+		<module>eid-trust-service-entity</module>
+		<module>eid-trust-service-sql-ddl</module>
 		<module>eid-trust-service-model</module>
 		<module>eid-trust-service-portal-model</module>
 		<module>eid-trust-service-portal-webapp</module>
@@ -35,6 +37,7 @@
 		<module>eid-trust-service-deploy</module>
 		<module>eid-trust-service-client</module>
 		<module>eid-trust-service-startup-runtime</module>
+		<module>eid-trust-service-mysql-distribution</module>
 	</modules>
 	<profiles>
 		<profile>
@@ -87,9 +90,30 @@
 				<artifactId>commons-net</artifactId>
 				<version>1.4.1</version>
 			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-tools</artifactId>
+				<version>3.2.4.GA</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>1.5.8</version>
+			</dependency>
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>5.1.5</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
 	<properties>
 		<eid-applet.version>1.0.1-SNAPSHOT</eid-applet.version>
+		<trust-service.data.source.user>trust
+		</trust-service.data.source.user>
+		<trust-service.data.source.pass>trust
+		</trust-service.data.source.pass>
 	</properties>
+
 </project>

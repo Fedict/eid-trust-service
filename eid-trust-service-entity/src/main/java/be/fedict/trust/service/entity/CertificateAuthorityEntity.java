@@ -28,6 +28,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -122,6 +123,7 @@ public class CertificateAuthorityEntity implements Serializable {
 	}
 
 	@Lob
+	@Column(length = 4 * 1024)
 	@Basic(fetch = FetchType.LAZY)
 	public byte[] getEncodedCertificate() {
 		return this.encodedCertificate;

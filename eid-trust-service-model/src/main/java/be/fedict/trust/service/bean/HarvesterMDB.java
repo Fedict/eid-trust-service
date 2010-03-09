@@ -56,7 +56,7 @@ import be.fedict.trust.service.entity.Status;
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
 		@ActivationConfigProperty(propertyName = "destination", propertyValue = HarvesterMDB.HARVESTER_QUEUE_NAME),
-		@ActivationConfigProperty(propertyName = "transactionTimeout", propertyValue = "600") })
+		@ActivationConfigProperty(propertyName = "transactionTimeout", propertyValue = "1200") })
 public class HarvesterMDB implements MessageListener {
 
 	private static final Log LOG = LogFactory.getLog(HarvesterMDB.class);

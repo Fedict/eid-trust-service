@@ -7,12 +7,12 @@
 		<artifactId>eid-trust-service</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<name>FedICT eID Trust Service Model</name>
-	<description>EJB3 Model for eID Trust Service</description>
+	<name>FedICT eID Trust Service Entities</name>
+	<description>EJB3 Entities for eID Trust Service</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
-	<artifactId>eid-trust-service-model</artifactId>
+	<artifactId>eid-trust-service-entity</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<packaging>ejb</packaging>
+	<packaging>jar</packaging>
 	<build>
 		<plugins>
 			<plugin>
@@ -23,48 +23,9 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-ejb-plugin</artifactId>
-				<configuration>
-					<ejbVersion>3.0</ejbVersion>
-					<generateClient>true</generateClient>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
-		<dependency>
-			<groupId>be.fedict.eid-trust-service</groupId>
-			<artifactId>eid-trust-service-entity</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>be.fedict.eid-applet</groupId>
-			<artifactId>eid-applet-service-spi</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>be.fedict</groupId>
-			<artifactId>jtrust</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>quartz</groupId>
-			<artifactId>quartz</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bctsp-jdk16</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-net</groupId>
-			<artifactId>commons-net</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging-api</artifactId>
@@ -78,14 +39,6 @@
 			<artifactId>jboss-ejb3-ext-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.security</groupId>
-			<artifactId>jacc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
 		</dependency>
@@ -94,12 +47,8 @@
 			<artifactId>hibernate-annotations</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.jms</groupId>
-			<artifactId>jms</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

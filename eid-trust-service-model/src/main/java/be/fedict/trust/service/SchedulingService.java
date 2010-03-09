@@ -72,9 +72,11 @@ public interface SchedulingService {
 			boolean update) throws InvalidCronExpressionException;
 
 	/**
-	 * Cancel running {@link Timer}'s for the specified {@link TimerInfo}.
+	 * Cancel running {@link Timer}'s for the specified timer info. This is or
+	 * the {@link TrustPointEntity}'s name, or {@value
+	 * TrustServiceConstants.CLOCK_DRIFT_TIMER}
 	 * 
 	 * @param timerInfo
 	 */
-	void cancelTimers(TimerInfo timerInfo);
+	void cancelTimers(String timerInfo);
 }

@@ -43,7 +43,7 @@ import org.quartz.CronTrigger;
 
 import be.fedict.trust.service.ClockDriftService;
 import be.fedict.trust.service.SchedulingService;
-import be.fedict.trust.service.TimerInfo;
+import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
@@ -90,25 +90,18 @@ public class SchedulingServiceBean implements SchedulingService {
 	@Timeout
 	public void timeOut(Timer timer) {
 
-		TimerInfo timerInfo = (TimerInfo) timer.getInfo();
+		String timerInfo = (String) timer.getInfo();
 		if (null == timerInfo) {
 			LOG.error("no timer info ?? cancel timer");
 			timer.cancel();
 			return;
 		}
 
-		LOG.debug("scheduler timeout for: " + timerInfo.getType() + " name="
-				+ timerInfo.getName());
-
-		switch (timerInfo.getType()) {
-		case TRUST_POINT: {
-			handleTrustPointTimeout(timerInfo.getName(), timer);
-			break;
-		}
-		case CLOCK_DRIFT: {
+		LOG.debug("scheduler timeout for: " + timerInfo);
+		if (timerInfo.equals(TrustServiceConstants.CLOCK_DRIFT_TIMER)) {
 			handleClockDriftTimeout(timer);
-			break;
-		}
+		} else {
+			handleTrustPointTimeout(timerInfo, timer);
 		}
 	}
 
@@ -193,10 +186,10 @@ public class SchedulingServiceBean implements SchedulingService {
 				clockDriftConfig.getFireDate());
 
 		// remove old timers
-		cancelTimers(new TimerInfo(clockDriftConfig));
+		cancelTimers(TrustServiceConstants.CLOCK_DRIFT_TIMER);
 
-		Timer timer = this.timerService.createTimer(fireDate, new TimerInfo(
-				clockDriftConfig));
+		Timer timer = this.timerService.createTimer(fireDate,
+				TrustServiceConstants.CLOCK_DRIFT_TIMER);
 		LOG.debug("created timer for clock drift at " + fireDate.toString());
 		clockDriftConfig.setFireDate(fireDate);
 		clockDriftConfig.setTimerHandle(timer.getHandle());
@@ -219,10 +212,10 @@ public class SchedulingServiceBean implements SchedulingService {
 				trustPoint.getFireDate());
 
 		// remove old timers
-		cancelTimers(new TimerInfo(trustPoint));
+		cancelTimers(trustPoint.getName());
 
-		Timer timer = this.timerService.createTimer(fireDate, new TimerInfo(
-				trustPoint));
+		Timer timer = this.timerService.createTimer(fireDate, trustPoint
+				.getName());
 		LOG.debug("created timer for " + trustPoint.getName() + " at "
 				+ fireDate.toString());
 		trustPoint.setFireDate(fireDate);
@@ -252,14 +245,14 @@ public class SchedulingServiceBean implements SchedulingService {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
-	public void cancelTimers(TimerInfo timerInfo) {
+	public void cancelTimers(String timerInfo) {
 
 		Collection<Timer> timers = this.timerService.getTimers();
 		for (Timer timer : timers) {
 			if (timer.getInfo() != null) {
-				if (((TimerInfo) timer.getInfo()).equals(timerInfo)) {
+				if (((String) timer.getInfo()).equals(timerInfo)) {
 					timer.cancel();
-					LOG.debug("cancel timer: " + timerInfo.toString());
+					LOG.debug("cancel timer: " + timerInfo);
 				}
 			}
 

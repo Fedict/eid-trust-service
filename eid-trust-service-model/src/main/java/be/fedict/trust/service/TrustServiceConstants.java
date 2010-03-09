@@ -31,6 +31,8 @@ public abstract class TrustServiceConstants {
 	public static final String ADMIN_SECURITY_DOMAIN = "trust-service-admin";
 	public static final String ADMIN_ROLE = "admin";
 
+	public static final String CLOCK_DRIFT_TIMER = "clock-drift-timer";
+
 	public static final String NETWORK_CONFIG = "network-config";
 	public static final String CLOCK_DRIFT_CONFIG = "clock-drift-config";
 	public static final String CLOCK_DRIFT_NTP_SERVER = "0.pool.ntp.org";

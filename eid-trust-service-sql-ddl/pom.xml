@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>be.fedict</groupId>
+		<artifactId>eid-trust-service</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<name>FedICT eID Trust Service SQL DDL</name>
+	<description>SQL DDL for eID Trust Service</description>
+	<groupId>be.fedict.eid-trust-service</groupId>
+	<artifactId>eid-trust-service-sql-ddl</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>filter</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sql-ddl</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<echo>Generating SQL DDL...</echo>
+								<path id="jpatoolslib">
+									<path refid="maven.compile.classpath" />
+									<path refid="maven.plugin.classpath" />
+									<pathelement location="${project.build.directory}/classes/resources" />
+								</path>
+								<taskdef classname="org.hibernate.tool.ant.HibernateToolTask"
+									name="hibernatetool" classpathref="jpatoolslib" />
+								<mkdir dir="${project.build.directory}/classes" />
+								<hibernatetool destdir="${project.build.directory}/classes">
+									<classpath>
+										<path refid="jpatoolslib" />
+									</classpath>
+									<!-- jpaconfiguration can directly use the PAR -->
+									<annotationconfiguration
+										configurationfile="${project.build.directory}/classes/resources/hsql-trust-service.cfg.xml" />
+									<hbm2ddl export="false" format="true"
+										outputfilename="hsql-trust-service-ddl.sql" />
+								</hibernatetool>
+								<hibernatetool destdir="${project.build.directory}/classes">
+									<classpath>
+										<path refid="jpatoolslib" />
+									</classpath>
+									<!-- jpaconfiguration can directly use the PAR -->
+									<annotationconfiguration
+										configurationfile="${project.build.directory}/classes/resources/mysql-trust-service.cfg.xml" />
+									<hbm2ddl export="false" format="true"
+										outputfilename="mysql-trust-service-ddl.sql" />
+								</hibernatetool>
+								<hibernatetool destdir="${project.build.directory}/classes">
+									<classpath>
+										<path refid="jpatoolslib" />
+									</classpath>
+									<!-- jpaconfiguration can directly use the PAR -->
+									<annotationconfiguration
+										configurationfile="${project.build.directory}/classes/resources/oracle-trust-service.cfg.xml" />
+									<hbm2ddl export="false" format="true"
+										outputfilename="oracle-trust-service-ddl.sql" />
+								</hibernatetool>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<!-- Specific Dependencies: linkID -->
+		<dependency>
+			<groupId>be.fedict.eid-trust-service</groupId>
+			<artifactId>eid-trust-service-entity</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<!-- Specific Dependencies: External -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<!--
+			<dependency> <groupId>org.jboss</groupId>
+			<artifactId>jboss-j2ee</artifactId> </dependency>
+		-->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-tools</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>changes-report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
+
+</project>
