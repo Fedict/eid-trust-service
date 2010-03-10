@@ -9,7 +9,7 @@
 		<meta http-equiv="expires" content="0" />
 		<meta http-equiv="cache-control" content="no-cache, no-store" />
 		<meta http-equiv="pragma" content="no-cache" />
-		<title>eID Trust Service</title>
+		<title>#{messages.title}</title>
 		<link rel="stylesheet" type="text/css"
 			href="#{facesContext.externalContext.requestContextPath}/style.css" />
 	</head>
@@ -21,7 +21,18 @@
 				<div id="ict">ict</div>
 				<div id="egov">e-gov</div>
 			</div>
-			<h1>eID Trust Service</h1>
+			<h1>#{messages.title}</h1>
+
+			<div id="language">
+				<h:form id="language_form">
+					<h:selectOneMenu value="#{localeSelector.localeString}">
+						<f:selectItems value="#{localeSelector.supportedLocales}" />
+					</h:selectOneMenu>
+					<h:commandLink action="#{localeSelector.select}"
+						value="#{messages.changeLanguage}" />
+				</h:form>
+			</div>
+
 		</div>
 
 		<f:view>
@@ -32,13 +43,13 @@
 							<c:when test="#{activeMenu == 'main'}">
 								<li class="selected">
 									<a
-										href="#{facesContext.externalContext.requestContextPath}/main.seam">Home</a>
+										href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
 								</li>
 							</c:when>
 							<c:otherwise>
 								<li>
 									<a
-										href="#{facesContext.externalContext.requestContextPath}/main.seam">Home</a>
+										href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
 								</li>
 							</c:otherwise>
 						</c:choose>
@@ -47,13 +58,13 @@
 							<c:when test="#{activeMenu == 'validate'}">
 								<li class="selected">
 									<a
-										href="#{facesContext.externalContext.requestContextPath}/validate.seam">Validate</a>
+										href="#{facesContext.externalContext.requestContextPath}/validate.seam">#{messages.validate}</a>
 								</li>
 							</c:when>
 							<c:otherwise>
 								<li>
 									<a
-										href="#{facesContext.externalContext.requestContextPath}/validate.seam">Validate</a>
+										href="#{facesContext.externalContext.requestContextPath}/validate.seam">#{messages.validate}</a>
 								</li>
 							</c:otherwise>
 						</c:choose>

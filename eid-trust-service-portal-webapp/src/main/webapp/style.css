@@ -50,6 +50,9 @@ h3 {
 	font-size: 10px;
 	padding-right: 10px;
 }
+#language {
+	float: right;
+}
 
 #header {
 	width: 700px;
