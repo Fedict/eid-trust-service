@@ -111,7 +111,7 @@ public interface TrustDomainService {
 	 * 
 	 * @param trustPoint
 	 */
-	void remove(TrustPointEntity trustPoint);
+	void removeTrustPoint(TrustPointEntity trustPoint);
 
 	/**
 	 * Finds the {@link TrustPointEntity} from the specified name. Returns

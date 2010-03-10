@@ -168,7 +168,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 * {@inheritDoc}
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void remove(TrustPointEntity trustPoint) {
+	public void removeTrustPoint(TrustPointEntity trustPoint) {
 
 		LOG.debug("remove trust point: " + trustPoint.getName());
 

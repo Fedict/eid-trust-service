@@ -142,6 +142,7 @@ public class TrustDomainBean implements TrustDomain {
 	public void destroyCallback() {
 
 		this.log.debug("#destroy");
+		this.name = null;
 		this.sourceTrustPoints = null;
 		this.selectedTrustPoints = null;
 		this.certificatePolicy = null;

@@ -1,7 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j">
+	xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:s="http://jboss.com/products/seam/taglib">
 	<body>
 		<ui:composition template="/WEB-INF/template.xhtml">
 			<ui:param name="activeMenu" value="trustpoint" />
@@ -55,10 +56,41 @@
 						</div>
 					</rich:modalPanel>
 
-					<h:commandButton action="add" id="add" value="#{messages.add}"
-						immediate="true" styleClass="submit" />
+					<!--
+						<p> <h:commandButton action="add" id="add" value="#{messages.add}"
+						immediate="true" styleClass="submit" /> </p>
+					-->
 
 					<h:messages styleClass="error" globalOnly="true" />
+
+				</h:form>
+
+				<h3>#{messages.addTrustPoint}</h3>
+
+				<h:form id="add_form" enctype="multipart/form-data">
+
+					<h:panelGrid id="panel" columns="2" border="0">
+
+						<h:outputLabel for="cron" value="#{messages.crlRefresh}" />
+						<s:decorate>
+							<h:inputText id="cron" value="#{ts_trustPoint.crlRefreshCron}" />
+							<h:message for="cron" styleClass="error" />
+						</s:decorate>
+
+						<h:outputLabel for="certificate" value="#{messages.certificate}" />
+
+						<rich:fileUpload fileUploadListener="#{ts_trustPoint.uploadListener}"
+							maxFilesQuantity="1" id="upload" immediateUpload="true">
+						</rich:fileUpload>
+
+					</h:panelGrid>
+
+					<h:commandButton action="#{ts_trustPoint.add}" id="addTrustPoint"
+						value="#{messages.add}" />
+					<h:commandButton action="back" id="back"
+						value="#{messages.back}" immediate="true" styleClass="submit" />
+
+					<h:messages globalOnly="true" styleClass="error" />
 
 				</h:form>
 

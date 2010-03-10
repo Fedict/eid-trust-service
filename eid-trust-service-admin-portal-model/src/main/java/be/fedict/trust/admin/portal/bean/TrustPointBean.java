@@ -132,7 +132,7 @@ public class TrustPointBean implements TrustPoint {
 
 		this.log.debug("remove trust point: #0", this.selectedTrustPoint
 				.getName());
-		this.trustDomainService.remove(this.selectedTrustPoint);
+		this.trustDomainService.removeTrustPoint(this.selectedTrustPoint);
 		trustPointListFactory();
 		if (null != this.selectedTrustDomain) {
 			return "success_trustdomain";
@@ -189,6 +189,9 @@ public class TrustPointBean implements TrustPoint {
 		try {
 			this.trustDomainService.addTrustPoint(this.crlRefreshCron,
 					this.certificateBytes);
+			this.crlRefreshCron = null;
+			this.certificateBytes = null;
+			trustPointListFactory();
 		} catch (CertificateException e) {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorX509Encoding");
