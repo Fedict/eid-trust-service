@@ -37,7 +37,6 @@ import javax.ejb.MessageDriven;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -155,24 +154,8 @@ public class HarvesterMDB implements MessageListener {
 			} else {
 				LOG.debug("no entries found, adding...");
 
-				for (X509CRLEntry revokedCertificate : revokedCertificates) {
-					X500Principal certificateIssuer = revokedCertificate
-							.getCertificateIssuer();
-					String issuerName;
-					if (null == certificateIssuer) {
-						issuerName = crl.getIssuerX500Principal().toString();
-					} else {
-						issuerName = certificateIssuer.toString();
-					}
-					BigInteger serialNumber = revokedCertificate
-							.getSerialNumber();
-					Date revocationDate = revokedCertificate
-							.getRevocationDate();
-
-					this.certificateAuthorityDAO
-							.addRevokedCertificate(issuerName, serialNumber,
-									revocationDate, crlNumber);
-				}
+				this.certificateAuthorityDAO.addRevokedCertificates(crl,
+						crlNumber);
 
 				if (null != crlNumber) {
 					this.certificateAuthorityDAO.removeOldRevokedCertificates(

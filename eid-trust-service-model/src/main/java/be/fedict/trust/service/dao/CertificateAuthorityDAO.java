@@ -19,6 +19,7 @@
 package be.fedict.trust.service.dao;
 
 import java.math.BigInteger;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
@@ -102,4 +103,6 @@ public interface CertificateAuthorityDAO {
 	 * @return # of {@link RevokedCertificateEntity}'s removed.
 	 */
 	int removeOldRevokedCertificates(BigInteger crlNumber, String issuerName);
+
+	void addRevokedCertificates(X509CRL crl, BigInteger crlNumber);
 }

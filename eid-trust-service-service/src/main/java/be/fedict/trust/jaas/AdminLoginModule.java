@@ -175,15 +175,16 @@ public class AdminLoginModule implements LoginModule {
 		}
 
 		// authenticate
-		String userId;
 		AdminAuthorizationService adminAuthorizationService = getAdminAuthorizationService();
-		userId = adminAuthorizationService.authenticate(authnCert);
+		String userId = adminAuthorizationService.authenticate(authnCert);
+		LOG.debug("userId = " + userId);
 
 		if (null == userId)
 			throw new FailedLoginException("Administrator not found");
 
 		String expectedUserId = nameCallback.getName();
-		if (userId != expectedUserId)
+		LOG.debug("expectedUserId = " + expectedUserId);
+		if (!userId.equals(expectedUserId))
 			throw new FailedLoginException("user ID not correct");
 
 		this.authenticatedPrincipal = new SimplePrincipal(nameCallback

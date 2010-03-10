@@ -20,6 +20,8 @@ package be.fedict.trust.service.dao.bean;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509CRL;
+import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
@@ -30,9 +32,11 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.ejb3.annotation.TransactionTimeout;
 
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
@@ -119,6 +123,30 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 				issuerName, serialNumber, revocationDate, crlNumber);
 		this.entityManager.persist(revokedCertificate);
 		return revokedCertificate;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	@TransactionTimeout(1200)
+	public void addRevokedCertificates(X509CRL crl, BigInteger crlNumber) {
+
+		for (X509CRLEntry revokedCertificate : crl.getRevokedCertificates()) {
+			X500Principal certificateIssuer = revokedCertificate
+					.getCertificateIssuer();
+			String issuerName;
+			if (null == certificateIssuer) {
+				issuerName = crl.getIssuerX500Principal().toString();
+			} else {
+				issuerName = certificateIssuer.toString();
+			}
+			BigInteger serialNumber = revokedCertificate.getSerialNumber();
+			Date revocationDate = revokedCertificate.getRevocationDate();
+
+			this.entityManager.persist(new RevokedCertificateEntity(issuerName,
+					serialNumber, revocationDate, crlNumber));
+		}
 	}
 
 	/**

@@ -130,7 +130,7 @@ public class InitializationServiceBean implements InitializationService {
 
 		if (null == rootCa.getTrustPoint()) {
 			TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
-					.addTrustPoint(null, rootCa);
+					.addTrustPoint(TrustServiceConstants.DEFAULT_CRON, rootCa);
 			rootCa.setTrustPoint(rootCaTrustPoint);
 		}
 		trustPoints.add(rootCa.getTrustPoint());
@@ -145,7 +145,7 @@ public class InitializationServiceBean implements InitializationService {
 
 		if (null == rootCa2.getTrustPoint()) {
 			TrustPointEntity rootCa2TrustPoint = this.trustDomainDAO
-					.addTrustPoint(null, rootCa2);
+					.addTrustPoint(TrustServiceConstants.DEFAULT_CRON, rootCa2);
 			rootCa2.setTrustPoint(rootCa2TrustPoint);
 		}
 		trustPoints.add(rootCa2.getTrustPoint());
@@ -175,19 +175,21 @@ public class InitializationServiceBean implements InitializationService {
 		trustDomain.setTrustPoints(trustPoints);
 
 		// initialize certificate constraints
-		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.DIGITAL_SIGNATURE, true);
-		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.NON_REPUDIATION, false);
+		if (trustDomain.getCertificateConstraints().isEmpty()) {
+			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+					KeyUsageType.DIGITAL_SIGNATURE, true);
+			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+					KeyUsageType.NON_REPUDIATION, false);
 
-		this.trustDomainDAO.addCertificatePolicy(trustDomain,
-				"2.16.56.1.1.1.2.2");
-		this.trustDomainDAO.addCertificatePolicy(trustDomain,
-				"2.16.56.1.1.1.7.2");
-		this.trustDomainDAO.addCertificatePolicy(trustDomain,
-				"2.16.56.9.1.1.2.2");
-		this.trustDomainDAO.addCertificatePolicy(trustDomain,
-				"2.16.56.9.1.1.7.2");
+			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+					"2.16.56.1.1.1.2.2");
+			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+					"2.16.56.1.1.1.7.2");
+			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+					"2.16.56.9.1.1.2.2");
+			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+					"2.16.56.9.1.1.7.2");
+		}
 	}
 
 	private void initBelgianEidNonRepudiationDomain(
@@ -203,22 +205,23 @@ public class InitializationServiceBean implements InitializationService {
 		trustDomain.setTrustPoints(trustPoints);
 
 		// initialize certificate constraints
-		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.DIGITAL_SIGNATURE, false);
-		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.NON_REPUDIATION, true);
+		if (trustDomain.getCertificateConstraints().isEmpty()) {
+			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+					KeyUsageType.DIGITAL_SIGNATURE, false);
+			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+					KeyUsageType.NON_REPUDIATION, true);
 
-		this.trustDomainDAO.addCertificatePolicy(trustDomain,
-				"2.16.56.1.1.1.2.1");
-		this.trustDomainDAO.addCertificatePolicy(trustDomain,
-				"2.16.56.1.1.1.7.1");
-		this.trustDomainDAO.addCertificatePolicy(trustDomain,
-				"2.16.56.9.1.1.2.1");
-		this.trustDomainDAO.addCertificatePolicy(trustDomain,
-				"2.16.56.9.1.1.7.1");
+			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+					"2.16.56.1.1.1.2.1");
+			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+					"2.16.56.1.1.1.7.1");
+			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+					"2.16.56.9.1.1.2.1");
+			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+					"2.16.56.9.1.1.7.1");
 
-		this.trustDomainDAO.addQCStatementsConstraint(trustDomain, true);
-
+			this.trustDomainDAO.addQCStatementsConstraint(trustDomain, true);
+		}
 	}
 
 	private void initBelgianEidNationalRegistryTrustDomain(
@@ -234,16 +237,18 @@ public class InitializationServiceBean implements InitializationService {
 		trustDomain.setTrustPoints(trustPoints);
 
 		// initialize certificate constraints
-		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.DIGITAL_SIGNATURE, true);
-		this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
-				KeyUsageType.NON_REPUDIATION, true);
+		if (trustDomain.getCertificateConstraints().isEmpty()) {
+			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+					KeyUsageType.DIGITAL_SIGNATURE, true);
+			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
+					KeyUsageType.NON_REPUDIATION, true);
 
-		this.trustDomainDAO
-				.addCertificatePolicy(trustDomain, "2.16.56.1.1.1.4");
+			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+					"2.16.56.1.1.1.4");
 
-		this.trustDomainDAO.addDNConstraint(trustDomain, "CN=RRN, O=RRN, C=BE");
-
+			this.trustDomainDAO.addDNConstraint(trustDomain,
+					"CN=RRN, O=RRN, C=BE");
+		}
 	}
 
 	private void initTrustPointScheduling(TrustPointEntity trustPoint) {

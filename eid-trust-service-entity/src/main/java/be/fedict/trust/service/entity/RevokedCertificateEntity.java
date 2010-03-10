@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -97,6 +98,7 @@ public class RevokedCertificateEntity implements Serializable {
 		this.issuer = issuer;
 	}
 
+	@Column(precision = 50)
 	public BigInteger getSerialNumber() {
 
 		return this.serialNumber;
@@ -116,6 +118,7 @@ public class RevokedCertificateEntity implements Serializable {
 		this.revocationDate = revocationDate;
 	}
 
+	@Column(precision = 50)
 	public BigInteger getCrlNumber() {
 		return this.crlNumber;
 	}
