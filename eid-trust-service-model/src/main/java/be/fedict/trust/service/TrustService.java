@@ -18,14 +18,15 @@
 
 package be.fedict.trust.service;
 
-import java.security.cert.X509CRL;
+import java.io.IOException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CRLException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
 import javax.ejb.Local;
-
-import org.bouncycastle.ocsp.OCSPResp;
 
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
@@ -72,9 +73,14 @@ public interface TrustService {
 	 * @param crls
 	 * 
 	 * @throws TrustDomainNotFoundException
+	 * @throws IOException
+	 * @throws CRLException
+	 * @throws NoSuchProviderException
+	 * @throws CertificateException
 	 */
 	ValidationResult validate(String trustDomain,
 			List<X509Certificate> certificateChain, Date validationDate,
-			List<OCSPResp> ocspResponses, List<X509CRL> crls)
-			throws TrustDomainNotFoundException;
+			List<byte[]> ocspResponses, List<byte[]> crls)
+			throws TrustDomainNotFoundException, CertificateException,
+			NoSuchProviderException, CRLException, IOException;
 }

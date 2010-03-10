@@ -20,10 +20,10 @@ package be.fedict.trust.xkms2;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,7 +38,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.ocsp.OCSPResp;
 import org.bouncycastle.util.encoders.Base64;
 import org.etsi.uri._01903.v1_3.CRLValuesType;
 import org.etsi.uri._01903.v1_3.EncapsulatedPKIDataType;
@@ -56,7 +55,6 @@ import org.w3._2002._03.xkms_.ValidateRequestType;
 import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
-import sun.security.x509.X509CRLImpl;
 import be.fedict.trust.CRLRevocationData;
 import be.fedict.trust.OCSPRevocationData;
 import be.fedict.trust.RevocationData;
@@ -144,57 +142,43 @@ public class XKMSPortImpl implements XKMSPortType {
 
 		// look if historical validation is active
 		Date validationDate = null;
-		List<OCSPResp> ocspResponses = new LinkedList<OCSPResp>();
-		List<X509CRL> crls = new LinkedList<X509CRL>();
+		List<byte[]> ocspResponses = new LinkedList<byte[]>();
+		List<byte[]> crls = new LinkedList<byte[]>();
 		if (null != body.getQueryKeyBinding().getTimeInstant()) {
-			try {
-				validationDate = getDate(body.getQueryKeyBinding()
-						.getTimeInstant().getTime());
-				for (MessageExtensionAbstractType messageExtension : body
-						.getMessageExtension()) {
-					if (messageExtension instanceof RevocationDataMessageExtensionType) {
-						RevocationDataMessageExtensionType revocationDataMessageExtension = (RevocationDataMessageExtensionType) messageExtension;
-						if (null == revocationDataMessageExtension
-								.getRevocationValues()) {
-							LOG.error("missing revocation values");
-							return createResultResponse(ResultMajorCode.SENDER,
-									ResultMinorCode.INCOMPLETE);
-						}
-						if (null != revocationDataMessageExtension
-								.getRevocationValues().getOCSPValues()) {
-							for (EncapsulatedPKIDataType ocspValue : revocationDataMessageExtension
-									.getRevocationValues().getOCSPValues()
-									.getEncapsulatedOCSPValue()) {
-								OCSPResp ocspResponse = new OCSPResp(Base64
-										.decode(ocspValue.getValue()));
-								ocspResponses.add(ocspResponse);
-							}
-						}
-						if (null != revocationDataMessageExtension
-								.getRevocationValues().getCRLValues()) {
-							for (EncapsulatedPKIDataType crlValue : revocationDataMessageExtension
-									.getRevocationValues().getCRLValues()
-									.getEncapsulatedCRLValue()) {
-								X509CRL crl = new X509CRLImpl(Base64
-										.decode(crlValue.getValue()));
-								crls.add(crl);
-							}
-						}
-					} else {
-						LOG.error("invalid message extension: "
-								+ messageExtension.getClass().toString());
+			validationDate = getDate(body.getQueryKeyBinding().getTimeInstant()
+					.getTime());
+			for (MessageExtensionAbstractType messageExtension : body
+					.getMessageExtension()) {
+				if (messageExtension instanceof RevocationDataMessageExtensionType) {
+					RevocationDataMessageExtensionType revocationDataMessageExtension = (RevocationDataMessageExtensionType) messageExtension;
+					if (null == revocationDataMessageExtension
+							.getRevocationValues()) {
+						LOG.error("missing revocation values");
 						return createResultResponse(ResultMajorCode.SENDER,
-								ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+								ResultMinorCode.INCOMPLETE);
 					}
+					if (null != revocationDataMessageExtension
+							.getRevocationValues().getOCSPValues()) {
+						for (EncapsulatedPKIDataType ocspValue : revocationDataMessageExtension
+								.getRevocationValues().getOCSPValues()
+								.getEncapsulatedOCSPValue()) {
+							ocspResponses.add(ocspValue.getValue());
+						}
+					}
+					if (null != revocationDataMessageExtension
+							.getRevocationValues().getCRLValues()) {
+						for (EncapsulatedPKIDataType crlValue : revocationDataMessageExtension
+								.getRevocationValues().getCRLValues()
+								.getEncapsulatedCRLValue()) {
+							crls.add(crlValue.getValue());
+						}
+					}
+				} else {
+					LOG.error("invalid message extension: "
+							+ messageExtension.getClass().toString());
+					return createResultResponse(ResultMajorCode.SENDER,
+							ResultMinorCode.MESSAGE_NOT_SUPPORTED);
 				}
-			} catch (CRLException e) {
-				LOG.error("CRLException: " + e.getMessage(), e);
-				return createResultResponse(ResultMajorCode.SENDER,
-						ResultMinorCode.MESSAGE_NOT_SUPPORTED);
-			} catch (IOException e) {
-				LOG.error("IOException: " + e.getMessage(), e);
-				return createResultResponse(ResultMajorCode.SENDER,
-						ResultMinorCode.MESSAGE_NOT_SUPPORTED);
 			}
 		}
 
@@ -211,6 +195,22 @@ public class XKMSPortImpl implements XKMSPortType {
 			LOG.error("invalid trust domain");
 			return createResultResponse(ResultMajorCode.SENDER,
 					ResultMinorCode.TRUST_DOMAIN_NOT_FOUND);
+		} catch (CRLException e) {
+			LOG.error("CRLException: " + e.getMessage(), e);
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+		} catch (IOException e) {
+			LOG.error("IOException: " + e.getMessage(), e);
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+		} catch (CertificateException e) {
+			LOG.error("CertificateException: " + e.getMessage(), e);
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+		} catch (NoSuchProviderException e) {
+			LOG.error("NoSuchProviderException: " + e.getMessage(), e);
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
 		}
 
 		// return the result

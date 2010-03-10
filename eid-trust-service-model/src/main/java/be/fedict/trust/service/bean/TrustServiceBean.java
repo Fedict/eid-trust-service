@@ -18,8 +18,11 @@
 
 package be.fedict.trust.service.bean;
 
+import java.io.IOException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CRLException;
 import java.security.cert.CertPathValidatorException;
-import java.security.cert.X509CRL;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
@@ -36,7 +39,6 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.ocsp.OCSPResp;
 
 import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.MemoryCertificateRepository;
@@ -135,12 +137,18 @@ public class TrustServiceBean implements TrustService {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @throws IOException
+	 * @throws CRLException
+	 * @throws NoSuchProviderException
+	 * @throws CertificateException
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public ValidationResult validate(String trustDomain,
 			List<X509Certificate> certificateChain, Date validationDate,
-			List<OCSPResp> ocspResponses, List<X509CRL> crls)
-			throws TrustDomainNotFoundException {
+			List<byte[]> ocspResponses, List<byte[]> crls)
+			throws TrustDomainNotFoundException, CertificateException,
+			NoSuchProviderException, CRLException, IOException {
 
 		LOG.debug("isValid: "
 				+ certificateChain.get(0).getSubjectX500Principal());
@@ -251,10 +259,15 @@ public class TrustServiceBean implements TrustService {
 	 * @param crls
 	 * 
 	 * @throws TrustDomainNotFoundException
+	 * @throws IOException
+	 * @throws CRLException
+	 * @throws NoSuchProviderException
+	 * @throws CertificateException
 	 */
 	private TrustValidator getTrustValidator(String trustDomainName,
-			List<OCSPResp> ocspResponses, List<X509CRL> crls)
-			throws TrustDomainNotFoundException {
+			List<byte[]> ocspResponses, List<byte[]> crls)
+			throws TrustDomainNotFoundException, IOException,
+			CertificateException, NoSuchProviderException, CRLException {
 
 		LOG
 				.debug("get trust validator using specified ocsp repsonses and crls");
