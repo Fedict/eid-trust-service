@@ -20,8 +20,10 @@ package be.fedict.trust.service;
 
 import javax.ejb.Local;
 import javax.ejb.Timer;
+import javax.jms.JMSException;
 
 import be.fedict.trust.service.bean.HarvesterMDB;
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
@@ -58,6 +60,14 @@ public interface SchedulingService {
 			throws InvalidCronExpressionException;
 
 	/**
+	 * Starts a new timer for the specified {@link TrustPointEntity}
+	 * immediately.
+	 * 
+	 * @param trustPoint
+	 */
+	void startTimerNow(TrustPointEntity trustPoint);
+
+	/**
 	 * Start a new timer for the specified {@link ClockDriftConfigEntity}.
 	 * 
 	 * If update is set to <code>false</code>, it will ignore a previously set
@@ -79,4 +89,13 @@ public interface SchedulingService {
 	 * @param timerInfo
 	 */
 	void cancelTimers(String timerInfo);
+
+	/**
+	 * Refresh the revocation cache of the specified
+	 * {@link CertificateAuthorityEntity} immediately.
+	 * 
+	 * @param ca
+	 * @throws JMSException
+	 */
+	void refreshCA(CertificateAuthorityEntity ca) throws JMSException;
 }

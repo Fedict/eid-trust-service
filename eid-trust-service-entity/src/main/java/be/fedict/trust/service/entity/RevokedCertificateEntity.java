@@ -43,8 +43,8 @@ import org.apache.commons.lang.builder.ToStringStyle;
 @NamedQueries( {
 		@NamedQuery(name = RevokedCertificateEntity.QUERY_WHERE_ISSUER_SERIAL, query = "SELECT rc FROM RevokedCertificateEntity "
 				+ "AS rc WHERE rc.issuer = :issuer AND rc.serialNumber = :serialNumber ORDER BY rc.crlNumber DESC"),
-		@NamedQuery(name = RevokedCertificateEntity.QUERY_WHERE_ISSUER_CRL_NUMBER, query = "SELECT rc FROM RevokedCertificateEntity "
-				+ "AS rc WHERE rc.issuer = :issuer AND rc.crlNumber = :crlNumber"),
+		@NamedQuery(name = RevokedCertificateEntity.QUERY_COUNT_WHERE_ISSUER_CRL_NUMBER, query = "SELECT COUNT(rc) "
+				+ "FROM RevokedCertificateEntity AS rc WHERE rc.issuer = :issuer AND rc.crlNumber = :crlNumber"),
 		@NamedQuery(name = RevokedCertificateEntity.DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER, query = "DELETE FROM RevokedCertificateEntity rc "
 				+ "WHERE rc.crlNumber < :crlNumber AND rc.issuer = :issuer") })
 public class RevokedCertificateEntity implements Serializable {
@@ -52,7 +52,7 @@ public class RevokedCertificateEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public static final String QUERY_WHERE_ISSUER_SERIAL = "rc.q.i.s";
-	public static final String QUERY_WHERE_ISSUER_CRL_NUMBER = "rc.q.i.c";
+	public static final String QUERY_COUNT_WHERE_ISSUER_CRL_NUMBER = "rc.q.c.i.c";
 	public static final String DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER = "rc.d.i.old.c";
 
 	private long id;

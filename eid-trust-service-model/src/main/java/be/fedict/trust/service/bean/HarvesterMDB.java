@@ -27,7 +27,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -49,7 +48,6 @@ import be.fedict.trust.crl.OnlineCrlRepository;
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
-import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.Status;
 
 @MessageDriven(activationConfig = {
@@ -143,14 +141,16 @@ public class HarvesterMDB implements MessageListener {
 		if (null != revokedCertificates) {
 			LOG.debug("found " + revokedCertificates.size() + " crl entries");
 
-			boolean entriesFound = false;
+			long entriesFound = 0;
 			if (null != crlNumber) {
-				entriesFound = entriesFound(crlNumber, crl
-						.getIssuerX500Principal().toString());
+				entriesFound = this.certificateAuthorityDAO
+						.countRevokedCertificates(crlNumber, crl
+								.getIssuerX500Principal().toString());
 			}
 
-			if (entriesFound) {
-				LOG.debug("entries already added, skipping...");
+			if (entriesFound > 0) {
+				LOG.debug("entries already added, skipping... (#="
+						+ entriesFound + ")");
 			} else {
 				LOG.debug("no entries found, adding...");
 
@@ -171,15 +171,6 @@ public class HarvesterMDB implements MessageListener {
 		certificateAuthority.setThisUpdate(crl.getThisUpdate());
 		certificateAuthority.setNextUpdate(crl.getNextUpdate());
 		LOG.debug("cache activated for CA: " + crl.getIssuerX500Principal());
-	}
-
-	private boolean entriesFound(BigInteger crlNumber, String issuerName) {
-		LOG.debug("find existing CRL entries in the cache with crlNumber="
-				+ crlNumber);
-
-		List<RevokedCertificateEntity> revokedCertificates = this.certificateAuthorityDAO
-				.listRevokedCertificates(crlNumber, issuerName);
-		return !revokedCertificates.isEmpty();
 	}
 
 	private BigInteger getCrlNumber(X509CRL crl) {

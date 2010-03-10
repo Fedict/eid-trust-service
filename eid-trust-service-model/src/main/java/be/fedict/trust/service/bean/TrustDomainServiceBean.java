@@ -28,6 +28,7 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.jms.JMSException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -419,6 +420,39 @@ public class TrustDomainServiceBean implements TrustDomainService {
 				.findCertificateConstraint(qcConstraint);
 		attachedQcStatementsConstraint.setQcComplianceFilter(qcConstraint
 				.getQcComplianceFilter());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void refreshTrustPointCache(TrustPointEntity trustPoint) {
+
+		LOG.debug("refresh trust point revocation cache: "
+				+ trustPoint.getName());
+		this.schedulingService.startTimerNow(trustPoint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public List<CertificateAuthorityEntity> listTrustPointCAs(
+			TrustPointEntity trustPoint) {
+
+		LOG.debug("list CA's for trust point: " + trustPoint.getName());
+		return this.trustDomainDAO.listCertificateAuthorities(trustPoint);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void refreshCACache(CertificateAuthorityEntity ca)
+			throws JMSException {
+
+		LOG.debug("refresh CA revocation cache: " + ca.getName());
+		this.schedulingService.refreshCA(ca);
 	}
 
 }

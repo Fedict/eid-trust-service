@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.ejb.Local;
 import javax.ejb.Timer;
+import javax.jms.JMSException;
 
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -55,6 +56,15 @@ public interface TrustDomainService {
 	 * List all {@link TrustPointEntity}'s.
 	 */
 	List<TrustPointEntity> listTrustPoints();
+
+	/**
+	 * List all {@link CertificateAuthorityEntity}'s related to the specified
+	 * {@link TrustPointEntity}.
+	 * 
+	 * @param trustPoint
+	 */
+	List<CertificateAuthorityEntity> listTrustPointCAs(
+			TrustPointEntity trustPoint);
 
 	/**
 	 * List all {@link TrustPointEntity}'s for the specified
@@ -226,4 +236,20 @@ public interface TrustDomainService {
 	 */
 	void removeTrustDomain(TrustDomainEntity trustDomain);
 
+	/**
+	 * Refresh the specified {@link TrustPointEntity}'s revocation cache
+	 * immediately.
+	 * 
+	 * @param trustPoint
+	 */
+	void refreshTrustPointCache(TrustPointEntity trustPoint);
+
+	/**
+	 * Refresh the specified {@link CertificateAuthorityEntity}'s revocation
+	 * cache immediately.
+	 * 
+	 * @param ca
+	 * @throws JMSException
+	 */
+	void refreshCACache(CertificateAuthorityEntity ca) throws JMSException;
 }

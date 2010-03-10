@@ -24,7 +24,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -152,24 +151,22 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public List<RevokedCertificateEntity> listRevokedCertificates(
-			BigInteger crlNumber, String issuerName) {
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public long countRevokedCertificates(BigInteger crlNumber, String issuerName) {
 
-		LOG.debug("list revoked certificates for crl number " + crlNumber
+		LOG.debug("count revoked certificates for crl number " + crlNumber
 				+ " issuer " + issuerName);
 		Query query = this.entityManager
-				.createNamedQuery(RevokedCertificateEntity.QUERY_WHERE_ISSUER_CRL_NUMBER);
+				.createNamedQuery(RevokedCertificateEntity.QUERY_COUNT_WHERE_ISSUER_CRL_NUMBER);
 		query.setParameter("issuer", issuerName);
 		query.setParameter("crlNumber", crlNumber);
-		return (List<RevokedCertificateEntity>) query.getResultList();
+		return (Long) query.getSingleResult();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public int removeOldRevokedCertificates(BigInteger crlNumber,
 			String issuerName) {
 

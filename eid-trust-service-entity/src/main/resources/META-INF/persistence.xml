@@ -4,9 +4,5 @@
 	version="1.0">
 	<persistence-unit name="trust">
 		<jta-data-source>java:/DefaultDS</jta-data-source>
-		<!--
-			<properties> <property name="hibernate.hbm2ddl.auto"
-			value="create-drop" /> </properties>
-		-->
 	</persistence-unit>
 </persistence>

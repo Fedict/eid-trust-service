@@ -200,6 +200,7 @@ public class SchedulingServiceBean implements SchedulingService {
 	 */
 	public void startTimer(TrustPointEntity trustPoint, boolean update)
 			throws InvalidCronExpressionException {
+
 		LOG.debug("start timer for " + trustPoint.getName());
 
 		if (null == trustPoint.getCrlRefreshCron()) {
@@ -210,6 +211,20 @@ public class SchedulingServiceBean implements SchedulingService {
 
 		Date fireDate = getFireDate(trustPoint.getCrlRefreshCron(), update,
 				trustPoint.getFireDate());
+
+		startTimer(trustPoint, fireDate);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void startTimerNow(TrustPointEntity trustPoint) {
+
+		Date fireDate = new Date(new Date().getTime() + (1000 * 10));
+		startTimer(trustPoint, fireDate);
+	}
+
+	private void startTimer(TrustPointEntity trustPoint, Date fireDate) {
 
 		// remove old timers
 		cancelTimers(trustPoint.getName());
@@ -257,6 +272,14 @@ public class SchedulingServiceBean implements SchedulingService {
 			}
 
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void refreshCA(CertificateAuthorityEntity ca) throws JMSException {
+
+		notifyHarvester(ca.getName());
 	}
 
 	private void notifyHarvester(String issuerName) throws JMSException {

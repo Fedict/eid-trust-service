@@ -25,6 +25,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Remove;
 import javax.ejb.Stateful;
+import javax.jms.JMSException;
 
 import org.apache.commons.io.FileUtils;
 import org.jboss.ejb3.annotation.LocalBinding;
@@ -46,6 +47,7 @@ import org.richfaces.model.UploadItem;
 import be.fedict.trust.admin.portal.AdminConstants;
 import be.fedict.trust.admin.portal.TrustPoint;
 import be.fedict.trust.service.TrustDomainService;
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
@@ -60,6 +62,7 @@ public class TrustPointBean implements TrustPoint {
 	public static final String SELECTED_TRUST_POINT = "selectedTrustPoint";
 	private static final String UPLOADED_CERTIFICATE = "uploadedCertificate";
 	private static final String TRUST_POINT_LIST_NAME = "trustPointList";
+	private static final String TRUST_POINT_CA_LIST_NAME = "trustPointCAList";
 
 	@Logger
 	private Log log;
@@ -78,6 +81,13 @@ public class TrustPointBean implements TrustPoint {
 	@In(value = SELECTED_TRUST_POINT, required = false)
 	@Out(value = SELECTED_TRUST_POINT, required = false, scope = ScopeType.SESSION)
 	private TrustPointEntity selectedTrustPoint;
+
+	@SuppressWarnings("unused")
+	@DataModel(TRUST_POINT_CA_LIST_NAME)
+	private List<CertificateAuthorityEntity> caList;
+
+	@DataModelSelection(TRUST_POINT_CA_LIST_NAME)
+	private CertificateAuthorityEntity selectedCA;
 
 	@In(value = UPLOADED_CERTIFICATE, required = false)
 	@Out(value = UPLOADED_CERTIFICATE, required = false, scope = ScopeType.SESSION)
@@ -106,6 +116,17 @@ public class TrustPointBean implements TrustPoint {
 
 		this.log.debug("trust point list factory");
 		this.trustPointList = this.trustDomainService.listTrustPoints();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Factory(TRUST_POINT_CA_LIST_NAME)
+	public void trustPointCAListFactory() {
+
+		this.log.debug("trust point CA list factory");
+		this.caList = this.trustDomainService
+				.listTrustPointCAs(this.selectedTrustPoint);
 	}
 
 	/**
@@ -208,6 +229,37 @@ public class TrustPointBean implements TrustPoint {
 		}
 
 		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String refresh() {
+
+		this.log.debug("refresh trust point: #0", this.selectedTrustPoint
+				.getName());
+
+		this.trustDomainService.refreshTrustPointCache(this.selectedTrustPoint);
+
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String refreshCA() {
+
+		this.log.debug("refresh CA: #0", this.selectedCA.getName());
+
+		try {
+			this.trustDomainService.refreshCACache(this.selectedCA);
+		} catch (JMSException e) {
+			this.facesMessages.addFromResourceBundle(
+					StatusMessage.Severity.ERROR, "errorHarvesterNotification");
+			return null;
+		}
+
+		return "refresh";
 	}
 
 	/**

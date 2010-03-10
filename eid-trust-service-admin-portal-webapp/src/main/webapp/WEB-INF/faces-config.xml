@@ -53,7 +53,7 @@
 		</navigation-case>
 		<navigation-case>
 			<from-outcome>view</from-outcome>
-			<to-view-id>/trust-point.seam</to-view-id>
+			<to-view-id>/trust-point-edit.seam</to-view-id>
 			<redirect />
 		</navigation-case>
 		<navigation-case>
@@ -75,21 +75,8 @@
 	<navigation-rule>
 		<from-view-id>/trust-point-edit.xhtml</from-view-id>
 		<navigation-case>
-			<from-outcome>success</from-outcome>
-			<to-view-id>/trust-domain-edit.seam</to-view-id>
-			<redirect />
-		</navigation-case>
-		<navigation-case>
 			<from-outcome>back</from-outcome>
-			<to-view-id>/trust-domain-edit.seam</to-view-id>
-			<redirect />
-		</navigation-case>
-	</navigation-rule>
-	<navigation-rule>
-		<from-view-id>/trust-point.xhtml</from-view-id>
-		<navigation-case>
-			<from-outcome>back</from-outcome>
-			<to-view-id>/trust-points.seam</to-view-id>
+			<to-view-id>/trust-point.seam</to-view-id>
 			<redirect />
 		</navigation-case>
 		<navigation-case>
@@ -99,7 +86,12 @@
 		</navigation-case>
 		<navigation-case>
 			<from-outcome>success</from-outcome>
-			<to-view-id>/trust-points.seam</to-view-id>
+			<to-view-id>/trust-point.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>refresh</from-outcome>
+			<to-view-id>/trust-point-edit.seam</to-view-id>
 			<redirect />
 		</navigation-case>
 		<navigation-case>
@@ -109,15 +101,15 @@
 		</navigation-case>
 	</navigation-rule>
 	<navigation-rule>
-		<from-view-id>/trust-points.xhtml</from-view-id>
+		<from-view-id>/trust-point.xhtml</from-view-id>
 		<navigation-case>
 			<from-outcome>modify</from-outcome>
-			<to-view-id>/trust-point.seam</to-view-id>
+			<to-view-id>/trust-point-edit.seam</to-view-id>
 			<redirect />
 		</navigation-case>
 		<navigation-case>
 			<from-outcome>success</from-outcome>
-			<to-view-id>/trust-points.seam</to-view-id>
+			<to-view-id>/trust-point.seam</to-view-id>
 			<redirect />
 		</navigation-case>
 	</navigation-rule>

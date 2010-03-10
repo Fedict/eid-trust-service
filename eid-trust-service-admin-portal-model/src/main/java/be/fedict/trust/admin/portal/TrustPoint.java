@@ -28,9 +28,11 @@ import org.richfaces.event.UploadEvent;
 public interface TrustPoint {
 
 	/*
-	 * Factory
+	 * Factories
 	 */
 	void trustPointListFactory();
+
+	void trustPointCAListFactory();
 
 	/*
 	 * Lifecycle.
@@ -58,6 +60,10 @@ public interface TrustPoint {
 	String add();
 
 	String back();
+
+	String refresh();
+
+	String refreshCA();
 
 	/*
 	 * Richfaces component callbacks

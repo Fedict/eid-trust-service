@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.List;
 
 import javax.ejb.Local;
 
@@ -85,14 +84,13 @@ public interface CertificateAuthorityDAO {
 			BigInteger serialNumber, Date revocationDate, BigInteger crlNumber);
 
 	/**
-	 * List {@link RevokedCertificateEntity}'s for the specified crl number and
-	 * issuer.
+	 * Returns number of {@link RevokedCertificateEntity}'s for the specified
+	 * crl number and issuer.
 	 * 
 	 * @param crlNumber
 	 * @param issuerName
 	 */
-	List<RevokedCertificateEntity> listRevokedCertificates(
-			BigInteger crlNumber, String issuerName);
+	long countRevokedCertificates(BigInteger crlNumber, String issuerName);
 
 	/**
 	 * Remove {@link RevokedCertificateEntity}'s for the specified issuer that
