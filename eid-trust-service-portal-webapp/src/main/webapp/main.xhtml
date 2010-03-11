@@ -7,7 +7,9 @@
 			<ui:define name="body">
 				<h2>#{messages.welcome}</h2>
 				<p>#{messages.welcomeMsg}</p>
-				<p>#{messages.informationMsg}</p>
+				<p>
+					<h:outputText value="#{ts_localization.info}" />
+				</p>
 				<p>
 					<a
 						href="#{facesContext.externalContext.requestContextPath}/validate.seam">#{messages.clickToValidate}</a>

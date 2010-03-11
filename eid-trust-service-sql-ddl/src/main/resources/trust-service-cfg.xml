@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mapping class="be.fedict.trust.service.entity.AdminEntity" />
+<mapping class="be.fedict.trust.service.entity.LocalizationKeyEntity" />
+<mapping class="be.fedict.trust.service.entity.LocalizationTextEntity" />
 <mapping class="be.fedict.trust.service.entity.CertificateAuthorityEntity" />
 <mapping class="be.fedict.trust.service.entity.ClockDriftConfigEntity" />
 <mapping class="be.fedict.trust.service.entity.NetworkConfigEntity" />

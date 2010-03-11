@@ -8,6 +8,6 @@
 	<core:init jndi-pattern="fedict/eid/trust/portal/#{ejbName}" />
 
 	<international:locale-config
-		default-locale="en" supported-locales="en nl" />
+		default-locale="en" supported-locales="en nl fr" />
 
 </components>

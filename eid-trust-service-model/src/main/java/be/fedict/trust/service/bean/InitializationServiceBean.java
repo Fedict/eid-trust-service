@@ -22,8 +22,11 @@ import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -36,6 +39,7 @@ import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
+import be.fedict.trust.service.dao.LocalizationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
@@ -61,6 +65,9 @@ public class InitializationServiceBean implements InitializationService {
 	private ConfigurationDAO configurationDAO;
 
 	@EJB
+	private LocalizationDAO localizationDAO;
+
+	@EJB
 	private TrustDomainDAO trustDomainDAO;
 
 	@EJB
@@ -73,6 +80,8 @@ public class InitializationServiceBean implements InitializationService {
 
 		LOG.debug("initialize");
 
+		initTexts();
+
 		initNetworkConfig();
 		initClockDrift();
 
@@ -81,14 +90,24 @@ public class InitializationServiceBean implements InitializationService {
 		initBelgianEidAuthTrustDomain(trustPoints);
 		initBelgianEidNonRepudiationDomain(trustPoints);
 		initBelgianEidNationalRegistryTrustDomain(trustPoints);
+	}
 
+	private void initTexts() {
+
+		if (null == this.localizationDAO.findLocalization("info")) {
+			Map<Locale, String> texts = new HashMap<Locale, String>();
+			texts.put(Locale.ENGLISH, "English info");
+			texts.put(new Locale("nl"), "Nederlandse info");
+			texts.put(Locale.FRENCH, "Info français");
+			this.localizationDAO.addLocalization("info", texts);
+		}
 	}
 
 	private void initNetworkConfig() {
 
 		// Default network config
-		configurationDAO.setNetworkConfig(null, 0);
-		configurationDAO.setNetworkConfigEnabled(false);
+		this.configurationDAO.setNetworkConfig(null, 0);
+		this.configurationDAO.setNetworkConfigEnabled(false);
 	}
 
 	private void initClockDrift() {
