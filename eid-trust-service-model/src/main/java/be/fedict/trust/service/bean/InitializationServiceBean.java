@@ -100,6 +100,7 @@ public class InitializationServiceBean implements InitializationService {
 			texts.put(Locale.ENGLISH, "English info");
 			texts.put(new Locale("nl"), "Nederlandse info");
 			texts.put(Locale.FRENCH, "Info français");
+			texts.put(Locale.GERMAN, "Deutsch info");
 			this.localizationDAO.addLocalization("info", texts);
 		}
 	}
