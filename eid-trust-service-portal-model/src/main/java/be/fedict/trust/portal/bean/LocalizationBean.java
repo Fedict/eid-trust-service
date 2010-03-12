@@ -30,6 +30,7 @@ import org.jboss.seam.log.Log;
 import be.fedict.trust.portal.Localization;
 import be.fedict.trust.portal.PortalConstants;
 import be.fedict.trust.service.LocalizationService;
+import be.fedict.trust.service.TrustServiceConstants;
 
 @Stateless
 @Name(PortalConstants.PORTAL_SEAM_PREFIX + "localization")
@@ -46,8 +47,9 @@ public class LocalizationBean implements Localization {
 	public String getInfo() {
 
 		this.log.debug("get \"info\" localization");
-		return this.localizationService.findText("info", LocaleSelector
-				.instance().getLocale());
+		return this.localizationService.findText(
+				TrustServiceConstants.INFO_MESSAGE_KEY, LocaleSelector
+						.instance().getLocale());
 	}
 
 }

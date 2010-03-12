@@ -20,6 +20,7 @@ package be.fedict.trust.admin.portal.bean;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -28,11 +29,15 @@ import javax.ejb.Stateful;
 import javax.faces.model.SelectItem;
 
 import org.jboss.ejb3.annotation.LocalBinding;
+import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Begin;
 import org.jboss.seam.annotations.Destroy;
+import org.jboss.seam.annotations.End;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Out;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
@@ -40,6 +45,7 @@ import org.jboss.seam.log.Log;
 import be.fedict.trust.admin.portal.AdminConstants;
 import be.fedict.trust.admin.portal.Configuration;
 import be.fedict.trust.service.ConfigurationService;
+import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.entity.NetworkConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
@@ -69,6 +75,12 @@ public class ConfigurationBean implements Configuration {
 	private int clockDriftTimeout;
 	private int clockDriftMaxClockOffset;
 	private String clockDriftCron;
+
+	@In(value = "language", required = false)
+	@Out(value = "language", required = false, scope = ScopeType.CONVERSATION)
+	private String language;
+
+	private String informationMessage;
 
 	/**
 	 * {@inheritDoc}
@@ -139,6 +151,32 @@ public class ConfigurationBean implements Configuration {
 			return null;
 		}
 
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Begin(join = true)
+	public String editInfoMessage() {
+
+		this.log.debug("edit info message for language=#0", this.language);
+		this.informationMessage = this.configurationService.findText(
+				TrustServiceConstants.INFO_MESSAGE_KEY, new Locale(
+						this.language));
+		return "edit";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@End
+	public String saveInfoMessage() {
+
+		this.log.debug("save info message for language=#0", this.language);
+		this.configurationService.saveText(
+				TrustServiceConstants.INFO_MESSAGE_KEY, new Locale(
+						this.language), this.informationMessage);
 		return "success";
 	}
 
@@ -281,5 +319,51 @@ public class ConfigurationBean implements Configuration {
 	public void setClockDriftTimeout(int clockDriftTimeout) {
 
 		this.clockDriftTimeout = clockDriftTimeout;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Factory("supportedLanguages")
+	public List<SelectItem> supportedLanguagesFactory() {
+
+		List<SelectItem> locales = new LinkedList<SelectItem>();
+		for (String language : this.configurationService
+				.listLanguages(TrustServiceConstants.INFO_MESSAGE_KEY)) {
+			locales.add(new SelectItem(language, language));
+		}
+		return locales;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getLanguage() {
+
+		return this.language;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setLanguage(String language) {
+
+		this.language = language;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getInformationMessage() {
+
+		return this.informationMessage;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setInformationMessage(String informationMessage) {
+
+		this.informationMessage = informationMessage;
 	}
 }

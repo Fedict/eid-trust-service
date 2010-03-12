@@ -18,6 +18,10 @@
 
 package be.fedict.trust.service.bean;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -30,7 +34,10 @@ import be.fedict.trust.service.ConfigurationService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.ConfigurationDAO;
+import be.fedict.trust.service.dao.LocalizationDAO;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.LocalizationKeyEntity;
+import be.fedict.trust.service.entity.LocalizationTextEntity;
 import be.fedict.trust.service.entity.NetworkConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
@@ -50,6 +57,9 @@ public class ConfigurationServiceBean implements ConfigurationService {
 
 	@EJB
 	private ConfigurationDAO configurationDAO;
+
+	@EJB
+	private LocalizationDAO localizationDAO;
 
 	@EJB
 	private SchedulingService schedulingService;
@@ -97,5 +107,57 @@ public class ConfigurationServiceBean implements ConfigurationService {
 				.setClockDriftConfig(timeProtocol, server, timeout,
 						maxClockOffset, cron);
 		this.schedulingService.startTimer(clockDriftConfig, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public List<String> listLanguages(String key) {
+
+		LOG.debug("list languages for: " + key);
+		List<String> languages = new LinkedList<String>();
+		LocalizationKeyEntity localizationKey = this.localizationDAO
+				.findLocalization(key);
+		if (null != localizationKey) {
+			for (LocalizationTextEntity text : localizationKey.getTexts()) {
+				languages.add(text.getLanguage());
+			}
+		}
+		return languages;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public String findText(String key, Locale locale) {
+
+		LOG.debug("find text for key=" + key + " language="
+				+ locale.getLanguage());
+		LocalizationKeyEntity localizationKey = this.localizationDAO
+				.findLocalization(key);
+		for (LocalizationTextEntity text : localizationKey.getTexts()) {
+			if (text.getLanguage().equals(locale.getLanguage()))
+				return text.getText();
+		}
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void saveText(String key, Locale locale, String text) {
+
+		LOG.debug("save text for key=" + key + " language="
+				+ locale.getLanguage());
+		LocalizationKeyEntity localizationKey = this.localizationDAO
+				.findLocalization(key);
+		for (LocalizationTextEntity localizationText : localizationKey
+				.getTexts()) {
+			if (localizationText.getLanguage().equals(locale.getLanguage()))
+				localizationText.setText(text);
+		}
 	}
 }

@@ -94,7 +94,8 @@ public class InitializationServiceBean implements InitializationService {
 
 	private void initTexts() {
 
-		if (null == this.localizationDAO.findLocalization("info")) {
+		if (null == this.localizationDAO
+				.findLocalization(TrustServiceConstants.INFO_MESSAGE_KEY)) {
 			Map<Locale, String> texts = new HashMap<Locale, String>();
 			texts.put(Locale.ENGLISH, "English info");
 			texts.put(new Locale("nl"), "Nederlandse info");

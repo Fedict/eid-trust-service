@@ -18,6 +18,9 @@
 
 package be.fedict.trust.service;
 
+import java.util.List;
+import java.util.Locale;
+
 import javax.ejb.Local;
 
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
@@ -67,4 +70,29 @@ public interface ConfigurationService {
 	void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
 			int timeout, int maxClockOffset, String cron)
 			throws InvalidCronExpressionException;
+
+	/**
+	 * List the languages available for the specified key.
+	 * 
+	 * @param key
+	 */
+	List<String> listLanguages(String key);
+
+	/**
+	 * Return the localization text for specified key and {@link Locale}.
+	 * Returns <code>null</code> if not found.
+	 * 
+	 * @param key
+	 * @param locale
+	 */
+	String findText(String key, Locale locale);
+
+	/**
+	 * Save the specified localization text.
+	 * 
+	 * @param key
+	 * @param locale
+	 * @param text
+	 */
+	void saveText(String key, Locale locale, String text);
 }

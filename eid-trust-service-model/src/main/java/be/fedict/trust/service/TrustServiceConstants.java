@@ -44,4 +44,6 @@ public abstract class TrustServiceConstants {
 	public static final String BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN = "BE-NAT-REG";
 
 	public static final String DEFAULT_CRON = "0 0 0/3 * * ?";
+
+	public static final String INFO_MESSAGE_KEY = "info";
 }

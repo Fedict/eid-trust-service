@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html">
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:s="http://jboss.com/products/seam/taglib">
 	<body>
 		<ui:composition template="/WEB-INF/template.xhtml">
 			<ui:param name="activeMenu" value="main" />
@@ -8,7 +8,7 @@
 				<h2>#{messages.welcome}</h2>
 				<p>#{messages.welcomeMsg}</p>
 				<p>
-					<h:outputText value="#{ts_localization.info}" />
+					<s:formattedText value="#{ts_localization.info}" />
 				</p>
 				<p>
 					<a

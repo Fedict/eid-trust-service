@@ -37,6 +37,8 @@ public interface Configuration {
 	 */
 	List<SelectItem> clockDriftProtocolFactory();
 
+	List<SelectItem> supportedLanguagesFactory();
+
 	/*
 	 * Accessors
 	 */
@@ -72,6 +74,14 @@ public interface Configuration {
 
 	void setClockDriftCron(String clockDriftCron);
 
+	String getLanguage();
+
+	void setLanguage(String language);
+
+	String getInformationMessage();
+
+	void setInformationMessage(String informationMessage);
+
 	/*
 	 * Actions
 	 */
@@ -79,4 +89,7 @@ public interface Configuration {
 
 	String saveClockDriftConfig();
 
+	String editInfoMessage();
+
+	String saveInfoMessage();
 }
