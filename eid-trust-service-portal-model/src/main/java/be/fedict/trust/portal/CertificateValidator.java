@@ -23,5 +23,12 @@ import javax.ejb.Local;
 @Local
 public interface CertificateValidator {
 
+	/*
+	 * Actions
+	 */
+	String validateAuthn();
+
+	String validateSigning();
+
 	void validate();
 }

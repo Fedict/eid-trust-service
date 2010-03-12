@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html">
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:c="http://java.sun.com/jstl/core">
 	<body>
 		<ui:composition template="/WEB-INF/template.xhtml">
 			<ui:param name="activeMenu" value="validate" />
@@ -8,7 +8,14 @@
 				<h2>#{messages.validateResult}</h2>
 				<h:panelGroup>
 					<h:panelGrid columns="2">
-						<h:outputText value="#{messages.authnCertificate}:" />
+						<c:choose>
+							<c:when test="#{authn == true}">
+								<h:outputText value="#{messages.authnCertificate}:" />
+							</c:when>
+							<c:otherwise>
+								<h:outputText value="#{messages.signingCertificate}:" />
+							</c:otherwise>
+						</c:choose>
 						<h:outputText value="#{authnCertStatus}" />
 					</h:panelGrid>
 				</h:panelGroup>
