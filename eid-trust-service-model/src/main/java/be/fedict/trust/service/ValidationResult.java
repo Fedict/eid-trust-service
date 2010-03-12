@@ -19,6 +19,8 @@
 package be.fedict.trust.service;
 
 import be.fedict.trust.RevocationData;
+import be.fedict.trust.TrustLinkerResult;
+import be.fedict.trust.TrustLinkerResultReason;
 
 /**
  * Validation result wrapper.
@@ -30,18 +32,24 @@ import be.fedict.trust.RevocationData;
  */
 public class ValidationResult {
 
-	private final boolean valid;
+	private final TrustLinkerResult result;
 	private final RevocationData revocationData;
 
-	public ValidationResult(boolean valid, RevocationData revocationData) {
+	public ValidationResult(TrustLinkerResult result,
+			RevocationData revocationData) {
 
-		this.valid = valid;
+		this.result = result;
 		this.revocationData = revocationData;
 	}
 
 	public boolean isValid() {
 
-		return this.valid;
+		return this.result.isValid();
+	}
+
+	public TrustLinkerResultReason getReason() {
+
+		return this.result.getReason();
 	}
 
 	public RevocationData getRevocationData() {

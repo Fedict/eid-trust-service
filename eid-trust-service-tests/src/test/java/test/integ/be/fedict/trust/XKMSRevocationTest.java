@@ -48,6 +48,7 @@ import org.junit.Test;
 import sun.security.x509.X509CRLImpl;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.xkms2.XKMSConstants;
 
 /**
  * eID Trust Service XKMS2 Integration Tests.
@@ -155,8 +156,12 @@ public class XKMSRevocationTest {
 				signCertificateChain, calendar.getTime(), Collections
 						.singletonList(ocspResp), Collections
 						.singletonList(crl));
+		List<String> reasonURIs = client.getReasonURIs();
 
 		// verify
 		assertFalse(result);
+		assertEquals(1, reasonURIs.size());
+		assertEquals(XKMSConstants.KEY_BINDING_REASON_ISSUER_TRUST_URI,
+				reasonURIs.get(0));
 	}
 }

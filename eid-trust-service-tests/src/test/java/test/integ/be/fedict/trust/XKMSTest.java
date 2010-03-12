@@ -47,6 +47,7 @@ import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.NetworkConfig;
+import be.fedict.trust.TrustLinkerResult;
 import be.fedict.trust.TrustValidator;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
@@ -136,7 +137,9 @@ public class XKMSTest {
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
 				.createTrustValidator(NETWORK_CONFIG);
 
-		trustValidator.isTrusted(authnCertificateChain);
+		TrustLinkerResult result = trustValidator
+				.isTrusted(authnCertificateChain);
+		assertTrue(result.isValid());
 	}
 
 	@Test
@@ -148,7 +151,9 @@ public class XKMSTest {
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
 				.createNonRepudiationTrustValidator(NETWORK_CONFIG);
 
-		trustValidator.isTrusted(signCertificateChain);
+		TrustLinkerResult result = trustValidator
+				.isTrusted(signCertificateChain);
+		assertTrue(result.isValid());
 	}
 
 	@Test
@@ -160,7 +165,9 @@ public class XKMSTest {
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
 				.createNationalRegistryTrustValidator(NETWORK_CONFIG);
 
-		trustValidator.isTrusted(nationalRegistryCertificateChain);
+		TrustLinkerResult result = trustValidator
+				.isTrusted(nationalRegistryCertificateChain);
+		assertTrue(result.isValid());
 	}
 
 	private static final int COUNT = 20;

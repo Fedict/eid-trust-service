@@ -21,7 +21,6 @@ package be.fedict.trust.service.bean;
 import java.io.IOException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
-import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -46,6 +45,7 @@ import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.PublicKeyTrustLinker;
 import be.fedict.trust.RevocationData;
 import be.fedict.trust.TrustLinker;
+import be.fedict.trust.TrustLinkerResult;
 import be.fedict.trust.TrustValidator;
 import be.fedict.trust.constraints.CertificatePoliciesCertificateConstraint;
 import be.fedict.trust.constraints.DistinguishedNameCertificateConstraint;
@@ -108,7 +108,7 @@ public class TrustServiceBean implements TrustService {
 			return validate(null, certificateChain, false);
 		} catch (TrustDomainNotFoundException e) {
 			LOG.error("Default trust domain not set ?!");
-			return new ValidationResult(false, null);
+			return new ValidationResult(new TrustLinkerResult(false), null);
 		}
 	}
 
@@ -125,14 +125,8 @@ public class TrustServiceBean implements TrustService {
 
 		TrustValidator trustValidator = getTrustValidator(trustDomain,
 				returnRevocationData);
-		try {
-			trustValidator.isTrusted(certificateChain);
-		} catch (CertPathValidatorException e) {
-			LOG.debug("certificate path validation error: " + e.getMessage());
-			return new ValidationResult(false, trustValidator
-					.getRevocationData());
-		}
-		return new ValidationResult(true, trustValidator.getRevocationData());
+		TrustLinkerResult result = trustValidator.isTrusted(certificateChain);
+		return new ValidationResult(result, trustValidator.getRevocationData());
 	}
 
 	/**
@@ -156,14 +150,9 @@ public class TrustServiceBean implements TrustService {
 		TrustValidator trustValidator = getTrustValidator(trustDomain,
 				ocspResponses, crls);
 
-		try {
-			trustValidator.isTrusted(certificateChain, validationDate);
-		} catch (CertPathValidatorException e) {
-			LOG.debug("certificate path validation error: " + e.getMessage());
-			return new ValidationResult(false, trustValidator
-					.getRevocationData());
-		}
-		return new ValidationResult(true, trustValidator.getRevocationData());
+		TrustLinkerResult result = trustValidator.isTrusted(certificateChain,
+				validationDate);
+		return new ValidationResult(result, trustValidator.getRevocationData());
 	}
 
 	/**

@@ -225,11 +225,37 @@ public class XKMSPortImpl implements XKMSPortType {
 		keyBinding.setStatus(status);
 		String statusValue;
 		if (validationResult.isValid()) {
-			statusValue = "http://www.w3.org/2002/03/xkms#Valid";
+			statusValue = XKMSConstants.KEY_BINDING_STATUS_VALID_URI;
 		} else {
-			statusValue = "http://www.w3.org/2002/03/xkms#Invalid";
+			statusValue = XKMSConstants.KEY_BINDING_STATUS_INVALID_URI;
 		}
 		status.setStatusValue(statusValue);
+
+		// add invalid reason info ...
+		if (!validationResult.isValid()) {
+			switch (validationResult.getReason()) {
+			case INVALID_TRUST: {
+				status.getInvalidReason().add(
+						XKMSConstants.KEY_BINDING_REASON_ISSUER_TRUST_URI);
+				break;
+			}
+			case INVALID_REVOCATION_STATUS: {
+				status.getInvalidReason().add(
+						XKMSConstants.KEY_BINDING_REASON_REVOCATION_STATUS_URI);
+				break;
+			}
+			case INVALID_SIGNATURE: {
+				status.getInvalidReason().add(
+						XKMSConstants.KEY_BINDING_REASON_SIGNATURE_URI);
+				break;
+			}
+			case INVALID_VALIDITY_INTERVAL: {
+				status.getInvalidReason().add(
+						XKMSConstants.KEY_BINDING_REASON_VALIDITY_INTERVAL_URI);
+				break;
+			}
+			}
+		}
 
 		// optionally append used revocation data if specified
 		if (returnRevocationData) {

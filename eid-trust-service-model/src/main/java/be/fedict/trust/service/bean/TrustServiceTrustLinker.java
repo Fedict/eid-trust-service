@@ -41,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
 
 import be.fedict.trust.RevocationData;
 import be.fedict.trust.TrustLinker;
+import be.fedict.trust.TrustLinkerResult;
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
@@ -70,7 +71,7 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		this.queue = queue;
 	}
 
-	public Boolean hasTrustLink(X509Certificate childCertificate,
+	public TrustLinkerResult hasTrustLink(X509Certificate childCertificate,
 			X509Certificate certificate, Date validationDate,
 			RevocationData revocationData) {
 		LOG.debug("certificate: " + childCertificate.getSubjectX500Principal());
@@ -162,17 +163,17 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		if (null == revokedCertificate) {
 			LOG.debug("certificate valid: "
 					+ childCertificate.getSubjectX500Principal());
-			return true;
+			return new TrustLinkerResult(true);
 		}
 		if (revokedCertificate.getRevocationDate().after(validationDate)) {
 			LOG.debug("CRL OK for: "
 					+ childCertificate.getSubjectX500Principal() + " at "
 					+ validationDate);
-			return true;
+			return new TrustLinkerResult(true);
 		}
 		LOG.debug("certificate invalid: "
 				+ childCertificate.getSubjectX500Principal());
-		return false;
+		return new TrustLinkerResult(true);
 	}
 
 	@SuppressWarnings("unchecked")

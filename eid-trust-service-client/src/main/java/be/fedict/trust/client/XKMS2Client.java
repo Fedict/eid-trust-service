@@ -26,6 +26,7 @@ import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -81,6 +82,8 @@ public class XKMS2Client {
 
 	private RevocationValuesType revocationValues;
 
+	private List<String> reasonURIs;
+
 	/**
 	 * Main constructor
 	 * 
@@ -88,6 +91,8 @@ public class XKMS2Client {
 	 *            the location (host:port) of the XKMS2 web service
 	 */
 	public XKMS2Client(String location) {
+
+		this.reasonURIs = new LinkedList<String>();
 
 		XKMSService xkmsService = XKMSServiceFactory.getInstance();
 		port = xkmsService.getXKMSPort();
@@ -341,14 +346,19 @@ public class XKMS2Client {
 			}
 		}
 
+		// store reason URIs
+
 		List<KeyBindingType> keyBindings = validateResult.getKeyBinding();
 		for (KeyBindingType keyBinding : keyBindings) {
 			// TODO better result verification
 			StatusType status = keyBinding.getStatus();
 			String statusValue = status.getStatusValue();
 			LOG.debug("status: " + statusValue);
-			if ("http://www.w3.org/2002/03/xkms#Valid".equals(statusValue)) {
+			if (XKMSConstants.KEY_BINDING_STATUS_VALID_URI.equals(statusValue)) {
 				return true;
+			}
+			for (String invalidReason : status.getInvalidReason()) {
+				this.reasonURIs.add(invalidReason);
 			}
 		}
 		return false;
@@ -444,6 +454,16 @@ public class XKMS2Client {
 	public RevocationValuesType getRevocationValues() {
 
 		return this.revocationValues;
+	}
+
+	/**
+	 * Returns the list of XKMS2 reason URI's in case validation has failed.
+	 * 
+	 * {@link http://www.w3.org/TR/xkms2/#XKMS_2_0_Section_5_1}
+	 */
+	public List<String> getReasonURIs() {
+
+		return this.reasonURIs;
 	}
 
 	private XMLGregorianCalendar getXmlGregorianCalendar(Date date) {
