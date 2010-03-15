@@ -36,6 +36,21 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.jboss.jbossas</groupId>
+			<artifactId>jboss-as-system</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.snmp4j</groupId>
+			<artifactId>snmp4j</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.snmp4j</groupId>
+			<artifactId>snmp4j-agent</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.jboss.security</groupId>
 			<artifactId>jbosssx-client</artifactId>
 			<scope>provided</scope>

@@ -31,6 +31,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.interceptor.Interceptors;
 import javax.jms.Queue;
 import javax.jms.QueueConnectionFactory;
 import javax.persistence.EntityManager;
@@ -72,6 +73,8 @@ import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.service.snmp.SNMP;
+import be.fedict.trust.service.snmp.SNMPInterceptor;
 
 /**
  * Trust Service Bean implementation.
@@ -80,6 +83,7 @@ import be.fedict.trust.service.exception.TrustDomainNotFoundException;
  * 
  */
 @Stateless
+@Interceptors(SNMPInterceptor.class)
 public class TrustServiceBean implements TrustService {
 
 	private static final Log LOG = LogFactory.getLog(TrustServiceBean.class);
@@ -116,6 +120,7 @@ public class TrustServiceBean implements TrustService {
 	 * {@inheritDoc}
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@SNMP(oid = "1.3.6.1.4.1.7890.0.0")
 	public ValidationResult validate(String trustDomain,
 			List<X509Certificate> certificateChain, boolean returnRevocationData)
 			throws TrustDomainNotFoundException {

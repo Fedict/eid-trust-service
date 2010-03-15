@@ -25,4 +25,7 @@
 		</depends>
 	</mbean>
 
+	<mbean code="be.fedict.trust.service.SNMPService" name="trust:service=SNMP" />
+
+
 </server>

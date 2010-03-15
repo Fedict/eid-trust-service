@@ -99,6 +99,19 @@
 							<includeInApplicationXml>true</includeInApplicationXml>
 							<bundleDir>lib</bundleDir>
 						</jarModule>
+						<jarModule>
+							<groupId>org.snmp4j</groupId>
+							<artifactId>snmp4j</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+							<bundleDir>lib</bundleDir>
+						</jarModule>
+						<jarModule>
+							<groupId>org.snmp4j</groupId>
+							<artifactId>snmp4j-agent</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+							<bundleDir>lib</bundleDir>
+						</jarModule>
+
 					</modules>
 					<version>5</version>
 				</configuration>
@@ -181,6 +194,14 @@
 		<dependency>
 			<groupId>com.sun.facelets</groupId>
 			<artifactId>jsf-facelets</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.snmp4j</groupId>
+			<artifactId>snmp4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.snmp4j</groupId>
+			<artifactId>snmp4j-agent</artifactId>
 		</dependency>
 
 		<!--
