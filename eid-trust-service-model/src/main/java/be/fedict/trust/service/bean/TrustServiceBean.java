@@ -143,6 +143,7 @@ public class TrustServiceBean implements TrustService {
 	 * @throws CertificateException
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@SNMP(oid = "1.3.6.1.4.1.7890.0.0")
 	public ValidationResult validate(String trustDomain,
 			List<X509Certificate> certificateChain, Date validationDate,
 			List<byte[]> ocspResponses, List<byte[]> crls)

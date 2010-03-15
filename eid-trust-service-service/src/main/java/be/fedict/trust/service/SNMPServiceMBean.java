@@ -18,10 +18,22 @@
 
 package be.fedict.trust.service;
 
-import org.jboss.system.Service;
 
-public interface SNMPServiceMBean extends Service {
+public interface SNMPServiceMBean {
 
+	/**
+	 * Increment the SNMP {@link Counter} with specified OID. If not yet
+	 * registered, does so.
+	 * 
+	 * @param oid
+	 */
 	public void increment(String oid);
+
+	/**
+	 * Attributes
+	 */
+	String getAddress();
+
+	void setAddress(String address);
 
 }

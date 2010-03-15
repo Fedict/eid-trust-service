@@ -50,14 +50,19 @@ import org.snmp4j.util.ThreadPool;
 
 public class SNMPAgent extends BaseAgent {
 
+	private String udpAddress;
 	private List<Counter> counters;
 
-	public SNMPAgent(File bootCounterFile, File configFile) throws IOException {
+	public SNMPAgent(String udpAddress, File bootCounterFile, File configFile)
+			throws IOException {
 
 		super(bootCounterFile, configFile, new CommandProcessor(
 				new OctetString(MPv3.createLocalEngineID())));
 		agent.setWorkerPool(ThreadPool.create("RequestPool", 4));
+
+		this.udpAddress = udpAddress;
 		this.counters = new LinkedList<Counter>();
+
 		init();
 		loadConfig(ImportModes.REPLACE_CREATE);
 		addShutdownHook();
@@ -70,7 +75,7 @@ public class SNMPAgent extends BaseAgent {
 
 		transportMappings = new TransportMapping[1];
 		transportMappings[0] = new DefaultUdpTransportMapping(new UdpAddress(
-				"0.0.0.0/7894"));
+				this.udpAddress));
 	}
 
 	@Override

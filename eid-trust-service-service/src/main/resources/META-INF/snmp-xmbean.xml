@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbean PUBLIC "-//JBoss//DTD JBOSS XMBEAN 1.2//EN" "http://www.jboss.org/j2ee/dtd/jboss_xmbean_1_2.dtd">
+<mbean>
+	<description>SNMP Service</description>
+	<class>be.fedict.trust.service.SNMPService</class>
+	<constructor>
+		<description>The default constructor</description>
+		<name>SNMPService</name>
+	</constructor>
+	<attribute getMethod="getAddress" setMethod="setAddress">
+		<description>The SNMP Agent's UDP Address</description>
+		<name>Address</name>
+		<type>java.lang.String</type>
+		<descriptors>
+			<default>0.0.0.0/7894</default>
+		</descriptors>
+	</attribute>
+	<operation>
+		<description>
+			Increments the SNMP counter specified by the given OID.
+			Registers it to the SNMP agent if not yet done so.
+        </description>
+		<name>increment</name>
+		<parameter>
+			<description>The SNMP OID of this counter</description>
+			<name>OID</name>
+			<type>java.lang.String</type>
+		</parameter>
+	</operation>
+</mbean>
+  

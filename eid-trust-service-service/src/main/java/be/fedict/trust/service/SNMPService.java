@@ -19,6 +19,7 @@
 package be.fedict.trust.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +34,8 @@ public class SNMPService implements SNMPServiceMBean {
 
 	private static final Log LOG = LogFactory.getLog(SNMPService.class);
 
+	private String address;
+
 	private Thread snmpThread;
 	private SNMPAgent snmpAgent;
 
@@ -42,6 +45,22 @@ public class SNMPService implements SNMPServiceMBean {
 	 * {@inheritDoc}
 	 */
 	public void increment(String oid) {
+
+		if (null == this.snmpAgent) {
+			LOG.debug("Address=" + this.address);
+			try {
+				this.snmpAgent = new SNMPAgent(this.address, new File(
+						"performance.snmp.agent.boot.counter.cfg"), new File(
+						"performance.snmp.agent.cfg"));
+			} catch (IOException e) {
+				LOG.error("Failed to start SNMP agent: " + e.getMessage(), e);
+				throw new RuntimeException(e);
+			}
+			this.snmpThread = new Thread(this.snmpAgent);
+			this.snmpThread.start();
+
+			this.snmpValues = new HashMap<String, Long>();
+		}
 
 		Long value = snmpValues.get(oid);
 		if (null == value) {
@@ -82,41 +101,16 @@ public class SNMPService implements SNMPServiceMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void create() throws Exception {
+	public String getAddress() {
 
-		LOG.debug("create");
+		return this.address;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void destroy() {
+	public void setAddress(String address) {
 
-		LOG.debug("destroy");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void start() throws Exception {
-
-		LOG.debug("start");
-		this.snmpAgent = new SNMPAgent(new File(
-				"performance.snmp.agent.boot.counter.cfg"), new File(
-				"performance.snmp.agent.cfg"));
-		this.snmpThread = new Thread(this.snmpAgent);
-		this.snmpThread.start();
-
-		this.snmpValues = new HashMap<String, Long>();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void stop() {
-
-		LOG.debug("stop");
-		this.snmpThread.interrupt();
-		this.snmpAgent.stop();
+		this.address = address;
 	}
 }
