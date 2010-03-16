@@ -14,6 +14,8 @@
 					</rich:editor>
 					<h:commandButton id="save" value="#{messages.save}"
 						action="#{ts_config.saveInfoMessage}" />
+					<h:commandButton id="save" value="#{messages.cancel}"
+						immediate="true" action="cancel" />
 				</h:form>
 
 			</ui:define>

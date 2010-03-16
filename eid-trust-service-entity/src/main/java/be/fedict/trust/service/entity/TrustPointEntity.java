@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.ejb.TimerHandle;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -81,7 +82,7 @@ public class TrustPointEntity implements Serializable {
 		this.name = name;
 	}
 
-	@OneToOne(optional = false)
+	@OneToOne(optional = false, cascade = CascadeType.REMOVE)
 	public CertificateAuthorityEntity getCertificateAuthority() {
 
 		return this.certificateAuthority;

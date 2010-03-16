@@ -30,7 +30,9 @@ import javax.jms.JMSException;
 import org.apache.commons.io.FileUtils;
 import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Begin;
 import org.jboss.seam.annotations.Destroy;
+import org.jboss.seam.annotations.End;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
@@ -79,7 +81,7 @@ public class TrustPointBean implements TrustPoint {
 
 	@DataModelSelection(TRUST_POINT_LIST_NAME)
 	@In(value = SELECTED_TRUST_POINT, required = false)
-	@Out(value = SELECTED_TRUST_POINT, required = false, scope = ScopeType.SESSION)
+	@Out(value = SELECTED_TRUST_POINT, required = false, scope = ScopeType.CONVERSATION)
 	private TrustPointEntity selectedTrustPoint;
 
 	@SuppressWarnings("unused")
@@ -90,7 +92,7 @@ public class TrustPointBean implements TrustPoint {
 	private CertificateAuthorityEntity selectedCA;
 
 	@In(value = UPLOADED_CERTIFICATE, required = false)
-	@Out(value = UPLOADED_CERTIFICATE, required = false, scope = ScopeType.SESSION)
+	@Out(value = UPLOADED_CERTIFICATE, required = false, scope = ScopeType.CONVERSATION)
 	private byte[] certificateBytes;
 
 	@In(value = TrustDomainBean.SELECTED_TRUST_DOMAIN, required = false)
@@ -132,6 +134,7 @@ public class TrustPointBean implements TrustPoint {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Begin(join = true)
 	public String modify() {
 
 		this.log.debug("modify: #0", this.selectedTrustPoint.getName());
@@ -141,6 +144,7 @@ public class TrustPointBean implements TrustPoint {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Begin(join = true)
 	public void select() {
 
 		this.log.debug("selected trust point: #0", this.selectedTrustPoint);
@@ -149,11 +153,13 @@ public class TrustPointBean implements TrustPoint {
 	/**
 	 * {@inheritDoc}
 	 */
+	@End
 	public String remove() {
 
 		this.log.debug("remove trust point: #0", this.selectedTrustPoint
 				.getName());
 		this.trustDomainService.removeTrustPoint(this.selectedTrustPoint);
+		this.selectedTrustPoint = null;
 		trustPointListFactory();
 		if (null != this.selectedTrustDomain) {
 			return "success_trustdomain";
@@ -164,6 +170,7 @@ public class TrustPointBean implements TrustPoint {
 	/**
 	 * {@inheritDoc}
 	 */
+	@End
 	public String save() {
 
 		this.log.debug("save trust point: #0", this.selectedTrustPoint
@@ -184,6 +191,7 @@ public class TrustPointBean implements TrustPoint {
 	/**
 	 * {@inheritDoc}
 	 */
+	@End
 	public String back() {
 
 		if (null != this.selectedTrustDomain) {
@@ -196,6 +204,7 @@ public class TrustPointBean implements TrustPoint {
 	/**
 	 * {@inheritDoc}
 	 */
+	@End
 	public String add() {
 
 		this.log.debug("add trust point: crlRefreshCron=#0",
@@ -281,6 +290,7 @@ public class TrustPointBean implements TrustPoint {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Begin(join = true)
 	public void uploadListener(UploadEvent event) throws IOException {
 		UploadItem item = event.getUploadItem();
 		this.log.debug(item.getContentType());

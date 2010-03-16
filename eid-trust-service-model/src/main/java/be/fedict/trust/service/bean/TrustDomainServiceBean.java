@@ -172,24 +172,28 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	public void removeTrustPoint(TrustPointEntity trustPoint) {
 
 		LOG.debug("remove trust point: " + trustPoint.getName());
+		TrustPointEntity attachedTrustPoint = this.trustDomainDAO
+				.attachTrustPoint(trustPoint);
+		attachedTrustPoint.getCertificateAuthority().setTrustPoint(null);
 
 		// remove timers
-		this.schedulingService.cancelTimers(trustPoint.getName());
+		this.schedulingService.cancelTimers(attachedTrustPoint.getName());
 
 		// remove CA's
-		this.certificateAuthorityDAO.removeCertificateAuthorities(trustPoint);
+		this.certificateAuthorityDAO
+				.removeCertificateAuthorities(attachedTrustPoint);
 
 		// remove trust point from all trustdomains
 		List<TrustDomainEntity> trustDomains = this.trustDomainDAO
-				.listTrustDomains(trustPoint);
+				.listTrustDomains(attachedTrustPoint);
 		for (TrustDomainEntity trustDomain : trustDomains) {
-			LOG.debug("remove trust point " + trustPoint.getName()
+			LOG.debug("remove trust point " + attachedTrustPoint.getName()
 					+ " from trust domain " + trustDomain.getName());
-			trustDomain.getTrustPoints().remove(trustPoint);
+			trustDomain.getTrustPoints().remove(attachedTrustPoint);
 		}
 
 		// remove trust point
-		this.trustDomainDAO.removeTrustPoint(trustPoint);
+		this.trustDomainDAO.removeTrustPoint(attachedTrustPoint);
 	}
 
 	/**

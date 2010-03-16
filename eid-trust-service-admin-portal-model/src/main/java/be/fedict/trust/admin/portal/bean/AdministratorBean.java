@@ -74,7 +74,7 @@ public class AdministratorBean implements Administrator {
 
 	@DataModelSelection(ADMIN_LIST_NAME)
 	@In(value = SELECTED_ADMIN, required = false)
-	@Out(value = SELECTED_ADMIN, required = false, scope = ScopeType.SESSION)
+	@Out(value = SELECTED_ADMIN, required = false, scope = ScopeType.PAGE)
 	private AdminEntity selectedAdmin;
 
 	/**

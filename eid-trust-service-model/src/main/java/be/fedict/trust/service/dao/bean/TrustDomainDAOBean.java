@@ -225,6 +225,9 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 
 		LOG.debug("remove trust point " + trustPoint.getName());
 		TrustPointEntity attachedTrustPoint = attachTrustPoint(trustPoint);
+		LOG
+				.debug("remove attached trust point "
+						+ attachedTrustPoint.getName());
 		this.entityManager.remove(attachedTrustPoint);
 	}
 

@@ -98,7 +98,7 @@ public class TrustDomainBean implements TrustDomain {
 	@In(required = false)
 	private TrustDomainEntity selectedTrustDomain;
 
-	@Out(value = TrustPointBean.SELECTED_TRUST_POINT, required = false, scope = ScopeType.SESSION)
+	@Out(value = TrustPointBean.SELECTED_TRUST_POINT, required = false, scope = ScopeType.CONVERSATION)
 	private TrustPointEntity selectedTrustPoint;
 
 	private TreeNode<TrustPointEntity> rootNode = null;
@@ -258,6 +258,7 @@ public class TrustDomainBean implements TrustDomain {
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("unchecked")
+	@Begin(join = true)
 	public void processNodeSelection(NodeSelectedEvent event) {
 
 		HtmlTree tree = (HtmlTree) event.getComponent();
