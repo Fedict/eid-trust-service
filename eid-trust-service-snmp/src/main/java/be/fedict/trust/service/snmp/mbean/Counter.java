@@ -16,24 +16,30 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.service;
+package be.fedict.trust.service.snmp.mbean;
 
+import org.snmp4j.agent.MOAccess;
+import org.snmp4j.agent.mo.MOScalar;
+import org.snmp4j.smi.OID;
+import org.snmp4j.smi.Variable;
 
-public interface SNMPServiceMBean {
+public abstract class Counter extends MOScalar {
+
+	public Counter(OID id, MOAccess access) {
+
+		super(id, access, null);
+		setVolatile(true);
+	}
 
 	/**
-	 * Increment the SNMP {@link Counter} with specified OID. If not yet
-	 * registered, does so.
-	 * 
-	 * @param oid
+	 * {@inheritDoc}
 	 */
-	public void increment(String oid);
+	@Override
+	public Variable getValue() {
 
-	/**
-	 * Attributes
-	 */
-	String getAddress();
+		return getCounterValue();
+	}
 
-	void setAddress(String address);
+	protected abstract Variable getCounterValue();
 
 }

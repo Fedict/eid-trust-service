@@ -33,6 +33,16 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.snmp4j</groupId>
+			<artifactId>snmp4j</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.snmp4j</groupId>
+			<artifactId>snmp4j-agent</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>javax.ejb</groupId>
 			<artifactId>ejb-api</artifactId>
 		</dependency>

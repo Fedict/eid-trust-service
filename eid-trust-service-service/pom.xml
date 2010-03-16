@@ -36,18 +36,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.jbossas</groupId>
-			<artifactId>jboss-as-system</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.snmp4j</groupId>
-			<artifactId>snmp4j</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.snmp4j</groupId>
-			<artifactId>snmp4j-agent</artifactId>
+			<groupId>be.fedict.eid-trust-service</groupId>
+			<artifactId>eid-trust-service-snmp</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

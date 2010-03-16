@@ -25,7 +25,7 @@
 		</depends>
 	</mbean>
 
-	<mbean name="trust:service=SNMP" code="be.fedict.trust.service.SNMPService"
+	<mbean name="trust:service=SNMP" code="be.fedict.trust.service.snmp.mbean.SNMPService"
 		xmbean-dd="META-INF/snmp-xmbean.xml">
 		<attribute name="Address">0.0.0.0/7894</attribute>
 	</mbean>

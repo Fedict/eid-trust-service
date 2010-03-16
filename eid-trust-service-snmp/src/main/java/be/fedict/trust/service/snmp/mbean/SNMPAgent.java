@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package be.fedict.trust.service;
+package be.fedict.trust.service.snmp.mbean;
 
 import java.io.File;
 import java.io.IOException;
