@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC 
+	"-//OASIS//DTD DocBook XML V4.5//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article lang="en">
+	<articleinfo>
+		<title>Fedict eID Trust Service Administrator Manual</title>
+		<copyright>
+			<year>2008-2010</year>
+			<holder>Fedict</holder>
+		</copyright>
+		<releaseinfo>16 Mar 2010</releaseinfo>
+		<authorgroup>
+			<author>
+				<firstname>Wim</firstname>
+				<surname>Vandenhaute</surname>
+			</author>
+		</authorgroup>
+		<abstract>
+			<para>This manual serves as an entry point for setting up the eID
+				Trust Service.</para>
+		</abstract>
+	</articleinfo>
+	<section>
+		<title>Installation</title>
+		<para>
+			The Fedict eID Trust Service comes with support for HSQL, MySQL
+			and Oracle. This chapter explains how to initialize the database.
+		</para>
+		<section>
+			<title>HSQL</title>
+			<para>
+				If you wish to run the Fedict eID Trust Service using HSQL, you
+				can
+				use the JBoss distribution that comes with the Fedict eID Applet.
+				Simply execute
+				<code>mvn jboss:deploy</code>
+				in the eid-trust-service-deploy artifact and you are good to go.
+			</para>
+			<para>
+				Beware though, as parsing large CRL's might be memory
+				intensive, you can quickly run into memory issues on HSQL. Therefore
+				it is only recommended to use this during a test setup.
+			</para>
+		</section>
+		<section>
+			<title>MySQL</title>
+			<para>
+				If you wish to run the Fedict eID Trust Service using MySQL,
+				you can
+				use the eid-trust-service-mysql-distribution artifact.
+				After
+				unpacking you first have to initialize your database. To do so,
+				execute following sql scripts which can be found in
+				<code>./sql</code>
+				.
+				<programlisting role="XML"><![CDATA[
+				mysql -u root -p < mysql-create-account.sql
+				mysql -u trust -p < mysql-create-database.sql
+				mysql -u trust -p trust < mysql-trust-service-ddl.sql
+				]]></programlisting>
+				. The default username/password for the
+				<code>trust</code>
+				database that is used by the Fedict eID Trust Service is
+				<code>trust/trust</code>
+				. If you wish to change this, you will have to manually modify the
+				sql scripts and change the datasource in the jboss distribution. The
+				latter can be found in
+				<code>./jboss/server/default/deploy/trust-service-ds.xml</code>
+				.
+			</para>
+		</section>
+		<section>
+			<title>Oracle</title>
+			<para>TBD</para>
+		</section>
+	</section>
+	<section>
+		<title>Running</title>
+		<para>
+			After you have correctly setup your database, you can start the
+			application by
+			<code>./jboss/bin/run.sh -b 0.0.0.0</code>
+			. Note that in case you choose HSQL as your database, you will have
+			to first start the Fedict eID Applet JBoss distribution, followed by
+			running the command
+			<code>mvn jboss:deploy</code>
+			from the eid-trust-service-deploy artifact. The MySQL and Oracle
+			distribution have the Fedict eID Trust Service Application packaged
+			and will be started automatically.
+		</para>
+		<para>
+			After the application has started, it will have initialized itself
+			with 3 default trust domains.
+			<orderedlist>
+				<listitem>
+					eID Authentication Trust Domain
+				</listitem>
+				<listitem>
+					eID Non Repudiation Trust Domain
+				</listitem>
+				<listitem>
+					eID National Registry Trust Domain
+				</listitem>
+			</orderedlist>
+		</para>
+		<para>
+			The default trust domain will be set to the eID Authentication
+			Trust
+			Domain. In order to function properly, the application needs to
+			be
+			able to make outgoing calls for CRL, OCSP, TSP and NTP. If you are
+			running behind a proxy, you can setup the proxy using the
+			administration webapp.
+		</para>
+	</section>
+	<section>
+		<title>Administration</title>
+		<para>
+			The Fedict eID Trust Service comes with an administration
+			portal. This portal allows you to setup your network proxy if any,
+			manage trust domains and other aspects of the service.
+		</para>
+		<section>
+			<title>Administrator registration</title>
+			<para>
+				To authenticate to the administrator portal, an eID
+				authentication will be performed. If the service was freshly
+				installed, the first successfull authentication will be
+				automatically
+				registered as administrator. Subsequent administrators
+				will have to
+				be accepted by this one. To do so you can, or perform a
+				login which
+				will add you as a pending administrator which can then be
+				approved
+				by
+				an already approved administrator. Or a logged in
+				administrator can
+				directly add another administrator from within the
+				admin portal
+				after
+				a successfull eID authentication.
+			</para>
+		</section>
+		<section>
+			<title>Configuration</title>
+			<section>
+				<title>Network Configuration</title>
+				<para>If you are operating behind a proxy, you can setup this in
+					here and enable or disable the proxy configuration temporarily.
+				</para>
+			</section>
+			<section>
+				<title>Clock Drift Detection</title>
+				<para>
+					The Fedict eID Trust Service comes with built in support for
+					NTP and TSP.
+				</para>
+			</section>
+			<section>
+				<title>Information Message</title>
+				<para>
+					The Fedict eID Trust Service comes with a portal where regular
+					users can perform a validation of their eID certificates. The
+					information messages to be displayed on the initial page of that
+					portal can be configured here. 
+				</para>
+			</section>
+		</section>
+	</section>
+	<appendix>
+		<title>eID Trust Service Admin Manual License</title>
+		<para>
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="cc.logo.large.png"
+						scale="100" />
+				</imageobject>
+			</mediaobject>
+			This document has been released under the Creative Commons license.
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="share.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You are free to Share — to copy, distribute and transmit the work.
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="by.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You must attribute the work in the manner specified by the author or
+			licensor (but not in any way that suggests that they endorse you or
+			your use of the work).
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="nc.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You may not use this work for commercial purposes.
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="nd.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You may not alter, transform, or build upon this work.
+		</para>
+		<para>
+			More information about the Creative Commons license conditions can be
+			found at
+			<ulink url="http://creativecommons.org/">Creative Commons organization</ulink>
+			.
+		</para>
+	</appendix>
+	<appendix>
+		<title>eID Trust Service License</title>
+		<para>The eID Trust Service source code has been released under the
+			GNU LGPL version 3.0.</para>
+		<para>
+			<code>This is free software; you can redistribute it and/or modify it
+				under the terms of the GNU Lesser General Public License version
+				3.0
+				as published by the Free Software Foundation.
+
+				This software is
+				distributed in the hope that it will be useful,
+				but WITHOUT ANY
+				WARRANTY; without even the implied warranty of
+				MERCHANTABILITY or
+				FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+				Lesser General Public
+				License for more details.
+
+				You should have received a copy of the GNU
+				Lesser General Public
+				License along with this software; if not, see
+				http://www.gnu.org/licenses/.</code>
+		</para>
+	</appendix>
+	<appendix>
+		<title>Revision history</title>
+		<table>
+			<title>Revision history</title>
+			<tgroup cols="2">
+				<colspec colwidth="1*" />
+				<colspec colwidth="1*" />
+				<colspec colwidth="2*" />
+				<thead>
+					<row>
+						<entry>Date</entry>
+						<entry>Author</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>16 Mar 2010</entry>
+						<entry>Wim Vandenhaute</entry>
+						<entry>Initial version.</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+	</appendix>
+</article>
