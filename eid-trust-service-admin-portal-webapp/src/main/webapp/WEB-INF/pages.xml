@@ -7,4 +7,7 @@
 	<page view-id="/trust-point-select.xhtml">
 		<action execute="#{ts_trustDomain.initSelect}" />
 	</page>
+	<page view-id="/trust-domain-select.xhtml">
+		<action execute="#{ts_trustDomain.initSelectVirtual}" />
+	</page>
 </pages>

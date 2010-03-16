@@ -28,6 +28,7 @@ import javax.jms.JMSException;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
@@ -37,6 +38,7 @@ import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
+import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
 /**
  * Trust domain service.
@@ -51,6 +53,11 @@ public interface TrustDomainService {
 	 * List all {@link TrustDomainEntity}'s.
 	 */
 	List<TrustDomainEntity> listTrustDomains();
+
+	/**
+	 * List all {@link VirtualTrustDomainEntity}'s.
+	 */
+	List<VirtualTrustDomainEntity> listVirtualTrustDomains();
 
 	/**
 	 * List all {@link TrustPointEntity}'s.
@@ -144,6 +151,20 @@ public interface TrustDomainService {
 			List<String> trustPointNames) throws TrustDomainNotFoundException;
 
 	/**
+	 * Sets the {@link TrustDomainEntity}'s for the specified
+	 * {@link VirtualTrustDomainEntity}.
+	 * 
+	 * @param virtualTrustDomain
+	 * @param trustDomainNames
+	 * 
+	 * @throws VirtualTrustDomainNotFoundException
+	 */
+	VirtualTrustDomainEntity setTrustDomains(
+			VirtualTrustDomainEntity virtualTrustDomain,
+			List<String> trustDomainNames)
+			throws VirtualTrustDomainNotFoundException;
+
+	/**
 	 * Add a new {@link PolicyConstraintEntity} to the specified
 	 * {@link TrustDomainEntity}.
 	 * 
@@ -230,11 +251,25 @@ public interface TrustDomainService {
 	TrustDomainEntity addTrustDomain(String name);
 
 	/**
+	 * Add a new {@link VirtualTrustDomainEntity}.
+	 * 
+	 * @param name
+	 */
+	VirtualTrustDomainEntity addVirtualTrustDomain(String name);
+
+	/**
 	 * Remove the specified {@link TrustDomainEntity}.
 	 * 
 	 * @param trustDomain
 	 */
 	void removeTrustDomain(TrustDomainEntity trustDomain);
+
+	/**
+	 * Remove the specified {@link VirtualTrustDomainEntity}.
+	 * 
+	 * @param virtualTrustDomain
+	 */
+	void removeVirtualTrustDomain(VirtualTrustDomainEntity virtualTrustDomain);
 
 	/**
 	 * Refresh the specified {@link TrustPointEntity}'s revocation cache

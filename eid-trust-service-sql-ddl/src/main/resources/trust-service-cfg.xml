@@ -8,6 +8,7 @@
 <mapping class="be.fedict.trust.service.entity.RevokedCertificateEntity" />
 <mapping class="be.fedict.trust.service.entity.TrustDomainEntity" />
 <mapping class="be.fedict.trust.service.entity.TrustPointEntity" />
+<mapping class="be.fedict.trust.service.entity.VirtualTrustDomainEntity" />
 <mapping class="be.fedict.trust.service.entity.constraints.CertificateConstraintEntity" />
 <mapping class="be.fedict.trust.service.entity.constraints.DNConstraintEntity" />
 <mapping class="be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity" />

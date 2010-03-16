@@ -56,6 +56,7 @@ import be.fedict.trust.admin.portal.TrustDomain;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
 import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
@@ -65,6 +66,7 @@ import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
 @Stateful
 @Name(AdminConstants.ADMIN_SEAM_PREFIX + "trustDomain")
@@ -73,7 +75,9 @@ import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 public class TrustDomainBean implements TrustDomain {
 
 	public static final String SELECTED_TRUST_DOMAIN = "selectedTrustDomain";
+	public static final String SELECTED_VIRTUAL_TRUST_DOMAIN = "selectedVirtualTrustDomain";
 	private static final String TRUST_DOMAIN_LIST_NAME = "trustDomainList";
+	private static final String VIRTUAL_TRUST_DOMAIN_LIST_NAME = "virtualTrustDomainList";
 
 	private static final String CONSTRAINTS_POLICY_LIST = "constraintsPolicies";
 	private static final String CONSTRAINTS_KEY_USAGE_LIST = "constraintsKeyUsage";
@@ -98,13 +102,26 @@ public class TrustDomainBean implements TrustDomain {
 	@In(required = false)
 	private TrustDomainEntity selectedTrustDomain;
 
+	@SuppressWarnings("unused")
+	@DataModel(VIRTUAL_TRUST_DOMAIN_LIST_NAME)
+	private List<VirtualTrustDomainEntity> virtualTrustDomainList;
+
+	@DataModelSelection(VIRTUAL_TRUST_DOMAIN_LIST_NAME)
+	@Out(value = SELECTED_VIRTUAL_TRUST_DOMAIN, required = false, scope = ScopeType.CONVERSATION)
+	@In(required = false)
+	private VirtualTrustDomainEntity selectedVirtualTrustDomain;
+
 	@Out(value = TrustPointBean.SELECTED_TRUST_POINT, required = false, scope = ScopeType.CONVERSATION)
 	private TrustPointEntity selectedTrustPoint;
 
 	private TreeNode<TrustPointEntity> rootNode = null;
+	private TreeNode<TrustDomainEntity> rootNodeVirtual = null;
 
 	private List<String> sourceTrustPoints;
 	private List<String> selectedTrustPoints;
+
+	private List<String> sourceTrustDomains;
+	private List<String> selectedTrustDomains;
 
 	@DataModel(CONSTRAINTS_POLICY_LIST)
 	private List<PolicyConstraintEntity> policyConstraints;
@@ -125,6 +142,7 @@ public class TrustDomainBean implements TrustDomain {
 	private EndEntityConstraintEntity selectedEndEntityConstraint;
 
 	private String name;
+	private String nameVirtual;
 	private String certificatePolicy;
 	private String keyUsage;
 	private boolean allowed;
@@ -145,6 +163,8 @@ public class TrustDomainBean implements TrustDomain {
 		this.name = null;
 		this.sourceTrustPoints = null;
 		this.selectedTrustPoints = null;
+		this.sourceTrustDomains = null;
+		this.selectedTrustDomains = null;
 		this.certificatePolicy = null;
 		this.keyUsage = null;
 		this.allowed = false;
@@ -167,10 +187,22 @@ public class TrustDomainBean implements TrustDomain {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Factory(VIRTUAL_TRUST_DOMAIN_LIST_NAME)
+	public void virtualTrustDomainListFactory() {
+
+		this.log.debug("virtual trust domain list factory");
+		this.virtualTrustDomainList = this.trustDomainService
+				.listVirtualTrustDomains();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Begin(join = true)
 	public String modify() {
 
-		this.log.debug("modify: #0", this.selectedTrustDomain.getName());
+		this.log.debug("modify trust domain: #0", this.selectedTrustDomain
+				.getName());
 		for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
 				.getCertificateConstraints()) {
 			if (certificateConstraint instanceof DNConstraintEntity) {
@@ -182,6 +214,17 @@ public class TrustDomainBean implements TrustDomain {
 			}
 		}
 		return "modify";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Begin(join = true)
+	public String modifyVirtual() {
+
+		this.log.debug("modify virtual trust domain: #0",
+				this.selectedVirtualTrustDomain.getName());
+		return "modify_virtual";
 	}
 
 	/**
@@ -200,10 +243,32 @@ public class TrustDomainBean implements TrustDomain {
 	 * {@inheritDoc}
 	 */
 	@Begin(join = true)
+	public String addVirtual() {
+
+		this.log.debug("add virtual trust domain #0", this.nameVirtual);
+		this.selectedVirtualTrustDomain = this.trustDomainService
+				.addVirtualTrustDomain(this.nameVirtual);
+		return "modify_virtual";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Begin(join = true)
 	public void select() {
 
 		this.log.debug("selected trust domain: #0", this.selectedTrustDomain
 				.getName());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Begin(join = true)
+	public void selectVirtual() {
+
+		this.log.debug("selected virtual trust domain: #0",
+				this.selectedVirtualTrustDomain.getName());
 	}
 
 	/**
@@ -222,8 +287,24 @@ public class TrustDomainBean implements TrustDomain {
 	 * {@inheritDoc}
 	 */
 	@End
+	public String removeVirtual() {
+
+		this.log.debug("remove virtual: #0", this.selectedVirtualTrustDomain
+				.getName());
+		this.trustDomainService
+				.removeVirtualTrustDomain(this.selectedVirtualTrustDomain);
+		virtualTrustDomainListFactory();
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@End
 	public String back() {
 
+		trustDomainListFactory();
+		virtualTrustDomainListFactory();
 		return "back";
 	}
 
@@ -257,6 +338,31 @@ public class TrustDomainBean implements TrustDomain {
 	/**
 	 * {@inheritDoc}
 	 */
+	public TreeNode<TrustDomainEntity> getTreeNodeVirtual() {
+		if (this.rootNodeVirtual == null) {
+			loadTreeVirtual();
+		}
+		return this.rootNodeVirtual;
+	}
+
+	private void loadTreeVirtual() {
+		this.rootNodeVirtual = new TreeNodeImpl<TrustDomainEntity>();
+		addNodesVirtual(null, this.rootNodeVirtual);
+	}
+
+	private void addNodesVirtual(String path, TreeNode<TrustDomainEntity> node) {
+
+		for (TrustDomainEntity trustDomain : this.selectedVirtualTrustDomain
+				.getTrustDomains()) {
+			TreeNodeImpl<TrustDomainEntity> nodeImpl = new TreeNodeImpl<TrustDomainEntity>();
+			nodeImpl.setData(trustDomain);
+			node.addChild(trustDomain.getName(), nodeImpl);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Begin(join = true)
 	public void processNodeSelection(NodeSelectedEvent event) {
@@ -265,7 +371,21 @@ public class TrustDomainBean implements TrustDomain {
 		TreeNode<TrustPointEntity> currentNode = tree.getModelTreeNode(tree
 				.getRowKey());
 		this.selectedTrustPoint = (TrustPointEntity) currentNode.getData();
-		this.log.debug("view: " + selectedTrustPoint.getName());
+		this.log.debug("view trust point: #0", selectedTrustPoint.getName());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	@Begin(join = true)
+	public void processNodeSelectionVirtual(NodeSelectedEvent event) {
+
+		HtmlTree tree = (HtmlTree) event.getComponent();
+		TreeNode<TrustDomainEntity> currentNode = tree.getModelTreeNode(tree
+				.getRowKey());
+		this.selectedTrustDomain = (TrustDomainEntity) currentNode.getData();
+		this.log.debug("view trust domain: #0", selectedTrustDomain.getName());
 	}
 
 	/**
@@ -311,6 +431,16 @@ public class TrustDomainBean implements TrustDomain {
 	/**
 	 * {@inheritDoc}
 	 */
+	public String selectTrustDomains() {
+
+		this.log.debug("select trust domainsfor virtual trust domain: #0",
+				this.selectedVirtualTrustDomain.getName());
+		return "select";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void initSelect() {
 
 		this.log.debug("#init select");
@@ -319,6 +449,21 @@ public class TrustDomainBean implements TrustDomain {
 			for (TrustPointEntity trustPoint : this.trustDomainService
 					.listTrustPoints(this.selectedTrustDomain)) {
 				this.selectedTrustPoints.add(trustPoint.getName());
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void initSelectVirtual() {
+
+		this.log.debug("#init select virtual");
+		if (null != this.selectedVirtualTrustDomain) {
+			this.selectedTrustDomains = new LinkedList<String>();
+			for (TrustDomainEntity trustDomain : this.selectedVirtualTrustDomain
+					.getTrustDomains()) {
+				this.selectedTrustDomains.add(trustDomain.getName());
 			}
 		}
 	}
@@ -373,6 +518,64 @@ public class TrustDomainBean implements TrustDomain {
 					this.selectedTrustPoints);
 			loadTree();
 		} catch (TrustDomainNotFoundException e) {
+			this.facesMessages.addFromResourceBundle(
+					StatusMessage.Severity.ERROR, "errorTrustDomainNotFound");
+			return null;
+		}
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> getSourceTrustDomains() {
+
+		this.sourceTrustDomains = new LinkedList<String>();
+		for (TrustDomainEntity trustDomain : this.trustDomainService
+				.listTrustDomains()) {
+			if (null != this.selectedTrustDomains
+					&& !this.selectedTrustDomains.contains(trustDomain
+							.getName()))
+				this.sourceTrustDomains.add(trustDomain.getName());
+		}
+		return this.sourceTrustDomains;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setSourceTrustDomains(List<String> sourceTrustDomains) {
+
+		this.sourceTrustDomains = sourceTrustDomains;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> getSelectedTrustDomains() {
+
+		return this.selectedTrustDomains;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setSelectedTrustDomains(List<String> selectedTrustDomains) {
+
+		this.selectedTrustDomains = selectedTrustDomains;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String saveSelectVirtual() {
+
+		try {
+			this.selectedVirtualTrustDomain = this.trustDomainService
+					.setTrustDomains(this.selectedVirtualTrustDomain,
+							this.selectedTrustDomains);
+			loadTreeVirtual();
+		} catch (VirtualTrustDomainNotFoundException e) {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorTrustDomainNotFound");
 			return null;
@@ -761,5 +964,21 @@ public class TrustDomainBean implements TrustDomain {
 	public void setName(String name) {
 
 		this.name = name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getNameVirtual() {
+
+		return this.nameVirtual;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setNameVirtual(String nameVirtual) {
+
+		this.nameVirtual = nameVirtual;
 	}
 }

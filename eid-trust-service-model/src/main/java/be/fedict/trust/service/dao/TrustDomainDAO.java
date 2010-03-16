@@ -26,6 +26,7 @@ import javax.ejb.Local;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
 import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
@@ -34,6 +35,7 @@ import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
 /**
  * Trust Domain DAO.
@@ -48,6 +50,11 @@ public interface TrustDomainDAO {
 	 * Returns list of {@link TrustDomainEntity}'s
 	 */
 	List<TrustDomainEntity> listTrustDomains();
+
+	/**
+	 * Returns list of {@link VirtualTrustDomainEntity}\s.
+	 */
+	List<VirtualTrustDomainEntity> listVirtualTrustDomains();
 
 	/**
 	 * Returns list of {@link TrustDomainEntity}'s containing the specified
@@ -77,6 +84,25 @@ public interface TrustDomainDAO {
 			throws TrustDomainNotFoundException;
 
 	/**
+	 * Return {@link VirtualTrustDomainEntity} from specified name. Returns
+	 * <code>null</code> if not found.
+	 * 
+	 * @param name
+	 */
+	VirtualTrustDomainEntity findVirtualTrustDomain(String name);
+
+	/**
+	 * Returns {@link VirtualTrustDomainEntity} from specified name. Throws
+	 * {@link TrustDomainNotFoundException} if not found.
+	 * 
+	 * @param name
+	 * 
+	 * @throws VirtualTrustDomainNotFoundException
+	 */
+	VirtualTrustDomainEntity getVirtualTrustDomain(String name)
+			throws VirtualTrustDomainNotFoundException;
+
+	/**
 	 * Create a new {@link TrustDomainEntity}.
 	 * 
 	 * @param name
@@ -84,11 +110,25 @@ public interface TrustDomainDAO {
 	TrustDomainEntity addTrustDomain(String name);
 
 	/**
+	 * Create a new {@link VirtualTrustDomainEntity}.
+	 * 
+	 * @param name
+	 */
+	VirtualTrustDomainEntity addVirtualTrustDomain(String name);
+
+	/**
 	 * Remove the specified {@link TrustDomainEntity}.
 	 * 
 	 * @param trustDomain
 	 */
 	void removeTrustDomain(TrustDomainEntity trustDomain);
+
+	/**
+	 * Remove the specified {@link VirtualTrustDomainEntity}.
+	 * 
+	 * @param virtualTrustDomain
+	 */
+	void removeVirtualTrustDomain(VirtualTrustDomainEntity virtualTrustDomain);
 
 	/**
 	 * Sets the {@link TrustDomainEntity} as default.
@@ -240,4 +280,5 @@ public interface TrustDomainDAO {
 	 */
 	CertificateConstraintEntity findCertificateConstraint(
 			CertificateConstraintEntity certificateConstraint);
+
 }

@@ -22,8 +22,10 @@ import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
@@ -42,6 +44,7 @@ import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
@@ -51,6 +54,7 @@ import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
+import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
 /**
  * Trust Domain Service Bean implementation.
@@ -88,6 +92,16 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 * {@inheritDoc}
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public VirtualTrustDomainEntity addVirtualTrustDomain(String name) {
+
+		LOG.debug("add virtualtrust domain: " + name);
+		return this.trustDomainDAO.addVirtualTrustDomain(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public void removeTrustDomain(TrustDomainEntity trustDomain) {
 
 		LOG.debug("remove trust domain: " + trustDomain.getName());
@@ -98,10 +112,32 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 * {@inheritDoc}
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void removeVirtualTrustDomain(
+			VirtualTrustDomainEntity virtualTrustDomain) {
+
+		LOG.debug("remove virtual trust domain: "
+				+ virtualTrustDomain.getName());
+		this.trustDomainDAO.removeVirtualTrustDomain(virtualTrustDomain);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public List<TrustDomainEntity> listTrustDomains() {
 
 		LOG.debug("list trust domains");
 		return this.trustDomainDAO.listTrustDomains();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public List<VirtualTrustDomainEntity> listVirtualTrustDomains() {
+
+		LOG.debug("list virtual trust domains");
+		return this.trustDomainDAO.listVirtualTrustDomains();
 	}
 
 	/**
@@ -268,6 +304,28 @@ public class TrustDomainServiceBean implements TrustDomainService {
 			trustPoints.add(this.trustDomainDAO.findTrustPoint(trustPointName));
 		}
 		attachedTrustDomain.setTrustPoints(trustPoints);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public VirtualTrustDomainEntity setTrustDomains(
+			VirtualTrustDomainEntity virtualTrustDomain,
+			List<String> trustDomainNames)
+			throws VirtualTrustDomainNotFoundException {
+
+		LOG.debug("set selected trust domains for virtual domain: "
+				+ virtualTrustDomain.getName());
+		VirtualTrustDomainEntity attachedVirtualTrustDomain = this.trustDomainDAO
+				.getVirtualTrustDomain(virtualTrustDomain.getName());
+		Set<TrustDomainEntity> trustDomains = new HashSet<TrustDomainEntity>();
+		for (String trustDomainName : trustDomainNames) {
+			trustDomains.add(this.trustDomainDAO
+					.findTrustDomain(trustDomainName));
+		}
+		attachedVirtualTrustDomain.setTrustDomains(trustDomains);
+		return attachedVirtualTrustDomain;
 	}
 
 	/**

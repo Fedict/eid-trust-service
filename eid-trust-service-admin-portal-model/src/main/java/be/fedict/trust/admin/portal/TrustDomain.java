@@ -28,6 +28,7 @@ import org.richfaces.event.NodeSelectedEvent;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.TreeNode;
 
+import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
@@ -39,6 +40,8 @@ public interface TrustDomain {
 	 * Factory
 	 */
 	void trustDomainListFactory();
+
+	void virtualTrustDomainListFactory();
 
 	void constraintsPolicyFactory();
 
@@ -60,6 +63,10 @@ public interface TrustDomain {
 
 	void setName(String name);
 
+	String getNameVirtual();
+
+	void setNameVirtual(String nameVirtual);
+
 	List<String> getSourceTrustPoints();
 
 	void setSourceTrustPoints(List<String> sourceTrustPoints);
@@ -67,6 +74,14 @@ public interface TrustDomain {
 	List<String> getSelectedTrustPoints();
 
 	void setSelectedTrustPoints(List<String> selectedTrustPoints);
+
+	List<String> getSourceTrustDomains();
+
+	void setSourceTrustDomains(List<String> sourceTrustDomains);
+
+	List<String> getSelectedTrustDomains();
+
+	void setSelectedTrustDomains(List<String> selectedTrustDomains);
 
 	String getCertificatePolicy();
 
@@ -97,11 +112,19 @@ public interface TrustDomain {
 	 */
 	String modify();
 
+	String modifyVirtual();
+
 	void select();
+
+	void selectVirtual();
 
 	String remove();
 
+	String removeVirtual();
+
 	String add();
+
+	String addVirtual();
 
 	String save();
 
@@ -109,9 +132,15 @@ public interface TrustDomain {
 
 	String selectTrustPoints();
 
+	String selectTrustDomains();
+
 	void initSelect();
 
 	String saveSelect();
+
+	void initSelectVirtual();
+
+	String saveSelectVirtual();
 
 	String back();
 
@@ -142,14 +171,18 @@ public interface TrustDomain {
 	String removeConstraintQc();
 
 	/*
-	 * Trust points tree
+	 * Richfaces tree
 	 */
 	TreeNode<TrustPointEntity> getTreeNode();
+
+	TreeNode<TrustDomainEntity> getTreeNodeVirtual();
 
 	/*
 	 * Richfaces component callbacks
 	 */
 	void processNodeSelection(NodeSelectedEvent event);
+
+	void processNodeSelectionVirtual(NodeSelectedEvent event);
 
 	void uploadListener(UploadEvent event) throws IOException;
 

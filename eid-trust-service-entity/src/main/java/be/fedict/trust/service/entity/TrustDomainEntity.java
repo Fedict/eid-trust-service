@@ -79,7 +79,6 @@ public class TrustDomainEntity implements Serializable {
 	 * Main constructor.
 	 * 
 	 * @param name
-	 * @param crlRefreshCron
 	 */
 	public TrustDomainEntity(String name) {
 

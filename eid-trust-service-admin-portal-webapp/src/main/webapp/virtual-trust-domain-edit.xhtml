@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:s="http://jboss.com/products/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j">
+	<body>
+		<ui:composition template="/WEB-INF/template.xhtml">
+			<ui:param name="activeMenu" value="domain" />
+			<ui:define name="body">
+				<h2>#{messages.modifyVirtualTrustDomain}:
+					#{selectedVirtualTrustDomain.name}</h2>
+
+				<h:form id="form">
+
+					<h3>#{messages.trustDomains}</h3>
+
+					<rich:tree style="width:300px" value="#{ts_trustDomain.treeNodeVirtual}"
+						switchType="client" var="item" reRender="selectedNode"
+						ajaxSubmitSelection="true"
+						nodeSelectListener="#{ts_trustDomain.processNodeSelectionVirtual}">
+						<rich:treeNode>
+							<h:commandLink action="view">
+								<h:outputText value="#{item.name}" />
+							</h:commandLink>
+
+						</rich:treeNode>
+					</rich:tree>
+
+					<br />
+
+					<h:commandButton action="#{ts_trustDomain.selectTrustDomains}"
+						id="select" value="#{messages.select}" immediate="true"
+						styleClass="submit" />
+					<h:commandButton action="#{ts_trustDomain.back}"
+						id="back" value="#{messages.back}" immediate="true" styleClass="submit" />
+
+					<h:messages globalOnly="true" styleClass="error" />
+
+				</h:form>
+
+			</ui:define>
+		</ui:composition>
+	</body>
+</html>

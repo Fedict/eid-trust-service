@@ -34,6 +34,7 @@ import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
 import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
@@ -42,6 +43,7 @@ import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
 /**
  * Trust Domain DAO Bean implementation.
@@ -72,6 +74,18 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
+	public List<VirtualTrustDomainEntity> listVirtualTrustDomains() {
+
+		LOG.debug("list virtual trust domains");
+		Query query = this.entityManager
+				.createNamedQuery(VirtualTrustDomainEntity.QUERY_LIST_ALL);
+		return (List<VirtualTrustDomainEntity>) query.getResultList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public TrustDomainEntity findTrustDomain(String name) {
 
 		LOG.debug("find trust domain: " + name);
@@ -93,6 +107,27 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
+	public VirtualTrustDomainEntity findVirtualTrustDomain(String name) {
+
+		LOG.debug("find virtual trust domain: " + name);
+		return this.entityManager.find(VirtualTrustDomainEntity.class, name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public VirtualTrustDomainEntity getVirtualTrustDomain(String name)
+			throws VirtualTrustDomainNotFoundException {
+		LOG.debug("get virtual trust domain: " + name);
+		VirtualTrustDomainEntity virtualTrustDomain = findVirtualTrustDomain(name);
+		if (null == virtualTrustDomain)
+			throw new VirtualTrustDomainNotFoundException();
+		return virtualTrustDomain;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public TrustDomainEntity addTrustDomain(String name) {
 
 		LOG.debug("add trust domain name=" + name);
@@ -104,12 +139,38 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
+	public VirtualTrustDomainEntity addVirtualTrustDomain(String name) {
+
+		LOG.debug("add virtual trust domain name=" + name);
+		VirtualTrustDomainEntity virtualTrustDomain = new VirtualTrustDomainEntity(
+				name);
+		this.entityManager.persist(virtualTrustDomain);
+		return virtualTrustDomain;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void removeTrustDomain(TrustDomainEntity trustDomain) {
 
 		LOG.debug("remove trust domain " + trustDomain.getName());
 		TrustDomainEntity attachedTrustDomain = findTrustDomain(trustDomain
 				.getName());
 		this.entityManager.remove(attachedTrustDomain);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeVirtualTrustDomain(
+			VirtualTrustDomainEntity virtualTrustDomain) {
+
+		LOG
+				.debug("remove virtual trust domain "
+						+ virtualTrustDomain.getName());
+		VirtualTrustDomainEntity attachedVirtualTrustDomain = findVirtualTrustDomain(virtualTrustDomain
+				.getName());
+		this.entityManager.remove(attachedVirtualTrustDomain);
 	}
 
 	/**
