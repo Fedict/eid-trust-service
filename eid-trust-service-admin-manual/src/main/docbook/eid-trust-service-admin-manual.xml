@@ -163,10 +163,39 @@
 				<para>
 					The Fedict eID Trust Service comes with a portal where regular
 					users can perform a validation of their eID certificates. The
-					information messages to be displayed on the initial page of that
+					information message to be displayed on the initial page of that
 					portal can be configured here. 
 				</para>
 			</section>
+		</section>
+		<section>
+			<title>Trust Domains</title>
+			<para>
+				You can manage the trust domains in this sections. This
+				includes specifying the default trust domain, whether or not CRL
+				caching should be used, manage the trust points associated with this
+				domain and configure the certificate constraints.
+			</para>
+		</section>
+		<section>
+			<title>Virtual Trust Domains</title>
+			<para>
+				Virtual trust domains are a group of existing trust domains and
+				can be managed in this section.
+			</para>
+		</section>
+		<section>
+			<title>Trust Points</title>
+			<para>
+				For each trust point, you can specify a cron expression for
+				specifying
+				the CRL cache refresh interval. Such a refresh includes
+				refreshing all
+				underlying CA's that have been cached. You can also
+				refresh the CRL cache immediately here for debugging purposes. For
+				each trust point you can also see the list of CA's associated with
+				this trust point and for each CA refresh the cache individually.
+		</para>
 		</section>
 	</section>
 	<appendix>
