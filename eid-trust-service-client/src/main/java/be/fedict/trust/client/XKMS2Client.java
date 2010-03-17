@@ -19,6 +19,7 @@
 package be.fedict.trust.client;
 
 import java.io.IOException;
+import java.security.PublicKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509CRL;
@@ -78,8 +79,6 @@ public class XKMS2Client {
 
 	private final XKMSPortType port;
 
-	private final String location;
-
 	private RevocationValuesType revocationValues;
 
 	private List<String> reasonURIs;
@@ -96,14 +95,27 @@ public class XKMS2Client {
 
 		XKMSService xkmsService = XKMSServiceFactory.getInstance();
 		port = xkmsService.getXKMSPort();
-		this.location = MessageFormat.format("{0}/eid-trust-service-ws/xkms2",
-				location);
+		String wsLocation = MessageFormat.format(
+				"{0}/eid-trust-service-ws/xkms2", location);
 
-		setEndpointAddress();
+		setEndpointAddress(wsLocation);
 	}
 
-	private void setEndpointAddress() {
+	/**
+	 * If set, server certificate will be verified against the specified
+	 * {@link PublicKey}.
+	 * 
+	 * @param publicKey
+	 */
+	public void setServicePublicKey(PublicKey publicKey) {
 
+		SSLTrustManager.setTrustedPublicKey(publicKey);
+		SSLTrustManager.initialize();
+	}
+
+	private void setEndpointAddress(String location) {
+
+		LOG.debug("ws location=" + location);
 		BindingProvider bindingProvider = (BindingProvider) port;
 		bindingProvider.getRequestContext().put(
 				BindingProvider.ENDPOINT_ADDRESS_PROPERTY, location);
@@ -321,8 +333,6 @@ public class XKMS2Client {
 
 		}
 
-		// TODO: WS trust via unilateral TLS trust model based on public key
-
 		ValidateResultType validateResult = port.validate(validateRequest);
 
 		if (null == validateResult) {
@@ -347,10 +357,8 @@ public class XKMS2Client {
 		}
 
 		// store reason URIs
-
 		List<KeyBindingType> keyBindings = validateResult.getKeyBinding();
 		for (KeyBindingType keyBinding : keyBindings) {
-			// TODO better result verification
 			StatusType status = keyBinding.getStatus();
 			String statusValue = status.getStatusValue();
 			LOG.debug("status: " + statusValue);

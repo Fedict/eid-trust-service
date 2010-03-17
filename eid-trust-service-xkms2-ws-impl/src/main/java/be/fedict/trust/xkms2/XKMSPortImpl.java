@@ -285,6 +285,7 @@ public class XKMSPortImpl implements XKMSPortType {
 
 	private X509Certificate getCertificate(byte[] encodedCertificate)
 			throws CertificateException {
+
 		CertificateFactory certificateFactory = CertificateFactory
 				.getInstance("X.509");
 		X509Certificate certificate = (X509Certificate) certificateFactory

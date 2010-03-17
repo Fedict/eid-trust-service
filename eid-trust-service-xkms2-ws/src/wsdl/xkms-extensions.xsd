@@ -28,4 +28,20 @@
 		</complexContent>
 	</complexType>
 
+	<element name="AttributeCertificateMessageExtension" type="tns:AttributeCertificateMessageExtensionType" />
+	<complexType name="AttributeCertificateMessageExtensionType">
+		<sequence>
+			<element name="AttributeCertificate" type="base64Binary"
+				minOccurs="1" />
+		</sequence>
+	</complexType>
+
+	<element name="TSACertificateMessageExtension" type="tns:TSACertificateMessageExtensionType" />
+	<complexType name="TSACertificateMessageExtensionType">
+		<sequence>
+			<element name="XAdESTimeStamp" type="xades:XAdESTimeStampType"
+				minOccurs="1" />
+		</sequence>
+	</complexType>
+
 </schema>

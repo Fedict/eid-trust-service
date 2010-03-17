@@ -117,7 +117,6 @@ public class HarvesterMDB implements MessageListener {
 		X509CRL crl = onlineCrlRepository.findCrl(crlUri, certificateAuthority
 				.getCertificate(), validationDate);
 		if (null == crl) {
-			// XXX: what to do, throw runtime exception so mdb retries ?
 			LOG.error("failed to download CRL for CA " + caName);
 			throw new RuntimeException();
 		}
