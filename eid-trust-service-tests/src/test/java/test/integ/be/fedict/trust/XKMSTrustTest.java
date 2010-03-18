@@ -103,11 +103,10 @@ public class XKMSTrustTest {
 					.validate(
 							TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
 							signCertificateChain);
+			fail();
 		} catch (ClientTransportException e) {
 			// expected
-			return;
 		}
-		fail();
 	}
 
 	private KeyPair generateKeyPair() throws NoSuchAlgorithmException,

@@ -84,6 +84,9 @@ public class SSLTrustManager implements X509TrustManager {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void checkServerTrusted(X509Certificate[] chain, String authType)
 			throws CertificateException {
 
@@ -109,6 +112,9 @@ public class SSLTrustManager implements X509TrustManager {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void checkClientTrusted(X509Certificate[] chain, String authType)
 			throws CertificateException {
 
@@ -116,6 +122,9 @@ public class SSLTrustManager implements X509TrustManager {
 				"this trust manager cannot be used as server-side trust manager");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public X509Certificate[] getAcceptedIssuers() {
 
 		return null;
