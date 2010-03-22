@@ -4,5 +4,11 @@
 	version="1.0">
 	<persistence-unit name="trust">
 		<jta-data-source>java:/DefaultDS</jta-data-source>
+
+		<properties>
+			<property name="hibernate.dialect" value="${hibernate.dialect}" />
+			<property name="hibernate.hbm2ddl.auto" value="${hibernate.hbm2ddl.auto}" />
+		</properties>
+
 	</persistence-unit>
 </persistence>

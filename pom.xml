@@ -60,6 +60,11 @@
 					<value>prod-mysql</value>
 				</property>
 			</activation>
+			<properties>
+				<hibernate.dialect>org.hibernate.dialect.MySQLDialect
+				</hibernate.dialect>
+				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
+			</properties>
 			<modules>
 				<module>eid-trust-service-mysql-distribution</module>
 			</modules>
@@ -148,12 +153,16 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<!-- Default properties -->
 	<properties>
 		<eid-applet.version>1.0.1-SNAPSHOT</eid-applet.version>
 		<trust-service.data.source.user>trust
 		</trust-service.data.source.user>
 		<trust-service.data.source.pass>trust
 		</trust-service.data.source.pass>
+		<hibernate.dialect>org.hibernate.dialect.HSQLDialect
+		</hibernate.dialect>
+		<hibernate.hbm2ddl.auto>create-drop</hibernate.hbm2ddl.auto>
 	</properties>
 
 </project>
