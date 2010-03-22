@@ -38,7 +38,6 @@
 		<module>eid-trust-service-client</module>
 		<module>eid-trust-service-startup-runtime</module>
 		<module>eid-trust-service-snmp</module>
-		<module>eid-trust-service-mysql-distribution</module>
 	</modules>
 	<profiles>
 		<profile>
@@ -53,13 +52,38 @@
 				<module>eid-trust-service-tests</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>mysql</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>prod-mysql</value>
+				</property>
+			</activation>
+			<modules>
+				<module>eid-trust-service-mysql-distribution</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>all</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>all</value>
+				</property>
+			</activation>
+			<modules>
+				<module>eid-trust-service-tests</module>
+				<module>eid-trust-service-mysql-distribution</module>
+			</modules>
+		</profile>
 	</profiles>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>be.fedict</groupId>
 				<artifactId>jtrust</artifactId>
-				<version>1.1.1-SNAPSHOT</version>
+				<version>1.1.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>be.fedict.eid-applet</groupId>

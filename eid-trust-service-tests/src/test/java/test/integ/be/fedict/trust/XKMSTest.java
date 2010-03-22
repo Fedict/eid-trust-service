@@ -47,7 +47,6 @@ import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.NetworkConfig;
-import be.fedict.trust.TrustLinkerResult;
 import be.fedict.trust.TrustValidator;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
@@ -63,7 +62,7 @@ public class XKMSTest {
 
 	private static final Log LOG = LogFactory.getLog(XKMSTest.class);
 
-	private static final String location = "http://sebeco-dev-11:8080";
+	private static final String location = "http://localhost:8080";
 
 	// private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
 	// "proxy.yourict.net", 8080);
@@ -137,9 +136,8 @@ public class XKMSTest {
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
 				.createTrustValidator(NETWORK_CONFIG);
 
-		TrustLinkerResult result = trustValidator
-				.isTrusted(authnCertificateChain);
-		assertTrue(result.isValid());
+		trustValidator.isTrusted(authnCertificateChain);
+		assertTrue(trustValidator.getResult().isValid());
 	}
 
 	@Test
@@ -151,9 +149,8 @@ public class XKMSTest {
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
 				.createNonRepudiationTrustValidator(NETWORK_CONFIG);
 
-		TrustLinkerResult result = trustValidator
-				.isTrusted(signCertificateChain);
-		assertTrue(result.isValid());
+		trustValidator.isTrusted(signCertificateChain);
+		assertTrue(trustValidator.getResult().isValid());
 	}
 
 	@Test
@@ -165,9 +162,8 @@ public class XKMSTest {
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
 				.createNationalRegistryTrustValidator(NETWORK_CONFIG);
 
-		TrustLinkerResult result = trustValidator
-				.isTrusted(nationalRegistryCertificateChain);
-		assertTrue(result.isValid());
+		trustValidator.isTrusted(nationalRegistryCertificateChain);
+		assertTrue(trustValidator.getResult().isValid());
 	}
 
 	private static final int COUNT = 20;

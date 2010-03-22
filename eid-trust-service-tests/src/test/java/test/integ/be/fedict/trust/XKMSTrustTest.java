@@ -61,7 +61,7 @@ public class XKMSTrustTest {
 
 	private static final Log LOG = LogFactory.getLog(XKMSTrustTest.class);
 
-	private static final String hostname = "sebeco-dev-11";
+	private static final String hostname = "localhost";
 	private static final int port = 8443;
 
 	@Before

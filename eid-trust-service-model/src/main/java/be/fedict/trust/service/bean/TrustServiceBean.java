@@ -21,6 +21,7 @@ package be.fedict.trust.service.bean;
 import java.io.IOException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
+import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -130,8 +131,12 @@ public class TrustServiceBean implements TrustService {
 
 		TrustValidator trustValidator = getTrustValidator(trustDomain,
 				returnRevocationData);
-		TrustLinkerResult result = trustValidator.isTrusted(certificateChain);
-		return new ValidationResult(result, trustValidator.getRevocationData());
+		try {
+			trustValidator.isTrusted(certificateChain);
+		} catch (CertPathValidatorException e) {
+		}
+		return new ValidationResult(trustValidator.getResult(), trustValidator
+				.getRevocationData());
 	}
 
 	/**
@@ -156,9 +161,12 @@ public class TrustServiceBean implements TrustService {
 		TrustValidator trustValidator = getTrustValidator(trustDomain,
 				ocspResponses, crls);
 
-		TrustLinkerResult result = trustValidator.isTrusted(certificateChain,
-				validationDate);
-		return new ValidationResult(result, trustValidator.getRevocationData());
+		try {
+			trustValidator.isTrusted(certificateChain, validationDate);
+		} catch (CertPathValidatorException e) {
+		}
+		return new ValidationResult(trustValidator.getResult(), trustValidator
+				.getRevocationData());
 	}
 
 	/**
