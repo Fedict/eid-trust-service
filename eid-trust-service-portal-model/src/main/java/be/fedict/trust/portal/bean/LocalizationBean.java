@@ -18,10 +18,14 @@
 
 package be.fedict.trust.portal.bean;
 
+import java.util.List;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.faces.model.SelectItem;
 
 import org.jboss.ejb3.annotation.LocalBinding;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.international.LocaleSelector;
@@ -41,15 +45,46 @@ public class LocalizationBean implements Localization {
 	@Logger
 	private Log log;
 
+	@In
+	private LocaleSelector localeSelector;
+
 	@EJB
 	private LocalizationService localizationService;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getInfo() {
 
 		this.log.debug("get \"info\" localization");
 		return this.localizationService.findText(
 				TrustServiceConstants.INFO_MESSAGE_KEY, LocaleSelector
 						.instance().getLocale());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getLocaleString() {
+
+		return this.localeSelector.getLocaleString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<SelectItem> getSupportedLocales() {
+
+		return this.localeSelector.getSupportedLocales();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setLocaleString(String localeString) {
+
+		this.localeSelector.setLocaleString(localeString);
+		this.localeSelector.select();
 	}
 
 }

@@ -101,6 +101,7 @@ public class HarvesterMDB implements MessageListener {
 		String crlUrl = certificateAuthority.getCrlUrl();
 		if (null == crlUrl) {
 			LOG.warn("No CRL url for CA " + certificateAuthority.getName());
+			certificateAuthority.setStatus(Status.NONE);
 			return;
 		}
 

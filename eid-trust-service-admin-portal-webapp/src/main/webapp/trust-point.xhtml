@@ -22,18 +22,15 @@
 							<h:outputText value="#{item.crlRefreshCron}" />
 						</h:column>
 						<h:column>
-							<f:facet name="header">#{messages.modify}</f:facet>
 							<h:commandLink id="modify" value="#{messages.modify}"
 								action="#{ts_trustPoint.modify}" />
 						</h:column>
 						<h:column>
-							<f:facet name="header">#{messages.remove}</f:facet>
 							<a4j:commandLink action="#{ts_trustPoint.select}"
 								immediate="true" id="remove" value="#{messages.remove}"
 								onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
 						</h:column>
 						<h:column>
-							<f:facet name="header">#{messages.refreshNow}</f:facet>
 							<h:commandLink id="refresh" value="#{messages.refreshNow}"
 								action="#{ts_trustPoint.refresh}" />
 						</h:column>

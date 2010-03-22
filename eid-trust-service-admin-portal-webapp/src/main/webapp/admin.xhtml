@@ -42,15 +42,17 @@
 									styleClass="center">
 									<a4j:commandButton id="remove2" value="#{messages.remove}"
 										action="#{ts_admin.remove}" immediate="true"
-										oncomplete="Richfaces.hideModalPanel('removeConfirm');" />
+										oncomplete="#{facesContext.maximumSeverity == null ?
+									'Richfaces.hideModalPanel(\'removeConfirm\');' :
+									'Richfaces.showModalPanel(\'removeConfirm\ ');'}" />
 									<a4j:commandButton id="cancel" value="#{messages.cancel}"
 										onclick="Richfaces.hideModalPanel('removeConfirm');" />
 								</h:panelGrid>
 							</p>
+							<rich:messages styleClass="error" />
 						</div>
 					</rich:modalPanel>
 
-					<h:messages styleClass="error" globalOnly="true" />
 					<p>
 						<a href="./register.seam">
 							#{messages.registerAdmin}</a>

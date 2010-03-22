@@ -42,6 +42,7 @@ import org.apache.commons.logging.LogFactory;
 import be.fedict.trust.RevocationData;
 import be.fedict.trust.TrustLinker;
 import be.fedict.trust.TrustLinkerResult;
+import be.fedict.trust.TrustLinkerResultReason;
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
@@ -173,7 +174,9 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		}
 		LOG.debug("certificate invalid: "
 				+ childCertificate.getSubjectX500Principal());
-		return new TrustLinkerResult(true);
+		return new TrustLinkerResult(false,
+				TrustLinkerResultReason.INVALID_REVOCATION_STATUS,
+				"certificate revoked by cached CRL");
 	}
 
 	@SuppressWarnings("unchecked")

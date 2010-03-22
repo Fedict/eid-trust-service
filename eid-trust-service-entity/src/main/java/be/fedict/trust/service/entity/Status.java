@@ -18,7 +18,24 @@
 
 package be.fedict.trust.service.entity;
 
+/**
+ * Status of the {@link CertificateAuthorityEntity}'s CRL cache.
+ * 
+ * @author wvdhaute
+ * 
+ */
 public enum Status {
 
-	INACTIVE, ACTIVE
+	/**
+	 * Still processing the CRL
+	 */
+	INACTIVE,
+	/**
+	 * CRL processed and cached
+	 */
+	ACTIVE,
+	/**
+	 * No cache possible (e.g. no CRL)
+	 */
+	NONE
 }
