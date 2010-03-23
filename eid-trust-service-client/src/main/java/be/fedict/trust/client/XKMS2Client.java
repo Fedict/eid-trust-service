@@ -186,9 +186,6 @@ public class XKMS2Client {
 			LOG.error(msg, e);
 			throw new RuntimeException(msg, e);
 		}
-
-		// SSLTrustManager.setTrustedPublicKey(publicKey);
-		// SSLTrustManager.initialize();
 	}
 
 	private void setEndpointAddress(String location) {

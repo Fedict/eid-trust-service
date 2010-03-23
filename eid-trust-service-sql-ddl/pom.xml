@@ -96,7 +96,7 @@
 
 	<dependencies>
 
-		<!-- Specific Dependencies: linkID -->
+		<!-- Specific Dependencies: Fedict eID Trust Service -->
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-entity</artifactId>
@@ -109,10 +109,6 @@
 			<artifactId>hibernate-annotations</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!--
-			<dependency> <groupId>org.jboss</groupId>
-			<artifactId>jboss-j2ee</artifactId> </dependency>
-		-->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-tools</artifactId>
