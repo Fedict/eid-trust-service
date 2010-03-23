@@ -26,9 +26,14 @@ public interface CertificateValidator {
 	/*
 	 * Actions
 	 */
-	String validateAuthn();
-
-	String validateSigning();
+	String validateCertificates();
 
 	void validate();
+
+	/*
+	 * Accessors
+	 */
+	boolean isAuthnValid();
+
+	boolean isSigningValid();
 }

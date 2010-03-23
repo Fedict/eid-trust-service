@@ -12,12 +12,8 @@
 				</p>
 				<h:form id="form">
 					<p>
-						<h:commandLink action="#{ts_certificateValidator.validateAuthn}"
-							value="#{messages.clickToValidateAuthn}" />
-					</p>
-					<p>
-						<h:commandLink action="#{ts_certificateValidator.validateSigning}"
-							value="#{messages.clickToValidateSigning}" />
+						<h:commandLink action="#{ts_certificateValidator.validateCertificates}"
+							value="#{messages.clickToValidate}" />
 					</p>
 				</h:form>
 			</ui:define>

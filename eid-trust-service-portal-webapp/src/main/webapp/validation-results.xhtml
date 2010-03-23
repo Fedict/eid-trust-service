@@ -8,15 +8,32 @@
 				<h2>#{messages.validateResult}</h2>
 				<h:panelGroup>
 					<h:panelGrid columns="2">
+						<h:outputText value="#{messages.authnCertificate}" />
 						<c:choose>
-							<c:when test="#{authn == true}">
-								<h:outputText value="#{messages.authnCertificate}:" />
+							<c:when test="#{ts_certificateValidator.authnValid}">
+								<h:graphicImage id="authn-ok" alt="OK"
+									url="/images/ok.png">
+								</h:graphicImage>
 							</c:when>
 							<c:otherwise>
-								<h:outputText value="#{messages.signingCertificate}:" />
+								<h:graphicImage id="authn-error" alt="ERROR"
+									url="/images/error.png">
+								</h:graphicImage>
 							</c:otherwise>
 						</c:choose>
-						<h:outputText value="#{authnCertStatus}" />
+						<h:outputText value="#{messages.signingCertificate}" />
+						<c:choose>
+							<c:when test="#{ts_certificateValidator.signingValid}">
+								<h:graphicImage id="sign-ok" alt="OK"
+									url="/images/ok.png">
+								</h:graphicImage>
+							</c:when>
+							<c:otherwise>
+								<h:graphicImage id="sign-error" alt="ERROR"
+									url="/images/error.png">
+								</h:graphicImage>
+							</c:otherwise>
+						</c:choose>
 					</h:panelGrid>
 				</h:panelGroup>
 				<p>

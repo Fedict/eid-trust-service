@@ -23,14 +23,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.EJB;
-import javax.ejb.Stateless;
+import javax.ejb.Remove;
+import javax.ejb.Stateful;
 
 import org.jboss.ejb3.annotation.LocalBinding;
-import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Out;
 import org.jboss.seam.contexts.SessionContext;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
@@ -44,7 +43,7 @@ import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
-@Stateless
+@Stateful
 @Name(PortalConstants.PORTAL_SEAM_PREFIX + "certificateValidator")
 @LocalBinding(jndiBinding = PortalConstants.PORTAL_JNDI_CONTEXT
 		+ "CertificateValidatorBean")
@@ -62,30 +61,18 @@ public class CertificateValidatorBean implements CertificateValidator {
 	@EJB
 	private TrustService trustService;
 
-	@Out(scope = ScopeType.SESSION)
-	private boolean authn = true;
-
-	@SuppressWarnings("unused")
-	@Out(required = false)
-	private String authnCertStatus;
+	private ValidationResult authnResult;
+	private ValidationResult signResult;
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public String validateAuthn() {
+	@Remove
+	public String validateCertificates() {
 
 		this.log.debug("validate authn");
-		this.authn = true;
-		return "validate";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String validateSigning() {
-
-		this.log.debug("validate signing");
-		this.authn = false;
+		this.authnResult = null;
+		this.signResult = null;
 		return "validate";
 	}
 
@@ -104,30 +91,50 @@ public class CertificateValidatorBean implements CertificateValidator {
 		X509Certificate rootCert = (X509Certificate) this.sessionContext
 				.get(IdentityDataMessageHandler.ROOT_CERT_SESSION_ATTRIBTUE);
 
-		List<X509Certificate> certChain = new LinkedList<X509Certificate>();
-		if (this.authn)
-			certChain.add(authnCert);
-		else
-			certChain.add(signCert);
-		certChain.add(caCert);
-		certChain.add(rootCert);
+		/*
+		 * Validate authentication certificate chain
+		 */
+		List<X509Certificate> authnCertChain = new LinkedList<X509Certificate>();
+		authnCertChain.add(authnCert);
+		authnCertChain.add(caCert);
+		authnCertChain.add(rootCert);
 
-		String trustDomain = this.authn ? TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN
-				: TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN;
+		/*
+		 * Validate signing certificate chain
+		 */
+		List<X509Certificate> signCertChain = new LinkedList<X509Certificate>();
+		signCertChain.add(signCert);
+		signCertChain.add(caCert);
+		signCertChain.add(rootCert);
 
-		ValidationResult validationResult;
 		try {
-			validationResult = this.trustService.validate(trustDomain,
-					certChain, false);
+			this.authnResult = this.trustService.validate(
+					TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN,
+					authnCertChain, false);
+			this.signResult = this.trustService
+					.validate(
+							TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+							signCertChain, false);
 		} catch (TrustDomainNotFoundException e) {
 			this.facesMessages.addFromResourceBundle(
 					StatusMessage.Severity.ERROR, "errorTrustDomainNotFound");
 			return;
 		}
-		if (validationResult.isValid()) {
-			this.authnCertStatus = "Certificate valid.";
-		} else {
-			this.authnCertStatus = "Certificate invalid.";
-		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isAuthnValid() {
+
+		return this.authnResult.isValid();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isSigningValid() {
+
+		return this.signResult.isValid();
 	}
 }
