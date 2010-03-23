@@ -19,9 +19,16 @@
 package be.fedict.trust.client;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
@@ -29,7 +36,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -66,6 +77,8 @@ import be.fedict.trust.xkms2.ResultMajorCode;
 import be.fedict.trust.xkms2.ResultMinorCode;
 import be.fedict.trust.xkms2.XKMSConstants;
 import be.fedict.trust.xkms2.XKMSServiceFactory;
+
+import com.sun.xml.ws.developer.JAXWSProperties;
 
 /**
  * Client component for the eID Trust Service XKMS2 web service.
@@ -107,10 +120,75 @@ public class XKMS2Client {
 	 * 
 	 * @param publicKey
 	 */
-	public void setServicePublicKey(PublicKey publicKey) {
+	public void setServicePublicKey(final PublicKey publicKey) {
 
-		SSLTrustManager.setTrustedPublicKey(publicKey);
-		SSLTrustManager.initialize();
+		// Create TrustManager
+		TrustManager[] trustManager = { new X509TrustManager() {
+
+			public X509Certificate[] getAcceptedIssuers() {
+
+				return null;
+			}
+
+			public void checkServerTrusted(X509Certificate[] chain,
+					String authType) throws CertificateException {
+
+				X509Certificate serverCertificate = chain[0];
+				LOG.debug("server X509 subject: "
+						+ serverCertificate.getSubjectX500Principal()
+								.toString());
+				LOG.debug("authentication type: " + authType);
+				if (null == publicKey)
+					return;
+
+				try {
+					serverCertificate.verify(publicKey);
+					LOG.debug("valid server certificate");
+				} catch (InvalidKeyException e) {
+					throw new CertificateException("Invalid Key");
+				} catch (NoSuchAlgorithmException e) {
+					throw new CertificateException("No such algorithm");
+				} catch (NoSuchProviderException e) {
+					throw new CertificateException("No such provider");
+				} catch (SignatureException e) {
+					throw new CertificateException("Wrong signature");
+				}
+			}
+
+			public void checkClientTrusted(X509Certificate[] chain,
+					String authType) throws CertificateException {
+
+				throw new CertificateException(
+						"this trust manager cannot be used as server-side trust manager");
+			}
+		} };
+
+		// Create SSL Context
+		try {
+			SSLContext sslContext = SSLContext.getInstance("TLS");
+			SecureRandom secureRandom = new SecureRandom();
+			sslContext.init(null, trustManager, secureRandom);
+			LOG.debug("SSL context provider: "
+					+ sslContext.getProvider().getName());
+
+			// Setup TrustManager for validation
+			Map<String, Object> requestContext = ((BindingProvider) port)
+					.getRequestContext();
+			requestContext.put(JAXWSProperties.SSL_SOCKET_FACTORY, sslContext
+					.getSocketFactory());
+
+		} catch (KeyManagementException e) {
+			String msg = "key management error: " + e.getMessage();
+			LOG.error(msg, e);
+			throw new RuntimeException(msg, e);
+		} catch (NoSuchAlgorithmException e) {
+			String msg = "TLS algo not present: " + e.getMessage();
+			LOG.error(msg, e);
+			throw new RuntimeException(msg, e);
+		}
+
+		// SSLTrustManager.setTrustedPublicKey(publicKey);
+		// SSLTrustManager.initialize();
 	}
 
 	private void setEndpointAddress(String location) {

@@ -45,11 +45,10 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-import be.fedict.trust.client.SSLTrustManager;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.service.TrustServiceConstants;
 
-import com.sun.xml.internal.ws.client.ClientTransportException;
+import com.sun.xml.ws.client.ClientTransportException;
 
 /**
  * eID Trust Service XKMS2 Integration Tests.
@@ -71,7 +70,7 @@ public class XKMSTrustTest {
 
 	@Test
 	public void testValidateUnilateralTLSTrustFail() throws Exception {
-		LOG.debug("validate using unilateral TLS Trust, fail.");
+		LOG.debug("validate using unilateral TLS Trust, should fail.");
 
 		// Setup
 		KeyPair keyPair = generateKeyPair();
@@ -125,7 +124,6 @@ public class XKMSTrustTest {
 		LOG.debug("validate using unilateral TLS Trust.");
 
 		// Retrieve server public key
-		SSLTrustManager.reset();
 		SSLTrustManager.initialize();
 		SSLSocketFactory factory = HttpsURLConnection
 				.getDefaultSSLSocketFactory();
@@ -150,7 +148,6 @@ public class XKMSTrustTest {
 		});
 
 		// setup
-		SSLTrustManager.reset();
 		List<X509Certificate> signCertificateChain = XKMSTest
 				.getSignCertificateChain();
 		XKMS2Client client = new XKMS2Client("https://" + hostname + ":" + port);

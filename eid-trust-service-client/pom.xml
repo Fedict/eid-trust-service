@@ -27,6 +27,10 @@
 			<artifactId>bcprov-jdk16</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-rt</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>

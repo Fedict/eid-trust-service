@@ -1,12 +1,26 @@
-package be.fedict.trust.client;
+/*
+ * eID Trust Service Project.
+ * Copyright (C) 2009-2010 FedICT.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License version
+ * 3.0 as published by the Free Software Foundation.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, see 
+ * http://www.gnu.org/licenses/.
+ */
 
-import java.security.InvalidKeyException;
+package test.integ.be.fedict.trust;
+
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -19,6 +33,12 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Test SSL Trust Manager that accepts all.
+ * 
+ * @author wvdhaute
+ * 
+ */
 public class SSLTrustManager implements X509TrustManager {
 
 	private static final Log LOG = LogFactory.getLog(SSLTrustManager.class);
@@ -29,7 +49,6 @@ public class SSLTrustManager implements X509TrustManager {
 	}
 
 	private static SSLSocketFactory socketFactory;
-	private static PublicKey trustedPublicKey;
 
 	public static synchronized void initialize() {
 
@@ -43,22 +62,6 @@ public class SSLTrustManager implements X509TrustManager {
 					.getDefaultSSLSocketFactory()))
 				throw new RuntimeException("wrong SSL socket factory installed");
 		}
-	}
-
-	public static synchronized void reset() {
-		socketFactory = null;
-		trustedPublicKey = null;
-	}
-
-	/**
-	 * Sets the trusted public key to be used by this trust manager during SSL
-	 * handshake for expressing trust towards the service.
-	 * 
-	 * @param trustedPublicKey
-	 */
-	public static void setTrustedPublicKey(PublicKey trustedPublicKey) {
-
-		SSLTrustManager.trustedPublicKey = trustedPublicKey;
 	}
 
 	private static void initSocketFactory() {
@@ -90,26 +93,8 @@ public class SSLTrustManager implements X509TrustManager {
 	public void checkServerTrusted(X509Certificate[] chain, String authType)
 			throws CertificateException {
 
-		X509Certificate serverCertificate = chain[0];
-		LOG.debug("server X509 subject: "
-				+ serverCertificate.getSubjectX500Principal().toString());
-		LOG.debug("authentication type: " + authType);
-		if (null == SSLTrustManager.trustedPublicKey)
-			return;
-
-		try {
-			serverCertificate.verify(SSLTrustManager.trustedPublicKey);
-			LOG.debug("valid server certificate");
-		} catch (InvalidKeyException e) {
-			throw new CertificateException("Invalid Key");
-		} catch (NoSuchAlgorithmException e) {
-			throw new CertificateException("No such algorithm");
-		} catch (NoSuchProviderException e) {
-			throw new CertificateException("No such provider");
-		} catch (SignatureException e) {
-			throw new CertificateException("Wrong signature");
-		}
-
+		LOG.debug("Test SSL Trust Manager: checkServerTrusted");
+		return;
 	}
 
 	/**
@@ -118,8 +103,7 @@ public class SSLTrustManager implements X509TrustManager {
 	public void checkClientTrusted(X509Certificate[] chain, String authType)
 			throws CertificateException {
 
-		throw new CertificateException(
-				"this trust manager cannot be used as server-side trust manager");
+		LOG.debug("Test SSL Trust Manager: checkClientTrusted");
 	}
 
 	/**
