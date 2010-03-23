@@ -1,7 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:s="http://jboss.com/products/seam/taglib" xmlns:rich="http://richfaces.org/rich">
+	xmlns:s="http://jboss.com/products/seam/taglib" xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j">
 	<body>
 		<ui:composition template="/WEB-INF/template.xhtml">
 			<ui:param name="activeMenu" value="config" />
@@ -9,6 +10,60 @@
 				<h2>#{messages.configuration}</h2>
 
 				<rich:tabPanel switchType="client">
+
+					<rich:tab label="#{messages.admin}">
+						<h:form id="admin_form">
+							<rich:dataTable id="data" var="item" value="#{adminList}"
+								rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
+
+								<h:column>
+									<f:facet name="header">#{messages.admin}</f:facet>
+									<h:outputText value="#{item.name}" />
+								</h:column>
+								<h:column>
+									<f:facet name="header">#{messages.remove}</f:facet>
+									<a4j:commandLink action="#{ts_admin.select}"
+										immediate="true" id="remove" value="#{messages.remove}"
+										onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
+								</h:column>
+								<h:column>
+									<f:facet name="header">#{messages.approve}</f:facet>
+									<h:commandLink id="register" value="#{messages.approve}"
+										action="#{ts_admin.registerPending}" rendered="#{item.pending}" />
+								</h:column>
+								<f:facet name="footer">
+									<rich:datascroller for="data" pageIndexVar="pageIndex"
+										pagesVar="pages" fastControls="hide">
+									</rich:datascroller>
+								</f:facet>
+							</rich:dataTable>
+
+							<rich:modalPanel id="removeConfirm">
+								<div class="center">
+									<h:outputText value="#{messages.removeAdminConfirmation}" />
+									<p>
+										<h:panelGrid id="confirmPanel" columns="2" border="0"
+											styleClass="center">
+											<a4j:commandButton id="remove2" value="#{messages.remove}"
+												action="#{ts_admin.remove}" immediate="true"
+												oncomplete="#{facesContext.maximumSeverity == null ?
+									'Richfaces.hideModalPanel(\'removeConfirm\');' :
+									'Richfaces.showModalPanel(\'removeConfirm\');'}" />
+											<a4j:commandButton id="cancel" value="#{messages.cancel}"
+												onclick="Richfaces.hideModalPanel('removeConfirm');" />
+										</h:panelGrid>
+									</p>
+									<rich:messages styleClass="error" />
+								</div>
+							</rich:modalPanel>
+
+							<p>
+								<a href="./register.seam">
+									#{messages.registerAdmin}</a>
+							</p>
+
+						</h:form>
+					</rich:tab>
 
 					<rich:tab label="#{messages.networkConfig}">
 						<h:form id="network_form">

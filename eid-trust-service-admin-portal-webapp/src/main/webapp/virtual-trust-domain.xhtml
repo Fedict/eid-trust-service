@@ -5,35 +5,29 @@
 	xmlns:s="http://jboss.com/products/seam/taglib">
 	<body>
 		<ui:composition template="/WEB-INF/template.xhtml">
-			<ui:param name="activeMenu" value="domain" />
+			<ui:param name="activeMenu" value="virtual_domain" />
 			<ui:define name="body">
-				<h2>#{messages.manageTrustDomains}</h2>
+				<h2>#{messages.manageVirtualTrustDomains}</h2>
 
-				<h:form id="form1">
-					<rich:dataTable id="data" var="item" value="#{trustDomainList}"
-						rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
+				<h:form id="virt_form">
+					<rich:dataTable id="data" var="item"
+						value="#{virtualTrustDomainList}" rows="10"
+						rowClasses="listingTable_Row1,listingTable_Row2">
 
 						<h:column>
 							<f:facet name="header">#{messages.name}</f:facet>
 							<h:outputText value="#{item.name}" />
 						</h:column>
 						<h:column>
-							<f:facet name="header">#{messages.default}</f:facet>
-							<h:selectBooleanCheckbox disabled="true"
-								value="#{item.defaultDomain}" />
-							<h:commandButton id="setDefault" value="#{messages.setDefault}"
-								action="#{ts_trustDomain.setDefault}" />
-						</h:column>
-						<h:column>
 							<f:facet name="header">#{messages.modify}</f:facet>
 							<h:commandLink id="modify" value="#{messages.modify}"
-								action="#{ts_trustDomain.modify}" immediate="true" />
+								action="#{ts_trustDomain.modifyVirtual}" immediate="true" />
 						</h:column>
 						<h:column>
 							<f:facet name="header">#{messages.remove}</f:facet>
-							<a4j:commandLink action="#{ts_trustDomain.select}"
+							<a4j:commandLink action="#{ts_trustDomain.selectVirtual}"
 								immediate="true" id="remove" value="#{messages.remove}"
-								onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
+								onclick="Richfaces.showModalPanel('removeConfirmVirtual',{width:400, top:200})" />
 						</h:column>
 						<f:facet name="footer">
 							<rich:datascroller for="data" pageIndexVar="pageIndex"
@@ -42,45 +36,42 @@
 						</f:facet>
 					</rich:dataTable>
 
-					<rich:modalPanel id="removeConfirm">
+					<rich:modalPanel id="removeConfirmVirtual">
 						<div class="center">
-							<h:outputText value="#{messages.removeTrustDomainConfirmation}" />
+							<h:outputText value="#{messages.removeVirtualTrustDomainConfirmation}" />
 							<p>
 								<h:panelGrid id="confirmPanel" columns="2" border="0"
 									styleClass="center">
 									<a4j:commandButton id="remove2" value="#{messages.remove}"
-										action="#{ts_trustDomain.remove}" immediate="true"
-										oncomplete="Richfaces.hideModalPanel('removeConfirm');" />
+										action="#{ts_trustDomain.removeVirtual}" immediate="true"
+										oncomplete="Richfaces.hideModalPanel('removeConfirmVirtual');" />
 									<a4j:commandButton id="cancel" value="#{messages.cancel}"
-										onclick="Richfaces.hideModalPanel('removeConfirm');" />
+										onclick="Richfaces.hideModalPanel('removeConfirmVirtual');" />
 								</h:panelGrid>
 							</p>
 						</div>
 					</rich:modalPanel>
 
-					<h:messages styleClass="error" globalOnly="true" />
-				</h:form>
-
-				<h3>#{messages.addTrustDomain}</h3>
-
-				<h:form id="form2">
+					<h3>#{messages.addVirtualTrustDomain}</h3>
 
 					<h:panelGrid id="panel" columns="3" border="0">
 
 						<h:outputLabel for="name" value="#{messages.name}" />
 						<s:decorate>
-							<h:inputText id="name" value="#{ts_trustDomain.name}"
+							<h:inputText id="name" value="#{ts_trustDomain.nameVirtual}"
 								required="true" />
 							<h:message for="name" styleClass="error" />
 						</s:decorate>
 
-						<h:commandButton action="#{ts_trustDomain.add}"
+						<h:commandButton action="#{ts_trustDomain.addVirtual}"
 							id="add" value="#{messages.add}" />
 
 					</h:panelGrid>
 
+
 					<h:messages styleClass="error" globalOnly="true" />
 				</h:form>
+
 
 			</ui:define>
 		</ui:composition>

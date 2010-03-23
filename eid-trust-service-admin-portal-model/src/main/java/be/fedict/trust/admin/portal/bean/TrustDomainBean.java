@@ -65,7 +65,9 @@ import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.TrustDomainAlreadyExistsException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.service.exception.VirtualTrustDomainAlreadyExistsException;
 import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
 @Stateful
@@ -224,7 +226,7 @@ public class TrustDomainBean implements TrustDomain {
 
 		this.log.debug("modify virtual trust domain: #0",
 				this.selectedVirtualTrustDomain.getName());
-		return "modify_virtual";
+		return "modify";
 	}
 
 	/**
@@ -234,8 +236,15 @@ public class TrustDomainBean implements TrustDomain {
 	public String add() {
 
 		this.log.debug("add trust domain #0", this.name);
-		this.selectedTrustDomain = this.trustDomainService
-				.addTrustDomain(this.name);
+		try {
+			this.selectedTrustDomain = this.trustDomainService
+					.addTrustDomain(this.name);
+		} catch (TrustDomainAlreadyExistsException e) {
+			this.facesMessages.addToControlFromResourceBundle("name",
+					StatusMessage.Severity.ERROR,
+					"errorTrustDomainAlreadyExists");
+			return null;
+		}
 		return "modify";
 	}
 
@@ -246,9 +255,16 @@ public class TrustDomainBean implements TrustDomain {
 	public String addVirtual() {
 
 		this.log.debug("add virtual trust domain #0", this.nameVirtual);
-		this.selectedVirtualTrustDomain = this.trustDomainService
-				.addVirtualTrustDomain(this.nameVirtual);
-		return "modify_virtual";
+		try {
+			this.selectedVirtualTrustDomain = this.trustDomainService
+					.addVirtualTrustDomain(this.nameVirtual);
+		} catch (VirtualTrustDomainAlreadyExistsException e) {
+			this.facesMessages.addToControlFromResourceBundle("name",
+					StatusMessage.Severity.ERROR,
+					"errorVirtualTrustDomainAlreadyExists");
+			return null;
+		}
+		return "modify";
 	}
 
 	/**

@@ -52,8 +52,10 @@ import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.TrustDomainAlreadyExistsException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
+import be.fedict.trust.service.exception.VirtualTrustDomainAlreadyExistsException;
 import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
 /**
@@ -82,8 +84,13 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 * {@inheritDoc}
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public TrustDomainEntity addTrustDomain(String name) {
+	public TrustDomainEntity addTrustDomain(String name)
+			throws TrustDomainAlreadyExistsException {
 
+		if (null != this.trustDomainDAO.findTrustDomain(name)) {
+			LOG.error("Trust domain: " + name + " already exists");
+			throw new TrustDomainAlreadyExistsException();
+		}
 		LOG.debug("add trust domain: " + name);
 		return this.trustDomainDAO.addTrustDomain(name);
 	}
@@ -92,8 +99,13 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 * {@inheritDoc}
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public VirtualTrustDomainEntity addVirtualTrustDomain(String name) {
+	public VirtualTrustDomainEntity addVirtualTrustDomain(String name)
+			throws VirtualTrustDomainAlreadyExistsException {
 
+		if (null != this.trustDomainDAO.findVirtualTrustDomain(name)) {
+			LOG.error("Virtual Trust domain: " + name + " already exists");
+			throw new VirtualTrustDomainAlreadyExistsException();
+		}
 		LOG.debug("add virtualtrust domain: " + name);
 		return this.trustDomainDAO.addVirtualTrustDomain(name);
 	}

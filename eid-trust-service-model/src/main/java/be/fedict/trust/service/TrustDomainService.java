@@ -36,8 +36,10 @@ import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.TrustDomainAlreadyExistsException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
+import be.fedict.trust.service.exception.VirtualTrustDomainAlreadyExistsException;
 import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
 /**
@@ -247,15 +249,19 @@ public interface TrustDomainService {
 	 * Add a new {@link TrustDomainEntity}.
 	 * 
 	 * @param name
+	 * @throws TrustDomainAlreadyExistsException
 	 */
-	TrustDomainEntity addTrustDomain(String name);
+	TrustDomainEntity addTrustDomain(String name)
+			throws TrustDomainAlreadyExistsException;
 
 	/**
 	 * Add a new {@link VirtualTrustDomainEntity}.
 	 * 
 	 * @param name
+	 * @throws VirtualTrustDomainAlreadyExistsException
 	 */
-	VirtualTrustDomainEntity addVirtualTrustDomain(String name);
+	VirtualTrustDomainEntity addVirtualTrustDomain(String name)
+			throws VirtualTrustDomainAlreadyExistsException;
 
 	/**
 	 * Remove the specified {@link TrustDomainEntity}.
