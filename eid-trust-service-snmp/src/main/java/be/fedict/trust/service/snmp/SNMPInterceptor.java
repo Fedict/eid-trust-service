@@ -44,8 +44,9 @@ public class SNMPInterceptor {
 		LOG.debug("process SNMP on " + target.getClass().getCanonicalName());
 
 		SNMP snmp = invocationContext.getMethod().getAnnotation(SNMP.class);
-		if (null == snmp)
+		if (null == snmp) {
 			return;
+		}
 
 		increment(snmp);
 	}

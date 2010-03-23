@@ -58,7 +58,7 @@ public class SNMPAgent extends BaseAgent {
 
 		super(bootCounterFile, configFile, new CommandProcessor(
 				new OctetString(MPv3.createLocalEngineID())));
-		agent.setWorkerPool(ThreadPool.create("RequestPool", 4));
+		this.agent.setWorkerPool(ThreadPool.create("RequestPool", 4));
 
 		this.udpAddress = udpAddress;
 		this.counters = new LinkedList<Counter>();
@@ -73,9 +73,9 @@ public class SNMPAgent extends BaseAgent {
 	@Override
 	protected void initTransportMappings() throws IOException {
 
-		transportMappings = new TransportMapping[1];
-		transportMappings[0] = new DefaultUdpTransportMapping(new UdpAddress(
-				this.udpAddress));
+		this.transportMappings = new TransportMapping[1];
+		this.transportMappings[0] = new DefaultUdpTransportMapping(
+				new UdpAddress(this.udpAddress));
 	}
 
 	@Override

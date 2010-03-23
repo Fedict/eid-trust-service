@@ -62,16 +62,16 @@ public class SNMPService implements SNMPServiceMBean {
 			this.snmpValues = new HashMap<String, Long>();
 		}
 
-		Long value = snmpValues.get(oid);
+		Long value = this.snmpValues.get(oid);
 		if (null == value) {
-			snmpValues.put(oid, 1L);
+			this.snmpValues.put(oid, 1L);
 			try {
 				addSNMPCounter(oid);
 			} catch (DuplicateRegistrationException e) {
 				LOG.error("Counter with oid=" + oid + " already registered.");
 			}
 		} else {
-			snmpValues.put(oid, value + 1);
+			this.snmpValues.put(oid, value + 1);
 		}
 		LOG.debug("oid=" + oid + " value=" + snmpValues.get(oid));
 	}
