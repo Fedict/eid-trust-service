@@ -290,17 +290,18 @@ public class XKMSTest {
 			return null;
 		}
 
-		public boolean privacyQuestion(boolean includeAddress,
-				boolean includePhoto) {
-			return true;
-		}
-
 		public void progressIndication(int max, int current) {
 			this.log.debug("progress " + current + " of " + max);
 		}
 
 		public void setStatusMessage(Status status, String statusMessage) {
 			this.log.debug(status.toString() + ": " + statusMessage);
+		}
+
+		public boolean privacyQuestion(boolean includeAddress,
+				boolean includePhoto, String arg2) {
+
+			return true;
 		}
 	}
 }
