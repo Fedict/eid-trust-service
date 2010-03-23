@@ -44,7 +44,7 @@
 										action="#{ts_admin.remove}" immediate="true"
 										oncomplete="#{facesContext.maximumSeverity == null ?
 									'Richfaces.hideModalPanel(\'removeConfirm\');' :
-									'Richfaces.showModalPanel(\'removeConfirm\ ');'}" />
+									'Richfaces.showModalPanel(\'removeConfirm\');'}" />
 									<a4j:commandButton id="cancel" value="#{messages.cancel}"
 										onclick="Richfaces.hideModalPanel('removeConfirm');" />
 								</h:panelGrid>

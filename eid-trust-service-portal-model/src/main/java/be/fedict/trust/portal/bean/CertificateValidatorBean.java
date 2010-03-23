@@ -70,7 +70,6 @@ public class CertificateValidatorBean implements CertificateValidator {
 	@Remove
 	public String validateCertificates() {
 
-		this.log.debug("validate authn");
 		this.authnResult = null;
 		this.signResult = null;
 		return "validate";

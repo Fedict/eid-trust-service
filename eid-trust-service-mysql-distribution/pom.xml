@@ -116,7 +116,28 @@
 				</executions>
 			</plugin>
 
-			<!-- 3. Assemble our distribution. -->
+			<!-- 3. Patching -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-patch-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>apply-patches</id>
+						<phase>package</phase>
+						<goals>
+							<goal>apply</goal>
+						</goals>
+						<configuration>
+							<targetDirectory>target/files/jboss-as-distribution</targetDirectory>
+							<patches>
+								<patch>jboss-txn.patch</patch>
+							</patches>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- 4. Assemble our distribution. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>

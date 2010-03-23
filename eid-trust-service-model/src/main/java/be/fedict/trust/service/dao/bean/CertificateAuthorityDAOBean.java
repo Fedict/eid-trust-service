@@ -35,7 +35,6 @@ import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.TransactionTimeout;
 
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
@@ -128,7 +127,6 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 	 * {@inheritDoc}
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-	@TransactionTimeout(1200)
 	public void addRevokedCertificates(X509CRL crl, BigInteger crlNumber) {
 
 		for (X509CRLEntry revokedCertificate : crl.getRevokedCertificates()) {
