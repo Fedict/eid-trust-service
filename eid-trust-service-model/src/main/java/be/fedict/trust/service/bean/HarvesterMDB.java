@@ -33,6 +33,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
+import javax.interceptor.Interceptors;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -45,14 +46,18 @@ import org.bouncycastle.asn1.DEROctetString;
 
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.crl.OnlineCrlRepository;
+import be.fedict.trust.service.SnmpConstants;
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.Status;
+import be.fedict.trust.service.snmp.SNMP;
+import be.fedict.trust.service.snmp.SNMPInterceptor;
 
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
 		@ActivationConfigProperty(propertyName = "destination", propertyValue = HarvesterMDB.HARVESTER_QUEUE_NAME) })
+@Interceptors(SNMPInterceptor.class)
 public class HarvesterMDB implements MessageListener {
 
 	private static final Log LOG = LogFactory.getLog(HarvesterMDB.class);
@@ -65,11 +70,15 @@ public class HarvesterMDB implements MessageListener {
 	@EJB
 	private CertificateAuthorityDAO certificateAuthorityDAO;
 
+	@SNMP(oid = SnmpConstants.CRL_DOWNLOAD_FAILURES)
+	private Long failures = 0L;
+
 	@PostConstruct
 	public void postConstructCallback() {
 		LOG.debug("post construct");
 	}
 
+	@SNMP(oid = SnmpConstants.CACHE_REFRESH)
 	public void onMessage(Message message) {
 		LOG.debug("onMessage");
 		HarvestMessage harvestMessage;
@@ -118,6 +127,7 @@ public class HarvesterMDB implements MessageListener {
 				.getCertificate(), validationDate);
 		if (null == crl) {
 			LOG.error("failed to download CRL for CA " + caName);
+			this.failures++;
 			throw new RuntimeException();
 		}
 

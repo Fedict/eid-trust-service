@@ -61,6 +61,7 @@ import be.fedict.trust.crl.OnlineCrlRepository;
 import be.fedict.trust.ocsp.OcspTrustLinker;
 import be.fedict.trust.ocsp.OfflineOcspRepository;
 import be.fedict.trust.ocsp.OnlineOcspRepository;
+import be.fedict.trust.service.SnmpConstants;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.dao.ConfigurationDAO;
@@ -121,7 +122,7 @@ public class TrustServiceBean implements TrustService {
 	 * {@inheritDoc}
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@SNMP(oid = "1.3.6.1.4.1.7890.0.0")
+	@SNMP(oid = SnmpConstants.VALIDATE)
 	public ValidationResult validate(String trustDomain,
 			List<X509Certificate> certificateChain, boolean returnRevocationData)
 			throws TrustDomainNotFoundException {
@@ -135,6 +136,7 @@ public class TrustServiceBean implements TrustService {
 			trustValidator.isTrusted(certificateChain);
 		} catch (CertPathValidatorException e) {
 		}
+
 		return new ValidationResult(trustValidator.getResult(), trustValidator
 				.getRevocationData());
 	}
@@ -148,7 +150,7 @@ public class TrustServiceBean implements TrustService {
 	 * @throws CertificateException
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	@SNMP(oid = "1.3.6.1.4.1.7890.0.0")
+	@SNMP(oid = SnmpConstants.VALIDATE)
 	public ValidationResult validate(String trustDomain,
 			List<X509Certificate> certificateChain, Date validationDate,
 			List<byte[]> ocspResponses, List<byte[]> crls)
@@ -165,6 +167,7 @@ public class TrustServiceBean implements TrustService {
 			trustValidator.isTrusted(certificateChain, validationDate);
 		} catch (CertPathValidatorException e) {
 		}
+
 		return new ValidationResult(trustValidator.getResult(), trustValidator
 				.getRevocationData());
 	}
@@ -296,8 +299,10 @@ public class TrustServiceBean implements TrustService {
 
 		FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
 
-		fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(ocspRepository));
-		fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(crlRepository));
+		fallbackTrustLinker.addTrustLinker(new TrustServiceOcspTrustLinker(
+				ocspRepository));
+		fallbackTrustLinker.addTrustLinker(new TrustServiceCrlTrustLinker(
+				crlRepository));
 
 		trustValidator.addTrustLinker(fallbackTrustLinker);
 
@@ -338,7 +343,6 @@ public class TrustServiceBean implements TrustService {
 					keyUsageCertificateConstraint = new KeyUsageCertificateConstraint();
 				}
 				switch (keyUsageConstraint.getKeyUsage()) {
-				// XXX: complete after jtrust is updated for all KeyUsages
 				case DIGITAL_SIGNATURE: {
 					keyUsageCertificateConstraint
 							.setDigitalSignatureFilter(keyUsageConstraint

@@ -26,6 +26,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
+import javax.interceptor.Interceptors;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
@@ -44,9 +45,12 @@ import be.fedict.trust.TrustLinker;
 import be.fedict.trust.TrustLinkerResult;
 import be.fedict.trust.TrustLinkerResultReason;
 import be.fedict.trust.crl.CrlTrustLinker;
+import be.fedict.trust.service.SnmpConstants;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.Status;
+import be.fedict.trust.service.snmp.SNMP;
+import be.fedict.trust.service.snmp.SNMPInterceptor;
 
 /**
  * Implementation of a trust linker based on the trust service infrastructure.
@@ -54,6 +58,7 @@ import be.fedict.trust.service.entity.Status;
  * @author fcorneli
  * 
  */
+@Interceptors(SNMPInterceptor.class)
 public class TrustServiceTrustLinker implements TrustLinker {
 
 	private static final Log LOG = LogFactory
@@ -65,6 +70,12 @@ public class TrustServiceTrustLinker implements TrustLinker {
 
 	private final Queue queue;
 
+	@SNMP(oid = SnmpConstants.CACHE_HITS)
+	private Long cacheHits = 0L;
+
+	@SNMP(oid = SnmpConstants.CACHE_MISSES)
+	private Long cacheMisses = 0L;
+
 	public TrustServiceTrustLinker(EntityManager entityManager,
 			QueueConnectionFactory queueConnectionFactory, Queue queue) {
 		this.entityManager = entityManager;
@@ -75,6 +86,7 @@ public class TrustServiceTrustLinker implements TrustLinker {
 	public TrustLinkerResult hasTrustLink(X509Certificate childCertificate,
 			X509Certificate certificate, Date validationDate,
 			RevocationData revocationData) {
+
 		LOG.debug("certificate: " + childCertificate.getSubjectX500Principal());
 		String issuerName = childCertificate.getIssuerX500Principal()
 				.toString();
@@ -82,6 +94,11 @@ public class TrustServiceTrustLinker implements TrustLinker {
 				.find(CertificateAuthorityEntity.class, issuerName);
 		if (null == certificateAuthority) {
 			LOG.debug("no data cache entry for CA: " + issuerName);
+			/*
+			 * Cache Miss
+			 */
+			this.cacheMisses++;
+
 			URI crlUri = CrlTrustLinker.getCrlUri(childCertificate);
 			String crlUrl;
 			try {
@@ -131,6 +148,7 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			/*
 			 * Harvester is still busy processing the first CRL.
 			 */
+			this.cacheMisses++;
 			return null;
 		}
 		/*
@@ -139,11 +157,13 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		Date thisUpdate = certificateAuthority.getThisUpdate();
 		if (null == thisUpdate) {
 			LOG.warn("no thisUpdate value");
+			this.cacheMisses++;
 			return null;
 		}
 		Date nextUpdate = certificateAuthority.getNextUpdate();
 		if (null == nextUpdate) {
 			LOG.warn("no nextUpdate value");
+			this.cacheMisses++;
 			return null;
 		}
 		/*
@@ -151,13 +171,20 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		 */
 		if (thisUpdate.after(validationDate)) {
 			LOG.warn("cached CRL data too recent");
+			this.cacheMisses++;
 			return null;
 		}
 		if (validationDate.after(nextUpdate)) {
 			LOG.warn("cached CRL data too old");
+			this.cacheMisses++;
 			return null;
 		}
 		LOG.debug("using cached CRL data");
+		/*
+		 * Cache Hit
+		 */
+		this.cacheHits++;
+
 		BigInteger serialNumber = childCertificate.getSerialNumber();
 		RevokedCertificateEntity revokedCertificate = findRevokedCertificate(
 				issuerName, serialNumber);

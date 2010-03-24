@@ -25,8 +25,17 @@ public interface SNMPServiceMBean {
 	 * registered, does so.
 	 * 
 	 * @param oid
+	 * @param increment
 	 */
-	public void increment(String oid);
+	public void increment(String oid, Long increment);
+
+	/**
+	 * Returns the current value of the SNMP {@link Counter} associated with the
+	 * specified OID. If not yet created and registered, does so.
+	 * 
+	 * @param oid
+	 */
+	public Long getValue(String oid);
 
 	/**
 	 * Attributes

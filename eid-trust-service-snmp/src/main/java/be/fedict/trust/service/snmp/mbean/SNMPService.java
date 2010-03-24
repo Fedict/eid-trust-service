@@ -20,6 +20,7 @@ package be.fedict.trust.service.snmp.mbean;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,10 +45,53 @@ public class SNMPService implements SNMPServiceMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void increment(String oid) {
+	public Long getValue(String oid) {
+
+		initSNMPAgent();
+
+		Long value = this.snmpValues.get(oid);
+		if (null == value) {
+			value = 0L;
+			this.snmpValues.put(oid, value);
+			try {
+				addSNMPCounter(oid);
+			} catch (DuplicateRegistrationException e) {
+				LOG.error("Counter with oid=" + oid + " already registered.");
+			}
+		}
+
+		LOG.debug("getValue: oid=" + oid + " value=" + value);
+		return value;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void increment(String oid, Long increment) {
+
+		initSNMPAgent();
+
+		Long value = this.snmpValues.get(oid);
+		if (null == value) {
+			this.snmpValues.put(oid, increment);
+			try {
+				addSNMPCounter(oid);
+			} catch (DuplicateRegistrationException e) {
+				LOG.error("Counter with oid=" + oid + " already registered.");
+			}
+		} else {
+			this.snmpValues.put(oid, value + increment);
+		}
+		LOG.debug("increment: oid=" + oid + " value=" + snmpValues.get(oid));
+	}
+
+	/**
+	 * Initialized the {@link SNMPAgent} if not yet done so.
+	 */
+	private void initSNMPAgent() {
 
 		if (null == this.snmpAgent) {
-			LOG.debug("Address=" + this.address);
+			LOG.debug("Start SNMP agent @ address=" + this.address);
 			try {
 				this.snmpAgent = new SNMPAgent(this.address, new File(
 						"performance.snmp.agent.boot.counter.cfg"), new File(
@@ -59,21 +103,9 @@ public class SNMPService implements SNMPServiceMBean {
 			this.snmpThread = new Thread(this.snmpAgent);
 			this.snmpThread.start();
 
-			this.snmpValues = new HashMap<String, Long>();
+			this.snmpValues = Collections
+					.synchronizedMap(new HashMap<String, Long>());
 		}
-
-		Long value = this.snmpValues.get(oid);
-		if (null == value) {
-			this.snmpValues.put(oid, 1L);
-			try {
-				addSNMPCounter(oid);
-			} catch (DuplicateRegistrationException e) {
-				LOG.error("Counter with oid=" + oid + " already registered.");
-			}
-		} else {
-			this.snmpValues.put(oid, value + 1);
-		}
-		LOG.debug("oid=" + oid + " value=" + snmpValues.get(oid));
 	}
 
 	/**
