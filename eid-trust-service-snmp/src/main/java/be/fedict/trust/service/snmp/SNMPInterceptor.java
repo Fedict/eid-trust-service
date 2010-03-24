@@ -19,6 +19,7 @@
 package be.fedict.trust.service.snmp;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,16 +33,24 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * SNMP interceptor.
+ * SNMP intercepter.
  * 
- * In case the {@link SNMP} annotation is put on the method, each invocation
- * will trigger an increment on the value associated with the configured SNMP
- * oid.
+ * In case an {@link SNMP} annotation is put on the method, each invocation will
+ * trigger an increment of 1 on the value associated with the configured SNMP
+ * OID.
  * 
- * In case the {@link SNMP} annotation is put on a field, before an invocation
- * in one of the classes methods, the current value associated with the SNMP oid
+ * In case an {@link SNMP} annotation is put on a field, before an invocation in
+ * one of the classes methods, the current value associated with the SNMP OID
  * will be fetched and injected in the field. After completion of the method,
- * the updated value will be checked and if changed update the SNMP value.
+ * the updated value will be checked and if changed the delta will be
+ * incremented in the SNMP value. In case the field is derived, nothing will be
+ * updated here, the update happens in a method annotated with
+ * {@link SNMPCounter}.
+ * 
+ * In case an {@link SNMPCounter} annotation is put on a field, after every
+ * invocation of other methods, the intercepter will execute this method. This
+ * is helpful for derived {@link SNMP} fields, dependent on other {@link SNMP}
+ * fields to limit faults due to changes while invoking.
  * 
  * @author wvdhaute
  * 
@@ -49,6 +58,8 @@ import org.apache.commons.logging.LogFactory;
 public class SNMPInterceptor {
 
 	private static final Log LOG = LogFactory.getLog(SNMPInterceptor.class);
+
+	private Map<String, Long> values;
 
 	@AroundInvoke
 	public Object invoke(InvocationContext invocationContext) throws Exception {
@@ -59,7 +70,7 @@ public class SNMPInterceptor {
 	private Object process(InvocationContext invocationContext)
 			throws Exception {
 
-		Map<String, Long> values = new HashMap<String, Long>();
+		this.values = new HashMap<String, Long>();
 		Object target = invocationContext.getTarget();
 		LOG.debug("process SNMP on " + target.getClass().getCanonicalName());
 
@@ -69,24 +80,62 @@ public class SNMPInterceptor {
 		SNMP methodSnmp = invocationContext.getMethod().getAnnotation(
 				SNMP.class);
 		if (null != methodSnmp) {
-			increment(methodSnmp, 1L);
+			increment(methodSnmp.oid(), methodSnmp.service(), 1L);
 		}
 
 		/*
 		 * Process the possible SNMP annotation on the fields
 		 */
-		Field[] fields = target.getClass().getDeclaredFields();
-		for (Field field : fields) {
+		injectSnmpFields(target);
+
+		/*
+		 * Invoke
+		 */
+		Object result = invocationContext.proceed();
+
+		/*
+		 * Post-process the possible SNMP annotation on the fields
+		 */
+		updateSnmpFields(target);
+
+		/*
+		 * Check for SNMPCounter methods
+		 */
+		SNMPCounter snmpCounter = invocationContext.getMethod().getAnnotation(
+				SNMPCounter.class);
+		if (null == snmpCounter) {
+			// check if other methods are annotated this way, if so execute them
+			for (Method method : target.getClass().getMethods()) {
+				if (null != method.getAnnotation(SNMPCounter.class)) {
+					method.invoke(target);
+				}
+			}
+		}
+
+		/*
+		 * Update the SNMP derived fields
+		 */
+		updateSnmpDerivedFields(target);
+
+		/*
+		 * Return the invocation result
+		 */
+		return result;
+	}
+
+	private void injectSnmpFields(Object target) {
+
+		for (Field field : target.getClass().getDeclaredFields()) {
 			SNMP fieldSnmp = field.getAnnotation(SNMP.class);
 			if (null == fieldSnmp) {
 				continue;
 			}
 
 			// retrieve the current value of the associated SNMP counter
-			Long value = getValue(fieldSnmp);
+			Long value = getValue(fieldSnmp.oid(), fieldSnmp.service());
 
 			// put this value in the map to compare afterwards
-			values.put(field.getName(), value);
+			this.values.put(field.getName(), value);
 
 			// inject the value into the field
 			field.setAccessible(true);
@@ -97,18 +146,16 @@ public class SNMPInterceptor {
 						+ " value to " + value, e);
 			}
 		}
+	}
 
-		/*
-		 * Invoke
-		 */
-		Object result = invocationContext.proceed();
+	private void updateSnmpFields(Object target) {
 
-		/*
-		 * Post-process the possible SNMP annotation on the fields
-		 */
-		for (Field field : fields) {
+		for (Field field : target.getClass().getDeclaredFields()) {
 			SNMP fieldSnmp = field.getAnnotation(SNMP.class);
-			if (null == fieldSnmp) {
+			/*
+			 * Derived SNMP fields are updated on SNMPCounter method invocations
+			 */
+			if (null == fieldSnmp || fieldSnmp.derived()) {
 				continue;
 			}
 
@@ -120,33 +167,52 @@ public class SNMPInterceptor {
 			} catch (Exception e) {
 				LOG.error("Failed to get field=" + field.getName() + " value",
 						e);
-				return result;
+				return;
 			}
 
 			// increment the SNMP counter's value with the delta of the current
 			// field value and the initial value
-			Long increment = value - values.get(field.getName());
+			Long increment = value - this.values.get(field.getName());
 			if (increment != 0L)
-				increment(fieldSnmp, value - values.get(field.getName()));
+				increment(fieldSnmp.oid(), fieldSnmp.service(), value
+						- this.values.get(field.getName()));
 		}
-
-		/*
-		 * Return the invocation result
-		 */
-		return result;
 	}
 
-	private Long getValue(SNMP snmp) {
+	private void updateSnmpDerivedFields(Object target) {
 
-		LOG.debug("get value of counter oid=" + snmp.oid() + " @ service="
-				+ snmp.service());
+		for (Field field : target.getClass().getDeclaredFields()) {
+			SNMP fieldSnmp = field.getAnnotation(SNMP.class);
+			if (null == fieldSnmp || !fieldSnmp.derived()) {
+				continue;
+			}
+
+			// retrieve the possibly changed field value
+			field.setAccessible(true);
+			Long value;
+			try {
+				value = (Long) field.get(target);
+			} catch (Exception e) {
+				LOG.error("Failed to get field=" + field.getName() + " value",
+						e);
+				return;
+			}
+
+			// set the SNMP value
+			setValue(fieldSnmp.oid(), fieldSnmp.service(), value);
+		}
+
+	}
+
+	private static Long getValue(String oid, String service) {
+
+		LOG.debug("get value of counter oid=" + oid + " @ service=" + service);
 
 		try {
 			for (MBeanServer mBeanServer : MBeanServerFactory
 					.findMBeanServer(null)) {
-				return (Long) mBeanServer.invoke(
-						new ObjectName(snmp.service()), "getValue",
-						new Object[] { snmp.oid() },
+				return (Long) mBeanServer.invoke(new ObjectName(service),
+						"getValue", new Object[] { oid },
 						new String[] { "java.lang.String" });
 
 			}
@@ -157,21 +223,41 @@ public class SNMPInterceptor {
 		return 0L;
 	}
 
-	private void increment(SNMP snmp, Long increment) {
+	public static void setValue(String oid, String service, Long value) {
 
-		LOG.debug("increment counter oid=" + snmp.oid() + " @ service="
-				+ snmp.service() + " with " + increment);
+		LOG.debug("set value of counter oid=" + oid + " @ service=" + service
+				+ " to " + value);
+
 		try {
 			for (MBeanServer mBeanServer : MBeanServerFactory
 					.findMBeanServer(null)) {
-				mBeanServer.invoke(new ObjectName(snmp.service()), "increment",
-						new Object[] { snmp.oid(), increment }, new String[] {
+				mBeanServer.invoke(new ObjectName(service), "setValue",
+						new Object[] { oid, value }, new String[] {
 								"java.lang.String", "java.lang.Long" });
 
 			}
 		} catch (Exception e) {
 			LOG.error("Failed to contact SNMP Mbean: " + e.getMessage(), e);
 		}
+	}
+
+	public static void increment(String oid, String service, Long increment) {
+
+		LOG.debug("increment counter oid=" + oid + " @ service=" + service
+				+ " with " + increment);
+
+		try {
+			for (MBeanServer mBeanServer : MBeanServerFactory
+					.findMBeanServer(null)) {
+				mBeanServer.invoke(new ObjectName(service), "increment",
+						new Object[] { oid, increment }, new String[] {
+								"java.lang.String", "java.lang.Long" });
+
+			}
+		} catch (Exception e) {
+			LOG.error("Failed to contact SNMP Mbean: " + e.getMessage(), e);
+		}
+
 	}
 
 }

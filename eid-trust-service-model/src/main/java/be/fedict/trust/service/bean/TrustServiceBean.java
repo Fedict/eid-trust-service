@@ -76,6 +76,7 @@ import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.snmp.SNMP;
+import be.fedict.trust.service.snmp.SNMPCounter;
 import be.fedict.trust.service.snmp.SNMPInterceptor;
 
 /**
@@ -104,6 +105,15 @@ public class TrustServiceBean implements TrustService {
 
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
+
+	@SNMP(oid = SnmpConstants.CACHE_HITS)
+	private Long cacheHits;
+
+	@SNMP(oid = SnmpConstants.CACHE_MISSES)
+	private Long cacheMisses;
+
+	@SNMP(oid = SnmpConstants.CACHE_HIT_PERCENTAGE, derived = true)
+	private Long cacheHitPercentage;
 
 	/**
 	 * {@inheritDoc}
@@ -429,5 +439,22 @@ public class TrustServiceBean implements TrustService {
 			trustValidator
 					.addCertificateConstrain(endEntityCertificateConstraint);
 		}
+	}
+
+	@SNMPCounter
+	public void updateCacheHitPercentage() {
+
+		LOG.debug("update cache hit %");
+		if (0L == this.cacheHits && 0L == this.cacheMisses) {
+			return;
+		}
+
+		LOG.debug("hits  : " + this.cacheHits);
+		LOG.debug("missed: " + this.cacheMisses);
+
+		double v = ((double) this.cacheHits / (double) (this.cacheHits + this.cacheMisses));
+		LOG.debug("v=" + v);
+		this.cacheHitPercentage = Math.round(v * 100);
+		LOG.debug("cache hit % = " + this.cacheHitPercentage);
 	}
 }

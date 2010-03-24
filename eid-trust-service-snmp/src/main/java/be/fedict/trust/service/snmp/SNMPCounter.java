@@ -22,23 +22,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation to be set on fields or methods.
+ * Annotation to be set on methods.
  * 
  * @see SNMPInterceptor
  * 
  * @author wvdhaute
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SNMP {
-
-	String oid();
-
-	String service() default "trust:service=SNMP";
-
-	/**
-	 * If <code>true</code> the field annotated with this will only be updated
-	 * if a method is annotated with {@link SNMPCounter}.
-	 */
-	boolean derived() default false;
+public @interface SNMPCounter {
 
 }

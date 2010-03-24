@@ -67,6 +67,25 @@ public class SNMPService implements SNMPServiceMBean {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void setValue(String oid, Long value) {
+
+		initSNMPAgent();
+
+		if (null == this.snmpValues.get(oid)) {
+			try {
+				addSNMPCounter(oid);
+			} catch (DuplicateRegistrationException e) {
+				LOG.error("Counter with oid=" + oid + " already registered.");
+			}
+		}
+		this.snmpValues.put(oid, value);
+
+		LOG.debug("setValue: oid=" + oid + " value=" + value);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public void increment(String oid, Long increment) {
 
 		initSNMPAgent();

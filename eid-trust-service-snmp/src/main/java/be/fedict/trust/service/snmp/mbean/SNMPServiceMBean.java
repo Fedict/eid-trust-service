@@ -38,6 +38,15 @@ public interface SNMPServiceMBean {
 	public Long getValue(String oid);
 
 	/**
+	 * Sets the value of the SNMP {@link Counter} associated with the specified
+	 * OID. If not yet created and registered, does so.
+	 * 
+	 * @param oid
+	 * @param value
+	 */
+	public void setValue(String oid, Long value);
+
+	/**
 	 * Attributes
 	 */
 	String getAddress();

@@ -35,7 +35,7 @@
 	</operation>
 	<operation>
 		<description>
-			Returns the current value of the SNMP Counter} associated
+			Returns the current value of the SNMP Counter associated
 			with the specified OID. If not yet created and registered, does so.
 		</description>
 		<name>getValue</name>
@@ -45,6 +45,25 @@
 			<type>java.lang.String</type>
 		</parameter>
 		<return-type>java.lang.Long</return-type>
+	</operation>
+	<operation>
+		<description>
+			Sets the value of the SNMP counter associated with the
+			specified OID.
+			If not yet created and registered, does so.
+		</description>
+		<name>setValue</name>
+		<parameter>
+			<description>The SNMP OID of this counter</description>
+			<name>OID</name>
+			<type>java.lang.String</type>
+		</parameter>
+		<parameter>
+			<description>The value</description>
+			<name>value</name>
+			<type>java.lang.Long</type>
+		</parameter>
+		<return-type>void</return-type>
 	</operation>
 </mbean>
   

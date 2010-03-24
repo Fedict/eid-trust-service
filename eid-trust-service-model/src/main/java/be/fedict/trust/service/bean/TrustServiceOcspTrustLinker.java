@@ -21,17 +21,11 @@ package be.fedict.trust.service.bean;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import javax.interceptor.Interceptors;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import be.fedict.trust.RevocationData;
 import be.fedict.trust.TrustLinkerResult;
 import be.fedict.trust.ocsp.OcspRepository;
 import be.fedict.trust.ocsp.OcspTrustLinker;
 import be.fedict.trust.service.SnmpConstants;
-import be.fedict.trust.service.snmp.SNMP;
 import be.fedict.trust.service.snmp.SNMPInterceptor;
 
 /**
@@ -41,14 +35,7 @@ import be.fedict.trust.service.snmp.SNMPInterceptor;
  * @author wvdhaute
  * 
  */
-@Interceptors(SNMPInterceptor.class)
 public class TrustServiceOcspTrustLinker extends OcspTrustLinker {
-
-	private static final Log LOG = LogFactory
-			.getLog(TrustServiceOcspTrustLinker.class);
-
-	@SNMP(oid = SnmpConstants.OCSP_FAILURES)
-	private Long failures = 0L;
 
 	public TrustServiceOcspTrustLinker(OcspRepository ocspRepository) {
 
@@ -63,8 +50,8 @@ public class TrustServiceOcspTrustLinker extends OcspTrustLinker {
 		TrustLinkerResult result = super.hasTrustLink(childCertificate,
 				certificate, validationDate, revocationData);
 		if (null == result) {
-			this.failures++;
-			LOG.debug("OCSP failures: " + this.failures);
+			SNMPInterceptor.increment(SnmpConstants.OCSP_FAILURES,
+					SnmpConstants.SNMP_SERVICE, 1L);
 		}
 
 		return result;

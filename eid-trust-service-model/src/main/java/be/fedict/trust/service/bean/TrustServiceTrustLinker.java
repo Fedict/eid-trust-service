@@ -26,7 +26,6 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
-import javax.interceptor.Interceptors;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
@@ -49,7 +48,6 @@ import be.fedict.trust.service.SnmpConstants;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.Status;
-import be.fedict.trust.service.snmp.SNMP;
 import be.fedict.trust.service.snmp.SNMPInterceptor;
 
 /**
@@ -58,7 +56,6 @@ import be.fedict.trust.service.snmp.SNMPInterceptor;
  * @author fcorneli
  * 
  */
-@Interceptors(SNMPInterceptor.class)
 public class TrustServiceTrustLinker implements TrustLinker {
 
 	private static final Log LOG = LogFactory
@@ -69,12 +66,6 @@ public class TrustServiceTrustLinker implements TrustLinker {
 	private final QueueConnectionFactory queueConnectionFactory;
 
 	private final Queue queue;
-
-	@SNMP(oid = SnmpConstants.CACHE_HITS)
-	private Long cacheHits = 0L;
-
-	@SNMP(oid = SnmpConstants.CACHE_MISSES)
-	private Long cacheMisses = 0L;
 
 	public TrustServiceTrustLinker(EntityManager entityManager,
 			QueueConnectionFactory queueConnectionFactory, Queue queue) {
@@ -97,7 +88,8 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			/*
 			 * Cache Miss
 			 */
-			this.cacheMisses++;
+			SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
+					SnmpConstants.SNMP_SERVICE, 1L);
 
 			URI crlUri = CrlTrustLinker.getCrlUri(childCertificate);
 			String crlUrl;
@@ -148,7 +140,11 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			/*
 			 * Harvester is still busy processing the first CRL.
 			 */
-			this.cacheMisses++;
+			if (Status.NONE != certificateAuthority.getStatus()) {
+				// none means no CRL is available so not really a cache miss ...
+				SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
+						SnmpConstants.SNMP_SERVICE, 1L);
+			}
 			return null;
 		}
 		/*
@@ -157,13 +153,15 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		Date thisUpdate = certificateAuthority.getThisUpdate();
 		if (null == thisUpdate) {
 			LOG.warn("no thisUpdate value");
-			this.cacheMisses++;
+			SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
+					SnmpConstants.SNMP_SERVICE, 1L);
 			return null;
 		}
 		Date nextUpdate = certificateAuthority.getNextUpdate();
 		if (null == nextUpdate) {
 			LOG.warn("no nextUpdate value");
-			this.cacheMisses++;
+			SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
+					SnmpConstants.SNMP_SERVICE, 1L);
 			return null;
 		}
 		/*
@@ -171,19 +169,22 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		 */
 		if (thisUpdate.after(validationDate)) {
 			LOG.warn("cached CRL data too recent");
-			this.cacheMisses++;
+			SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
+					SnmpConstants.SNMP_SERVICE, 1L);
 			return null;
 		}
 		if (validationDate.after(nextUpdate)) {
 			LOG.warn("cached CRL data too old");
-			this.cacheMisses++;
+			SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
+					SnmpConstants.SNMP_SERVICE, 1L);
 			return null;
 		}
 		LOG.debug("using cached CRL data");
 		/*
 		 * Cache Hit
 		 */
-		this.cacheHits++;
+		SNMPInterceptor.increment(SnmpConstants.CACHE_HITS,
+				SnmpConstants.SNMP_SERVICE, 1L);
 
 		BigInteger serialNumber = childCertificate.getSerialNumber();
 		RevokedCertificateEntity revokedCertificate = findRevokedCertificate(

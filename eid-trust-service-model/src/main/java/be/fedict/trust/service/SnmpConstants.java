@@ -26,6 +26,8 @@ package be.fedict.trust.service;
  */
 public abstract class SnmpConstants {
 
+	public static final String SNMP_SERVICE = "trust:service=SNMP";
+
 	private static final String SNMP_OID_ROOT = "1.3.6.1.4.1.7890.";
 
 	public static final String VALIDATE = SNMP_OID_ROOT + "0.0";
