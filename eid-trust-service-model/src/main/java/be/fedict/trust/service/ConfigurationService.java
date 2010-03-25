@@ -24,9 +24,12 @@ import java.util.Locale;
 import javax.ejb.Local;
 
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
 import be.fedict.trust.service.entity.NetworkConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.KeyStoreLoadException;
 
 /**
  * Configuration service.
@@ -70,6 +73,27 @@ public interface ConfigurationService {
 	void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
 			int timeout, int maxClockOffset, String cron)
 			throws InvalidCronExpressionException;
+
+	/**
+	 * Returns the {@link WSSecurityConfigEntity}.
+	 */
+	WSSecurityConfigEntity getWSSecurityConfig();
+
+	/**
+	 * Save the {@link WSSecurityConfigEntity}.
+	 * 
+	 * @param signing
+	 * @param keyStoreType
+	 * @param keyStorePath
+	 * @param keyStorePassword
+	 * @param keyEntryPassword
+	 * @param alias
+	 * 
+	 * @throws KeyStoreLoadException
+	 */
+	void saveWSSecurityConfig(boolean signing, KeyStoreType keyStoreType,
+			String keyStorePath, String keyStorePassword,
+			String keyEntryPassword, String alias) throws KeyStoreLoadException;
 
 	/**
 	 * List the languages available for the specified key.

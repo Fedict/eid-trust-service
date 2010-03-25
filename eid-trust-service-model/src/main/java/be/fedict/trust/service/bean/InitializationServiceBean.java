@@ -43,6 +43,7 @@ import be.fedict.trust.service.dao.LocalizationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
 import be.fedict.trust.service.entity.TimeProtocol;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
@@ -82,6 +83,7 @@ public class InitializationServiceBean implements InitializationService {
 
 		initTexts();
 
+		initWSSecurityConfig();
 		initNetworkConfig();
 		initClockDrift();
 
@@ -105,22 +107,37 @@ public class InitializationServiceBean implements InitializationService {
 		}
 	}
 
+	private void initWSSecurityConfig() {
+
+		// Default WS Security config
+		if (null == this.configurationDAO.findWSSecurityConfig()) {
+			this.configurationDAO.setWSSecurityConfig(false,
+					KeyStoreType.PKCS12, null, null, null, null);
+		}
+	}
+
 	private void initNetworkConfig() {
 
 		// Default network config
-		this.configurationDAO.setNetworkConfig(null, 0);
-		this.configurationDAO.setNetworkConfigEnabled(false);
+		if (null == this.configurationDAO.findNetworkConfigEntity()) {
+			this.configurationDAO.setNetworkConfig(null, 0);
+			this.configurationDAO.setNetworkConfigEnabled(false);
+		}
 	}
 
 	private void initClockDrift() {
 
 		// Default clock drift config
-		ClockDriftConfigEntity clockDriftConfig = configurationDAO
-				.setClockDriftConfig(TimeProtocol.NTP,
-						TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER,
-						TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
-						TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET,
-						TrustServiceConstants.DEFAULT_CRON);
+		ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
+				.findClockDriftConfig();
+		if (null == clockDriftConfig) {
+			clockDriftConfig = this.configurationDAO.setClockDriftConfig(
+					TimeProtocol.NTP,
+					TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER,
+					TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
+					TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET,
+					TrustServiceConstants.DEFAULT_CRON);
+		}
 
 		// Clock drift timer
 		LOG.debug("start timer for clock drift");

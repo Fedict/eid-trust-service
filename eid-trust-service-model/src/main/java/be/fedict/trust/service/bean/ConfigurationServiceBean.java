@@ -31,16 +31,20 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.SecurityDomain;
 
 import be.fedict.trust.service.ConfigurationService;
+import be.fedict.trust.service.KeyStoreUtils;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.LocalizationDAO;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
 import be.fedict.trust.service.entity.LocalizationKeyEntity;
 import be.fedict.trust.service.entity.LocalizationTextEntity;
 import be.fedict.trust.service.entity.NetworkConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.KeyStoreLoadException;
 
 /**
  * Configuration Service Bean implementation.
@@ -159,5 +163,35 @@ public class ConfigurationServiceBean implements ConfigurationService {
 			if (localizationText.getLanguage().equals(locale.getLanguage()))
 				localizationText.setText(text);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public WSSecurityConfigEntity getWSSecurityConfig() {
+
+		return this.configurationDAO.getWSSecurityConfig();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void saveWSSecurityConfig(boolean signing,
+			KeyStoreType keyStoreType, String keyStorePath,
+			String keyStorePassword, String keyEntryPassword, String alias)
+			throws KeyStoreLoadException {
+
+		/*
+		 * Check if valid keystore configuration
+		 */
+		if (null != keyStorePath) {
+			KeyStoreUtils.loadPrivateKeyEntry(keyStoreType, keyStorePath,
+					keyStorePassword, keyEntryPassword, alias);
+		}
+
+		this.configurationDAO.setWSSecurityConfig(signing, keyStoreType,
+				keyStorePath, keyStorePassword, keyEntryPassword, alias);
 	}
 }

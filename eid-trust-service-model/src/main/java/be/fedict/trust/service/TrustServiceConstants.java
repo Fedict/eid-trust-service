@@ -33,6 +33,7 @@ public abstract class TrustServiceConstants {
 
 	public static final String CLOCK_DRIFT_TIMER = "clock-drift-timer";
 
+	public static final String WS_SECURITY_CONFIG = "ws-security-config";
 	public static final String NETWORK_CONFIG = "network-config";
 	public static final String CLOCK_DRIFT_CONFIG = "clock-drift-config";
 	public static final String CLOCK_DRIFT_NTP_SERVER = "0.pool.ntp.org";

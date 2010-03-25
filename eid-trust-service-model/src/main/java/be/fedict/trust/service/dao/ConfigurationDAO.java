@@ -22,8 +22,10 @@ import javax.ejb.Local;
 
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
 import be.fedict.trust.service.entity.NetworkConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 
 /**
  * Configuration DAO.
@@ -35,7 +37,13 @@ import be.fedict.trust.service.entity.TimeProtocol;
 public interface ConfigurationDAO {
 
 	/**
-	 * Returns the {@link NetworkConfigEntity}.
+	 * Returns the {@link NetworkConfigEntity} or <code>null</code> if not
+	 * found.
+	 */
+	NetworkConfigEntity findNetworkConfigEntity();
+
+	/**
+	 * Returns the {@link NetworkConfigEntity}. Creates if not existing.
 	 */
 	NetworkConfigEntity getNetworkConfigEntity();
 
@@ -61,7 +69,13 @@ public interface ConfigurationDAO {
 	void setNetworkConfigEnabled(boolean enabled);
 
 	/**
-	 * Returns the {@link ClockDriftConfigEntity}.
+	 * Returns the {@link ClockDriftConfigEntity}. Returns <code>null</code> if
+	 * not found.
+	 */
+	ClockDriftConfigEntity findClockDriftConfig();
+
+	/**
+	 * Returns the {@link ClockDriftConfigEntity}. Creates if not existing.
 	 */
 	ClockDriftConfigEntity getClockDriftConfig();
 
@@ -80,4 +94,29 @@ public interface ConfigurationDAO {
 	 */
 	ClockDriftConfigEntity setClockDriftConfig(TimeProtocol timeProtocol,
 			String server, int timeout, int maxClockOffset, String cron);
+
+	/**
+	 * Returns the {@link WSSecurityConfigEntity). Will create if not existing.
+	 */
+	WSSecurityConfigEntity getWSSecurityConfig();
+
+	/**
+	 * Returns the {@link WSSecurityConfigEntity) or <code>null</code> if not
+	 * found.
+	 */
+	WSSecurityConfigEntity findWSSecurityConfig();
+
+	/**
+	 * Add/update the {@link WSSecurityConfigEntity}.
+	 * 
+	 * @param signing
+	 * @param keyStoreType
+	 * @param keyStorePath
+	 * @param keyStorePassword
+	 * @param keyEntryPassword
+	 * @param alias
+	 */
+	WSSecurityConfigEntity setWSSecurityConfig(boolean signing,
+			KeyStoreType keyStoreType, String keyStorePath,
+			String keyStorePassword, String keyEntryPassword, String alias);
 }

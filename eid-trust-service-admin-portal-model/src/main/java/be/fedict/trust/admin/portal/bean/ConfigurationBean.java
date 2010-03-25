@@ -47,9 +47,12 @@ import be.fedict.trust.admin.portal.Configuration;
 import be.fedict.trust.service.ConfigurationService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
 import be.fedict.trust.service.entity.NetworkConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.KeyStoreLoadException;
 
 @Stateful
 @Name(AdminConstants.ADMIN_SEAM_PREFIX + "config")
@@ -75,6 +78,13 @@ public class ConfigurationBean implements Configuration {
 	private int clockDriftTimeout;
 	private int clockDriftMaxClockOffset;
 	private String clockDriftCron;
+
+	private boolean wsSecuritySigning;
+	private String wsSecurityKeyStoreType;
+	private String wsSecurityKeyStorePath;
+	private String wsSecurityKeyStorePassword;
+	private String wsSecurityKeyEntryPassword;
+	private String wsSecurityAlias;
 
 	@In(value = "language", required = false)
 	@Out(value = "language", required = false, scope = ScopeType.CONVERSATION)
@@ -112,6 +122,17 @@ public class ConfigurationBean implements Configuration {
 		this.clockDriftTimeout = clockDriftConfig.getTimeout();
 		this.clockDriftMaxClockOffset = clockDriftConfig.getMaxClockOffset();
 		this.clockDriftCron = clockDriftConfig.getCron();
+
+		WSSecurityConfigEntity wsSecurityConfig = this.configurationService
+				.getWSSecurityConfig();
+		this.wsSecuritySigning = wsSecurityConfig.isSigning();
+		this.wsSecurityKeyStoreType = wsSecurityConfig.getKeyStoreType().name();
+		this.wsSecurityKeyStorePath = wsSecurityConfig.getKeyStorePath();
+		this.wsSecurityKeyStorePassword = wsSecurityConfig
+				.getKeyStorePassword();
+		this.wsSecurityKeyEntryPassword = wsSecurityConfig
+				.getKeyEntryPassword();
+		this.wsSecurityAlias = wsSecurityConfig.getAlias();
 	}
 
 	/**
@@ -125,6 +146,34 @@ public class ConfigurationBean implements Configuration {
 
 		this.configurationService.saveNetworkConfig(proxyHost, proxyPort,
 				enabled);
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String saveWSSecurityConfig() {
+
+		this.log
+				.debug(
+						"save ws security config: signing=#0 type=#1, path=#2 store pw=#3 entry pw=#4 alias=#5",
+						this.wsSecuritySigning, this.wsSecurityKeyStoreType,
+						this.wsSecurityKeyStorePath,
+						this.wsSecurityKeyStorePassword,
+						this.wsSecurityKeyEntryPassword, this.wsSecurityAlias);
+		try {
+			this.configurationService.saveWSSecurityConfig(
+					this.wsSecuritySigning, KeyStoreType
+							.valueOf(this.wsSecurityKeyStoreType),
+					this.wsSecurityKeyStorePath,
+					this.wsSecurityKeyStorePassword,
+					this.wsSecurityKeyEntryPassword, this.wsSecurityAlias);
+		} catch (KeyStoreLoadException e) {
+			this.facesMessages.addToControlFromResourceBundle("wssec_path",
+					StatusMessage.Severity.ERROR, "errorLoadKeyStore", e
+							.getMessage());
+			return null;
+		}
 		return "success";
 	}
 
@@ -183,6 +232,46 @@ public class ConfigurationBean implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Factory("clockDriftProtocols")
+	public List<SelectItem> clockDriftProtocolFactory() {
+
+		List<SelectItem> protocols = new LinkedList<SelectItem>();
+		for (TimeProtocol protocol : TimeProtocol.values()) {
+			protocols.add(new SelectItem(protocol.name(), protocol.name()));
+		}
+		return protocols;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Factory("keyStoreTypes")
+	public List<SelectItem> keyStoreTypeFactory() {
+
+		List<SelectItem> keyStoreTypes = new LinkedList<SelectItem>();
+		for (KeyStoreType type : KeyStoreType.values()) {
+			keyStoreTypes.add(new SelectItem(type.name(), type.name()));
+		}
+		return keyStoreTypes;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Factory("supportedLanguages")
+	public List<SelectItem> supportedLanguagesFactory() {
+
+		List<SelectItem> locales = new LinkedList<SelectItem>();
+		for (String language : this.configurationService
+				.listLanguages(TrustServiceConstants.INFO_MESSAGE_KEY)) {
+			locales.add(new SelectItem(language, language));
+		}
+		return locales;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getProxyHost() {
 
 		return this.proxyHost;
@@ -226,19 +315,6 @@ public class ConfigurationBean implements Configuration {
 	public void setProxyPort(int proxyPort) {
 
 		this.proxyPort = proxyPort;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Factory("clockDriftProtocols")
-	public List<SelectItem> clockDriftProtocolFactory() {
-
-		List<SelectItem> protocols = new LinkedList<SelectItem>();
-		for (TimeProtocol protocol : TimeProtocol.values()) {
-			protocols.add(new SelectItem(protocol.name(), protocol.name()));
-		}
-		return protocols;
 	}
 
 	/**
@@ -324,20 +400,6 @@ public class ConfigurationBean implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Factory("supportedLanguages")
-	public List<SelectItem> supportedLanguagesFactory() {
-
-		List<SelectItem> locales = new LinkedList<SelectItem>();
-		for (String language : this.configurationService
-				.listLanguages(TrustServiceConstants.INFO_MESSAGE_KEY)) {
-			locales.add(new SelectItem(language, language));
-		}
-		return locales;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public String getLanguage() {
 
 		return this.language;
@@ -365,5 +427,101 @@ public class ConfigurationBean implements Configuration {
 	public void setInformationMessage(String informationMessage) {
 
 		this.informationMessage = informationMessage;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getWsSecurityKeyStorePassword() {
+
+		return this.wsSecurityKeyStorePassword;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getWsSecurityKeyStorePath() {
+
+		return this.wsSecurityKeyStorePath;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getWsSecurityKeyStoreType() {
+
+		return this.wsSecurityKeyStoreType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isWsSecuritySigning() {
+
+		return this.wsSecuritySigning;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setWsSecurityKeyStorePassword(String password) {
+
+		this.wsSecurityKeyStorePassword = password;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setWsSecurityKeyStorePath(String path) {
+
+		this.wsSecurityKeyStorePath = path;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setWsSecuritySigning(boolean signing) {
+
+		this.wsSecuritySigning = signing;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setWsSecurityKeyStoreType(String type) {
+
+		this.wsSecurityKeyStoreType = type;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getWsSecurityAlias() {
+
+		return this.wsSecurityAlias;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getWsSecurityKeyEntryPassword() {
+
+		return this.wsSecurityKeyEntryPassword;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setWsSecurityAlias(String alias) {
+
+		this.wsSecurityAlias = alias;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setWsSecurityKeyEntryPassword(String password) {
+
+		this.wsSecurityKeyEntryPassword = password;
 	}
 }

@@ -4,6 +4,7 @@
 <mapping class="be.fedict.trust.service.entity.LocalizationTextEntity" />
 <mapping class="be.fedict.trust.service.entity.CertificateAuthorityEntity" />
 <mapping class="be.fedict.trust.service.entity.ClockDriftConfigEntity" />
+<mapping class="be.fedict.trust.service.entity.WSSecurityConfigEntity" />
 <mapping class="be.fedict.trust.service.entity.NetworkConfigEntity" />
 <mapping class="be.fedict.trust.service.entity.RevokedCertificateEntity" />
 <mapping class="be.fedict.trust.service.entity.TrustDomainEntity" />

@@ -37,6 +37,8 @@ public interface Configuration {
 	 */
 	List<SelectItem> clockDriftProtocolFactory();
 
+	List<SelectItem> keyStoreTypeFactory();
+
 	List<SelectItem> supportedLanguagesFactory();
 
 	/*
@@ -82,10 +84,36 @@ public interface Configuration {
 
 	void setInformationMessage(String informationMessage);
 
+	boolean isWsSecuritySigning();
+
+	void setWsSecuritySigning(boolean signing);
+
+	String getWsSecurityKeyStoreType();
+
+	void setWsSecurityKeyStoreType(String type);
+
+	String getWsSecurityKeyStorePath();
+
+	void setWsSecurityKeyStorePath(String path);
+
+	String getWsSecurityKeyStorePassword();
+
+	void setWsSecurityKeyStorePassword(String password);
+
+	String getWsSecurityKeyEntryPassword();
+
+	void setWsSecurityKeyEntryPassword(String password);
+
+	String getWsSecurityAlias();
+
+	void setWsSecurityAlias(String alias);
+
 	/*
 	 * Actions
 	 */
 	String saveNetworkConfig();
+
+	String saveWSSecurityConfig();
 
 	String saveClockDriftConfig();
 

@@ -65,6 +65,71 @@
 						</h:form>
 					</rich:tab>
 
+					<rich:tab label="#{messages.wsSecurityConfig}">
+						<h:form id="wssec_form">
+							<h:panelGrid id="panel" columns="2" border="1">
+
+								<h:outputLabel for="signing" value="#{messages.wsSecuritySigning}" />
+								<h:selectBooleanCheckbox id="signing"
+									value="#{ts_config.wsSecuritySigning}" />
+
+								<h:outputLabel for="wssec_type"
+									value="#{messages.wsSecurityKeyStoreType}" />
+								<s:decorate>
+									<h:selectOneMenu id="wssec_type"
+										value="#{ts_config.wsSecurityKeyStoreType}" required="true">
+										<f:selectItems value="#{keyStoreTypes}" />
+										<h:message for="wssec_type" styleClass="error" />
+									</h:selectOneMenu>
+								</s:decorate>
+
+								<h:outputLabel for="wssec_path"
+									value="#{messages.wsSecurityKeyStorePath}" />
+								<s:decorate>
+									<h:inputText id="wssec_path"
+										value="#{ts_config.wsSecurityKeyStorePath}" required="true">
+									</h:inputText>
+									<h:message for="wssec_path" styleClass="error" />
+								</s:decorate>
+
+								<h:outputLabel for="wssec_pw"
+									value="#{messages.wsSecurityKeyStorePassword}" />
+								<s:decorate>
+									<h:inputText id="wssec_pw"
+										value="#{ts_config.wsSecurityKeyStorePassword}" required="true">
+									</h:inputText>
+									<h:message for="wssec_pw" styleClass="error" />
+								</s:decorate>
+
+								<h:outputLabel for="wssec_entry_pw"
+									value="#{messages.wsSecurityKeyEntryPassword}" />
+								<s:decorate>
+									<h:inputText id="wssec_entry_pw"
+										value="#{ts_config.wsSecurityKeyEntryPassword}" required="true">
+									</h:inputText>
+									<h:message for="wssec_entry_pw" styleClass="error" />
+								</s:decorate>
+
+								<h:outputLabel for="wssec_alias" value="#{messages.wsSecurityAlias}" />
+								<s:decorate>
+									<h:inputText id="wssec_alias" value="#{ts_config.wsSecurityAlias}"
+										required="true">
+									</h:inputText>
+									<h:message for="wssec_alias" styleClass="error" />
+								</s:decorate>
+
+								<f:facet name="footer">
+									<h:panelGroup style="display:block; text-align:center">
+										<h:commandButton id="submit" value="#{messages.save}"
+											action="#{ts_config.saveWSSecurityConfig}" />
+									</h:panelGroup>
+								</f:facet>
+							</h:panelGrid>
+							<h:messages globalOnly="true" styleClass="error" />
+						</h:form>
+					</rich:tab>
+
+
 					<rich:tab label="#{messages.networkConfig}">
 						<h:form id="network_form">
 							<h:panelGrid id="panel" columns="2" border="1">

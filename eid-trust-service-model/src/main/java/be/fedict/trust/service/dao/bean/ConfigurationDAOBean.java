@@ -29,8 +29,10 @@ import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
 import be.fedict.trust.service.entity.NetworkConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 
 /**
  * Configuration DAO Bean implementation.
@@ -50,12 +52,19 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 	/**
 	 * {@inheritDoc}
 	 */
+	public NetworkConfigEntity findNetworkConfigEntity() {
+
+		LOG.debug("find network config entity");
+		return this.entityManager.find(NetworkConfigEntity.class,
+				TrustServiceConstants.NETWORK_CONFIG);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public NetworkConfigEntity getNetworkConfigEntity() {
 
-		LOG.debug("get network config entity");
-		NetworkConfigEntity networkConfig = this.entityManager
-				.find(NetworkConfigEntity.class,
-						TrustServiceConstants.NETWORK_CONFIG);
+		NetworkConfigEntity networkConfig = findNetworkConfigEntity();
 		if (null == networkConfig) {
 			networkConfig = new NetworkConfigEntity(
 					TrustServiceConstants.NETWORK_CONFIG, null, 0);
@@ -104,12 +113,19 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 	/**
 	 * {@inheritDoc}
 	 */
+	public ClockDriftConfigEntity findClockDriftConfig() {
+
+		LOG.debug("find clock drift configuration");
+		return this.entityManager.find(ClockDriftConfigEntity.class,
+				TrustServiceConstants.CLOCK_DRIFT_CONFIG);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public ClockDriftConfigEntity getClockDriftConfig() {
 
-		LOG.debug("get clock drift configuration");
-		ClockDriftConfigEntity clockDriftConfig = this.entityManager.find(
-				ClockDriftConfigEntity.class,
-				TrustServiceConstants.CLOCK_DRIFT_CONFIG);
+		ClockDriftConfigEntity clockDriftConfig = findClockDriftConfig();
 		if (null == clockDriftConfig) {
 			clockDriftConfig = new ClockDriftConfigEntity(
 					TrustServiceConstants.CLOCK_DRIFT_CONFIG, TimeProtocol.NTP,
@@ -139,5 +155,51 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 		clockDriftConfig.setMaxClockOffset(maxClockOffset);
 		clockDriftConfig.setCron(cron);
 		return clockDriftConfig;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public WSSecurityConfigEntity findWSSecurityConfig() {
+
+		LOG.debug("find ws security config");
+		return this.entityManager.find(WSSecurityConfigEntity.class,
+				TrustServiceConstants.WS_SECURITY_CONFIG);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public WSSecurityConfigEntity getWSSecurityConfig() {
+
+		WSSecurityConfigEntity wsSecurityConfig = findWSSecurityConfig();
+		if (null == wsSecurityConfig) {
+			wsSecurityConfig = new WSSecurityConfigEntity(
+					TrustServiceConstants.WS_SECURITY_CONFIG, false, null,
+					null, null, null, null);
+			this.entityManager.persist(wsSecurityConfig);
+		}
+		return wsSecurityConfig;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public WSSecurityConfigEntity setWSSecurityConfig(boolean signing,
+			KeyStoreType keyStoreType, String keyStorePath,
+			String keyStorePassword, String keyEntryPassword, String alias) {
+
+		LOG.debug("set WS Security config: signing=" + signing
+				+ " keyStoreType=" + keyStoreType + " keyStorePath="
+				+ keyStorePath + " keyStorePassword=" + keyStorePassword
+				+ " keyEntryPassword=" + keyEntryPassword + " alias=" + alias);
+		WSSecurityConfigEntity wsSecurityConfig = getWSSecurityConfig();
+		wsSecurityConfig.setSigning(signing);
+		wsSecurityConfig.setKeyStoreType(keyStoreType);
+		wsSecurityConfig.setKeyStorePath(keyStorePath);
+		wsSecurityConfig.setKeyStorePassword(keyStorePassword);
+		wsSecurityConfig.setKeyEntryPassword(keyEntryPassword);
+		wsSecurityConfig.setAlias(alias);
+		return wsSecurityConfig;
 	}
 }
