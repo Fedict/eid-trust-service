@@ -5,4 +5,6 @@
 	version="2.0">
 	<endpoint name="XKMS2" implementation="be.fedict.trust.xkms2.XKMSPortImpl"
 		url-pattern="/xkms2" />
+	<endpoint name="Ping" implementation="be.fedict.trust.xkms2.PingPortImpl"
+		url-pattern="/ping" />
 </endpoints>

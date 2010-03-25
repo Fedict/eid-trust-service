@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 /**
@@ -83,4 +84,9 @@ public interface TrustService {
 			List<byte[]> ocspResponses, List<byte[]> crls)
 			throws TrustDomainNotFoundException, CertificateException,
 			NoSuchProviderException, CRLException, IOException;
+
+	/**
+	 * Returns the {@link WSSecurityConfigEntity}.
+	 */
+	WSSecurityConfigEntity getWsSecurityConfig();
 }

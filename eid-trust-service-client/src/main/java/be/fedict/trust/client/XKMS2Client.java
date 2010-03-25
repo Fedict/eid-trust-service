@@ -111,6 +111,7 @@ public class XKMS2Client {
 		String wsLocation = MessageFormat.format(
 				"{0}/eid-trust-service-ws/xkms2", location);
 
+		registerLoggerHandler(port);
 		setEndpointAddress(wsLocation);
 	}
 

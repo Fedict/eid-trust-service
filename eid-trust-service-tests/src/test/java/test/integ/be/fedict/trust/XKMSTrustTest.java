@@ -53,7 +53,7 @@ import com.sun.xml.ws.client.ClientTransportException;
 /**
  * eID Trust Service XKMS2 Integration Tests.
  * 
- * @author fcorneli
+ * @author wvdhaute
  * 
  */
 public class XKMSTrustTest {

@@ -53,14 +53,14 @@ import be.fedict.trust.xkms2.XKMSConstants;
 /**
  * eID Trust Service XKMS2 Integration Tests.
  * 
- * @author fcorneli
+ * @author wvdhaute
  * 
  */
 public class XKMSRevocationTest {
 
 	private static final Log LOG = LogFactory.getLog(XKMSRevocationTest.class);
 
-	private static final String location = "http://localhost:8080";
+	private static final String location = "http://sebeco-dev-11:8080";
 
 	@Before
 	public void setUp() {

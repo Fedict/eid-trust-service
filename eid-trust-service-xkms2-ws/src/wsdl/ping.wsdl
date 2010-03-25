@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="urn:net:test:ping"
+	xmlns:tns="urn:net:test:ping" name="PingWebService">
+
+	<types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="urn:net:test:ping">
+			<element name="Request">
+				<complexType />
+			</element>
+			<element name="Response">
+				<complexType />
+			</element>
+		</schema>
+	</types>
+
+	<message name="RequestMessage">
+		<part name="request" element="tns:Request" />
+	</message>
+	<message name="ResponseMessage">
+		<part name="result" element="tns:Response" />
+	</message>
+
+	<portType name="PingPort">
+		<operation name="PingOperation">
+			<input message="tns:RequestMessage" />
+			<output message="tns:ResponseMessage" />
+		</operation>
+	</portType>
+
+	<binding name="PingBinding" type="tns:PingPort">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="PingOperation">
+			<soap:operation soapAction="Ping" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+		</operation>
+	</binding>
+
+	<service name="PingService">
+		<port name="PingPort" binding="tns:PingBinding">
+			<soap:address
+				location="http://localhost:8080/eid-trust-service-ws/ping" />
+		</port>
+	</service>
+</definitions>

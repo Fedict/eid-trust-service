@@ -68,6 +68,7 @@ import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
@@ -449,12 +450,16 @@ public class TrustServiceBean implements TrustService {
 			return;
 		}
 
-		LOG.debug("hits  : " + this.cacheHits);
-		LOG.debug("missed: " + this.cacheMisses);
-
 		double v = ((double) this.cacheHits / (double) (this.cacheHits + this.cacheMisses));
-		LOG.debug("v=" + v);
 		this.cacheHitPercentage = Math.round(v * 100);
 		LOG.debug("cache hit % = " + this.cacheHitPercentage);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public WSSecurityConfigEntity getWsSecurityConfig() {
+
+		return this.configurationDAO.getWSSecurityConfig();
 	}
 }
