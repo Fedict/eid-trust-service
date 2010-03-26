@@ -100,11 +100,16 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public VirtualTrustDomainEntity addVirtualTrustDomain(String name)
-			throws VirtualTrustDomainAlreadyExistsException {
+			throws VirtualTrustDomainAlreadyExistsException,
+			TrustDomainAlreadyExistsException {
 
 		if (null != this.trustDomainDAO.findVirtualTrustDomain(name)) {
 			LOG.error("Virtual Trust domain: " + name + " already exists");
 			throw new VirtualTrustDomainAlreadyExistsException();
+		}
+		if (null != this.trustDomainDAO.findTrustDomain(name)) {
+			LOG.error("Trust domain: " + name + " already exists");
+			throw new TrustDomainAlreadyExistsException();
 		}
 		LOG.debug("add virtualtrust domain: " + name);
 		return this.trustDomainDAO.addVirtualTrustDomain(name);

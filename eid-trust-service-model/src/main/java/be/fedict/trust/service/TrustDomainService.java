@@ -259,9 +259,11 @@ public interface TrustDomainService {
 	 * 
 	 * @param name
 	 * @throws VirtualTrustDomainAlreadyExistsException
+	 * @throws TrustDomainAlreadyExistsException
 	 */
 	VirtualTrustDomainEntity addVirtualTrustDomain(String name)
-			throws VirtualTrustDomainAlreadyExistsException;
+			throws VirtualTrustDomainAlreadyExistsException,
+			TrustDomainAlreadyExistsException;
 
 	/**
 	 * Remove the specified {@link TrustDomainEntity}.

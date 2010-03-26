@@ -263,6 +263,11 @@ public class TrustDomainBean implements TrustDomain {
 					StatusMessage.Severity.ERROR,
 					"errorVirtualTrustDomainAlreadyExists");
 			return null;
+		} catch (TrustDomainAlreadyExistsException e) {
+			this.facesMessages.addToControlFromResourceBundle("name",
+					StatusMessage.Severity.ERROR,
+					"errorTrustDomainAlreadyExists");
+			return null;
 		}
 		return "modify";
 	}
