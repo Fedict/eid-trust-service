@@ -74,7 +74,7 @@ public class XKMSRevocationTest {
 				.debug("validate eID non repudiation certificate and return revocation data.");
 
 		// setup
-		List<X509Certificate> signCertificateChain = XKMSTest
+		List<X509Certificate> signCertificateChain = TestUtils
 				.getSignCertificateChain();
 		XKMS2Client client = new XKMS2Client(location);
 		Date validationDate = new Date();

@@ -21,16 +21,11 @@ package test.integ.be.fedict.trust;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -73,7 +68,7 @@ public class XKMSTrustTest {
 		LOG.debug("validate using unilateral TLS Trust, should fail.");
 
 		// Setup
-		KeyPair keyPair = generateKeyPair();
+		KeyPair keyPair = TestUtils.generateKeyPair();
 
 		/*
 		 * Override default verification that CN of server SSL certificate has
@@ -89,7 +84,7 @@ public class XKMSTrustTest {
 		});
 
 		// setup
-		List<X509Certificate> signCertificateChain = XKMSTest
+		List<X509Certificate> signCertificateChain = TestUtils
 				.getSignCertificateChain();
 		XKMS2Client client = new XKMS2Client("https://" + hostname + ":" + port);
 		client.setServicePublicKey(keyPair.getPublic());
@@ -106,17 +101,6 @@ public class XKMSTrustTest {
 		} catch (ClientTransportException e) {
 			// expected
 		}
-	}
-
-	private KeyPair generateKeyPair() throws NoSuchAlgorithmException,
-			InvalidAlgorithmParameterException {
-
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-		SecureRandom random = new SecureRandom();
-		keyPairGenerator.initialize(new RSAKeyGenParameterSpec(1024,
-				RSAKeyGenParameterSpec.F4), random);
-		KeyPair keyPair = keyPairGenerator.generateKeyPair();
-		return keyPair;
 	}
 
 	@Test
@@ -148,7 +132,7 @@ public class XKMSTrustTest {
 		});
 
 		// setup
-		List<X509Certificate> signCertificateChain = XKMSTest
+		List<X509Certificate> signCertificateChain = TestUtils
 				.getSignCertificateChain();
 		XKMS2Client client = new XKMS2Client("https://" + hostname + ":" + port);
 		client.setServicePublicKey(publicKey);

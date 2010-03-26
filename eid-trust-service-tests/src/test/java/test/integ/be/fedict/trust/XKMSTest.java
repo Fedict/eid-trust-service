@@ -21,18 +21,9 @@ package test.integ.be.fedict.trust;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.awt.Component;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.security.Security;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-
-import javax.smartcardio.CardException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,11 +31,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-import be.fedict.eid.applet.Messages;
-import be.fedict.eid.applet.Status;
-import be.fedict.eid.applet.View;
-import be.fedict.eid.applet.sc.PcscEid;
-import be.fedict.eid.applet.sc.PcscEidSpi;
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.TrustValidator;
@@ -77,7 +63,8 @@ public class XKMSTest {
 	public void testValidateEIDCertificate() throws Exception {
 		LOG.debug("validate eID authentication certificate.");
 
-		List<X509Certificate> authnCertificateChain = getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
 		XKMS2Client client = new XKMS2Client(location);
 		boolean result = client.validate(authnCertificateChain);
@@ -88,7 +75,8 @@ public class XKMSTest {
 	public void testValidateNonRepudiationEIDCertificate() throws Exception {
 		LOG.debug("validate eID non repudiation certificate.");
 
-		List<X509Certificate> signCertificateChain = getSignCertificateChain();
+		List<X509Certificate> signCertificateChain = TestUtils
+				.getSignCertificateChain();
 
 		XKMS2Client client = new XKMS2Client(location);
 		boolean result = client.validate(
@@ -101,7 +89,8 @@ public class XKMSTest {
 	public void testValidateNationalRegistryEIDCertificate() throws Exception {
 		LOG.debug("validate eID national registry certificate.");
 
-		List<X509Certificate> nationalRegistryCertificateChain = getNationalRegistryCertificateChain();
+		List<X509Certificate> nationalRegistryCertificateChain = TestUtils
+				.getNationalRegistryCertificateChain();
 
 		XKMS2Client client = new XKMS2Client(location);
 		boolean result = client
@@ -115,7 +104,8 @@ public class XKMSTest {
 	public void testValidateWrongTrustDomainEIDCertificate() throws Exception {
 		LOG.debug("validate eID certificate with wrong trust domain.");
 
-		List<X509Certificate> authnCertificateChain = getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
 		XKMS2Client client = new XKMS2Client(location);
 		try {
@@ -131,7 +121,8 @@ public class XKMSTest {
 	public void testValidateViaJTrust() throws Exception {
 		LOG.debug("validate eID certificate via jTrust.");
 
-		List<X509Certificate> authnCertificateChain = getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
 				.createTrustValidator(NETWORK_CONFIG);
@@ -144,7 +135,8 @@ public class XKMSTest {
 	public void testValidateNonRepudiationViaJTrust() throws Exception {
 		LOG.debug("validate eID non repudiation certificate via jTrust.");
 
-		List<X509Certificate> signCertificateChain = getSignCertificateChain();
+		List<X509Certificate> signCertificateChain = TestUtils
+				.getSignCertificateChain();
 
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
 				.createNonRepudiationTrustValidator(NETWORK_CONFIG);
@@ -157,7 +149,8 @@ public class XKMSTest {
 	public void testValidateNationalRegistryViaJTrust() throws Exception {
 		LOG.debug("validate eID national registry certificate via jTrust.");
 
-		List<X509Certificate> nationalRegistryCertificateChain = getNationalRegistryCertificateChain();
+		List<X509Certificate> nationalRegistryCertificateChain = TestUtils
+				.getNationalRegistryCertificateChain();
 
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
 				.createNationalRegistryTrustValidator(NETWORK_CONFIG);
@@ -172,7 +165,8 @@ public class XKMSTest {
 	public void testValidatePerformanceViaPKI() throws Exception {
 		LOG.debug("validate eID certificate (performance) via jTrust.");
 
-		List<X509Certificate> authnCertificateChain = getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
 		TrustValidator trustValidator = BelgianTrustValidatorFactory
 				.createTrustValidator(NETWORK_CONFIG);
@@ -189,7 +183,8 @@ public class XKMSTest {
 	public void testValidatePerformanceViaTrustService() throws Exception {
 		LOG.debug("validate eID authentication certificate (performance).");
 
-		List<X509Certificate> authnCertificateChain = getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
 		XKMS2Client client = new XKMS2Client(location);
 
@@ -201,107 +196,4 @@ public class XKMSTest {
 		LOG.debug("dt: " + ((double) (t1 - t0)) / 1000);
 	}
 
-	public static List<X509Certificate> getAuthnCertificateChain()
-			throws Exception, CardException, IOException, CertificateException {
-		Messages messages = new Messages(Locale.getDefault());
-		View view = new LogTestView(LOG);
-		PcscEidSpi pcscEid = new PcscEid(view, messages);
-
-		if (false == pcscEid.isEidPresent()) {
-			LOG.debug("insert eID card...");
-			pcscEid.waitForEidPresent();
-		}
-
-		List<X509Certificate> authnCertificateChain;
-		try {
-			authnCertificateChain = pcscEid.getAuthnCertificateChain();
-		} finally {
-			pcscEid.close();
-		}
-		return authnCertificateChain;
-	}
-
-	public static List<X509Certificate> getSignCertificateChain()
-			throws Exception, CardException, IOException, CertificateException {
-		Messages messages = new Messages(Locale.getDefault());
-		View view = new LogTestView(LOG);
-		PcscEidSpi pcscEid = new PcscEid(view, messages);
-
-		if (false == pcscEid.isEidPresent()) {
-			LOG.debug("insert eID card...");
-			pcscEid.waitForEidPresent();
-		}
-
-		List<X509Certificate> signCertificateChain;
-		try {
-			signCertificateChain = pcscEid.getSignCertificateChain();
-		} finally {
-			pcscEid.close();
-		}
-		return signCertificateChain;
-	}
-
-	public static List<X509Certificate> getNationalRegistryCertificateChain()
-			throws Exception, CardException, IOException, CertificateException {
-		Messages messages = new Messages(Locale.getDefault());
-		View view = new LogTestView(LOG);
-		PcscEid pcscEid = new PcscEid(view, messages);
-
-		if (false == pcscEid.isEidPresent()) {
-			LOG.debug("insert eID card...");
-			pcscEid.waitForEidPresent();
-		}
-
-		CertificateFactory certificateFactory = CertificateFactory
-				.getInstance("X.509");
-
-		List<X509Certificate> nrCertificateChain = new LinkedList<X509Certificate>();
-		try {
-			byte[] nrCertData = pcscEid.readFile(PcscEid.RRN_CERT_FILE_ID);
-			X509Certificate nrCert = (X509Certificate) certificateFactory
-					.generateCertificate(new ByteArrayInputStream(nrCertData));
-			nrCertificateChain.add(nrCert);
-			LOG.debug("national registry certificate issuer: "
-					+ nrCert.getIssuerX500Principal());
-			byte[] rootCaCertData = pcscEid.readFile(PcscEid.ROOT_CERT_FILE_ID);
-			X509Certificate rootCaCert = (X509Certificate) certificateFactory
-					.generateCertificate(new ByteArrayInputStream(
-							rootCaCertData));
-			nrCertificateChain.add(rootCaCert);
-		} finally {
-			pcscEid.close();
-		}
-		return nrCertificateChain;
-	}
-
-	private static class LogTestView implements View {
-
-		private final Log log;
-
-		public LogTestView(Log log) {
-			this.log = log;
-		}
-
-		public void addDetailMessage(String message) {
-			this.log.debug(message);
-		}
-
-		public Component getParentComponent() {
-			return null;
-		}
-
-		public void progressIndication(int max, int current) {
-			this.log.debug("progress " + current + " of " + max);
-		}
-
-		public void setStatusMessage(Status status, String statusMessage) {
-			this.log.debug(status.toString() + ": " + statusMessage);
-		}
-
-		public boolean privacyQuestion(boolean includeAddress,
-				boolean includePhoto, String arg2) {
-
-			return true;
-		}
-	}
 }
