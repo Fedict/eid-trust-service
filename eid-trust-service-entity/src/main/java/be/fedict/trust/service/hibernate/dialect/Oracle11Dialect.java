@@ -9,21 +9,21 @@ package be.fedict.trust.service.hibernate.dialect;
 
 import java.sql.Types;
 
-import org.hibernate.dialect.OracleDialect;
-
+import org.hibernate.dialect.Oracle10gDialect;
 
 /**
- * Custom Oracle Dialect to resolve the issue with Double mapping to Oracle's Double precision
+ * Custom Oracle Dialect to resolve the issue with Double mapping to Oracle's
+ * Double precision
  * 
  * @author wvdhaute
  * 
  */
-public class Oracle11Dialect extends OracleDialect {
+public class Oracle11Dialect extends Oracle10gDialect {
 
-    public Oracle11Dialect() {
+	public Oracle11Dialect() {
 
-        super();
-        registerColumnType(Types.DOUBLE, "binary_double");
-    }
+		super();
+		registerColumnType(Types.DOUBLE, "binary_double");
+	}
 
 }
