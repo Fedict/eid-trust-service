@@ -23,6 +23,9 @@
 				<exclude>server/default/deploy/hsqldb-ds.xml</exclude>
 				<exclude>server/default/deploy/messaging/hsqldb-persistence-service.xml
 				</exclude>
+				
+				<!-- Exclude JBossWS -->
+				<exclude>server/default/deployers/jbossws.deployer/</exclude>
 
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>

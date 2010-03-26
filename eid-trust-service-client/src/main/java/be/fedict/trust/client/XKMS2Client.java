@@ -73,6 +73,7 @@ import org.w3._2002._03.xkms_wsdl.XKMSService;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
+import be.fedict.trust.xkms2.LoggingSoapHandler;
 import be.fedict.trust.xkms2.ResultMajorCode;
 import be.fedict.trust.xkms2.ResultMinorCode;
 import be.fedict.trust.xkms2.XKMSConstants;
@@ -96,6 +97,8 @@ public class XKMS2Client {
 
 	private List<String> reasonURIs;
 
+	private WSSecurityClientHandler wsSecurityClientHandler;
+
 	/**
 	 * Main constructor
 	 * 
@@ -111,8 +114,36 @@ public class XKMS2Client {
 		String wsLocation = MessageFormat.format(
 				"{0}/eid-trust-service-ws/xkms2", location);
 
+		registeredWSSecurityHandler(port);
 		registerLoggerHandler(port);
 		setEndpointAddress(wsLocation);
+	}
+
+	/**
+	 * Set the optional server {@link X509Certificate}. If specified and the
+	 * trust service has message signing configured, the incoming
+	 * {@link X509Certificate} will be checked against the specified server
+	 * certificate.
+	 * 
+	 *@param serverCertificate
+	 *            the server X509 certificate.
+	 */
+	public void setServerCertificate(X509Certificate serverCertificate) {
+
+		this.wsSecurityClientHandler.setServerCertificate(serverCertificate);
+	}
+
+	/**
+	 * Set the maximum offset of the WS-Security timestamp ( in ms ). If not
+	 * specified this will be defaulted to 5 minutes.
+	 * 
+	 * @param maxWSSecurityTimestampOffset
+	 */
+	public void setMaxWSSecurityTimestampOffset(
+			long maxWSSecurityTimestampOffset) {
+
+		this.wsSecurityClientHandler
+				.setMaxWSSecurityTimestampOffset(maxWSSecurityTimestampOffset);
 	}
 
 	/**
@@ -211,6 +242,19 @@ public class XKMS2Client {
 		List<Handler> handlerChain = binding.getHandlerChain();
 		handlerChain.add(new LoggingSoapHandler());
 		binding.setHandlerChain(handlerChain);
+	}
+
+	protected void registeredWSSecurityHandler(Object port) {
+
+		BindingProvider bindingProvider = (BindingProvider) port;
+
+		Binding binding = bindingProvider.getBinding();
+		@SuppressWarnings("unchecked")
+		List<Handler> handlerChain = binding.getHandlerChain();
+		this.wsSecurityClientHandler = new WSSecurityClientHandler();
+		handlerChain.add(this.wsSecurityClientHandler);
+		binding.setHandlerChain(handlerChain);
+
 	}
 
 	/**

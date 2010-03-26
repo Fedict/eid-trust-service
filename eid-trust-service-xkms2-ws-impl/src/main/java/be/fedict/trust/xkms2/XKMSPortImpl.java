@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.EJB;
+import javax.jws.HandlerChain;
 import javax.jws.WebService;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -71,6 +72,7 @@ import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
  */
 @WebService(endpointInterface = "org.w3._2002._03.xkms_wsdl.XKMSPortType")
 @ServiceConsumer
+@HandlerChain(file = "ws-handlers.xml")
 public class XKMSPortImpl implements XKMSPortType {
 
 	private static final Log LOG = LogFactory.getLog(XKMSPortImpl.class);

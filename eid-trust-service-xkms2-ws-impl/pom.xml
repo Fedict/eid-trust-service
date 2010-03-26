@@ -41,10 +41,10 @@
 			<type>ejb-client</type>
 			<scope>provided</scope>
 		</dependency>
-		<!--
-			<dependency> <groupId>org.apache.ws.security</groupId>
-			<artifactId>wss4j</artifactId> </dependency>
-		-->
+		<dependency>
+			<groupId>org.apache.ws.security</groupId>
+			<artifactId>wss4j</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging-api</artifactId>

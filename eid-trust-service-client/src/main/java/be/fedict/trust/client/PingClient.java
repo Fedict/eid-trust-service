@@ -33,6 +33,7 @@ import net.test.ping.Request;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import be.fedict.trust.xkms2.LoggingSoapHandler;
 import be.fedict.trust.xkms2.PingServiceFactory;
 
 import com.sun.xml.ws.client.ClientTransportException;
