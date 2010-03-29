@@ -19,12 +19,19 @@
 package be.fedict.trust.service.bean;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertStore;
+import java.security.cert.CertStoreException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -40,7 +47,12 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.tsp.TSPException;
+import org.bouncycastle.tsp.TimeStampToken;
 
+import be.fedict.trust.CertificateRepository;
 import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.MemoryCertificateRepository;
 import be.fedict.trust.NetworkConfig;
@@ -154,11 +166,6 @@ public class TrustServiceBean implements TrustService {
 
 	/**
 	 * {@inheritDoc}
-	 * 
-	 * @throws IOException
-	 * @throws CRLException
-	 * @throws NoSuchProviderException
-	 * @throws CertificateException
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE)
@@ -176,6 +183,40 @@ public class TrustServiceBean implements TrustService {
 
 		try {
 			trustValidator.isTrusted(certificateChain, validationDate);
+		} catch (CertPathValidatorException e) {
+		}
+
+		return new ValidationResult(trustValidator.getResult(), trustValidator
+				.getRevocationData());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public ValidationResult validateTimestamp(byte[] encodedTimestampToken)
+			throws TSPException, IOException, CMSException,
+			NoSuchAlgorithmException, NoSuchProviderException,
+			CertStoreException {
+
+		LOG.debug("validate timestamp token");
+
+		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
+		TimeStampToken timestampToken = new TimeStampToken(new CMSSignedData(
+				encodedTimestampToken));
+		CertStore certStore = timestampToken.getCertificatesAndCRLs(
+				"Collection", "BC");
+
+		Collection<? extends Certificate> certificates = certStore
+				.getCertificates(null);
+		for (Certificate certificate : certificates) {
+			certificateChain.add((X509Certificate) certificate);
+		}
+		Collections.reverse(certificateChain);
+
+		TrustValidator trustValidator = getTSATrustValidator();
+		try {
+			trustValidator.isTrusted(certificateChain);
 		} catch (CertPathValidatorException e) {
 		}
 
@@ -213,6 +254,40 @@ public class TrustServiceBean implements TrustService {
 		}
 
 		return getTrustValidator(trustDomain, trustLinker, returnRevocationData);
+	}
+
+	private TrustValidator getTSATrustValidator() {
+
+		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
+
+		TrustValidator trustValidator = new TrustValidator(
+				new CertificateRepository() {
+
+					public boolean isTrustPoint(X509Certificate certificate) {
+
+						// XXX: debug
+						return true;
+					}
+				});
+
+		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
+
+		OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
+				networkConfig);
+
+		OnlineCrlRepository crlRepository = new OnlineCrlRepository(
+				networkConfig);
+		CachedCrlRepository cachedCrlRepository = new CachedCrlRepository(
+				crlRepository);
+
+		FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
+		fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(ocspRepository));
+		fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(
+				cachedCrlRepository));
+
+		trustValidator.addTrustLinker(fallbackTrustLinker);
+
+		return trustValidator;
 	}
 
 	/**

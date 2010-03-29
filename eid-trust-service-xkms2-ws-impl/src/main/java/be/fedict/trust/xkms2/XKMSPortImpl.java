@@ -20,8 +20,10 @@ package be.fedict.trust.xkms2;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
+import java.security.cert.CertStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -39,6 +41,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.util.encoders.Base64;
 import org.etsi.uri._01903.v1_3.CRLValuesType;
 import org.etsi.uri._01903.v1_3.EncapsulatedPKIDataType;
@@ -63,6 +67,7 @@ import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
+import be.fedict.trust.xkms.extensions.TSAMessageExtensionType;
 
 /**
  * Implementation of XKMS2 Web Service JAX-WS Port.
@@ -121,8 +126,9 @@ public class XKMSPortImpl implements XKMSPortType {
 			}
 		}
 
-		// look for a trust domain message extension
+		// parse UseKeyWith
 		String trustDomain = null;
+		boolean tsaValidation = false;
 		if (body.getQueryKeyBinding().getUseKeyWith().size() > 0) {
 			for (UseKeyWithType useKeyWith : body.getQueryKeyBinding()
 					.getUseKeyWith()) {
@@ -130,6 +136,10 @@ public class XKMSPortImpl implements XKMSPortType {
 						XKMSConstants.TRUST_DOMAIN_APPLICATION_URI)) {
 					trustDomain = useKeyWith.getIdentifier();
 					LOG.debug("validate against trust domain " + trustDomain);
+				} else if (useKeyWith.getApplication().equals(
+						XKMSConstants.TSA_APPLICATION_URI)) {
+					tsaValidation = true;
+					LOG.debug("TSA validation");
 				}
 			}
 		}
@@ -142,7 +152,7 @@ public class XKMSPortImpl implements XKMSPortType {
 			returnRevocationData = true;
 		}
 
-		// look if historical validation is active
+		// check message extensions for historical validation
 		Date validationDate = null;
 		List<byte[]> ocspResponses = new LinkedList<byte[]>();
 		List<byte[]> crls = new LinkedList<byte[]>();
@@ -175,6 +185,30 @@ public class XKMSPortImpl implements XKMSPortType {
 							crls.add(crlValue.getValue());
 						}
 					}
+
+				} else {
+					LOG.error("invalid message extension: "
+							+ messageExtension.getClass().toString());
+					return createResultResponse(ResultMajorCode.SENDER,
+							ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+				}
+			}
+		}
+
+		// check message extension for TSA validation timestamp token
+		byte[] timestampToken = null;
+		if (tsaValidation) {
+			for (MessageExtensionAbstractType messageExtension : body
+					.getMessageExtension()) {
+				if (messageExtension instanceof TSAMessageExtensionType) {
+					TSAMessageExtensionType tsaMessageExtension = (TSAMessageExtensionType) messageExtension;
+					if (null == tsaMessageExtension.getEncapsulatedTimeStamp()) {
+						LOG.error("missing timestamp token");
+						return createResultResponse(ResultMajorCode.SENDER,
+								ResultMinorCode.INCOMPLETE);
+					}
+					timestampToken = tsaMessageExtension
+							.getEncapsulatedTimeStamp().getValue();
 				} else {
 					LOG.error("invalid message extension: "
 							+ messageExtension.getClass().toString());
@@ -186,7 +220,10 @@ public class XKMSPortImpl implements XKMSPortType {
 
 		ValidationResult validationResult;
 		try {
-			if (null == validationDate) {
+			if (tsaValidation) {
+				validationResult = this.trustService
+						.validateTimestamp(timestampToken);
+			} else if (null == validationDate) {
 				validationResult = this.trustService.validate(trustDomain,
 						certificateChain, returnRevocationData);
 			} else {
@@ -211,6 +248,22 @@ public class XKMSPortImpl implements XKMSPortType {
 					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
 		} catch (NoSuchProviderException e) {
 			LOG.error("NoSuchProviderException: " + e.getMessage(), e);
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+		} catch (TSPException e) {
+			LOG.error("TSPException: " + e.getMessage(), e);
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+		} catch (CMSException e) {
+			LOG.error("CMSException: " + e.getMessage(), e);
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+		} catch (NoSuchAlgorithmException e) {
+			LOG.error("NoSuchAlgorithmException: " + e.getMessage(), e);
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+		} catch (CertStoreException e) {
+			LOG.error("CertStoreException: " + e.getMessage(), e);
 			return createResultResponse(ResultMajorCode.SENDER,
 					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
 		}

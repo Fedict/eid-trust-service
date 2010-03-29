@@ -51,6 +51,7 @@ import javax.xml.ws.handler.Handler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.ocsp.OCSPResp;
+import org.bouncycastle.tsp.TimeStampToken;
 import org.bouncycastle.util.encoders.Base64;
 import org.etsi.uri._01903.v1_3.CRLValuesType;
 import org.etsi.uri._01903.v1_3.EncapsulatedPKIDataType;
@@ -73,6 +74,7 @@ import org.w3._2002._03.xkms_wsdl.XKMSService;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
+import be.fedict.trust.xkms.extensions.TSAMessageExtensionType;
 import be.fedict.trust.xkms2.LoggingSoapHandler;
 import be.fedict.trust.xkms2.ResultMajorCode;
 import be.fedict.trust.xkms2.ResultMinorCode;
@@ -386,6 +388,65 @@ public class XKMS2Client {
 
 		return validate(trustDomain, certificateChain, returnRevocationData,
 				null, null, null, null);
+	}
+
+	// XXX
+	public boolean validate(TimeStampToken timeStampToken)
+			throws TrustDomainNotFoundException, IOException {
+
+		LOG.debug("validate timestamp token");
+
+		ObjectFactory objectFactory = new ObjectFactory();
+		org.w3._2000._09.xmldsig_.ObjectFactory xmldsigObjectFactory = new org.w3._2000._09.xmldsig_.ObjectFactory();
+
+		ValidateRequestType validateRequest = objectFactory
+				.createValidateRequestType();
+		QueryKeyBindingType queryKeyBinding = objectFactory
+				.createQueryKeyBindingType();
+		KeyInfoType keyInfo = xmldsigObjectFactory.createKeyInfoType();
+		queryKeyBinding.setKeyInfo(keyInfo);
+		validateRequest.setQueryKeyBinding(queryKeyBinding);
+		UseKeyWithType useKeyWith = objectFactory.createUseKeyWithType();
+		useKeyWith.setApplication(XKMSConstants.TSA_APPLICATION_URI);
+		// XXX: specify trust domain?
+		// useKeyWith.setIdentifier(trustDomain);
+		queryKeyBinding.getUseKeyWith().add(useKeyWith);
+
+		// add token in extension
+		be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
+		org.etsi.uri._01903.v1_3.ObjectFactory xadesObjectFactory = new org.etsi.uri._01903.v1_3.ObjectFactory();
+
+		TSAMessageExtensionType tsaMessageExtension = extensionsObjectFactory
+				.createTSAMessageExtensionType();
+		EncapsulatedPKIDataType timeStampTokenValue = xadesObjectFactory
+				.createEncapsulatedPKIDataType();
+		timeStampTokenValue.setValue(timeStampToken.getEncoded());
+		tsaMessageExtension.setEncapsulatedTimeStamp(timeStampTokenValue);
+		validateRequest.getMessageExtension().add(tsaMessageExtension);
+
+		ValidateResultType validateResult = port.validate(validateRequest);
+
+		if (null == validateResult) {
+			throw new RuntimeException("missing ValidateResult element");
+		}
+
+		checkResponse(validateResult);
+
+		// store reason URIs
+		List<KeyBindingType> keyBindings = validateResult.getKeyBinding();
+		for (KeyBindingType keyBinding : keyBindings) {
+			StatusType status = keyBinding.getStatus();
+			String statusValue = status.getStatusValue();
+			LOG.debug("status: " + statusValue);
+			if (XKMSConstants.KEY_BINDING_STATUS_VALID_URI.equals(statusValue)) {
+				return true;
+			}
+			for (String invalidReason : status.getInvalidReason()) {
+				this.reasonURIs.add(invalidReason);
+			}
+		}
+		return false;
+
 	}
 
 	private boolean validate(String trustDomain,

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:be:fedict:trust:xkms:extensions"
 	xmlns:tns="urn:be:fedict:trust:xkms:extensions" xmlns:xkms="http://www.w3.org/2002/03/xkms#"
-	xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" elementFormDefault="qualified">
+	xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+	elementFormDefault="qualified">
 
 	<annotation>
 		<documentation>
@@ -16,6 +17,8 @@
 		schemaLocation="xkms.xsd" />
 	<import namespace="http://uri.etsi.org/01903/v1.3.2#"
 		schemaLocation="xades.xsd" />
+	<import namespace="http://www.w3.org/2000/09/xmldsig#"
+		schemaLocation="xmldsig-core-schema.xsd" />
 
 	<element name="RevocationDataMessageExtension" type="tns:RevocationDataMessageExtensionType" />
 	<complexType name="RevocationDataMessageExtensionType">
@@ -36,12 +39,16 @@
 		</sequence>
 	</complexType>
 
-	<element name="TSACertificateMessageExtension" type="tns:TSACertificateMessageExtensionType" />
-	<complexType name="TSACertificateMessageExtensionType">
-		<sequence>
-			<element name="XAdESTimeStamp" type="xades:XAdESTimeStampType"
-				minOccurs="1" />
-		</sequence>
+	<element name="TSAMessageExtension" type="tns:TSAMessageExtensionType" />
+	<complexType name="TSAMessageExtensionType">
+		<complexContent>
+			<extension base="xkms:MessageExtensionAbstractType">
+				<sequence>
+					<element name="EncapsulatedTimeStamp" type="xades:EncapsulatedPKIDataType"
+						minOccurs="1" />
+				</sequence>
+			</extension>
+		</complexContent>
 	</complexType>
 
 </schema>
