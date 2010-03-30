@@ -23,15 +23,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathValidatorException;
-import java.security.cert.CertStore;
 import java.security.cert.CertStoreException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -48,12 +43,9 @@ import javax.persistence.PersistenceContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.tsp.TSPException;
-import org.bouncycastle.tsp.TimeStampToken;
 
 import be.fedict.trust.FallbackTrustLinker;
-import be.fedict.trust.MemoryCertificateRepository;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.PublicKeyTrustLinker;
 import be.fedict.trust.RevocationData;
@@ -78,7 +70,6 @@ import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.TrustDomainEntity;
-import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
@@ -200,28 +191,9 @@ public class TrustServiceBean implements TrustService {
 
 		LOG.debug("validate timestamp token");
 
-		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
-		TimeStampToken timestampToken = new TimeStampToken(new CMSSignedData(
-				encodedTimestampToken));
-		CertStore certStore = timestampToken.getCertificatesAndCRLs(
-				"Collection", "BC");
-
-		Collection<? extends Certificate> certificates = certStore
-				.getCertificates(null);
-		for (Certificate certificate : certificates) {
-			certificateChain.add((X509Certificate) certificate);
-			LOG.debug("certificate issuer : "
-					+ ((X509Certificate) certificate).getIssuerX500Principal()
-							.toString());
-			LOG.debug("certificate subject: "
-					+ ((X509Certificate) certificate).getSubjectX500Principal()
-							.toString());
-		}
-		Collections.reverse(certificateChain);
-
 		TrustValidator trustValidator = getTSATrustValidator(trustDomain);
 		try {
-			trustValidator.isTrusted(certificateChain);
+			trustValidator.isTrusted(encodedTimestampToken);
 		} catch (CertPathValidatorException e) {
 		}
 
@@ -374,11 +346,8 @@ public class TrustServiceBean implements TrustService {
 		else
 			trustDomain = this.trustDomainDAO.getTrustDomain(trustDomainName);
 
-		MemoryCertificateRepository certificateRepository = new MemoryCertificateRepository();
-		for (TrustPointEntity trustPoint : trustDomain.getTrustPoints()) {
-			certificateRepository.addTrustPoint(trustPoint
-					.getCertificateAuthority().getCertificate());
-		}
+		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(
+				trustDomain);
 
 		TrustValidator trustValidator = new TrustValidator(
 				certificateRepository);
