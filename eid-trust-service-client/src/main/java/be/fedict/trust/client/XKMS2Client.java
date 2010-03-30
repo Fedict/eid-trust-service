@@ -71,6 +71,7 @@ import org.w3._2002._03.xkms_.ValidateResultType;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 import org.w3._2002._03.xkms_wsdl.XKMSService;
 
+import sun.security.timestamp.TimestampToken;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
@@ -390,8 +391,16 @@ public class XKMS2Client {
 				null, null, null, null);
 	}
 
-	// XXX
-	public boolean validate(TimeStampToken timeStampToken)
+	/**
+	 * Validate the specified {@link TimestampToken} for the specified TSA trust
+	 * domain
+	 * 
+	 * @param trustDomain
+	 * @param timeStampToken
+	 * @throws TrustDomainNotFoundException
+	 * @throws IOException
+	 */
+	public boolean validate(String trustDomain, TimeStampToken timeStampToken)
 			throws TrustDomainNotFoundException, IOException {
 
 		LOG.debug("validate timestamp token");
@@ -408,8 +417,7 @@ public class XKMS2Client {
 		validateRequest.setQueryKeyBinding(queryKeyBinding);
 		UseKeyWithType useKeyWith = objectFactory.createUseKeyWithType();
 		useKeyWith.setApplication(XKMSConstants.TSA_APPLICATION_URI);
-		// XXX: specify trust domain?
-		// useKeyWith.setIdentifier(trustDomain);
+		useKeyWith.setIdentifier(trustDomain);
 		queryKeyBinding.getUseKeyWith().add(useKeyWith);
 
 		// add token in extension

@@ -52,7 +52,6 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.tsp.TimeStampToken;
 
-import be.fedict.trust.CertificateRepository;
 import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.MemoryCertificateRepository;
 import be.fedict.trust.NetworkConfig;
@@ -194,10 +193,10 @@ public class TrustServiceBean implements TrustService {
 	 * {@inheritDoc}
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public ValidationResult validateTimestamp(byte[] encodedTimestampToken)
-			throws TSPException, IOException, CMSException,
-			NoSuchAlgorithmException, NoSuchProviderException,
-			CertStoreException {
+	public ValidationResult validateTimestamp(String trustDomain,
+			byte[] encodedTimestampToken) throws TSPException, IOException,
+			CMSException, NoSuchAlgorithmException, NoSuchProviderException,
+			CertStoreException, TrustDomainNotFoundException {
 
 		LOG.debug("validate timestamp token");
 
@@ -211,10 +210,16 @@ public class TrustServiceBean implements TrustService {
 				.getCertificates(null);
 		for (Certificate certificate : certificates) {
 			certificateChain.add((X509Certificate) certificate);
+			LOG.debug("certificate issuer : "
+					+ ((X509Certificate) certificate).getIssuerX500Principal()
+							.toString());
+			LOG.debug("certificate subject: "
+					+ ((X509Certificate) certificate).getSubjectX500Principal()
+							.toString());
 		}
 		Collections.reverse(certificateChain);
 
-		TrustValidator trustValidator = getTSATrustValidator();
+		TrustValidator trustValidator = getTSATrustValidator(trustDomain);
 		try {
 			trustValidator.isTrusted(certificateChain);
 		} catch (CertPathValidatorException e) {
@@ -256,19 +261,19 @@ public class TrustServiceBean implements TrustService {
 		return getTrustValidator(trustDomain, trustLinker, returnRevocationData);
 	}
 
-	private TrustValidator getTSATrustValidator() {
+	private TrustValidator getTSATrustValidator(String trustDomainName)
+			throws TrustDomainNotFoundException {
 
 		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
 
+		TrustDomainEntity trustDomain = this.trustDomainDAO
+				.getTrustDomain(trustDomainName);
+
+		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(
+				trustDomain);
+
 		TrustValidator trustValidator = new TrustValidator(
-				new CertificateRepository() {
-
-					public boolean isTrustPoint(X509Certificate certificate) {
-
-						// XXX: debug
-						return true;
-					}
-				});
+				certificateRepository);
 
 		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
 

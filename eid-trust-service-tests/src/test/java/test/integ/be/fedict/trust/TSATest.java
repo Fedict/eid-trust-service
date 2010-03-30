@@ -42,6 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import be.fedict.trust.client.XKMS2Client;
+import be.fedict.trust.service.TrustServiceConstants;
 
 /**
  * TSA Test.
@@ -53,7 +54,7 @@ public class TSATest {
 
 	private static final Log LOG = LogFactory.getLog(TSATest.class);
 
-	private static final String location = "http://localhost:8080";
+	private static final String location = "http://sebeco-dev-11:8080";
 	private static final String tsa_location = "http://tsa.belgium.be/connect";
 
 	@Before
@@ -99,7 +100,9 @@ public class TSATest {
 
 		// send token to trust service
 		XKMS2Client client = new XKMS2Client(location);
-		boolean result = client.validate(tspResponse.getTimeStampToken());
+		boolean result = client.validate(
+				TrustServiceConstants.BELGIAN_TSA_TRUST_DOMAIN, tspResponse
+						.getTimeStampToken());
 
 		// verify
 		assertTrue(result);

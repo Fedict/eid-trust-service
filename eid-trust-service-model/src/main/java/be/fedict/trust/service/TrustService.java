@@ -32,6 +32,7 @@ import javax.ejb.Local;
 
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.tsp.TSPException;
+import org.bouncycastle.tsp.TimeStampToken;
 
 import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
@@ -91,8 +92,10 @@ public interface TrustService {
 			NoSuchProviderException, CRLException, IOException;
 
 	/**
-	 * Validate the specified encoded Timestamp Token
+	 * Validate the specified encoded {@link TimeStampToken} against the
+	 * specified trust domain
 	 * 
+	 * @param trustDomain
 	 * @param timestampToken
 	 * @throws CMSException
 	 * @throws IOException
@@ -100,11 +103,12 @@ public interface TrustService {
 	 * @throws NoSuchProviderException
 	 * @throws NoSuchAlgorithmException
 	 * @throws CertStoreException
+	 * @throws TrustDomainNotFoundException
 	 */
-	ValidationResult validateTimestamp(byte[] timestampToken)
+	ValidationResult validateTimestamp(String trustDomain, byte[] timestampToken)
 			throws TSPException, IOException, CMSException,
 			NoSuchAlgorithmException, NoSuchProviderException,
-			CertStoreException;
+			CertStoreException, TrustDomainNotFoundException;
 
 	/**
 	 * Returns the {@link WSSecurityConfigEntity}.

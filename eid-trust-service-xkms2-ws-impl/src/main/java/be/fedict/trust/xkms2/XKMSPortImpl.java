@@ -119,8 +119,8 @@ public class XKMSPortImpl implements XKMSPortType {
 						X509Certificate certificate = getCertificate(x509DataValue);
 						certificateChain.add(certificate);
 					} catch (CertificateException e) {
-						// TODO: proper error handling according to XKMS2 spec
-						throw new RuntimeException("X509 encoding error");
+						return createResultResponse(ResultMajorCode.SENDER,
+								ResultMinorCode.MESSAGE_NOT_SUPPORTED);
 					}
 				}
 			}
@@ -138,8 +138,9 @@ public class XKMSPortImpl implements XKMSPortType {
 					LOG.debug("validate against trust domain " + trustDomain);
 				} else if (useKeyWith.getApplication().equals(
 						XKMSConstants.TSA_APPLICATION_URI)) {
+					trustDomain = useKeyWith.getIdentifier();
 					tsaValidation = true;
-					LOG.debug("TSA validation");
+					LOG.debug("TSA validation: trust domain=" + trustDomain);
 				}
 			}
 		}
@@ -221,8 +222,8 @@ public class XKMSPortImpl implements XKMSPortType {
 		ValidationResult validationResult;
 		try {
 			if (tsaValidation) {
-				validationResult = this.trustService
-						.validateTimestamp(timestampToken);
+				validationResult = this.trustService.validateTimestamp(
+						trustDomain, timestampToken);
 			} else if (null == validationDate) {
 				validationResult = this.trustService.validate(trustDomain,
 						certificateChain, returnRevocationData);

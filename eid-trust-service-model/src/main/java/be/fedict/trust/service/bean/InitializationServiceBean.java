@@ -92,6 +92,8 @@ public class InitializationServiceBean implements InitializationService {
 		initBelgianEidAuthTrustDomain(trustPoints);
 		initBelgianEidNonRepudiationDomain(trustPoints);
 		initBelgianEidNationalRegistryTrustDomain(trustPoints);
+
+		initBelgianTSATrustDomain();
 	}
 
 	private void initTexts() {
@@ -287,6 +289,45 @@ public class InitializationServiceBean implements InitializationService {
 			this.trustDomainDAO.addDNConstraint(trustDomain,
 					"CN=RRN, O=RRN, C=BE");
 		}
+	}
+
+	/**
+	 * Initialize the Belgian TSA trust points.
+	 */
+	private void initBelgianTSATrustDomain() {
+
+		List<TrustPointEntity> trustPoints = new LinkedList<TrustPointEntity>();
+
+		// Belgian TSA Root CA trust points
+		X509Certificate rootCertificate = loadCertificate("be/fedict/trust/belgiumtsa.crt");
+		CertificateAuthorityEntity rootCa = this.certificateAuthorityDAO
+				.findCertificateAuthority(rootCertificate);
+		if (null == rootCa) {
+			rootCa = this.certificateAuthorityDAO
+					.addCertificateAuthority(rootCertificate);
+		}
+
+		if (null == rootCa.getTrustPoint()) {
+			TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
+					.addTrustPoint(TrustServiceConstants.DEFAULT_CRON, rootCa);
+			rootCa.setTrustPoint(rootCaTrustPoint);
+		}
+		trustPoints.add(rootCa.getTrustPoint());
+
+		for (TrustPointEntity trustPoint : trustPoints) {
+			// start timer
+			initTrustPointScheduling(trustPoint);
+		}
+
+		// Belgian TSA trust domain
+		TrustDomainEntity trustDomain = this.trustDomainDAO
+				.findTrustDomain(TrustServiceConstants.BELGIAN_TSA_TRUST_DOMAIN);
+		if (null == trustDomain) {
+			LOG.debug("create Belgian TSA Repudiation trust domain");
+			trustDomain = this.trustDomainDAO
+					.addTrustDomain(TrustServiceConstants.BELGIAN_TSA_TRUST_DOMAIN);
+		}
+		trustDomain.setTrustPoints(trustPoints);
 	}
 
 	private void initTrustPointScheduling(TrustPointEntity trustPoint) {
