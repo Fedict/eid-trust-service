@@ -12,26 +12,22 @@
 						<c:choose>
 							<c:when test="#{ts_certificateValidator.authnValid}">
 								<h:graphicImage id="authn-ok" alt="OK"
-									url="/images/ok.png">
-								</h:graphicImage>
+									url="/images/ok.png" />
 							</c:when>
 							<c:otherwise>
 								<h:graphicImage id="authn-error" alt="ERROR"
-									url="/images/error.png">
-								</h:graphicImage>
+									url="/images/error.png" />
 							</c:otherwise>
 						</c:choose>
 						<h:outputText value="#{messages.signingCertificate}" />
 						<c:choose>
 							<c:when test="#{ts_certificateValidator.signingValid}">
 								<h:graphicImage id="sign-ok" alt="OK"
-									url="/images/ok.png">
-								</h:graphicImage>
+									url="/images/ok.png" />
 							</c:when>
 							<c:otherwise>
 								<h:graphicImage id="sign-error" alt="ERROR"
-									url="/images/error.png">
-								</h:graphicImage>
+									url="/images/error.png" />
 							</c:otherwise>
 						</c:choose>
 					</h:panelGrid>

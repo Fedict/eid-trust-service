@@ -70,6 +70,19 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>sdk</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>sdk</value>
+				</property>
+			</activation>
+			<modules>
+				<module>eid-trust-service-admin-manual</module>
+				<module>eid-trust-service-devel-guide</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>all</id>
 			<activation>
 				<property>
@@ -80,6 +93,8 @@
 			<modules>
 				<module>eid-trust-service-tests</module>
 				<module>eid-trust-service-mysql-distribution</module>
+				<module>eid-trust-service-admin-manual</module>
+				<module>eid-trust-service-devel-guide</module>
 			</modules>
 		</profile>
 	</profiles>

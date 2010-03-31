@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC 
+	"-//OASIS//DTD DocBook XML V4.5//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article lang="en">
+	<articleinfo>
+		<title>Fedict eID Trust Service Developer Guide</title>
+		<copyright>
+			<year>2008-2010</year>
+			<holder>Fedict</holder>
+		</copyright>
+		<releaseinfo>31 Mar 2010</releaseinfo>
+		<authorgroup>
+			<author>
+				<firstname>Wim</firstname>
+				<surname>Vandenhaute</surname>
+			</author>
+		</authorgroup>
+		<abstract>
+			<para>This manual serves as an entry point for setting up the eID
+				Trust Service.</para>
+		</abstract>
+	</articleinfo>
+	<appendix>
+		<title>eID Trust Service Developer Guide License</title>
+		<para>
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="cc.logo.large.png"
+						scale="100" />
+				</imageobject>
+			</mediaobject>
+			This document has been released under the Creative Commons license.
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="share.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You are free to Share — to copy, distribute and transmit the work.
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="by.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You must attribute the work in the manner specified by the author or
+			licensor (but not in any way that suggests that they endorse you or
+			your use of the work).
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="nc.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You may not use this work for commercial purposes.
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="nd.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You may not alter, transform, or build upon this work.
+		</para>
+		<para>
+			More information about the Creative Commons license conditions can be
+			found at
+			<ulink url="http://creativecommons.org/">Creative Commons organization</ulink>
+			.
+		</para>
+	</appendix>
+	<appendix>
+		<title>eID Trust Service License</title>
+		<para>The eID Trust Service source code has been released under the
+			GNU LGPL version 3.0.</para>
+		<para>
+			<code>This is free software; you can redistribute it and/or modify it
+				under the terms of the GNU Lesser General Public License version
+				3.0
+				as published by the Free Software Foundation.
+
+				This software is
+				distributed in the hope that it will be useful,
+				but WITHOUT ANY
+				WARRANTY; without even the implied warranty of
+				MERCHANTABILITY or
+				FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+				Lesser General Public
+				License for more details.
+
+				You should have received a copy of the GNU
+				Lesser General Public
+				License along with this software; if not, see
+				http://www.gnu.org/licenses/.</code>
+		</para>
+	</appendix>
+	<appendix>
+		<title>Revision history</title>
+		<table>
+			<title>Revision history</title>
+			<tgroup cols="2">
+				<colspec colwidth="1*" />
+				<colspec colwidth="1*" />
+				<colspec colwidth="2*" />
+				<thead>
+					<row>
+						<entry>Date</entry>
+						<entry>Author</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>31 Mar 2010</entry>
+						<entry>Wim Vandenhaute</entry>
+						<entry>Initial version.</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+	</appendix>
+</article>
