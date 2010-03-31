@@ -74,6 +74,7 @@ import org.w3._2002._03.xkms_wsdl.XKMSService;
 import sun.security.timestamp.TimestampToken;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
+import be.fedict.trust.client.exception.ValidationFailedException;
 import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
 import be.fedict.trust.xkms.extensions.TSAMessageExtensionType;
 import be.fedict.trust.xkms2.LoggingSoapHandler;
@@ -98,8 +99,6 @@ public class XKMS2Client {
 
 	private RevocationValuesType revocationValues;
 
-	private List<String> reasonURIs;
-
 	private WSSecurityClientHandler wsSecurityClientHandler;
 
 	/**
@@ -109,8 +108,6 @@ public class XKMS2Client {
 	 *            the location (host:port) of the XKMS2 web service
 	 */
 	public XKMS2Client(String location) {
-
-		this.reasonURIs = new LinkedList<String>();
 
 		XKMSService xkmsService = XKMSServiceFactory.getInstance();
 		port = xkmsService.getXKMSPort();
@@ -269,12 +266,13 @@ public class XKMS2Client {
 	 * @throws CertificateEncodingException
 	 * @throws TrustDomainNotFoundException
 	 * @throws RevocationDataNotFoundException
+	 * @throws ValidationFailedException
 	 */
-	public boolean validate(List<X509Certificate> certificateChain)
+	public void validate(List<X509Certificate> certificateChain)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
-			RevocationDataNotFoundException {
+			RevocationDataNotFoundException, ValidationFailedException {
 
-		return validate(null, certificateChain);
+		validate(null, certificateChain);
 	}
 
 	/**
@@ -291,12 +289,14 @@ public class XKMS2Client {
 	 * @throws CertificateEncodingException
 	 * @throws TrustDomainNotFoundException
 	 * @throws RevocationDataNotFoundException
+	 * @throws ValidationFailedException
 	 */
-	public boolean validate(List<X509Certificate> certificateChain,
+	public void validate(List<X509Certificate> certificateChain,
 			boolean returnRevocationData) throws CertificateEncodingException,
-			TrustDomainNotFoundException, RevocationDataNotFoundException {
+			TrustDomainNotFoundException, RevocationDataNotFoundException,
+			ValidationFailedException {
 
-		return validate(null, certificateChain, returnRevocationData);
+		validate(null, certificateChain, returnRevocationData);
 	}
 
 	/**
@@ -309,13 +309,14 @@ public class XKMS2Client {
 	 * @throws CertificateEncodingException
 	 * @throws TrustDomainNotFoundException
 	 * @throws RevocationDataNotFoundException
+	 * @throws ValidationFailedException
 	 */
-	public boolean validate(String trustDomain,
+	public void validate(String trustDomain,
 			List<X509Certificate> certificateChain)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
-			RevocationDataNotFoundException {
+			RevocationDataNotFoundException, ValidationFailedException {
 
-		return validate(trustDomain, certificateChain, false);
+		validate(trustDomain, certificateChain, false);
 	}
 
 	/**
@@ -331,15 +332,16 @@ public class XKMS2Client {
 	 * @throws RevocationDataNotFoundException
 	 * @throws TrustDomainNotFoundException
 	 * @throws CertificateEncodingException
+	 * @throws ValidationFailedException
 	 */
-	public boolean validate(String trustDomain,
+	public void validate(String trustDomain,
 			List<X509Certificate> certificateChain, Date validationDate,
 			List<OCSPResp> ocspResponses, List<X509CRL> crls)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
-			RevocationDataNotFoundException {
+			RevocationDataNotFoundException, ValidationFailedException {
 
-		return validate(trustDomain, certificateChain, false, validationDate,
-				ocspResponses, crls, null);
+		validate(trustDomain, certificateChain, false, validationDate,
+				ocspResponses, crls, null, null);
 	}
 
 	/**
@@ -355,15 +357,16 @@ public class XKMS2Client {
 	 * @throws RevocationDataNotFoundException
 	 * @throws TrustDomainNotFoundException
 	 * @throws CertificateEncodingException
+	 * @throws ValidationFailedException
 	 */
-	public boolean validate(String trustDomain,
+	public void validate(String trustDomain,
 			List<X509Certificate> certificateChain, Date validationDate,
 			RevocationValuesType revocationValues)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
-			RevocationDataNotFoundException {
+			RevocationDataNotFoundException, ValidationFailedException {
 
-		return validate(trustDomain, certificateChain, false, validationDate,
-				null, null, revocationValues);
+		validate(trustDomain, certificateChain, false, validationDate, null,
+				null, revocationValues, null);
 	}
 
 	/**
@@ -381,13 +384,14 @@ public class XKMS2Client {
 	 * @throws CertificateEncodingException
 	 * @throws TrustDomainNotFoundException
 	 * @throws RevocationDataNotFoundException
+	 * @throws ValidationFailedException
 	 */
-	public boolean validate(String trustDomain,
+	public void validate(String trustDomain,
 			List<X509Certificate> certificateChain, boolean returnRevocationData)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
-			RevocationDataNotFoundException {
+			RevocationDataNotFoundException, ValidationFailedException {
 
-		return validate(trustDomain, certificateChain, returnRevocationData,
+		validate(trustDomain, certificateChain, returnRevocationData, null,
 				null, null, null, null);
 	}
 
@@ -398,72 +402,26 @@ public class XKMS2Client {
 	 * @param trustDomain
 	 * @param timeStampToken
 	 * @throws TrustDomainNotFoundException
-	 * @throws IOException
+	 * @throws RevocationDataNotFoundException
+	 * @throws CertificateEncodingException
+	 * @throws ValidationFailedException
 	 */
-	public boolean validate(String trustDomain, TimeStampToken timeStampToken)
-			throws TrustDomainNotFoundException, IOException {
+	public void validate(String trustDomain, TimeStampToken timeStampToken)
+			throws TrustDomainNotFoundException, CertificateEncodingException,
+			RevocationDataNotFoundException, ValidationFailedException {
 
 		LOG.debug("validate timestamp token");
-
-		ObjectFactory objectFactory = new ObjectFactory();
-		org.w3._2000._09.xmldsig_.ObjectFactory xmldsigObjectFactory = new org.w3._2000._09.xmldsig_.ObjectFactory();
-
-		ValidateRequestType validateRequest = objectFactory
-				.createValidateRequestType();
-		QueryKeyBindingType queryKeyBinding = objectFactory
-				.createQueryKeyBindingType();
-		KeyInfoType keyInfo = xmldsigObjectFactory.createKeyInfoType();
-		queryKeyBinding.setKeyInfo(keyInfo);
-		validateRequest.setQueryKeyBinding(queryKeyBinding);
-		UseKeyWithType useKeyWith = objectFactory.createUseKeyWithType();
-		useKeyWith.setApplication(XKMSConstants.TSA_APPLICATION_URI);
-		useKeyWith.setIdentifier(trustDomain);
-		queryKeyBinding.getUseKeyWith().add(useKeyWith);
-
-		// add token in extension
-		be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
-		org.etsi.uri._01903.v1_3.ObjectFactory xadesObjectFactory = new org.etsi.uri._01903.v1_3.ObjectFactory();
-
-		TSAMessageExtensionType tsaMessageExtension = extensionsObjectFactory
-				.createTSAMessageExtensionType();
-		EncapsulatedPKIDataType timeStampTokenValue = xadesObjectFactory
-				.createEncapsulatedPKIDataType();
-		timeStampTokenValue.setValue(timeStampToken.getEncoded());
-		tsaMessageExtension.setEncapsulatedTimeStamp(timeStampTokenValue);
-		validateRequest.getMessageExtension().add(tsaMessageExtension);
-
-		ValidateResultType validateResult = port.validate(validateRequest);
-
-		if (null == validateResult) {
-			throw new RuntimeException("missing ValidateResult element");
-		}
-
-		checkResponse(validateResult);
-
-		// store reason URIs
-		List<KeyBindingType> keyBindings = validateResult.getKeyBinding();
-		for (KeyBindingType keyBinding : keyBindings) {
-			StatusType status = keyBinding.getStatus();
-			String statusValue = status.getStatusValue();
-			LOG.debug("status: " + statusValue);
-			if (XKMSConstants.KEY_BINDING_STATUS_VALID_URI.equals(statusValue)) {
-				return true;
-			}
-			for (String invalidReason : status.getInvalidReason()) {
-				this.reasonURIs.add(invalidReason);
-			}
-		}
-		return false;
-
+		validate(trustDomain, new LinkedList<X509Certificate>(), false, null,
+				null, null, revocationValues, timeStampToken);
 	}
 
-	private boolean validate(String trustDomain,
+	private void validate(String trustDomain,
 			List<X509Certificate> authnCertificateChain,
 			boolean returnRevocationData, Date validationDate,
 			List<OCSPResp> ocspResponses, List<X509CRL> crls,
-			RevocationValuesType revocationValues)
+			RevocationValuesType revocationValues, TimeStampToken timeStampToken)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
-			RevocationDataNotFoundException {
+			RevocationDataNotFoundException, ValidationFailedException {
 
 		LOG.debug("validate: "
 				+ authnCertificateChain.get(0).getSubjectX500Principal());
@@ -489,10 +447,22 @@ public class XKMS2Client {
 		keyInfo.getContent().add(xmldsigObjectFactory.createX509Data(x509Data));
 		validateRequest.setQueryKeyBinding(queryKeyBinding);
 
-		/*
-		 * Set optional trust domain
-		 */
-		if (null != trustDomain) {
+		if (null != timeStampToken) {
+
+			/*
+			 * Flag TSA validation
+			 */
+			UseKeyWithType useKeyWith = objectFactory.createUseKeyWithType();
+			useKeyWith.setApplication(XKMSConstants.TSA_APPLICATION_URI);
+			useKeyWith.setIdentifier(trustDomain);
+			queryKeyBinding.getUseKeyWith().add(useKeyWith);
+
+			addTimeStampToken(validateRequest, timeStampToken, trustDomain);
+
+		} else if (null != trustDomain) {
+			/*
+			 * Set optional trust domain
+			 */
 			UseKeyWithType useKeyWith = objectFactory.createUseKeyWithType();
 			useKeyWith
 					.setApplication(XKMSConstants.TRUST_DOMAIN_APPLICATION_URI);
@@ -552,13 +522,11 @@ public class XKMS2Client {
 			String statusValue = status.getStatusValue();
 			LOG.debug("status: " + statusValue);
 			if (XKMSConstants.KEY_BINDING_STATUS_VALID_URI.equals(statusValue)) {
-				return true;
+				return;
 			}
-			for (String invalidReason : status.getInvalidReason()) {
-				this.reasonURIs.add(invalidReason);
-			}
+			throw new ValidationFailedException(status.getInvalidReason()
+					.get(0));
 		}
-		return false;
 	}
 
 	/**
@@ -625,6 +593,34 @@ public class XKMS2Client {
 	}
 
 	/**
+	 * Add the specified {@link TimeStampToken} to the
+	 * {@link ValidateRequestType}.
+	 * 
+	 * @param timeStampToken
+	 * @param trustDomain
+	 */
+	private void addTimeStampToken(ValidateRequestType validateRequest,
+			TimeStampToken timeStampToken, String trustDomain) {
+
+		be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
+		org.etsi.uri._01903.v1_3.ObjectFactory xadesObjectFactory = new org.etsi.uri._01903.v1_3.ObjectFactory();
+
+		TSAMessageExtensionType tsaMessageExtension = extensionsObjectFactory
+				.createTSAMessageExtensionType();
+		EncapsulatedPKIDataType timeStampTokenValue = xadesObjectFactory
+				.createEncapsulatedPKIDataType();
+		try {
+			timeStampTokenValue.setValue(timeStampToken.getEncoded());
+		} catch (IOException e) {
+			LOG.error("Failed to get encoded timestamp token", e);
+			throw new RuntimeException(e);
+		}
+		tsaMessageExtension.setEncapsulatedTimeStamp(timeStampTokenValue);
+		validateRequest.getMessageExtension().add(tsaMessageExtension);
+
+	}
+
+	/**
 	 * Checks the ResultMajor and ResultMinor code.
 	 * 
 	 * @param validateResult
@@ -651,16 +647,6 @@ public class XKMS2Client {
 	public RevocationValuesType getRevocationValues() {
 
 		return this.revocationValues;
-	}
-
-	/**
-	 * Returns the list of XKMS2 reason URI's in case validation has failed.
-	 * 
-	 * {@link http://www.w3.org/TR/xkms2/#XKMS_2_0_Section_5_1}
-	 */
-	public List<String> getReasonURIs() {
-
-		return this.reasonURIs;
 	}
 
 	private XMLGregorianCalendar getXmlGregorianCalendar(Date date) {

@@ -19,10 +19,9 @@
 package test.integ.be.fedict.trust;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.security.Security;
 import java.security.cert.X509CRL;
@@ -47,6 +46,7 @@ import org.junit.Test;
 
 import sun.security.x509.X509CRLImpl;
 import be.fedict.trust.client.XKMS2Client;
+import be.fedict.trust.client.exception.ValidationFailedException;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.xkms2.XKMSConstants;
 
@@ -82,12 +82,11 @@ public class XKMSRevocationTest {
 		/*
 		 * Operate: validate non repudiation and return used revocation data
 		 */
-		boolean result = client.validate(
+		client.validate(
 				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
 				signCertificateChain, true);
 
 		// verify
-		assertTrue(result);
 		RevocationValuesType revocationValues = client.getRevocationValues();
 		assertNotNull(revocationValues);
 		assertNotNull(revocationValues.getOCSPValues());
@@ -121,26 +120,20 @@ public class XKMSRevocationTest {
 		 * Operate: historical validation of non repudiation with just returned
 		 * used revocation data (indirect, use list of ocsp resonses and crls )
 		 */
-		result = client.validate(
+		client.validate(
 				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
 				signCertificateChain, validationDate, revocationValues);
-
-		// verify
-		assertTrue(result);
 
 		/*
 		 * Operate: historical validation of non repudiation with just returned
 		 * used revocation data (direct, append the RevocationValuesType object
 		 * returned by earlier call)
 		 */
-		result = client.validate(
+		client.validate(
 				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
 				signCertificateChain, validationDate, Collections
 						.singletonList(ocspResp), Collections
 						.singletonList(crl));
-
-		// verify
-		assertTrue(result);
 
 		// setup
 		Calendar calendar = Calendar.getInstance();
@@ -151,17 +144,18 @@ public class XKMSRevocationTest {
 		 * Operate: historical validation of non repudiation with just returned
 		 * used revocation data and year old validation date
 		 */
-		result = client.validate(
-				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
-				signCertificateChain, calendar.getTime(), Collections
-						.singletonList(ocspResp), Collections
-						.singletonList(crl));
-		List<String> reasonURIs = client.getReasonURIs();
-
-		// verify
-		assertFalse(result);
-		assertEquals(1, reasonURIs.size());
-		assertEquals(XKMSConstants.KEY_BINDING_REASON_ISSUER_TRUST_URI,
-				reasonURIs.get(0));
+		try {
+			client
+					.validate(
+							TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+							signCertificateChain, calendar.getTime(),
+							Collections.singletonList(ocspResp), Collections
+									.singletonList(crl));
+			fail();
+		} catch (ValidationFailedException e) {
+			// expected
+			assertEquals(XKMSConstants.KEY_BINDING_REASON_ISSUER_TRUST_URI, e
+					.getReason());
+		}
 	}
 }

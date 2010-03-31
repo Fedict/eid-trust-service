@@ -18,7 +18,6 @@
 
 package test.integ.be.fedict.trust;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.security.KeyPair;
@@ -140,11 +139,8 @@ public class XKMSTrustTest {
 		/*
 		 * Operate: validate non repudiation
 		 */
-		boolean result = client.validate(
+		client.validate(
 				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
 				signCertificateChain);
-
-		// verify
-		assertTrue(result);
 	}
 }

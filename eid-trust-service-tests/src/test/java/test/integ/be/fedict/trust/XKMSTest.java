@@ -67,8 +67,7 @@ public class XKMSTest {
 				.getAuthnCertificateChain();
 
 		XKMS2Client client = new XKMS2Client(location);
-		boolean result = client.validate(authnCertificateChain);
-		assertTrue(result);
+		client.validate(authnCertificateChain);
 	}
 
 	@Test
@@ -79,10 +78,9 @@ public class XKMSTest {
 				.getSignCertificateChain();
 
 		XKMS2Client client = new XKMS2Client(location);
-		boolean result = client.validate(
+		client.validate(
 				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
 				signCertificateChain);
-		assertTrue(result);
 	}
 
 	@Test
@@ -93,11 +91,10 @@ public class XKMSTest {
 				.getNationalRegistryCertificateChain();
 
 		XKMS2Client client = new XKMS2Client(location);
-		boolean result = client
+		client
 				.validate(
 						TrustServiceConstants.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN,
 						nationalRegistryCertificateChain);
-		assertTrue(result);
 	}
 
 	@Test

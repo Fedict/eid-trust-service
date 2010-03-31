@@ -18,8 +18,6 @@
 
 package test.integ.be.fedict.trust;
 
-import static org.junit.Assert.assertTrue;
-
 import java.math.BigInteger;
 import java.security.Security;
 import java.security.cert.CertStore;
@@ -100,11 +98,7 @@ public class TSATest {
 
 		// send token to trust service
 		XKMS2Client client = new XKMS2Client(location);
-		boolean result = client.validate(
-				TrustServiceConstants.BELGIAN_TSA_TRUST_DOMAIN, tspResponse
-						.getTimeStampToken());
-
-		// verify
-		assertTrue(result);
+		client.validate(TrustServiceConstants.BELGIAN_TSA_TRUST_DOMAIN,
+				tspResponse.getTimeStampToken());
 	}
 }
