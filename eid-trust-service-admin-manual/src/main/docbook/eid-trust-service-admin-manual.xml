@@ -30,27 +30,26 @@
 			<ulink url="http://www.ietf.org/rfc/rfc2119.txt">[RFC2119]</ulink>
 			.
 			The eID Trust Service provides two major service artifacts:
-			eID Trust
-			Service portal. Via this web portal citizens can check the
-			validity of
-			their eID certificates.
-			eID Trust Service validation web service. Via
-			this SOAP web service
-			Relying Parties (aka Service Providers) can
-			check the validity of
-			certificate paths. This web service is
-			constructed according to the
-			W3C XKMS2 web service standard.
-			Besides
-			these two service artifacts, the eID Trust Service also comes with
-			an
-			Admin portal that allows administrators to manage the eID Trust
-			Service via an easy to use web portal interface.
-			In the following
-			paragraphs we will use $EID_TRUST_SERVICE_ADDRESS as
-			the (internal)
-			web address where the eID Trust Service product has
-			been deployed.
+			<orderedlist>
+				<listitem>
+					eID Trust Service portal
+					<para>Via this web portal citizens can check the validity of their
+						eID certificates.</para>
+				</listitem>
+				<listitem>
+					eID Trust Service validation web service
+					<para>Via this SOAP web service Relying Parties (aka Service
+						Providers) can check the validity of certificate paths. This web
+						service is constructed according to the W3C XKMS2 web service
+						standard.</para>
+				</listitem>
+			</orderedlist>
+			Besides these two service artifacts, the eID Trust Service also comes
+			with an Admin portal that allows administrators to manage the eID
+			Trust Service via an easy to use web portal interface. In the
+			following paragraphs we will use $EID_TRUST_SERVICE_ADDRESS as the
+			(internal) web address where the eID Trust Service product has been
+			deployed.
 		</para>
 		<section>
 			<title>eID Trust Service Portal</title>
@@ -384,7 +383,8 @@
 				underlying CA's that have been cached. You can also
 				refresh the CRL cache immediately here for debugging purposes. For
 				each trust point you can see the list of CA's associated with
-				this trust point and for each CA refresh the cache individually.
+				this
+				trust point and for each CA refresh the cache individually.
 			</para>
 		</section>
 		<section>
