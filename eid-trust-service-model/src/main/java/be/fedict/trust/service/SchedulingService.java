@@ -91,6 +91,14 @@ public interface SchedulingService {
 	void cancelTimers(String timerInfo);
 
 	/**
+	 * Cancel running {@link Timer}'s for the specified
+	 * {@link ClockDriftConfigEntity}.
+	 * 
+	 * @param clockDriftConfig
+	 */
+	void cancelTimers(ClockDriftConfigEntity clockDriftConfig);
+
+	/**
 	 * Refresh the revocation cache of the specified
 	 * {@link CertificateAuthorityEntity} immediately.
 	 * 

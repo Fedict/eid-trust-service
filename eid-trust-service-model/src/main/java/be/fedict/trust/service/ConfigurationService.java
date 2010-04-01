@@ -67,11 +67,12 @@ public interface ConfigurationService {
 	 * @param timeout
 	 * @param maxClockOffset
 	 * @param cron
+	 * @param enabled
 	 * 
 	 * @throws InvalidCronExpressionException
 	 */
 	void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
-			int timeout, int maxClockOffset, String cron)
+			int timeout, int maxClockOffset, String cron, boolean enabled)
 			throws InvalidCronExpressionException;
 
 	/**

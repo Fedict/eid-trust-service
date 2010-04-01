@@ -142,12 +142,14 @@ public class InitializationServiceBean implements InitializationService {
 		}
 
 		// Clock drift timer
-		LOG.debug("start timer for clock drift");
-		try {
-			this.schedulingService.startTimer(clockDriftConfig, false);
-		} catch (InvalidCronExpressionException e) {
-			LOG.error("Failed to start timer for clock drift", e);
-			throw new RuntimeException(e);
+		if (clockDriftConfig.isEnabled()) {
+			LOG.debug("start timer for clock drift");
+			try {
+				this.schedulingService.startTimer(clockDriftConfig, false);
+			} catch (InvalidCronExpressionException e) {
+				LOG.error("Failed to start timer for clock drift", e);
+				throw new RuntimeException(e);
+			}
 		}
 
 	}

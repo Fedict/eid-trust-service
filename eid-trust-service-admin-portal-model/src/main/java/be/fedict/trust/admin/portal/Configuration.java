@@ -52,9 +52,9 @@ public interface Configuration {
 
 	void setProxyPort(int proxyPort);
 
-	boolean isEnabled();
+	boolean isProxyEnabled();
 
-	void setEnabled(boolean enabled);
+	void setProxyEnabled(boolean enabled);
 
 	String getClockDriftProtocol();
 
@@ -75,6 +75,10 @@ public interface Configuration {
 	String getClockDriftCron();
 
 	void setClockDriftCron(String clockDriftCron);
+
+	boolean isClockDriftEnabled();
+
+	void setClockDriftEnabled(boolean enabled);
 
 	String getLanguage();
 

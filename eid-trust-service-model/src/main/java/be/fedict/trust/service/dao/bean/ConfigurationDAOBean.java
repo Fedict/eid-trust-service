@@ -160,6 +160,16 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void setClockDriftConfigEnabled(boolean enabled) {
+
+		LOG.debug("set clock drift enabled: " + enabled);
+		ClockDriftConfigEntity clockDriftConfig = getClockDriftConfig();
+		clockDriftConfig.setEnabled(enabled);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public WSSecurityConfigEntity findWSSecurityConfig() {
 
 		LOG.debug("find ws security config");

@@ -44,6 +44,8 @@ public class ClockDriftConfigEntity implements Serializable {
 	private int timeout;
 	private int maxClockOffset;
 
+	private boolean enabled = false;
+
 	private String cron;
 	private TimerHandle timerHandle;
 	private Date fireDate;
@@ -130,6 +132,14 @@ public class ClockDriftConfigEntity implements Serializable {
 	public void setCron(String cron) {
 
 		this.cron = cron;
+	}
+
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	@Lob

@@ -103,14 +103,19 @@ public class ConfigurationServiceBean implements ConfigurationService {
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
-			int timeout, int maxClockOffset, String cron)
+			int timeout, int maxClockOffset, String cron, boolean enabled)
 			throws InvalidCronExpressionException {
 
 		LOG.debug("save clock drift detection config");
 		ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
 				.setClockDriftConfig(timeProtocol, server, timeout,
 						maxClockOffset, cron);
-		this.schedulingService.startTimer(clockDriftConfig, false);
+		this.configurationDAO.setClockDriftConfigEnabled(enabled);
+		if (enabled) {
+			this.schedulingService.startTimer(clockDriftConfig, false);
+		} else {
+			this.schedulingService.cancelTimers(clockDriftConfig);
+		}
 	}
 
 	/**

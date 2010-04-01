@@ -96,6 +96,13 @@ public interface ConfigurationDAO {
 			String server, int timeout, int maxClockOffset, String cron);
 
 	/**
+	 * Enable/disable the {@link ClockDriftConfigEntity}.
+	 * 
+	 * @param enabled
+	 */
+	void setClockDriftConfigEnabled(boolean enabled);
+
+	/**
 	 * Returns the {@link WSSecurityConfigEntity). Will create if not existing.
 	 */
 	WSSecurityConfigEntity getWSSecurityConfig();

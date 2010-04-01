@@ -259,6 +259,13 @@ public class SchedulingServiceBean implements SchedulingService {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void cancelTimers(ClockDriftConfigEntity clockDriftConfig) {
+		cancelTimers(TrustServiceConstants.CLOCK_DRIFT_TIMER);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	public void cancelTimers(String timerInfo) {
 

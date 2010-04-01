@@ -150,7 +150,7 @@
 								</s:decorate>
 
 								<h:outputLabel for="enabled" value="#{messages.enabled}" />
-								<h:selectBooleanCheckbox value="#{ts_config.enabled}" />
+								<h:selectBooleanCheckbox value="#{ts_config.proxyEnabled}" />
 
 								<f:facet name="footer">
 									<h:panelGroup style="display:block; text-align:center">
@@ -205,6 +205,9 @@
 										required="true" />
 									<h:message for="cron" styleClass="error" />
 								</s:decorate>
+
+								<h:outputLabel for="enabled" value="#{messages.enabled}" />
+								<h:selectBooleanCheckbox value="#{ts_config.clockDriftEnabled}" />
 
 								<f:facet name="footer">
 									<h:panelGroup style="display:block; text-align:center">

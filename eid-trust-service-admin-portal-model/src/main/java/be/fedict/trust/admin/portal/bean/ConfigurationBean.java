@@ -71,13 +71,14 @@ public class ConfigurationBean implements Configuration {
 
 	private String proxyHost;
 	private int proxyPort;
-	private boolean enabled;
+	private boolean proxyEnabled;
 
 	private String clockDriftProtocol;
 	private String clockDriftServer;
 	private int clockDriftTimeout;
 	private int clockDriftMaxClockOffset;
 	private String clockDriftCron;
+	private boolean clockDriftEnabled;
 
 	private boolean wsSecuritySigning;
 	private String wsSecurityKeyStoreType;
@@ -113,7 +114,7 @@ public class ConfigurationBean implements Configuration {
 				.getNetworkConfig();
 		this.proxyHost = networkConfig.getProxyHost();
 		this.proxyPort = networkConfig.getProxyPort();
-		this.enabled = networkConfig.isEnabled();
+		this.proxyEnabled = networkConfig.isEnabled();
 
 		ClockDriftConfigEntity clockDriftConfig = this.configurationService
 				.getClockDriftDetectionConfig();
@@ -122,6 +123,7 @@ public class ConfigurationBean implements Configuration {
 		this.clockDriftTimeout = clockDriftConfig.getTimeout();
 		this.clockDriftMaxClockOffset = clockDriftConfig.getMaxClockOffset();
 		this.clockDriftCron = clockDriftConfig.getCron();
+		this.clockDriftEnabled = clockDriftConfig.isEnabled();
 
 		WSSecurityConfigEntity wsSecurityConfig = this.configurationService
 				.getWSSecurityConfig();
@@ -142,10 +144,10 @@ public class ConfigurationBean implements Configuration {
 
 		this.log.debug(
 				"save network config: proxyHost=#0  proxyPort=#1  enabled=#2",
-				this.proxyHost, this.proxyPort, this.enabled);
+				this.proxyHost, this.proxyPort, this.proxyEnabled);
 
 		this.configurationService.saveNetworkConfig(proxyHost, proxyPort,
-				enabled);
+				proxyEnabled);
 		return "success";
 	}
 
@@ -184,16 +186,16 @@ public class ConfigurationBean implements Configuration {
 
 		this.log
 				.debug(
-						"save clock drift config: protocol=#0 server=#1 timeout=#2 maxClockOffset=#3 cron=#4",
+						"save clock drift config: protocol=#0 server=#1 timeout=#2 maxClockOffset=#3 cron=#4 enabled=#5",
 						this.clockDriftProtocol, this.clockDriftServer,
 						this.clockDriftTimeout, this.clockDriftMaxClockOffset,
-						this.clockDriftCron);
+						this.clockDriftCron, this.clockDriftEnabled);
 
 		try {
 			this.configurationService.saveClockDriftConfig(TimeProtocol
 					.valueOf(this.clockDriftProtocol), this.clockDriftServer,
 					this.clockDriftTimeout, this.clockDriftMaxClockOffset,
-					this.clockDriftCron);
+					this.clockDriftCron, this.clockDriftEnabled);
 		} catch (InvalidCronExpressionException e) {
 			this.facesMessages.addToControlFromResourceBundle("cron",
 					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
@@ -288,17 +290,17 @@ public class ConfigurationBean implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isEnabled() {
+	public boolean isProxyEnabled() {
 
-		return this.enabled;
+		return this.proxyEnabled;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setEnabled(boolean enabled) {
+	public void setProxyEnabled(boolean proxyEnabled) {
 
-		this.enabled = enabled;
+		this.proxyEnabled = proxyEnabled;
 	}
 
 	/**
@@ -395,6 +397,22 @@ public class ConfigurationBean implements Configuration {
 	public void setClockDriftTimeout(int clockDriftTimeout) {
 
 		this.clockDriftTimeout = clockDriftTimeout;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isClockDriftEnabled() {
+
+		return this.clockDriftEnabled;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setClockDriftEnabled(boolean clockDriftEnabled) {
+
+		this.clockDriftEnabled = clockDriftEnabled;
 	}
 
 	/**
