@@ -18,25 +18,27 @@
 
 package be.fedict.trust.client.exception;
 
+import java.util.List;
+
 public class ValidationFailedException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	private final String reason;
+	private final List<String> reasonURIs;
 
-	public ValidationFailedException(String reason) {
+	public ValidationFailedException(List<String> reasonURIs) {
 
-		this.reason = reason;
+		this.reasonURIs = reasonURIs;
 	}
 
 	/**
-	 * Returns the XKMS v2.0 reason URI for the failed validation.
+	 * Returns the XKMS v2.0 reason URIs for the failed validation.
 	 * 
 	 * @see <a href="http://www.w3.org/TR/xkms2/#XKMS_2_0_Section_5_1">XKMS
 	 *      2.0</a>
 	 */
-	public String getReason() {
+	public List<String> getReasons() {
 
-		return this.reason;
+		return this.reasonURIs;
 	}
 }

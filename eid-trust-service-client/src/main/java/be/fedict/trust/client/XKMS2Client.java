@@ -101,6 +101,8 @@ public class XKMS2Client {
 
 	private WSSecurityClientHandler wsSecurityClientHandler;
 
+	private List<String> invalidReasonURIs;
+
 	/**
 	 * Main constructor
 	 * 
@@ -108,6 +110,8 @@ public class XKMS2Client {
 	 *            the location (host:port) of the XKMS2 web service
 	 */
 	public XKMS2Client(String location) {
+
+		this.invalidReasonURIs = new LinkedList<String>();
 
 		XKMSService xkmsService = XKMSServiceFactory.getInstance();
 		port = xkmsService.getXKMSPort();
@@ -461,8 +465,10 @@ public class XKMS2Client {
 			if (XKMSConstants.KEY_BINDING_STATUS_VALID_URI.equals(statusValue)) {
 				return;
 			}
-			throw new ValidationFailedException(status.getInvalidReason()
-					.get(0));
+			for (String invalidReason : status.getInvalidReason()) {
+				this.invalidReasonURIs.add(invalidReason);
+			}
+			throw new ValidationFailedException(invalidReasonURIs);
 		}
 	}
 
@@ -573,6 +579,17 @@ public class XKMS2Client {
 	public RevocationValuesType getRevocationValues() {
 
 		return this.revocationValues;
+	}
+
+	/**
+	 * Returns the XKMS v2.0 reason URIs for the failed validation.
+	 * 
+	 * @see <a href="http://www.w3.org/TR/xkms2/#XKMS_2_0_Section_5_1">XKMS
+	 *      2.0</a>
+	 */
+	public List<String> getInvalidReasons() {
+
+		return this.invalidReasonURIs;
 	}
 
 	private XMLGregorianCalendar getXmlGregorianCalendar(Date date) {

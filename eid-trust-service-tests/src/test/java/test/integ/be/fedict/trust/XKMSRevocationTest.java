@@ -155,7 +155,7 @@ public class XKMSRevocationTest {
 		} catch (ValidationFailedException e) {
 			// expected
 			assertEquals(XKMSConstants.KEY_BINDING_REASON_ISSUER_TRUST_URI, e
-					.getReason());
+					.getReasons().get(0));
 		}
 	}
 }
