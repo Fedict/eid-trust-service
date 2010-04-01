@@ -26,8 +26,10 @@ import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -70,6 +72,7 @@ import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
 import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
@@ -136,22 +139,35 @@ public class TrustServiceBean implements TrustService {
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE)
-	public ValidationResult validate(String trustDomain,
+	public ValidationResult validate(String trustDomainName,
 			List<X509Certificate> certificateChain, boolean returnRevocationData)
 			throws TrustDomainNotFoundException {
 
 		LOG.debug("isValid: "
 				+ certificateChain.get(0).getSubjectX500Principal());
 
-		TrustValidator trustValidator = getTrustValidator(trustDomain,
-				returnRevocationData);
-		try {
-			trustValidator.isTrusted(certificateChain);
-		} catch (CertPathValidatorException e) {
+		TrustLinkerResult lastResult = null;
+		RevocationData lastRevocationData = null;
+		for (TrustDomainEntity trustDomain : getTrustDomains(trustDomainName)) {
+
+			TrustValidator trustValidator = getTrustValidator(trustDomain,
+					returnRevocationData);
+			try {
+				trustValidator.isTrusted(certificateChain);
+			} catch (CertPathValidatorException e) {
+			}
+
+			if (trustValidator.getResult().isValid()) {
+				LOG.debug("valid for trust domain: " + trustDomain.getName());
+				return new ValidationResult(trustValidator.getResult(),
+						trustValidator.getRevocationData());
+			}
+
+			lastResult = trustValidator.getResult();
+			lastRevocationData = trustValidator.getRevocationData();
 		}
 
-		return new ValidationResult(trustValidator.getResult(), trustValidator
-				.getRevocationData());
+		return new ValidationResult(lastResult, lastRevocationData);
 	}
 
 	/**
@@ -159,7 +175,7 @@ public class TrustServiceBean implements TrustService {
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE)
-	public ValidationResult validate(String trustDomain,
+	public ValidationResult validate(String trustDomainName,
 			List<X509Certificate> certificateChain, Date validationDate,
 			List<byte[]> ocspResponses, List<byte[]> crls)
 			throws TrustDomainNotFoundException, CertificateException,
@@ -168,60 +184,103 @@ public class TrustServiceBean implements TrustService {
 		LOG.debug("isValid: "
 				+ certificateChain.get(0).getSubjectX500Principal());
 
-		TrustValidator trustValidator = getTrustValidator(trustDomain,
-				ocspResponses, crls);
+		TrustLinkerResult lastResult = null;
+		RevocationData lastRevocationData = null;
+		for (TrustDomainEntity trustDomain : getTrustDomains(trustDomainName)) {
 
-		try {
-			trustValidator.isTrusted(certificateChain, validationDate);
-		} catch (CertPathValidatorException e) {
+			TrustValidator trustValidator = getTrustValidator(trustDomain,
+					ocspResponses, crls);
+
+			try {
+				trustValidator.isTrusted(certificateChain);
+			} catch (CertPathValidatorException e) {
+			}
+
+			if (trustValidator.getResult().isValid()) {
+				LOG.debug("valid for trust domain: " + trustDomain.getName());
+				return new ValidationResult(trustValidator.getResult(),
+						trustValidator.getRevocationData());
+			}
+
+			lastResult = trustValidator.getResult();
+			lastRevocationData = trustValidator.getRevocationData();
 		}
 
-		return new ValidationResult(trustValidator.getResult(), trustValidator
-				.getRevocationData());
+		return new ValidationResult(lastResult, lastRevocationData);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public ValidationResult validateTimestamp(String trustDomain,
+	public ValidationResult validateTimestamp(String trustDomainName,
 			byte[] encodedTimestampToken) throws TSPException, IOException,
 			CMSException, NoSuchAlgorithmException, NoSuchProviderException,
 			CertStoreException, TrustDomainNotFoundException {
 
 		LOG.debug("validate timestamp token");
 
-		TrustValidator trustValidator = getTSATrustValidator(trustDomain);
-		try {
-			trustValidator.isTrusted(encodedTimestampToken);
-		} catch (CertPathValidatorException e) {
+		TrustLinkerResult lastResult = null;
+		RevocationData lastRevocationData = null;
+		for (TrustDomainEntity trustDomain : getTrustDomains(trustDomainName)) {
+
+			TrustValidator trustValidator = getTSATrustValidator(trustDomain);
+
+			try {
+				trustValidator.isTrusted(encodedTimestampToken);
+			} catch (CertPathValidatorException e) {
+			}
+
+			if (trustValidator.getResult().isValid()) {
+				LOG.debug("valid for trust domain: " + trustDomain.getName());
+				return new ValidationResult(trustValidator.getResult(),
+						trustValidator.getRevocationData());
+			}
+
+			lastResult = trustValidator.getResult();
+			lastRevocationData = trustValidator.getRevocationData();
 		}
 
-		return new ValidationResult(trustValidator.getResult(), trustValidator
-				.getRevocationData());
+		return new ValidationResult(lastResult, lastRevocationData);
+	}
+
+	/**
+	 * Returns {@link Set} of {@link TrustDomainEntity}'s. Multiple are possible
+	 * if the specified trustDomainName is a {@link VirtualTrustDomainEntity}.
+	 */
+	private Set<TrustDomainEntity> getTrustDomains(String name)
+			throws TrustDomainNotFoundException {
+
+		if (null == name) {
+			return Collections.singleton(this.trustDomainDAO
+					.getDefaultTrustDomain());
+		} else {
+			TrustDomainEntity trustDomain = this.trustDomainDAO
+					.findTrustDomain(name);
+			if (null != trustDomain) {
+				return Collections.singleton(trustDomain);
+			} else {
+				// maybe a virtual trust domain?
+				VirtualTrustDomainEntity virtualTrustDomain = this.trustDomainDAO
+						.findVirtualTrustDomain(name);
+				if (null != virtualTrustDomain) {
+					return virtualTrustDomain.getTrustDomains();
+				}
+			}
+		}
+
+		throw new TrustDomainNotFoundException();
 	}
 
 	/**
 	 * Returns new {@link TrustValidator}.
 	 * 
-	 * @param trustDomainName
-	 *            optional, can be <code>null</code>. If <code>null</code> the
-	 *            default {@link TrustDomainEntity} will be taken.
-	 * 
 	 * @param returnRevocationData
 	 *            if <code>true</code> the used revocation data will be filled
 	 *            in the returned {@link TrustValidator}.
-	 * 
-	 * @throws TrustDomainNotFoundException
 	 */
-	private TrustValidator getTrustValidator(String trustDomainName,
-			boolean returnRevocationData) throws TrustDomainNotFoundException {
-
-		TrustDomainEntity trustDomain;
-		if (null == trustDomainName)
-			trustDomain = this.trustDomainDAO.getDefaultTrustDomain();
-		else
-			trustDomain = this.trustDomainDAO.getTrustDomain(trustDomainName);
+	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain,
+			boolean returnRevocationData) {
 
 		TrustLinker trustLinker = null;
 		if (!returnRevocationData && trustDomain.isUseCaching()) {
@@ -233,13 +292,9 @@ public class TrustServiceBean implements TrustService {
 		return getTrustValidator(trustDomain, trustLinker, returnRevocationData);
 	}
 
-	private TrustValidator getTSATrustValidator(String trustDomainName)
-			throws TrustDomainNotFoundException {
+	private TrustValidator getTSATrustValidator(TrustDomainEntity trustDomain) {
 
 		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
-
-		TrustDomainEntity trustDomain = this.trustDomainDAO
-				.getTrustDomain(trustDomainName);
 
 		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(
 				trustDomain);
@@ -327,24 +382,17 @@ public class TrustServiceBean implements TrustService {
 	 * @param ocspResponses
 	 * @param crls
 	 * 
-	 * @throws TrustDomainNotFoundException
 	 * @throws IOException
 	 * @throws CRLException
 	 * @throws NoSuchProviderException
 	 * @throws CertificateException
 	 */
-	private TrustValidator getTrustValidator(String trustDomainName,
-			List<byte[]> ocspResponses, List<byte[]> crls)
-			throws TrustDomainNotFoundException, IOException,
+	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain,
+			List<byte[]> ocspResponses, List<byte[]> crls) throws IOException,
 			CertificateException, NoSuchProviderException, CRLException {
 
 		LOG
 				.debug("get trust validator using specified ocsp repsonses and crls");
-		TrustDomainEntity trustDomain;
-		if (null == trustDomainName)
-			trustDomain = this.trustDomainDAO.getDefaultTrustDomain();
-		else
-			trustDomain = this.trustDomainDAO.getTrustDomain(trustDomainName);
 
 		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(
 				trustDomain);
