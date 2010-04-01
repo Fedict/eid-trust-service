@@ -88,8 +88,6 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 	/**
 	 * Set the maximum offset of the WS-Security timestamp ( in ms ). If not
 	 * specified this will be defaulted to 5 minutes.
-	 * 
-	 * @param maxWSSecurityTimestampOffset
 	 */
 	public void setMaxWSSecurityTimestampOffset(
 			long maxWSSecurityTimestampOffset) {
@@ -153,8 +151,6 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 	 * Handles the inbound SOAP message. If a WS-Security header is present, it
 	 * will be validates. If a server certificate was specified, it will be
 	 * checked against the {@link X509Certificate} in the WS-Security header.
-	 * 
-	 * @param document
 	 */
 	private void handleInboundDocument(SOAPPart document,
 			SOAPMessageContext soapMessageContext) {

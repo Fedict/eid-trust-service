@@ -39,78 +39,123 @@ import org.apache.ws.security.components.crypto.Crypto;
  */
 public class ServerCrypto implements Crypto {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getAliasForX509Cert(Certificate certificate) {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getAliasForX509Cert(String issuer) {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getAliasForX509Cert(byte[] subjectKeyIdentifier) {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getAliasForX509Cert(String issuer, BigInteger serialNumber) {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getAliasForX509CertThumb(byte[] thumb) {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String[] getAliasesForDN(String subjectDN) {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public byte[] getCertificateData(boolean reverse,
 			X509Certificate[] certificates) {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public CertificateFactory getCertificateFactory() {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public X509Certificate[] getCertificates(String alias) {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getDefaultX509Alias() {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public KeyStore getKeyStore() {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public PrivateKey getPrivateKey(String alias, String password)
 			throws Exception {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public byte[] getSKIBytesFromCert(X509Certificate certificate) {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public X509Certificate[] getX509Certificates(byte[] data, boolean reverse) {
 
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public X509Certificate loadCertificate(InputStream inputStream) {
 
 		CertificateFactory certificateFactory;
@@ -129,6 +174,9 @@ public class ServerCrypto implements Crypto {
 		return certificate;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean validateCertPath(X509Certificate[] certificates) {
 
 		return false;

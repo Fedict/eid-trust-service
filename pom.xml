@@ -80,6 +80,7 @@
 			<modules>
 				<module>eid-trust-service-admin-manual</module>
 				<module>eid-trust-service-devel-guide</module>
+				<module>eid-trust-service-sdk</module>
 			</modules>
 		</profile>
 		<profile>

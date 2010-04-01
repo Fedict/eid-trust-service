@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.0.0.xsd">
+	<id>package</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<!--
+		<dependencySets> <dependencySet>
+		<outputDirectory>/lib</outputDirectory> <excludes>
+		<exclude>eid-trust-service-client-1.0.0-SNAPSHOT.jar</exclude>
+		</excludes> </dependencySet> <dependencySet> <includes>
+		<include>eid-trust-service-client-1.0.0-SNAPSHOT.jar</include>
+		</includes> </dependencySet> </dependencySets>
+	-->
+	<fileSets>
+		<fileSet>
+			<directory>target/files/javadoc</directory>
+			<outputDirectory>/javadoc</outputDirectory>
+			<excludes>
+				<exclude>META-INF/**</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>target/files/sources</directory>
+			<outputDirectory>/sources</outputDirectory>
+			<excludes>
+				<exclude>META-INF/**</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>target/dependencies</directory>
+			<outputDirectory>/lib</outputDirectory>
+			<excludes>
+				<exclude>eid-trust-service-client*</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>target/dependencies</directory>
+			<outputDirectory>/</outputDirectory>
+			<includes>
+				<include>eid-trust-service-client*</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+
+	<files>
+		<file>
+			<source>target/files/eid-trust-service-devel-guide.pdf</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>src/main/files/README.txt</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+	</files>
+</assembly>

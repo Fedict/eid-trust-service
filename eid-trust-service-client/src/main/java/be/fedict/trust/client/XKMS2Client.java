@@ -136,8 +136,6 @@ public class XKMS2Client {
 	/**
 	 * Set the maximum offset of the WS-Security timestamp ( in ms ). If not
 	 * specified this will be defaulted to 5 minutes.
-	 * 
-	 * @param maxWSSecurityTimestampOffset
 	 */
 	public void setMaxWSSecurityTimestampOffset(
 			long maxWSSecurityTimestampOffset) {
@@ -149,8 +147,6 @@ public class XKMS2Client {
 	/**
 	 * If set, server certificate will be verified against the specified
 	 * {@link PublicKey}.
-	 * 
-	 * @param publicKey
 	 */
 	public void setServicePublicKey(final PublicKey publicKey) {
 
@@ -230,8 +226,6 @@ public class XKMS2Client {
 
 	/**
 	 * Registers the logging SOAP handler on the given JAX-WS port component.
-	 * 
-	 * @param port
 	 */
 	protected void registerLoggerHandler(Object port) {
 
@@ -260,13 +254,6 @@ public class XKMS2Client {
 	/**
 	 * Validate the specified certificate chain against the default trust domain
 	 * configured at the trust service we are connecting to.
-	 * 
-	 * @param certificateChain
-	 * 
-	 * @throws CertificateEncodingException
-	 * @throws TrustDomainNotFoundException
-	 * @throws RevocationDataNotFoundException
-	 * @throws ValidationFailedException
 	 */
 	public void validate(List<X509Certificate> certificateChain)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
@@ -282,14 +269,8 @@ public class XKMS2Client {
 	 * The used revocation data can be retrieved using
 	 * {@link #getRevocationValues()}.
 	 * 
-	 * @param certificateChain
 	 * @param returnRevocationData
 	 *            whether or not the used revocation data should be returned.
-	 * 
-	 * @throws CertificateEncodingException
-	 * @throws TrustDomainNotFoundException
-	 * @throws RevocationDataNotFoundException
-	 * @throws ValidationFailedException
 	 */
 	public void validate(List<X509Certificate> certificateChain,
 			boolean returnRevocationData) throws CertificateEncodingException,
@@ -302,14 +283,6 @@ public class XKMS2Client {
 	/**
 	 * Validate the specified certificate chain against the specified trust
 	 * domain.
-	 * 
-	 * @param trustDomain
-	 * @param certificateChain
-	 * 
-	 * @throws CertificateEncodingException
-	 * @throws TrustDomainNotFoundException
-	 * @throws RevocationDataNotFoundException
-	 * @throws ValidationFailedException
 	 */
 	public void validate(String trustDomain,
 			List<X509Certificate> certificateChain)
@@ -322,17 +295,6 @@ public class XKMS2Client {
 	/**
 	 * Validate the specified certificate chain against the specified trust
 	 * domain using historical validation using the specified revocation data.
-	 * 
-	 * @param trustDomain
-	 * @param certificateChain
-	 * @param validationDate
-	 * @param ocspResponses
-	 * @param crls
-	 * 
-	 * @throws RevocationDataNotFoundException
-	 * @throws TrustDomainNotFoundException
-	 * @throws CertificateEncodingException
-	 * @throws ValidationFailedException
 	 */
 	public void validate(String trustDomain,
 			List<X509Certificate> certificateChain, Date validationDate,
@@ -347,17 +309,6 @@ public class XKMS2Client {
 	/**
 	 * Validate the specified certificate chain against the specified trust
 	 * domain using historical validation using the specified revocation data.
-	 * 
-	 * @param trustDomain
-	 * @param certificateChain
-	 * @param validationDate
-	 * @param ocspResponses
-	 * @param crls
-	 * 
-	 * @throws RevocationDataNotFoundException
-	 * @throws TrustDomainNotFoundException
-	 * @throws CertificateEncodingException
-	 * @throws ValidationFailedException
 	 */
 	public void validate(String trustDomain,
 			List<X509Certificate> certificateChain, Date validationDate,
@@ -376,15 +327,8 @@ public class XKMS2Client {
 	 * The used revocation data can be retrieved using
 	 * {@link #getRevocationValues()}.
 	 * 
-	 * @param trustDomain
-	 * @param certificateChain
 	 * @param returnRevocationData
 	 *            whether or not the used revocation data should be returned.
-	 * 
-	 * @throws CertificateEncodingException
-	 * @throws TrustDomainNotFoundException
-	 * @throws RevocationDataNotFoundException
-	 * @throws ValidationFailedException
 	 */
 	public void validate(String trustDomain,
 			List<X509Certificate> certificateChain, boolean returnRevocationData)
@@ -398,13 +342,6 @@ public class XKMS2Client {
 	/**
 	 * Validate the specified {@link TimestampToken} for the specified TSA trust
 	 * domain
-	 * 
-	 * @param trustDomain
-	 * @param timeStampToken
-	 * @throws TrustDomainNotFoundException
-	 * @throws RevocationDataNotFoundException
-	 * @throws CertificateEncodingException
-	 * @throws ValidationFailedException
 	 */
 	public void validate(String trustDomain, TimeStampToken timeStampToken)
 			throws TrustDomainNotFoundException, CertificateEncodingException,
@@ -532,11 +469,6 @@ public class XKMS2Client {
 	/**
 	 * Add revocation data either from list of {@link OCSPResp} objects and
 	 * {@link X509CRL} objects or from specified {@link RevocationValuesType}.
-	 * 
-	 * @param validateRequest
-	 * @param ocspResponses
-	 * @param crls
-	 * @param revocationData
 	 */
 	private void addRevocationData(ValidateRequestType validateRequest,
 			List<OCSPResp> ocspResponses, List<X509CRL> crls,
@@ -595,9 +527,6 @@ public class XKMS2Client {
 	/**
 	 * Add the specified {@link TimeStampToken} to the
 	 * {@link ValidateRequestType}.
-	 * 
-	 * @param timeStampToken
-	 * @param trustDomain
 	 */
 	private void addTimeStampToken(ValidateRequestType validateRequest,
 			TimeStampToken timeStampToken, String trustDomain) {
@@ -622,9 +551,6 @@ public class XKMS2Client {
 
 	/**
 	 * Checks the ResultMajor and ResultMinor code.
-	 * 
-	 * @param validateResult
-	 * @throws TrustDomainNotFoundException
 	 */
 	private void checkResponse(ValidateResultType validateResult)
 			throws TrustDomainNotFoundException {

@@ -32,7 +32,8 @@ public class ValidationFailedException extends Exception {
 	/**
 	 * Returns the XKMS v2.0 reason URI for the failed validation.
 	 * 
-	 * {@link http://www.w3.org/TR/xkms2/#XKMS_2_0_Section_5_1}
+	 * @see <a href="http://www.w3.org/TR/xkms2/#XKMS_2_0_Section_5_1">XKMS
+	 *      2.0</a>
 	 */
 	public String getReason() {
 
