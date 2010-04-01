@@ -697,6 +697,190 @@
 	</section>
 	<section>
 		<title>Web Service Specifications</title>
+		<para>
+			This section gives an overview of the eID Trust Service XKMS2 web
+			service. For a detailed overview of the XKMS v2.0 specification
+			please go to:
+			<ulink url="http://www.w3.org/TR/xkms2/">XKMS v2.0</ulink>
+			. The eID Trust Service covers only a portion of the XKMS v2.0
+			specification as it only supports validation requests.
+		</para>
+		<para>
+			In its most minimal configuration, a client can specify a
+			certificate
+			path for validation. The eID Trust Service will then
+			perform a
+			PKI-validation against the configuration default Trust
+			Domain. The
+			XKMS2-request will then be
+			<programlisting role="text"><![CDATA[
+soap:Envelope/soap:Body/xkms2:ValidateRequest/xkms2:QueryKeyBinding/ds:KeyInfo/ds:X509Data/ds:X509Certificate
+			]]></programlisting>
+			where the client adds the X509 certificate elements in the
+			certificate path to be validated. After validation, the eID Trust
+			Service XKMS2 web service answers with following XKMS2 response:
+			<programlisting role="text"><![CDATA[
+soap:Envelope/soap:Body/xkms2:ValidateResult/xkms2:KeyBinding/xkms2:Status/@StatusValue=http://www.w3.org/2002/03/xkms#Valid
+			]]></programlisting>
+			.
+			In case the validation was invalid, a similar response but with
+			StatusValue
+			<code>Invalid</code>
+			will be returned. Additionally the Status will element will contain 1
+			or more XKMS2 Reason URI's why the validation has failed. Check out
+			the
+			<ulink url="http://www.w3.org/TR/xkms2/#XKMS_2_0_Section_5_1">XKMS2 Key Binding Specification</ulink>
+			for more details on the Status element.
+		</para>
+		<para>
+			Please take not that we take on the assumption that the client
+			allways provides the full certificate path and the eID Trust Service
+			does not handle construction of certificate paths.
+		</para>
+		<para>
+			If the client wishes to validate its certificate path against a
+			Trust
+			Domain not equal to the configured default Trust Domain, it has
+			the
+			option to specify the name of that Trust Domain. The client will
+			in
+			that case add, as the XKMS2 specficiation dictates, following
+			element
+			to the request:
+			<programlisting role="text"><![CDATA[
+xkms2:ValidateRequest/xkms2:QueryKeyBinding/xkms2:UseKeyWith@Application=urn:be:fedict:trust:trust-domain@Identifier=<trust-domain-name>
+			]]></programlisting>
+			.
+		</para>
+		<section>
+			<title>Service Authentication</title>
+			<para>
+				Service authentication for the web service client has 3 different
+				options:
+				<orderedlist>
+					<listitem>
+						<para>
+							The client software does not require any service
+							authentication. This is the case when the client software has a
+							dedicated connection with the eID Trust Service.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Service authentication using unilateral TLS authentication.
+							The client has this option by specifying the eID Trust Service
+							server certfifcate for validation.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Service authentication using signed XKMS2 responses. This
+							option has to be explicitly configured within the eID Trust
+							Service Admin Portal as adding the WS-Security signature adds a
+							significant performance impact. 
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
+		</section>
+		<section>
+			<title>Revocation Data</title>
+			<para>
+				It is possible to instruct the eID Trust Service XKMS2 web
+				service to
+				return the used revocation data (OCSP respones and/or
+				CRL's) during
+				the PKI-validation. This can be usefull for
+				non-repudiation
+				certificate paths where this data will be used to
+				finalize a XAdES
+				signature. An
+				<code>xkms2:MessageExtension</code>
+				element is therefor introduced containing the ETSI XAdES v1.3.2
+				<code>RevocationValues</code>
+				element that will hold this data if requested.
+			</para>
+			<para>
+				If revocation data is requested, the eID Trust Service will not
+				use locally cached certificate revocation data, but will perform an
+				onliny PKI-validation (OCSP/CRL) as recent certificate revocation
+				data is required in the response. This is important for XAdES
+				signatures.
+			</para>
+			<para>
+				To specify a request to return the used revocation data, following
+				element will be added to the request:
+				<programlisting role="text"><![CDATA[
+xkms2:ValidateRequest/xkms2:RespondWith/urn:be:fedict:trust:revocation-data
+				]]></programlisting>
+				.
+			</para>
+		</section>
+		<section>
+			<title>Historical Validation</title>
+			<para>
+				It is possible to perform historical validations on certificate
+				paths. To do so the
+				<programlisting role="text"><![CDATA[
+xkms2:ValidateRequest/xkms2:QueryKeyBinding/xkms2:TimeInstant
+				]]></programlisting>
+				element containing the time at which to validate the given
+				certificate path, will be added. The necessary revocation data (OCSP
+				responses and/or CRL's) will off course be required to be added by
+				the client itself in the XKMS2 request. To do so the same
+				<code>xkms2:MessageExtension</code>
+				used to return used revocation data will be used, being the ETSI
+				XAdES v1.3.2
+				<code>RevocationValues</code>
+				element.
+			</para>
+			<para>
+				Historical validations are usefull in the context of
+				verification of ETSI XAdES v.1.3.2 digital signatures, focussed on
+				XAdES-X-L signatures. XAdES-A signatures are not taken into account.
+			</para>
+		</section>
+		<section>
+			<title>TSA certificates</title>
+			<para>
+				It is possible the validate TSA certificates using the eID
+				Trust Service XKMS2 web service. This is important for XAdES-T
+				signatures.
+			</para>
+			<para>
+				To do so, another
+				<code>xkms2:MessageExtension</code>
+				has been introduced, namely the
+				<code>TSAMessageExtension</code>
+				. This extension contains an element of type
+				<code>xades:EncapsulatedPKIDataType</code>
+				containing the encoded Timestamp Token returned by a timestamp
+				request. Off course this token will have to contain the certificate
+				path of the used TSA certificate.
+			</para>
+			<para>
+				The eID Trust Service will perform a PKI validation of the
+				contained
+				certificate path against the TSA Trust Domain configured
+				in the eID
+				Trust Service and specified with
+				<programlisting role="text"><![CDATA[
+xkms2:ValidateRequest/xkms2:QueryKeyBinding/xkms2:UseKeyWith@Application=urn:be:fedict:trust:tsa@Identifier=<tsa-trust-domain-name>
+				]]></programlisting>
+				. Additionally it will verify that the TSA certificate contains the
+				<code>ExtendedKeyUsage</code>
+				extension with key purpose identifier
+				<code>id-kp-timeStamping</code>
+				.
+			</para>
+		</section>
+		<section>
+			<title>Attribute certificates</title>
+			<para>
+				It is possible to validate Attribute certificates using the eID
+				Trust Service XKMS2 web service. 
+			</para>
+		</section>
 	</section>
 	<appendix>
 		<title>eID Trust Service Developer Guide License</title>
