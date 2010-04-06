@@ -53,7 +53,9 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.ocsp.OCSPResp;
 import org.bouncycastle.tsp.TimeStampToken;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.x509.X509V2AttributeCertificate;
 import org.etsi.uri._01903.v1_3.CRLValuesType;
+import org.etsi.uri._01903.v1_3.CertifiedRolesListType;
 import org.etsi.uri._01903.v1_3.EncapsulatedPKIDataType;
 import org.etsi.uri._01903.v1_3.OCSPValuesType;
 import org.etsi.uri._01903.v1_3.RevocationValuesType;
@@ -75,6 +77,7 @@ import sun.security.timestamp.TimestampToken;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.client.exception.ValidationFailedException;
+import be.fedict.trust.xkms.extensions.AttributeCertificateMessageExtensionType;
 import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
 import be.fedict.trust.xkms.extensions.TSAMessageExtensionType;
 import be.fedict.trust.xkms2.LoggingSoapHandler;
@@ -126,8 +129,8 @@ public class XKMS2Client {
 	/**
 	 * Set the optional server {@link X509Certificate}. If specified and the
 	 * trust service has message signing configured, the incoming
-	 * {@link X509Certificate} will be checked against the specified server
-	 * certificate.
+	 * {@link X509Certificate} will be checked against the specified
+	 * {@link X509Certificate}.
 	 * 
 	 *@param serverCertificate
 	 *            the server X509 certificate.
@@ -149,8 +152,8 @@ public class XKMS2Client {
 	}
 
 	/**
-	 * If set, server certificate will be verified against the specified
-	 * {@link PublicKey}.
+	 * If set, unilateral TLS authentication will occurs, verifying the server
+	 * {@link X509Certificate} specified {@link PublicKey}.
 	 */
 	public void setServicePublicKey(final PublicKey publicKey) {
 
@@ -307,7 +310,7 @@ public class XKMS2Client {
 			RevocationDataNotFoundException, ValidationFailedException {
 
 		validate(trustDomain, certificateChain, false, validationDate,
-				ocspResponses, crls, null, null);
+				ocspResponses, crls, null, null, null);
 	}
 
 	/**
@@ -321,7 +324,7 @@ public class XKMS2Client {
 			RevocationDataNotFoundException, ValidationFailedException {
 
 		validate(trustDomain, certificateChain, false, validationDate, null,
-				null, revocationValues, null);
+				null, revocationValues, null, null);
 	}
 
 	/**
@@ -340,7 +343,7 @@ public class XKMS2Client {
 			RevocationDataNotFoundException, ValidationFailedException {
 
 		validate(trustDomain, certificateChain, returnRevocationData, null,
-				null, null, null, null);
+				null, null, null, null, null);
 	}
 
 	/**
@@ -353,19 +356,37 @@ public class XKMS2Client {
 
 		LOG.debug("validate timestamp token");
 		validate(trustDomain, new LinkedList<X509Certificate>(), false, null,
-				null, null, revocationValues, timeStampToken);
+				null, null, revocationValues, timeStampToken, null);
 	}
 
-	private void validate(String trustDomain,
-			List<X509Certificate> authnCertificateChain,
-			boolean returnRevocationData, Date validationDate,
-			List<OCSPResp> ocspResponses, List<X509CRL> crls,
-			RevocationValuesType revocationValues, TimeStampToken timeStampToken)
+	/**
+	 * Validate the specified {@link EncapsulatedPKIDataType} holding the
+	 * {@link X509V2AttributeCertificate}.
+	 * 
+	 * @param certificateChain
+	 *            the certificate chain for the attribute certificate
+	 */
+	public void validate(List<X509Certificate> certificateChain,
+			CertifiedRolesListType attributeCertificates)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException {
 
-		LOG.debug("validate: "
-				+ authnCertificateChain.get(0).getSubjectX500Principal());
+		LOG.debug("validate attribute certificate");
+		validate(null, certificateChain, false, null, null, null,
+				revocationValues, null, attributeCertificates);
+	}
+
+	private void validate(String trustDomain,
+			List<X509Certificate> certificateChain,
+			boolean returnRevocationData, Date validationDate,
+			List<OCSPResp> ocspResponses, List<X509CRL> crls,
+			RevocationValuesType revocationValues,
+			TimeStampToken timeStampToken,
+			CertifiedRolesListType attributeCertificates)
+			throws CertificateEncodingException, TrustDomainNotFoundException,
+			RevocationDataNotFoundException, ValidationFailedException {
+
+		LOG.debug("validate");
 
 		ObjectFactory objectFactory = new ObjectFactory();
 		org.w3._2000._09.xmldsig_.ObjectFactory xmldsigObjectFactory = new org.w3._2000._09.xmldsig_.ObjectFactory();
@@ -377,7 +398,7 @@ public class XKMS2Client {
 		KeyInfoType keyInfo = xmldsigObjectFactory.createKeyInfoType();
 		queryKeyBinding.setKeyInfo(keyInfo);
 		X509DataType x509Data = xmldsigObjectFactory.createX509DataType();
-		for (X509Certificate certificate : authnCertificateChain) {
+		for (X509Certificate certificate : certificateChain) {
 			byte[] encodedCertificate = certificate.getEncoded();
 			x509Data
 					.getX509IssuerSerialOrX509SKIOrX509SubjectName()
@@ -388,27 +409,30 @@ public class XKMS2Client {
 		keyInfo.getContent().add(xmldsigObjectFactory.createX509Data(x509Data));
 		validateRequest.setQueryKeyBinding(queryKeyBinding);
 
-		if (null != timeStampToken) {
-
-			/*
-			 * Flag TSA validation
-			 */
-			UseKeyWithType useKeyWith = objectFactory.createUseKeyWithType();
-			useKeyWith.setApplication(XKMSConstants.TSA_APPLICATION_URI);
-			useKeyWith.setIdentifier(trustDomain);
-			queryKeyBinding.getUseKeyWith().add(useKeyWith);
-
-			addTimeStampToken(validateRequest, timeStampToken, trustDomain);
-
-		} else if (null != trustDomain) {
-			/*
-			 * Set optional trust domain
-			 */
+		/*
+		 * Set optional trust domain
+		 */
+		if (null != trustDomain) {
 			UseKeyWithType useKeyWith = objectFactory.createUseKeyWithType();
 			useKeyWith
 					.setApplication(XKMSConstants.TRUST_DOMAIN_APPLICATION_URI);
 			useKeyWith.setIdentifier(trustDomain);
 			queryKeyBinding.getUseKeyWith().add(useKeyWith);
+		}
+
+		/*
+		 * Add timestamp token for TSA validation
+		 */
+
+		if (null != timeStampToken) {
+			addTimeStampToken(validateRequest, timeStampToken);
+		}
+
+		/*
+		 * Add attribute certificates
+		 */
+		if (null != attributeCertificates) {
+			addAttributeCertificates(validateRequest, attributeCertificates);
 		}
 
 		/*
@@ -535,7 +559,7 @@ public class XKMS2Client {
 	 * {@link ValidateRequestType}.
 	 */
 	private void addTimeStampToken(ValidateRequestType validateRequest,
-			TimeStampToken timeStampToken, String trustDomain) {
+			TimeStampToken timeStampToken) {
 
 		be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
 		org.etsi.uri._01903.v1_3.ObjectFactory xadesObjectFactory = new org.etsi.uri._01903.v1_3.ObjectFactory();
@@ -552,7 +576,23 @@ public class XKMS2Client {
 		}
 		tsaMessageExtension.setEncapsulatedTimeStamp(timeStampTokenValue);
 		validateRequest.getMessageExtension().add(tsaMessageExtension);
+	}
 
+	/**
+	 * Add the specified {@link EncapsulatedPKIDataType} holding the attribute
+	 * certificate to the {@link ValidateRequestType}.
+	 */
+	private void addAttributeCertificates(ValidateRequestType validateRequest,
+			CertifiedRolesListType attributeCertificates) {
+
+		be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
+
+		AttributeCertificateMessageExtensionType attributeCertificateMessageExtension = extensionsObjectFactory
+				.createAttributeCertificateMessageExtensionType();
+		attributeCertificateMessageExtension
+				.setCertifiedRoles(attributeCertificates);
+		validateRequest.getMessageExtension().add(
+				attributeCertificateMessageExtension);
 	}
 
 	/**

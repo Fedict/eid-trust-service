@@ -21,7 +21,6 @@ package be.fedict.trust.xkms2;
 public abstract class XKMSConstants {
 
 	public static final String TRUST_DOMAIN_APPLICATION_URI = "urn:be:fedict:trust:trust-domain";
-	public static final String TSA_APPLICATION_URI = "urn:be:fedict:trust:tsa";
 
 	public static final String RETURN_REVOCATION_DATA_URI = "urn:be:fedict:trust:revocation-data";
 

@@ -66,6 +66,7 @@ import be.fedict.trust.RevocationData;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.xkms.extensions.AttributeCertificateMessageExtensionType;
 import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
 import be.fedict.trust.xkms.extensions.TSAMessageExtensionType;
 
@@ -93,8 +94,17 @@ public class XKMSPortImpl implements XKMSPortType {
 		LOG.debug("validate");
 
 		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
+		String trustDomain = null;
+		boolean returnRevocationData = false;
+		Date validationDate = null;
+		List<byte[]> ocspResponses = new LinkedList<byte[]>();
+		List<byte[]> crls = new LinkedList<byte[]>();
+		byte[] timestampToken = null;
+		List<byte[]> attributeCertificates = new LinkedList<byte[]>();
 
-		// parse the request
+		/*
+		 * Get certification chain from QueryKeyBinding
+		 */
 		QueryKeyBindingType queryKeyBinding = body.getQueryKeyBinding();
 		KeyInfoType keyInfo = queryKeyBinding.getKeyInfo();
 		List<Object> keyInfoContent = keyInfo.getContent();
@@ -126,9 +136,9 @@ public class XKMSPortImpl implements XKMSPortType {
 			}
 		}
 
-		// parse UseKeyWith
-		String trustDomain = null;
-		boolean tsaValidation = false;
+		/*
+		 * Get optional trust domain name from UseKeyWith
+		 */
 		if (body.getQueryKeyBinding().getUseKeyWith().size() > 0) {
 			for (UseKeyWithType useKeyWith : body.getQueryKeyBinding()
 					.getUseKeyWith()) {
@@ -136,94 +146,112 @@ public class XKMSPortImpl implements XKMSPortType {
 						XKMSConstants.TRUST_DOMAIN_APPLICATION_URI)) {
 					trustDomain = useKeyWith.getIdentifier();
 					LOG.debug("validate against trust domain " + trustDomain);
-				} else if (useKeyWith.getApplication().equals(
-						XKMSConstants.TSA_APPLICATION_URI)) {
-					trustDomain = useKeyWith.getIdentifier();
-					tsaValidation = true;
-					LOG.debug("TSA validation: trust domain=" + trustDomain);
 				}
 			}
 		}
 
-		// look if revocation data should be returned
-		boolean returnRevocationData = false;
+		/*
+		 * Get optional returning of used revocation data from RespondWith
+		 */
 		if (body.getRespondWith().contains(
 				XKMSConstants.RETURN_REVOCATION_DATA_URI)) {
 			LOG.debug("will return used revocation data...");
 			returnRevocationData = true;
 		}
 
-		// check message extensions for historical validation
-		Date validationDate = null;
-		List<byte[]> ocspResponses = new LinkedList<byte[]>();
-		List<byte[]> crls = new LinkedList<byte[]>();
+		/*
+		 * Get optional validation date from TimeInstant field for historical
+		 * validation
+		 */
 		if (null != body.getQueryKeyBinding().getTimeInstant()) {
 			validationDate = getDate(body.getQueryKeyBinding().getTimeInstant()
 					.getTime());
-			for (MessageExtensionAbstractType messageExtension : body
-					.getMessageExtension()) {
-				if (messageExtension instanceof RevocationDataMessageExtensionType) {
-					RevocationDataMessageExtensionType revocationDataMessageExtension = (RevocationDataMessageExtensionType) messageExtension;
-					if (null == revocationDataMessageExtension
-							.getRevocationValues()) {
-						LOG.error("missing revocation values");
-						return createResultResponse(ResultMajorCode.SENDER,
-								ResultMinorCode.INCOMPLETE);
-					}
-					if (null != revocationDataMessageExtension
-							.getRevocationValues().getOCSPValues()) {
-						for (EncapsulatedPKIDataType ocspValue : revocationDataMessageExtension
-								.getRevocationValues().getOCSPValues()
-								.getEncapsulatedOCSPValue()) {
-							ocspResponses.add(ocspValue.getValue());
-						}
-					}
-					if (null != revocationDataMessageExtension
-							.getRevocationValues().getCRLValues()) {
-						for (EncapsulatedPKIDataType crlValue : revocationDataMessageExtension
-								.getRevocationValues().getCRLValues()
-								.getEncapsulatedCRLValue()) {
-							crls.add(crlValue.getValue());
-						}
-					}
+		}
 
-				} else {
-					LOG.error("invalid message extension: "
-							+ messageExtension.getClass().toString());
-					return createResultResponse(ResultMajorCode.SENDER,
-							ResultMinorCode.MESSAGE_NOT_SUPPORTED);
-				}
+		/*
+		 * Check for message extensions, these can be:
+		 * 
+		 * RevocatioDataMessageExtension: historical validation, contains to be
+		 * used OCSP/CRL data
+		 * 
+		 * TSAMessageExtension: TSA validation, contains encoded XAdES timestamp
+		 * token
+		 * 
+		 * AttributeCertificateMessageExtension: Attribute certificate
+		 * validation, contains XAdES CertifiedRole element containing the
+		 * encoded Attribute certificate
+		 */
+		for (MessageExtensionAbstractType messageExtension : body
+				.getMessageExtension()) {
+			if (messageExtension instanceof RevocationDataMessageExtensionType) {
+
+				RevocationDataMessageExtensionType revocationDataMessageExtension = (RevocationDataMessageExtensionType) messageExtension;
+				parseRevocationDataExtension(revocationDataMessageExtension,
+						ocspResponses, crls);
+
+			} else if (messageExtension instanceof TSAMessageExtensionType) {
+
+				TSAMessageExtensionType tsaMessageExtension = (TSAMessageExtensionType) messageExtension;
+				timestampToken = parseTSAExtension(tsaMessageExtension);
+
+			} else if (messageExtension instanceof AttributeCertificateMessageExtensionType) {
+
+				AttributeCertificateMessageExtensionType attributeCertificateMessageExtension = (AttributeCertificateMessageExtensionType) messageExtension;
+				parseAttributeCertificateExtension(
+						attributeCertificateMessageExtension,
+						attributeCertificates);
+
+			} else {
+				LOG.error("invalid message extension: "
+						+ messageExtension.getClass().toString());
+				return createResultResponse(ResultMajorCode.SENDER,
+						ResultMinorCode.MESSAGE_NOT_SUPPORTED);
 			}
 		}
 
-		// check message extension for TSA validation timestamp token
-		byte[] timestampToken = null;
-		if (tsaValidation) {
-			for (MessageExtensionAbstractType messageExtension : body
-					.getMessageExtension()) {
-				if (messageExtension instanceof TSAMessageExtensionType) {
-					TSAMessageExtensionType tsaMessageExtension = (TSAMessageExtensionType) messageExtension;
-					if (null == tsaMessageExtension.getEncapsulatedTimeStamp()) {
-						LOG.error("missing timestamp token");
-						return createResultResponse(ResultMajorCode.SENDER,
-								ResultMinorCode.INCOMPLETE);
-					}
-					timestampToken = tsaMessageExtension
-							.getEncapsulatedTimeStamp().getValue();
-				} else {
-					LOG.error("invalid message extension: "
-							+ messageExtension.getClass().toString());
-					return createResultResponse(ResultMajorCode.SENDER,
-							ResultMinorCode.MESSAGE_NOT_SUPPORTED);
-				}
-			}
+		/*
+		 * Check gathered data
+		 */
+		if (null != validationDate && ocspResponses.isEmpty() && crls.isEmpty()) {
+
+			LOG
+					.error("Historical validation requested but no revocation data provided");
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+
+		} else if (null != timestampToken && !certificateChain.isEmpty()) {
+
+			LOG
+					.error("Cannot both add a timestamp token and a seperate certificate chain");
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+		} else if (!attributeCertificates.isEmpty()
+				&& certificateChain.isEmpty()) {
+
+			LOG
+					.error("No certificate chain provided for the attribute certificates");
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
+
+		} else if (body.getMessageExtension().size() > 1) {
+
+			LOG.error("Only 1 message extension at a time is supported");
+			return createResultResponse(ResultMajorCode.SENDER,
+					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
 		}
 
+		/*
+		 * Validate!
+		 */
 		ValidationResult validationResult;
 		try {
-			if (tsaValidation) {
+			if (null != timestampToken) {
 				validationResult = this.trustService.validateTimestamp(
 						trustDomain, timestampToken);
+			} else if (!attributeCertificates.isEmpty()) {
+				validationResult = this.trustService
+						.validateAttributeCertificates(attributeCertificates,
+								certificateChain);
 			} else if (null == validationDate) {
 				validationResult = this.trustService.validate(trustDomain,
 						certificateChain, returnRevocationData);
@@ -269,7 +297,9 @@ public class XKMSPortImpl implements XKMSPortType {
 					ResultMinorCode.MESSAGE_NOT_SUPPORTED);
 		}
 
-		// return the result
+		/*
+		 * Create validation result response
+		 */
 		ValidateResultType validateResult = createResultResponse(
 				ResultMajorCode.SUCCESS, null);
 
@@ -287,7 +317,9 @@ public class XKMSPortImpl implements XKMSPortType {
 		}
 		status.setStatusValue(statusValue);
 
-		// add invalid reason info ...
+		/*
+		 * Add InvalidReason URI's
+		 */
 		if (!validationResult.isValid()) {
 			switch (validationResult.getReason()) {
 			case INVALID_TRUST: {
@@ -313,13 +345,75 @@ public class XKMSPortImpl implements XKMSPortType {
 			}
 		}
 
-		// optionally append used revocation data if specified
+		/*
+		 * Add used revocation data if requested
+		 */
 		if (returnRevocationData) {
 			addRevocationData(validateResult, validationResult
 					.getRevocationData());
 		}
 
 		return validateResult;
+	}
+
+	/**
+	 * Parse the {@link RevocationDataMessageExtensionType} for encoded OCSP
+	 * responses and/or encoded CRLs
+	 */
+	private void parseRevocationDataExtension(
+			RevocationDataMessageExtensionType revocationDataMessageExtension,
+			List<byte[]> ocspResponses, List<byte[]> crls) {
+
+		if (null == revocationDataMessageExtension.getRevocationValues()) {
+			return;
+		}
+
+		if (null != revocationDataMessageExtension.getRevocationValues()
+				.getOCSPValues()) {
+			for (EncapsulatedPKIDataType ocspValue : revocationDataMessageExtension
+					.getRevocationValues().getOCSPValues()
+					.getEncapsulatedOCSPValue()) {
+				ocspResponses.add(ocspValue.getValue());
+			}
+		}
+		if (null != revocationDataMessageExtension.getRevocationValues()
+				.getCRLValues()) {
+			for (EncapsulatedPKIDataType crlValue : revocationDataMessageExtension
+					.getRevocationValues().getCRLValues()
+					.getEncapsulatedCRLValue()) {
+				crls.add(crlValue.getValue());
+			}
+		}
+	}
+
+	/**
+	 * Parse the {@link TSAMessageExtensionType} and return an encoded timestamp
+	 * token or <code>null</code> if none found.
+	 */
+	private byte[] parseTSAExtension(TSAMessageExtensionType tsaMessageExtension) {
+
+		if (null == tsaMessageExtension.getEncapsulatedTimeStamp()) {
+			return null;
+		}
+		return tsaMessageExtension.getEncapsulatedTimeStamp().getValue();
+	}
+
+	/**
+	 * Parse the {@link AttributeCertificateMessageExtensionType} and return an
+	 * encoded attribute certificate or <code>null</code> if none found
+	 */
+	private void parseAttributeCertificateExtension(
+			AttributeCertificateMessageExtensionType attributeCertificateMessageExtension,
+			List<byte[]> attributeCertificates) {
+
+		if (null == attributeCertificateMessageExtension.getCertifiedRoles()) {
+			return;
+		}
+
+		for (EncapsulatedPKIDataType attributeCertificate : attributeCertificateMessageExtension
+				.getCertifiedRoles().getCertifiedRole()) {
+			attributeCertificates.add(attributeCertificate.getValue());
+		}
 	}
 
 	private ValidateResultType createResultResponse(
@@ -360,6 +454,9 @@ public class XKMSPortImpl implements XKMSPortType {
 		return calendar.getTime();
 	}
 
+	/**
+	 * Add the used revocation data if requested to the validation response
+	 */
 	private void addRevocationData(ValidateResultType validateResult,
 			RevocationData revocationData) {
 
@@ -370,7 +467,9 @@ public class XKMSPortImpl implements XKMSPortType {
 		RevocationValuesType revocationValues = xadesObjectFactory
 				.createRevocationValuesType();
 
-		// Add OCSP responses
+		/*
+		 * Add OCSP responses
+		 */
 		OCSPValuesType ocspValues = xadesObjectFactory.createOCSPValuesType();
 		for (OCSPRevocationData ocspRevocationData : revocationData
 				.getOcspRevocationData()) {
@@ -382,7 +481,9 @@ public class XKMSPortImpl implements XKMSPortType {
 		}
 		revocationValues.setOCSPValues(ocspValues);
 
-		// Add CRL's
+		/*
+		 * Add CRL's
+		 */
 		CRLValuesType crlValues = xadesObjectFactory.createCRLValuesType();
 		for (CRLRevocationData crlRevocationData : revocationData
 				.getCrlRevocationData()) {

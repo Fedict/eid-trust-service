@@ -33,10 +33,14 @@
 
 	<element name="AttributeCertificateMessageExtension" type="tns:AttributeCertificateMessageExtensionType" />
 	<complexType name="AttributeCertificateMessageExtensionType">
-		<sequence>
-			<element name="AttributeCertificate" type="base64Binary"
-				minOccurs="1" />
-		</sequence>
+		<complexContent>
+			<extension base="xkms:MessageExtensionAbstractType">
+				<sequence>
+					<element name="CertifiedRoles" type="xades:CertifiedRolesListType"
+						minOccurs="1" />
+				</sequence>
+			</extension>
+		</complexContent>
 	</complexType>
 
 	<element name="TSAMessageExtension" type="tns:TSAMessageExtensionType" />

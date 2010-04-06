@@ -47,6 +47,7 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.tsp.TSPException;
 
+import be.fedict.trust.CertificateRepository;
 import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.PublicKeyTrustLinker;
@@ -213,6 +214,7 @@ public class TrustServiceBean implements TrustService {
 	 * {@inheritDoc}
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@SNMP(oid = SnmpConstants.VALIDATE_TSA)
 	public ValidationResult validateTimestamp(String trustDomainName,
 			byte[] encodedTimestampToken) throws TSPException, IOException,
 			CMSException, NoSuchAlgorithmException, NoSuchProviderException,
@@ -242,6 +244,28 @@ public class TrustServiceBean implements TrustService {
 		}
 
 		return new ValidationResult(lastResult, lastRevocationData);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@SNMP(oid = SnmpConstants.VALIDATE_ATTRIBUTE_CERT)
+	public ValidationResult validateAttributeCertificates(
+			List<byte[]> encodedAttributeCertificates,
+			List<X509Certificate> certificatePath) {
+
+		LOG.debug("validate attribute certificates");
+
+		TrustValidator trustValidator = getAttributeCertificateTrustValidator(certificatePath);
+		try {
+			trustValidator.isTrusted(encodedAttributeCertificates,
+					certificatePath);
+		} catch (CertPathValidatorException e) {
+		}
+
+		return new ValidationResult(trustValidator.getResult(), trustValidator
+				.getRevocationData());
 	}
 
 	/**
@@ -290,6 +314,41 @@ public class TrustServiceBean implements TrustService {
 		}
 
 		return getTrustValidator(trustDomain, trustLinker, returnRevocationData);
+	}
+
+	private TrustValidator getAttributeCertificateTrustValidator(
+			final List<X509Certificate> certificateChain) {
+
+		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
+
+		// XXX
+		TrustValidator trustValidator = new TrustValidator(
+				new CertificateRepository() {
+
+					public boolean isTrustPoint(X509Certificate certificate) {
+
+						return certificateChain.contains(certificate);
+					}
+				});
+
+		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
+
+		OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
+				networkConfig);
+
+		OnlineCrlRepository crlRepository = new OnlineCrlRepository(
+				networkConfig);
+		CachedCrlRepository cachedCrlRepository = new CachedCrlRepository(
+				crlRepository);
+
+		FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
+		fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(ocspRepository));
+		fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(
+				cachedCrlRepository));
+
+		trustValidator.addTrustLinker(fallbackTrustLinker);
+
+		return trustValidator;
 	}
 
 	private TrustValidator getTSATrustValidator(TrustDomainEntity trustDomain) {

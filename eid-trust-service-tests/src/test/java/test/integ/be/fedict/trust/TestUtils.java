@@ -136,9 +136,10 @@ public class TestUtils {
 			SignatureException, IOException, CertificateException {
 
 		DateTime now = new DateTime();
+		DateTime notBefore = now.minusYears(10);
 		DateTime future = now.plusYears(10);
 		X509Certificate certificate = generateSelfSignedCertificate(keyPair,
-				dn, now, future, null, true, true, false);
+				dn, notBefore, future, null, true, true, false);
 		return certificate;
 	}
 

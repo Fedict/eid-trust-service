@@ -33,6 +33,7 @@ import javax.ejb.Local;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.tsp.TimeStampToken;
+import org.bouncycastle.x509.X509V2AttributeCertificate;
 
 import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
@@ -47,9 +48,7 @@ import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 public interface TrustService {
 
 	/**
-	 * Checks whether the given authentication certificate chain is valid.
-	 * 
-	 * @param certificateChain
+	 * Checks whether the given certificate chain is valid.
 	 */
 	ValidationResult validate(List<X509Certificate> certificateChain);
 
@@ -58,12 +57,9 @@ public interface TrustService {
 	 * 
 	 * @param trustDomain
 	 *            optional, can be null. If so default trust domain is taken.
-	 * @param certificateChain
 	 * @param returnRevocationData
 	 *            if true, used revocation data will be filled in in the
 	 *            {@link ValidationResult} and no caching will be used.
-	 * 
-	 * @throws TrustDomainNotFoundException
 	 */
 	ValidationResult validate(String trustDomain,
 			List<X509Certificate> certificateChain, boolean returnRevocationDate)
@@ -72,18 +68,6 @@ public interface TrustService {
 	/**
 	 * Checks whether the given certificate chain was valid at the specified
 	 * {@link Date}, using the specified revocation data.
-	 * 
-	 * @param trustDomain
-	 * @param certificateChain
-	 * @param validationDate
-	 * @param ocspResponses
-	 * @param crls
-	 * 
-	 * @throws TrustDomainNotFoundException
-	 * @throws IOException
-	 * @throws CRLException
-	 * @throws NoSuchProviderException
-	 * @throws CertificateException
 	 */
 	ValidationResult validate(String trustDomain,
 			List<X509Certificate> certificateChain, Date validationDate,
@@ -94,21 +78,18 @@ public interface TrustService {
 	/**
 	 * Validate the specified encoded {@link TimeStampToken} against the
 	 * specified trust domain
-	 * 
-	 * @param trustDomain
-	 * @param timestampToken
-	 * @throws CMSException
-	 * @throws IOException
-	 * @throws TSPException
-	 * @throws NoSuchProviderException
-	 * @throws NoSuchAlgorithmException
-	 * @throws CertStoreException
-	 * @throws TrustDomainNotFoundException
 	 */
 	ValidationResult validateTimestamp(String trustDomain, byte[] timestampToken)
 			throws TSPException, IOException, CMSException,
 			NoSuchAlgorithmException, NoSuchProviderException,
 			CertStoreException, TrustDomainNotFoundException;
+
+	/**
+	 * Validate the specified encoded {@link X509V2AttributeCertificate}'s.
+	 */
+	ValidationResult validateAttributeCertificates(
+			List<byte[]> attributeCertificate,
+			List<X509Certificate> certificateChain);
 
 	/**
 	 * Returns the {@link WSSecurityConfigEntity}.

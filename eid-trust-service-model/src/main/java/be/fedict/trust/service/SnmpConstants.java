@@ -31,6 +31,8 @@ public abstract class SnmpConstants {
 	private static final String SNMP_OID_ROOT = "1.3.6.1.4.1.7890.";
 
 	public static final String VALIDATE = SNMP_OID_ROOT + "0.0";
+	public static final String VALIDATE_TSA = SNMP_OID_ROOT + "0.1";
+	public static final String VALIDATE_ATTRIBUTE_CERT = SNMP_OID_ROOT + "0.2";
 	public static final String CACHE_REFRESH = SNMP_OID_ROOT + "1.0";
 	public static final String CACHE_HITS = SNMP_OID_ROOT + "2.0";
 	public static final String CACHE_MISSES = SNMP_OID_ROOT + "3.0";
