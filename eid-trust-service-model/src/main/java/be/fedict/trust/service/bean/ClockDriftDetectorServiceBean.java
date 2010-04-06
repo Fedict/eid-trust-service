@@ -49,6 +49,7 @@ import org.bouncycastle.tsp.TimeStampResponse;
 
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.service.ClockDriftService;
+import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 
@@ -67,6 +68,9 @@ public class ClockDriftDetectorServiceBean implements ClockDriftService {
 	@EJB
 	private ConfigurationDAO configurationDAO;
 
+	@EJB
+	private AuditDAO auditDAO;
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -74,9 +78,9 @@ public class ClockDriftDetectorServiceBean implements ClockDriftService {
 
 		LOG.debug("execute");
 
-		ClockDriftConfigEntity clockDriftConfig = configurationDAO
+		ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
 				.getClockDriftConfig();
-		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
+		NetworkConfig networkConfig = this.configurationDAO.getNetworkConfig();
 
 		switch (clockDriftConfig.getTimeProtocol()) {
 		case NTP: {
@@ -137,21 +141,19 @@ public class ClockDriftDetectorServiceBean implements ClockDriftService {
 			Long offset = timeInfo.getOffset();
 			LOG.debug("clock offset (ms): " + offset);
 			if (Math.abs(offset) > clockDriftConfig.getMaxClockOffset()) {
-				LOG.error("maximum clock offset reached");
-				// XXX: audit
+				this.auditDAO.logAudit("Maximum clock offset reached: "
+						+ Math.abs(offset) + " > "
+						+ clockDriftConfig.getMaxClockOffset());
 			}
 		} catch (SocketException e) {
-			LOG.error("Error contacting NTP server "
-					+ clockDriftConfig.getServer(), e);
-			// XXX: audit
+			this.auditDAO.logAudit("Error contacting NTP server "
+					+ clockDriftConfig.getServer());
 		} catch (UnknownHostException e) {
-			LOG.error("Error contacting NTP server "
-					+ clockDriftConfig.getServer(), e);
-			// XXX: audit
+			this.auditDAO.logAudit("Error contacting NTP server "
+					+ clockDriftConfig.getServer());
 		} catch (IOException e) {
-			LOG.error("Error contacting NTP server "
-					+ clockDriftConfig.getServer(), e);
-			// XXX: audit
+			this.auditDAO.logAudit("Error contacting NTP server "
+					+ clockDriftConfig.getServer());
 		}
 	}
 
@@ -163,7 +165,6 @@ public class ClockDriftDetectorServiceBean implements ClockDriftService {
 		try {
 			TimeStampRequestGenerator requestGen = new TimeStampRequestGenerator();
 
-			// XXX: TSP algo configurable?
 			TimeStampRequest request = requestGen.generate(TSPAlgorithms.SHA1,
 					new byte[20], BigInteger.valueOf(100));
 			byte[] requestData = request.getEncoded();
@@ -182,9 +183,9 @@ public class ClockDriftDetectorServiceBean implements ClockDriftService {
 
 			int statusCode = httpClient.executeMethod(postMethod);
 			if (statusCode != HttpStatus.SC_OK) {
-				LOG.error("Error contacting TSP server "
+				this.auditDAO.logAudit("Error contacting TSP server "
 						+ clockDriftConfig.getServer());
-				// XXX: audit
+				return;
 			}
 
 			TimeStampResponse tspResponse = new TimeStampResponse(postMethod
@@ -196,21 +197,16 @@ public class ClockDriftDetectorServiceBean implements ClockDriftService {
 					.getGenTime().getTime()
 					- now.getTime();
 			if (Math.abs(offset) > clockDriftConfig.getMaxClockOffset()) {
-				LOG.error("maximum clock offset reached, local="
-						+ now.toString()
-						+ " tsp="
-						+ tspResponse.getTimeStampToken().getTimeStampInfo()
-								.getGenTime().toString());
-				// XXX: audit
+				this.auditDAO.logAudit("Maximum clock offset reached: "
+						+ Math.abs(offset) + " > "
+						+ clockDriftConfig.getMaxClockOffset());
 			}
 		} catch (IOException e) {
-			LOG.error("Error contacting TSP server "
-					+ clockDriftConfig.getServer(), e);
-			// XXX: audit
+			this.auditDAO.logAudit("Error contacting TSP server "
+					+ clockDriftConfig.getServer());
 		} catch (TSPException e) {
-			LOG.error("Error contacting TSP server "
-					+ clockDriftConfig.getServer(), e);
-			// XXX: audit
+			this.auditDAO.logAudit("Error contacting TSP server "
+					+ clockDriftConfig.getServer());
 		}
 	}
 }

@@ -105,6 +105,20 @@
 										</li>
 									</c:otherwise>
 								</c:choose>
+								<c:choose>
+									<c:when test="#{activeMenu == 'audit'}">
+										<li class="selected">
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/audit.seam">#{messages.audit}</a>
+										</li>
+									</c:when>
+									<c:otherwise>
+										<li>
+											<a
+												href="#{facesContext.externalContext.requestContextPath}/audit.seam">#{messages.audit}</a>
+										</li>
+									</c:otherwise>
+								</c:choose>
 							</c:when>
 						</c:choose>
 

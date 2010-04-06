@@ -70,6 +70,7 @@ import be.fedict.trust.ocsp.OnlineOcspRepository;
 import be.fedict.trust.service.SnmpConstants;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.ValidationResult;
+import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -113,6 +114,9 @@ public class TrustServiceBean implements TrustService {
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
 
+	@EJB
+	private AuditDAO auditDAO;
+
 	@SNMP(oid = SnmpConstants.CACHE_HITS)
 	private Long cacheHits;
 
@@ -130,7 +134,7 @@ public class TrustServiceBean implements TrustService {
 		try {
 			return validate(null, certificateChain, false);
 		} catch (TrustDomainNotFoundException e) {
-			LOG.error("Default trust domain not set ?!");
+			this.auditDAO.logAudit("Default trust domain not set");
 			return new ValidationResult(new TrustLinkerResult(false), null);
 		}
 	}

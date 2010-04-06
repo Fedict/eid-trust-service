@@ -35,7 +35,7 @@
 			<redirect />
 		</navigation-case>
 	</navigation-rule>
-	<!-- END Administrator pages navigation rules -->
+	<!-- END Configuration pages navigation rules -->
 
 	<!--  Virtual Trust domain navigation rules -->
 	<navigation-rule>
@@ -186,5 +186,16 @@
 		</navigation-case>
 	</navigation-rule>
 	<!--  END Trust Domain navigation rules -->
+
+	<!-- Audit page navigation rules -->
+	<navigation-rule>
+		<from-view-id>/audit.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/audit.seam</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+	<!-- END Audit pages navigation rules -->
 
 </faces-config>

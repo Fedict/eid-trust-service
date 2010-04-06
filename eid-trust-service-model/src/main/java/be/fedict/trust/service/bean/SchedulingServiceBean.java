@@ -44,6 +44,7 @@ import org.quartz.CronTrigger;
 import be.fedict.trust.service.ClockDriftService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
@@ -80,6 +81,9 @@ public class SchedulingServiceBean implements SchedulingService {
 
 	@EJB
 	private ClockDriftService clockDriftService;
+
+	@EJB
+	private AuditDAO auditDAO;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -118,15 +122,14 @@ public class SchedulingServiceBean implements SchedulingService {
 		}
 
 		// perform clock drift detection
-		clockDriftService.execute();
+		this.clockDriftService.execute();
 
 		// start timer
 		try {
 			startTimer(clockDriftConfig, true);
 		} catch (InvalidCronExpressionException e) {
-			LOG.error("Exception starting timer for clock drift");
+			this.auditDAO.logAudit("Exception starting timer for clock drift");
 			return;
-			// XXX: audit ?
 		}
 	}
 
@@ -154,8 +157,8 @@ public class SchedulingServiceBean implements SchedulingService {
 				LOG.debug("harvester notified for"
 						+ certificateAuthority.getName());
 			} catch (JMSException e) {
-				LOG.error("Failed to notify harvester", e);
-				// XXX: audit
+				this.auditDAO.logAudit("Failed to notify harvester for CA="
+						+ certificateAuthority.getName());
 			}
 		}
 
@@ -163,10 +166,9 @@ public class SchedulingServiceBean implements SchedulingService {
 		try {
 			startTimer(trustPoint, true);
 		} catch (InvalidCronExpressionException e) {
-			LOG.error("Exception starting timer for trust point: "
+			this.auditDAO.logAudit("Exception starting timer for trust point: "
 					+ trustPoint.getName());
 			return;
-			// XXX: audit ?
 		}
 	}
 

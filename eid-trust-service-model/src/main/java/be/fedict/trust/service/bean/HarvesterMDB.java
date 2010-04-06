@@ -47,6 +47,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.crl.OnlineCrlRepository;
 import be.fedict.trust.service.SnmpConstants;
+import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
@@ -69,6 +70,9 @@ public class HarvesterMDB implements MessageListener {
 
 	@EJB
 	private CertificateAuthorityDAO certificateAuthorityDAO;
+
+	@EJB
+	private AuditDAO auditDAO;
 
 	@SNMP(oid = SnmpConstants.CRL_DOWNLOAD_FAILURES)
 	private Long failures = 0L;
@@ -126,7 +130,8 @@ public class HarvesterMDB implements MessageListener {
 		X509CRL crl = onlineCrlRepository.findCrl(crlUri, certificateAuthority
 				.getCertificate(), validationDate);
 		if (null == crl) {
-			LOG.error("failed to download CRL for CA " + caName);
+			this.auditDAO.logAudit("Failed to download CRL for CA=" + caName
+					+ " @ " + crlUrl);
 			this.failures++;
 			throw new RuntimeException();
 		}
@@ -138,7 +143,8 @@ public class HarvesterMDB implements MessageListener {
 		boolean crlValidity = CrlTrustLinker.checkCrlIntegrity(crl,
 				issuerCertificate, validationDate);
 		if (false == crlValidity) {
-			LOG.error("CRL invalid");
+			this.auditDAO.logAudit("Invalid CRL for CA=" + caName + " @ "
+					+ crlUrl);
 			return;
 		}
 		LOG.debug("processing CRL... " + caName);
