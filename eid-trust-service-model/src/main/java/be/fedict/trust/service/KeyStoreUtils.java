@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import sun.security.pkcs11.SunPKCS11;
 import be.fedict.trust.service.entity.KeyStoreType;
 import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
@@ -65,13 +66,18 @@ public final class KeyStoreUtils {
 			String alias) throws KeyStoreLoadException {
 
 		LOG.debug("load keystore");
-		InputStream keyStoreStream;
-		try {
-			keyStoreStream = new FileInputStream(path);
-		} catch (FileNotFoundException e) {
-			throw new KeyStoreLoadException(
-					"Can't load keystore from config-specified location: "
-							+ path, e);
+		InputStream keyStoreStream = null;
+
+		if (type.equals(KeyStoreType.PKCS11)) {
+			Security.addProvider(new SunPKCS11(path));
+		} else {
+			try {
+				keyStoreStream = new FileInputStream(path);
+			} catch (FileNotFoundException e) {
+				throw new KeyStoreLoadException(
+						"Can't load keystore from config-specified location: "
+								+ path, e);
+			}
 		}
 
 		/* Find the keystore. */

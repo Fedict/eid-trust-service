@@ -185,8 +185,10 @@ public class WSSecurityServerHandler implements SOAPHandler<SOAPMessageContext> 
 				wsSecSignature.computeSignature();
 
 			} catch (WSSecurityException e) {
+				trustService.logAudit("WS-Security error: " + e.getMessage());
 				throw new RuntimeException("WSS4J error: " + e.getMessage(), e);
 			} catch (KeyStoreLoadException e) {
+				trustService.logAudit("Load keystore error: " + e.getMessage());
 				throw new RuntimeException("Failed to laod keystore: "
 						+ e.getMessage(), e);
 			}

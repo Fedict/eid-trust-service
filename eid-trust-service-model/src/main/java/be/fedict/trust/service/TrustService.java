@@ -35,6 +35,7 @@ import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.tsp.TimeStampToken;
 import org.bouncycastle.x509.X509V2AttributeCertificate;
 
+import be.fedict.trust.service.entity.AuditEntity;
 import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
@@ -96,4 +97,10 @@ public interface TrustService {
 	 */
 	WSSecurityConfigEntity getWsSecurityConfig();
 
+	/**
+	 * Log specified message in an {@link AuditEntity}.
+	 * 
+	 * @param message
+	 */
+	void logAudit(String message);
 }

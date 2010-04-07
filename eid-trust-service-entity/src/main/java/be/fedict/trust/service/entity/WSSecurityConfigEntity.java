@@ -35,6 +35,7 @@ public class WSSecurityConfigEntity implements Serializable {
 	private String name;
 
 	private boolean signing;
+
 	private KeyStoreType keyStoreType;
 	private String keyStorePath;
 	private String keyStorePassword;

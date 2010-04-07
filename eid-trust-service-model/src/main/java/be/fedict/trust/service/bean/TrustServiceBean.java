@@ -622,4 +622,12 @@ public class TrustServiceBean implements TrustService {
 
 		return this.configurationDAO.getWSSecurityConfig();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void logAudit(String message) {
+
+		this.auditDAO.logAudit(message);
+	}
 }

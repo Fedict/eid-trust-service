@@ -20,5 +20,5 @@ package be.fedict.trust.service.entity;
 
 public enum KeyStoreType {
 
-	JKS, PKCS12;
+	JKS, PKCS12, PKCS11;
 }
