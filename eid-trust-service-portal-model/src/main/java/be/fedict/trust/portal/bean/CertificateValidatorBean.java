@@ -36,6 +36,7 @@ import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
 
 import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
+import be.fedict.trust.TrustLinkerResult;
 import be.fedict.trust.portal.CertificateValidator;
 import be.fedict.trust.portal.PortalConstants;
 import be.fedict.trust.service.TrustService;
@@ -135,5 +136,15 @@ public class CertificateValidatorBean implements CertificateValidator {
 	public boolean isSigningValid() {
 
 		return this.signResult.isValid();
+	}
+
+	public TrustLinkerResult getAuthnResult() {
+
+		return this.authnResult.getResult();
+	}
+
+	public TrustLinkerResult getSigningResult() {
+
+		return this.signResult.getResult();
 	}
 }

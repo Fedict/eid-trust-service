@@ -56,4 +56,9 @@ public class ValidationResult {
 
 		return this.revocationData;
 	}
+
+	public TrustLinkerResult getResult() {
+
+		return this.result;
+	}
 }

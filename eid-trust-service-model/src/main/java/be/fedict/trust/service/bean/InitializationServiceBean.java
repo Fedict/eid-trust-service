@@ -101,10 +101,10 @@ public class InitializationServiceBean implements InitializationService {
 		if (null == this.localizationDAO
 				.findLocalization(TrustServiceConstants.INFO_MESSAGE_KEY)) {
 			Map<Locale, String> texts = new HashMap<Locale, String>();
-			texts.put(Locale.ENGLISH, "English info");
-			texts.put(new Locale("nl"), "Nederlandse info");
-			texts.put(Locale.FRENCH, "Info français");
-			texts.put(Locale.GERMAN, "Deutsch info");
+			texts.put(Locale.ENGLISH, "");
+			texts.put(new Locale("nl"), "");
+			texts.put(Locale.FRENCH, "");
+			texts.put(Locale.GERMAN, "");
 			this.localizationDAO.addLocalization("info", texts);
 		}
 	}

@@ -20,6 +20,8 @@ package be.fedict.trust.portal;
 
 import javax.ejb.Local;
 
+import be.fedict.trust.TrustLinkerResult;
+
 @Local
 public interface CertificateValidator {
 
@@ -36,4 +38,8 @@ public interface CertificateValidator {
 	boolean isAuthnValid();
 
 	boolean isSigningValid();
+
+	TrustLinkerResult getAuthnResult();
+
+	TrustLinkerResult getSigningResult();
 }
