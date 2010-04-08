@@ -11,10 +11,22 @@
 		<meta http-equiv="pragma" content="no-cache" />
 		<title>#{messages.title}</title>
 		<a4j:loadStyle src="/style.css" />
+
+		<script type="text/javascript">
+			function setClass(id, className) {
+			obj =
+			document.getElementById(id);
+			if (null != obj) {
+			obj.className =
+			className;
+			}
+			}		
+        </script>
+
 	</head>
 
 
-	<body>
+	<body onload="setClass('menu_item_#{activeMenu}', 'selected');">
 		<div id="header">
 
 			<div id="language">
@@ -38,35 +50,13 @@
 			<h:form>
 				<div id="menu">
 					<ul>
-						<c:choose>
-							<c:when test="#{activeMenu == 'main'}">
-								<li class="selected">
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
-								</li>
-							</c:when>
-							<c:otherwise>
-								<li>
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
-								</li>
-							</c:otherwise>
-						</c:choose>
-
-						<c:choose>
-							<c:when test="#{activeMenu == 'validate'}">
-								<li class="selected">
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/validate.seam">#{messages.validate}</a>
-								</li>
-							</c:when>
-							<c:otherwise>
-								<li>
-									<a
-										href="#{facesContext.externalContext.requestContextPath}/validate.seam">#{messages.validate}</a>
-								</li>
-							</c:otherwise>
-						</c:choose>
+						<li id="menu_item_main">
+							<a href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
+						</li>
+						<li id="menu_item_validate">
+							<a
+								href="#{facesContext.externalContext.requestContextPath}/validate.seam">#{messages.validate}</a>
+						</li>
 					</ul>
 				</div>
 			</h:form>

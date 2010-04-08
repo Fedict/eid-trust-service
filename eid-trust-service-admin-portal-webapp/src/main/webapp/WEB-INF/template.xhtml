@@ -11,9 +11,20 @@
 		<meta http-equiv="pragma" content="no-cache" />
 		<title>#{messages.title}</title>
 		<a4j:loadStyle src="/style.css" />
+
+		<script type="text/javascript">
+			function setClass(id, className) {
+			obj =
+			document.getElementById(id);
+			if (null != obj) {
+			obj.className =
+			className;
+			}
+			}		
+        </script>
 	</head>
 
-	<body>
+	<body onload="setClass('menu_item_#{activeMenu}', 'selected');">
 		<div id="header">
 
 			<div id="logo">
@@ -31,94 +42,34 @@
 					<ul>
 						<c:choose>
 							<c:when test="#{userId == null}">
-								<c:choose>
-									<c:when test="#{activeMenu == 'main'}">
-										<li class="selected">
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
-										</li>
-									</c:when>
-									<c:otherwise>
-										<li>
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
-										</li>
-									</c:otherwise>
-								</c:choose>
+								<li id="menu_item_main">
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
+								</li>
 							</c:when>
 						</c:choose>
 						<c:choose>
 							<c:when test="#{userId != null}">
-								<c:choose>
-									<c:when test="#{activeMenu == 'config'}">
-										<li class="selected">
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{messages.configuration}</a>
-										</li>
-									</c:when>
-									<c:otherwise>
-										<li>
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{messages.configuration}</a>
-										</li>
-									</c:otherwise>
-								</c:choose>
-								<c:choose>
-									<c:when test="#{activeMenu == 'virtual_domain'}">
-										<li class="selected">
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/virtual-trust-domain.seam">#{messages.virtualTrustDomains}</a>
-										</li>
-									</c:when>
-									<c:otherwise>
-										<li>
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/virtual-trust-domain.seam">#{messages.virtualTrustDomains}</a>
-										</li>
-									</c:otherwise>
-								</c:choose>
-								<c:choose>
-									<c:when test="#{activeMenu == 'domain'}">
-										<li class="selected">
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{messages.trustDomains}</a>
-										</li>
-									</c:when>
-									<c:otherwise>
-										<li>
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{messages.trustDomains}</a>
-										</li>
-									</c:otherwise>
-								</c:choose>
-								<c:choose>
-									<c:when test="#{activeMenu == 'trustpoint'}">
-										<li class="selected">
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/trust-point.seam">#{messages.trustPoints}</a>
-										</li>
-									</c:when>
-									<c:otherwise>
-										<li>
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/trust-point.seam">#{messages.trustPoints}</a>
-										</li>
-									</c:otherwise>
-								</c:choose>
-								<c:choose>
-									<c:when test="#{activeMenu == 'audit'}">
-										<li class="selected">
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/audit.seam">#{messages.audit}</a>
-										</li>
-									</c:when>
-									<c:otherwise>
-										<li>
-											<a
-												href="#{facesContext.externalContext.requestContextPath}/audit.seam">#{messages.audit}</a>
-										</li>
-									</c:otherwise>
-								</c:choose>
+								<li id="menu_item_config">
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/configuration.seam">#{messages.configuration}</a>
+								</li>
+								<li id="menu_item_virtual_domain">
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/virtual-trust-domain.seam">#{messages.virtualTrustDomains}</a>
+								</li>
+								<li id="menu_item_domain">
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/trust-domain.seam">#{messages.trustDomains}</a>
+								</li>
+								<li id="menu_item_trustpoint">
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/trust-point.seam">#{messages.trustPoints}</a>
+								</li>
+								<li id="menu_item_audit">
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/audit.seam">#{messages.audit}</a>
+								</li>
 							</c:when>
 						</c:choose>
 
