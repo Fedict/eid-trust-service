@@ -64,6 +64,7 @@ import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
+import be.fedict.trust.service.entity.constraints.TSAConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainAlreadyExistsException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
@@ -153,6 +154,7 @@ public class TrustDomainBean implements TrustDomain {
 	private byte[] certificateBytes;
 	private QCStatementsConstraintEntity qcConstraint;
 	private boolean qc;
+	private TSAConstraintEntity tsaConstraint;
 
 	/**
 	 * {@inheritDoc}
@@ -174,6 +176,7 @@ public class TrustDomainBean implements TrustDomain {
 		this.dn = null;
 		this.certificateBytes = null;
 		this.qcConstraint = null;
+		this.tsaConstraint = null;
 	}
 
 	/**
@@ -213,6 +216,8 @@ public class TrustDomainBean implements TrustDomain {
 			} else if (certificateConstraint instanceof QCStatementsConstraintEntity) {
 				this.qcConstraint = (QCStatementsConstraintEntity) certificateConstraint;
 				this.qc = this.qcConstraint.getQcComplianceFilter();
+			} else if (certificateConstraint instanceof TSAConstraintEntity) {
+				this.tsaConstraint = (TSAConstraintEntity) certificateConstraint;
 			}
 		}
 		return "modify";
@@ -630,7 +635,7 @@ public class TrustDomainBean implements TrustDomain {
 			this.log.debug("remove policy constraint: #0",
 					this.selectedPolicyConstraint.getPolicy());
 			this.trustDomainService
-					.removeCertificatePolicy(this.selectedPolicyConstraint);
+					.removeCertificateConstraint(this.selectedPolicyConstraint);
 			this.selectedTrustDomain.getCertificateConstraints().remove(
 					this.selectedPolicyConstraint);
 			constraintsPolicyFactory();
@@ -710,7 +715,7 @@ public class TrustDomainBean implements TrustDomain {
 			this.log.debug("remove key usage constraint: #0",
 					this.selectedKeyUsageConstraint.getKeyUsage());
 			this.trustDomainService
-					.removeKeyUsageConstraint(this.selectedKeyUsageConstraint);
+					.removeCertificateConstraint(this.selectedKeyUsageConstraint);
 			this.selectedTrustDomain.getCertificateConstraints().remove(
 					this.selectedKeyUsageConstraint);
 			constraintsKeyUsageFactory();
@@ -747,7 +752,8 @@ public class TrustDomainBean implements TrustDomain {
 
 		if (null != this.dnConstraint) {
 			this.log.debug("Remove DN Statements constraint");
-			this.trustDomainService.removeDNConstraint(this.dnConstraint);
+			this.trustDomainService
+					.removeCertificateConstraint(this.dnConstraint);
 			this.dnConstraint = null;
 			this.dn = null;
 		}
@@ -815,7 +821,7 @@ public class TrustDomainBean implements TrustDomain {
 					this.selectedEndEntityConstraint.getIssuerName(),
 					this.selectedEndEntityConstraint.getSerialNumber());
 			this.trustDomainService
-					.removeEndEntityConstraint(this.selectedEndEntityConstraint);
+					.removeCertificateConstraint(this.selectedEndEntityConstraint);
 			this.selectedTrustDomain.getCertificateConstraints().remove(
 					this.selectedEndEntityConstraint);
 			constraintsEndEntityFactory();
@@ -841,7 +847,8 @@ public class TrustDomainBean implements TrustDomain {
 
 		if (null != this.qcConstraint) {
 			this.log.debug("Remove QC Statements constraint");
-			this.trustDomainService.removeQCConstraint(this.qcConstraint);
+			this.trustDomainService
+					.removeCertificateConstraint(this.qcConstraint);
 			this.qcConstraint = null;
 		}
 		return "success";
@@ -855,6 +862,31 @@ public class TrustDomainBean implements TrustDomain {
 		this.log.debug("Save QC Statements constraint: #0", this.qc);
 		this.qcConstraint.setQcComplianceFilter(this.qc);
 		this.trustDomainService.saveQCConstraint(this.qcConstraint);
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String addConstraintTsa() {
+
+		this.log.debug("Add TSA constraint");
+		this.tsaConstraint = this.trustDomainService
+				.addTSAConstraint(this.selectedTrustDomain);
+		return "success";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String removeConstraintTsa() {
+
+		if (null != this.tsaConstraint) {
+			this.log.debug("Remove TSA constraint");
+			this.trustDomainService
+					.removeCertificateConstraint(this.tsaConstraint);
+			this.tsaConstraint = null;
+		}
 		return "success";
 	}
 
@@ -952,6 +984,14 @@ public class TrustDomainBean implements TrustDomain {
 	public QCStatementsConstraintEntity getQcConstraint() {
 
 		return this.qcConstraint;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public TSAConstraintEntity getTsaConstraint() {
+
+		return this.tsaConstraint;
 	}
 
 	/**

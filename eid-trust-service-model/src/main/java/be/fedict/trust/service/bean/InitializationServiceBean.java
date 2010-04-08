@@ -330,6 +330,9 @@ public class InitializationServiceBean implements InitializationService {
 					.addTrustDomain(TrustServiceConstants.BELGIAN_TSA_TRUST_DOMAIN);
 		}
 		trustDomain.setTrustPoints(trustPoints);
+
+		// Add TSA certificate constraint
+		this.trustDomainDAO.addTSAConstraint(trustDomain);
 	}
 
 	private void initTrustPointScheduling(TrustPointEntity trustPoint) {

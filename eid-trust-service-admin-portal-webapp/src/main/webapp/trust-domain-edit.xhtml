@@ -219,6 +219,23 @@
 
 					</rich:tab>
 
+					<rich:tab label="#{messages.certificateConstraintTSA}">
+
+						<a4j:form id="tsa_form" ajaxSubmit="true" reRender="tsa_group">
+							<h:panelGroup id="tsa_group" layout="block">
+								<h:panelGrid columns="2" border="0">
+									<h:outputLabel value="#{messages.certificateConstraintTSAInfo}" />
+									<h:commandButton action="#{ts_trustDomain.addConstraintTsa}"
+										id="add_tsa" value="#{messages.add}" rendered="#{empty ts_trustDomain.tsaConstraint}" />
+									<h:commandButton action="#{ts_trustDomain.removeConstraintTsa}"
+										id="remove_tsa" value="#{messages.remove}" rendered="#{!empty ts_trustDomain.tsaConstraint}"
+										immediate="true" />
+								</h:panelGrid>
+							</h:panelGroup>
+						</a4j:form>
+
+					</rich:tab>
+
 				</rich:tabPanel>
 
 				<h:messages globalOnly="true" styleClass="error" />

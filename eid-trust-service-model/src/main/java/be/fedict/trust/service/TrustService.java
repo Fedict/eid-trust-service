@@ -79,8 +79,15 @@ public interface TrustService {
 	/**
 	 * Validate the specified encoded {@link TimeStampToken} against the
 	 * specified trust domain
+	 * 
+	 * @param timestampToken
+	 *            encoded {@link TimeStampToken}.
+	 * @param returnRevocationData
+	 *            if true, used revocation data will be filled in in the
+	 *            {@link ValidationResult} and no caching will be used.
 	 */
-	ValidationResult validateTimestamp(String trustDomain, byte[] timestampToken)
+	ValidationResult validateTimestamp(String trustDomain,
+			byte[] timestampToken, boolean returnRevocationDate)
 			throws TSPException, IOException, CMSException,
 			NoSuchAlgorithmException, NoSuchProviderException,
 			CertStoreException, TrustDomainNotFoundException;

@@ -34,6 +34,7 @@ import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
+import be.fedict.trust.service.entity.constraints.TSAConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
@@ -59,26 +60,18 @@ public interface TrustDomainDAO {
 	/**
 	 * Returns list of {@link TrustDomainEntity}'s containing the specified
 	 * {@link TrustPointEntity}.
-	 * 
-	 * @param trustPoint
 	 */
 	List<TrustDomainEntity> listTrustDomains(TrustPointEntity trustPoint);
 
 	/**
 	 * Return {@link TrustDomainEntity} from specified name. Returns
 	 * <code>null</code> if not found.
-	 * 
-	 * @param name
 	 */
 	TrustDomainEntity findTrustDomain(String name);
 
 	/**
 	 * Returns {@link TrustDomainEntity} from specified name. Throws
 	 * {@link TrustDomainNotFoundException} if not found.
-	 * 
-	 * @param name
-	 * 
-	 * @throws TrustDomainNotFoundException
 	 */
 	TrustDomainEntity getTrustDomain(String name)
 			throws TrustDomainNotFoundException;
@@ -86,54 +79,38 @@ public interface TrustDomainDAO {
 	/**
 	 * Return {@link VirtualTrustDomainEntity} from specified name. Returns
 	 * <code>null</code> if not found.
-	 * 
-	 * @param name
 	 */
 	VirtualTrustDomainEntity findVirtualTrustDomain(String name);
 
 	/**
 	 * Returns {@link VirtualTrustDomainEntity} from specified name. Throws
 	 * {@link TrustDomainNotFoundException} if not found.
-	 * 
-	 * @param name
-	 * 
-	 * @throws VirtualTrustDomainNotFoundException
 	 */
 	VirtualTrustDomainEntity getVirtualTrustDomain(String name)
 			throws VirtualTrustDomainNotFoundException;
 
 	/**
 	 * Create a new {@link TrustDomainEntity}.
-	 * 
-	 * @param name
 	 */
 	TrustDomainEntity addTrustDomain(String name);
 
 	/**
 	 * Create a new {@link VirtualTrustDomainEntity}.
-	 * 
-	 * @param name
 	 */
 	VirtualTrustDomainEntity addVirtualTrustDomain(String name);
 
 	/**
 	 * Remove the specified {@link TrustDomainEntity}.
-	 * 
-	 * @param trustDomain
 	 */
 	void removeTrustDomain(TrustDomainEntity trustDomain);
 
 	/**
 	 * Remove the specified {@link VirtualTrustDomainEntity}.
-	 * 
-	 * @param virtualTrustDomain
 	 */
 	void removeVirtualTrustDomain(VirtualTrustDomainEntity virtualTrustDomain);
 
 	/**
 	 * Sets the {@link TrustDomainEntity} as default.
-	 * 
-	 * @param trustDomain
 	 */
 	void setDefaultTrustDomain(TrustDomainEntity trustDomain);
 
@@ -144,9 +121,6 @@ public interface TrustDomainDAO {
 
 	/**
 	 * Create a new {@link TrustPointEntity}.
-	 * 
-	 * @param crlRefreshCron
-	 * @param ca
 	 */
 	TrustPointEntity addTrustPoint(String crlRefreshCron,
 			CertificateAuthorityEntity ca);
@@ -159,17 +133,12 @@ public interface TrustDomainDAO {
 	/**
 	 * Returns list of {@link TrustPointEntity}'s attached to the specified
 	 * {@link TrustDomainEntity}.
-	 * 
-	 * @param trustDomain
 	 */
 	List<TrustPointEntity> listTrustPoints(TrustDomainEntity trustDomain);
 
 	/**
 	 * Returns list of {@link TrustPointEntity}'s attached to the specified
 	 * {@link TrustDomainEntity} specified by trust domain name.
-	 * 
-	 * @param trustDomainName
-	 * @throws TrustDomainNotFoundException
 	 */
 	List<TrustPointEntity> listTrustPoints(String trustDomainName)
 			throws TrustDomainNotFoundException;
@@ -177,41 +146,29 @@ public interface TrustDomainDAO {
 	/**
 	 * Returns list of {@link CertificateAuthorityEntity}'s for the specified
 	 * {@link TrustPointEntity}.
-	 * 
-	 * @param trustPoint
 	 */
 	List<CertificateAuthorityEntity> listCertificateAuthorities(
 			TrustPointEntity trustPoint);
 
 	/**
 	 * Removes the selected {@link TrustPointEntity}.
-	 * 
-	 * @param trustPoint
 	 */
 	void removeTrustPoint(TrustPointEntity trustPoint);
 
 	/**
 	 * Returns the attached {@link TrustPointEntity}.
-	 * 
-	 * @param trustPoint
-	 * @return
 	 */
 	TrustPointEntity attachTrustPoint(TrustPointEntity trustPoint);
 
 	/**
 	 * Add a new {@link PolicyConstraintEntity} to the {@link TrustDomainEntity}
 	 * 's list of certificate contraints.
-	 * 
-	 * @param trustDomain
-	 * @param policy
 	 */
 	PolicyConstraintEntity addCertificatePolicy(TrustDomainEntity trustDomain,
 			String policy);
 
 	/**
 	 * Removes the specified {@link CertificateConstraintEntity}.
-	 * 
-	 * @param certificateConstraint
 	 */
 	void removeCertificateConstraint(
 			CertificateConstraintEntity certificateConstraint);
@@ -219,9 +176,6 @@ public interface TrustDomainDAO {
 	/**
 	 * Add a new {@link EndEntityConstraintEntity} to the
 	 * {@link TrustDomainEntity}'s list of certificate contraints.
-	 * 
-	 * @param trustDomain
-	 * @param certificate
 	 */
 	EndEntityConstraintEntity addEndEntityConstraint(
 			TrustDomainEntity trustDomain, X509Certificate certificate);
@@ -229,10 +183,6 @@ public interface TrustDomainDAO {
 	/**
 	 * Add a new {@link KeyUsageConstraintEntity} to the
 	 * {@link TrustDomainEntity}'s list of certificate contraints.
-	 * 
-	 * @param trustDomain
-	 * @param keyUsageType
-	 * @param allowed
 	 */
 	KeyUsageConstraintEntity addKeyUsageConstraint(
 			TrustDomainEntity trustDomain, KeyUsageType keyUsageType,
@@ -241,9 +191,6 @@ public interface TrustDomainDAO {
 	/**
 	 * Add a new {@link QCStatementsConstraintEntity} to the
 	 * {@link TrustDomainEntity}'s list of certificate contraints.
-	 * 
-	 * @param trustDomain
-	 * @param qcComplianceFilter
 	 */
 	QCStatementsConstraintEntity addQCStatementsConstraint(
 			TrustDomainEntity trustDomain, boolean qcComplianceFilter);
@@ -251,34 +198,24 @@ public interface TrustDomainDAO {
 	/**
 	 * Add a new {@link DNConstraintEntity} to the {@link TrustDomainEntity}'s
 	 * list of certificate contraints.
-	 * 
-	 * @param trustDomain
-	 * @param dn
 	 */
 	DNConstraintEntity addDNConstraint(TrustDomainEntity trustDomain, String dn);
 
 	/**
+	 * Add a new {@link TSAConstraintEntity} to the {@link TrustDomainEntity}'s
+	 * list of certificate constraints.
+	 */
+	TSAConstraintEntity addTSAConstraint(TrustDomainEntity trustDomain);
+
+	/**
 	 * Returns the {@link TrustPointEntity} from the specified name. Returns
 	 * <code>null</code> if not found.
-	 * 
-	 * @param name
 	 */
 	TrustPointEntity findTrustPoint(String name);
 
 	/**
-	 * Remove the possible {@link DNConstraintEntity} attached to the specified
-	 * {@link TrustDomainEntity}.
-	 * 
-	 * @param trustDomain
-	 */
-	void removeDNConstraint(TrustDomainEntity trustDomain);
-
-	/**
 	 * Returns the attached {@link CertificateConstraintEntity}.
-	 * 
-	 * @param certificateConstraint
 	 */
 	CertificateConstraintEntity findCertificateConstraint(
 			CertificateConstraintEntity certificateConstraint);
-
 }

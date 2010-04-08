@@ -42,6 +42,7 @@ import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
+import be.fedict.trust.service.entity.constraints.TSAConstraintEntity;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
@@ -368,22 +369,6 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeKeyUsageConstraint(
-			KeyUsageConstraintEntity keyUsageConstraint) {
-
-		KeyUsageConstraintEntity attachedKeyUsageConstraint = this.entityManager
-				.find(KeyUsageConstraintEntity.class, keyUsageConstraint
-						.getId());
-		attachedKeyUsageConstraint.getTrustDomain().getCertificateConstraints()
-				.remove(keyUsageConstraint);
-		attachedKeyUsageConstraint.setTrustDomain(null);
-		this.entityManager.flush();
-		this.entityManager.remove(attachedKeyUsageConstraint);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public QCStatementsConstraintEntity addQCStatementsConstraint(
 			TrustDomainEntity trustDomain, boolean qcComplianceFilter) {
 
@@ -415,34 +400,23 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	public TrustPointEntity findTrustPoint(String name) {
+	public TSAConstraintEntity addTSAConstraint(TrustDomainEntity trustDomain) {
 
-		LOG.debug("find trust point: " + name);
-		return this.entityManager.find(TrustPointEntity.class, name);
+		TSAConstraintEntity tsaConstraint = new TSAConstraintEntity(trustDomain);
+		this.entityManager.persist(tsaConstraint);
+		TrustDomainEntity attachedTrustDomain = findTrustDomain(trustDomain
+				.getName());
+		attachedTrustDomain.getCertificateConstraints().add(tsaConstraint);
+		return tsaConstraint;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeDNConstraint(TrustDomainEntity trustDomain) {
+	public TrustPointEntity findTrustPoint(String name) {
 
-		TrustDomainEntity attachedTrustDomain = findTrustDomain(trustDomain
-				.getName());
-		DNConstraintEntity dnConstraint = null;
-		for (CertificateConstraintEntity certificateConstraint : attachedTrustDomain
-				.getCertificateConstraints()) {
-			if (certificateConstraint instanceof DNConstraintEntity) {
-				dnConstraint = (DNConstraintEntity) certificateConstraint;
-			}
-		}
-		if (null != dnConstraint) {
-			LOG.debug("remove DN constraint: " + dnConstraint.getDn());
-			dnConstraint.getTrustDomain().getCertificateConstraints().remove(
-					dnConstraint);
-			dnConstraint.setTrustDomain(null);
-			this.entityManager.flush();
-			this.entityManager.remove(dnConstraint);
-		}
+		LOG.debug("find trust point: " + name);
+		return this.entityManager.find(TrustPointEntity.class, name);
 	}
 
 	/**

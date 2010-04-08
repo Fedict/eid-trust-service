@@ -23,11 +23,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertStore;
 import java.security.cert.CertStoreException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -45,7 +49,9 @@ import javax.persistence.PersistenceContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.tsp.TSPException;
+import org.bouncycastle.tsp.TimeStampToken;
 
 import be.fedict.trust.CertificateRepository;
 import be.fedict.trust.FallbackTrustLinker;
@@ -220,20 +226,43 @@ public class TrustServiceBean implements TrustService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE_TSA)
 	public ValidationResult validateTimestamp(String trustDomainName,
-			byte[] encodedTimestampToken) throws TSPException, IOException,
-			CMSException, NoSuchAlgorithmException, NoSuchProviderException,
+			byte[] encodedTimestampToken, boolean returnRevocationData)
+			throws TSPException, IOException, CMSException,
+			NoSuchAlgorithmException, NoSuchProviderException,
 			CertStoreException, TrustDomainNotFoundException {
 
 		LOG.debug("validate timestamp token");
 
+		/*
+		 * Parse embedded certificate chain
+		 */
+		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
+		TimeStampToken timestampToken = new TimeStampToken(new CMSSignedData(
+				encodedTimestampToken));
+		CertStore certStore = timestampToken.getCertificatesAndCRLs(
+				"Collection", "BC");
+		Collection<? extends Certificate> certificates = certStore
+				.getCertificates(null);
+		for (Certificate certificate : certificates) {
+			certificateChain.add((X509Certificate) certificate);
+		}
+
+		if (TrustValidator.isSelfSigned(certificateChain.get(0))) {
+			Collections.reverse(certificateChain);
+		}
+
+		/*
+		 * Validate
+		 */
 		TrustLinkerResult lastResult = null;
 		RevocationData lastRevocationData = null;
 		for (TrustDomainEntity trustDomain : getTrustDomains(trustDomainName)) {
 
-			TrustValidator trustValidator = getTSATrustValidator(trustDomain);
+			TrustValidator trustValidator = getTrustValidator(trustDomain,
+					returnRevocationData);
 
 			try {
-				trustValidator.isTrusted(encodedTimestampToken);
+				trustValidator.isTrusted(certificateChain);
 			} catch (CertPathValidatorException e) {
 			}
 
@@ -334,36 +363,6 @@ public class TrustServiceBean implements TrustService {
 						return certificateChain.contains(certificate);
 					}
 				});
-
-		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
-
-		OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
-				networkConfig);
-
-		OnlineCrlRepository crlRepository = new OnlineCrlRepository(
-				networkConfig);
-		CachedCrlRepository cachedCrlRepository = new CachedCrlRepository(
-				crlRepository);
-
-		FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
-		fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(ocspRepository));
-		fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(
-				cachedCrlRepository));
-
-		trustValidator.addTrustLinker(fallbackTrustLinker);
-
-		return trustValidator;
-	}
-
-	private TrustValidator getTSATrustValidator(TrustDomainEntity trustDomain) {
-
-		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
-
-		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(
-				trustDomain);
-
-		TrustValidator trustValidator = new TrustValidator(
-				certificateRepository);
 
 		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
 

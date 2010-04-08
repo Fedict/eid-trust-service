@@ -45,12 +45,14 @@ import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
+import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
+import be.fedict.trust.service.entity.constraints.TSAConstraintEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainAlreadyExistsException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
@@ -361,17 +363,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 * {@inheritDoc}
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void removeCertificatePolicy(PolicyConstraintEntity certificatePolicy) {
-
-		LOG.debug("remove certificate policy \""
-				+ certificatePolicy.getPolicy() + "\"");
-		this.trustDomainDAO.removeCertificateConstraint(certificatePolicy);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public KeyUsageConstraintEntity addKeyUsageConstraint(
 			TrustDomainEntity trustDomain, KeyUsageType keyUsage,
 			boolean allowed) {
@@ -380,18 +371,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
 				+ allowed);
 		return this.trustDomainDAO.addKeyUsageConstraint(trustDomain, keyUsage,
 				allowed);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void removeKeyUsageConstraint(
-			KeyUsageConstraintEntity keyUsageConstraint) {
-
-		LOG.debug("remove key usage constraint "
-				+ keyUsageConstraint.getKeyUsage());
-		this.trustDomainDAO.removeCertificateConstraint(keyUsageConstraint);
 	}
 
 	/**
@@ -425,16 +404,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 * {@inheritDoc}
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void removeDNConstraint(DNConstraintEntity dnConstraint) {
-
-		LOG.debug("Remove DN constraint");
-		this.trustDomainDAO.removeCertificateConstraint(dnConstraint);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public void saveDNConstraint(DNConstraintEntity dnConstraint) {
 
 		LOG.debug("Save DN constraint: " + dnConstraint);
@@ -460,32 +429,11 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	 * {@inheritDoc}
 	 */
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void removeEndEntityConstraint(
-			EndEntityConstraintEntity endEntityConstraint) {
-
-		LOG.debug("remove end entity constraint");
-		this.trustDomainDAO.removeCertificateConstraint(endEntityConstraint);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public QCStatementsConstraintEntity addQCConstraint(
 			TrustDomainEntity trustDomain, boolean qc) {
 
 		LOG.debug("Add QC constraint: " + qc);
 		return this.trustDomainDAO.addQCStatementsConstraint(trustDomain, qc);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void removeQCConstraint(QCStatementsConstraintEntity qcConstraint) {
-
-		LOG.debug("Remove QC constraint");
-		this.trustDomainDAO.removeCertificateConstraint(qcConstraint);
 	}
 
 	/**
@@ -499,6 +447,29 @@ public class TrustDomainServiceBean implements TrustDomainService {
 				.findCertificateConstraint(qcConstraint);
 		attachedQcStatementsConstraint.setQcComplianceFilter(qcConstraint
 				.getQcComplianceFilter());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public TSAConstraintEntity addTSAConstraint(TrustDomainEntity trustDomain) {
+
+		LOG.debug("Add TSA constraint");
+		return this.trustDomainDAO.addTSAConstraint(trustDomain);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+	public void removeCertificateConstraint(
+			CertificateConstraintEntity certificateConstraint) {
+
+		LOG.debug("Remove certificate constraint: "
+				+ certificateConstraint.getClass());
+		this.trustDomainDAO.removeCertificateConstraint(certificateConstraint);
+
 	}
 
 	/**

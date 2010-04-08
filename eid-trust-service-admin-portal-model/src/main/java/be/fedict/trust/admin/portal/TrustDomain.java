@@ -32,6 +32,7 @@ import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
+import be.fedict.trust.service.entity.constraints.TSAConstraintEntity;
 
 @Local
 public interface TrustDomain {
@@ -107,6 +108,8 @@ public interface TrustDomain {
 
 	QCStatementsConstraintEntity getQcConstraint();
 
+	TSAConstraintEntity getTsaConstraint();
+
 	/*
 	 * Actions
 	 */
@@ -169,6 +172,10 @@ public interface TrustDomain {
 	String saveConstraintQc();
 
 	String removeConstraintQc();
+
+	String addConstraintTsa();
+
+	String removeConstraintTsa();
 
 	/*
 	 * Richfaces tree

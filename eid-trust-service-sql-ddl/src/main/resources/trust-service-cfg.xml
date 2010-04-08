@@ -17,3 +17,4 @@
 <mapping class="be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity" />
 <mapping class="be.fedict.trust.service.entity.constraints.PolicyConstraintEntity" />
 <mapping class="be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity" />
+<mapping class="be.fedict.trust.service.entity.constraints.TSAConstraintEntity" />
