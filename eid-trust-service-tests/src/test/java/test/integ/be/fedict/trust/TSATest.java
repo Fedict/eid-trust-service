@@ -52,7 +52,7 @@ public class TSATest {
 
 	private static final Log LOG = LogFactory.getLog(TSATest.class);
 
-	private static final String location = "http://sebeco-dev-11:8080";
+	private static final String location = "http://localhost:8080";
 	private static final String tsa_location = "http://tsa.belgium.be/connect";
 
 	@Before

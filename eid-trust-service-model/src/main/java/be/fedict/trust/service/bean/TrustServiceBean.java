@@ -202,7 +202,7 @@ public class TrustServiceBean implements TrustService {
 					ocspResponses, crls);
 
 			try {
-				trustValidator.isTrusted(certificateChain);
+				trustValidator.isTrusted(certificateChain, validationDate);
 			} catch (CertPathValidatorException e) {
 			}
 
