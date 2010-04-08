@@ -1,9 +1,4 @@
-<?xml version="1.0"?>
-<!DOCTYPE schema [
-  <!--  The URI for the XKMS namespace, and also the base URI used for
-        URI's defined by the specification. -->
-  <!ENTITY xkms 'http://www.w3.org/2002/03/xkms#'>
-]>
+<?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns:xkms="http://www.w3.org/2002/03/xkms#" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
 	xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www.w3.org/2002/03/xkms#" elementFormDefault="qualified"
