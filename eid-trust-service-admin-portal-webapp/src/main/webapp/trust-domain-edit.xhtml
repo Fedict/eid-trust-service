@@ -18,8 +18,8 @@
 								value="#{selectedTrustDomain.useCaching}" />
 							<h:message for="cache" styleClass="error" />
 						</s:decorate>
-						<h:commandButton action="#{ts_trustDomain.save}" id="save"
-							value="#{messages.save}" />
+						<h:commandButton action="#{ts_trustDomain.save}"
+							id="save" value="#{messages.save}" />
 					</h:panelGrid>
 
 					<h3>#{messages.trustPoints}</h3>
@@ -40,8 +40,8 @@
 					<h:commandButton action="#{ts_trustDomain.selectTrustPoints}"
 						id="select" value="#{messages.select}" immediate="true"
 						styleClass="submit" />
-					<h:commandButton action="#{ts_trustDomain.back}" id="back"
-						value="#{messages.back}" immediate="true" styleClass="submit" />
+					<h:commandButton action="#{ts_trustDomain.back}"
+						id="back" value="#{messages.back}" immediate="true" styleClass="submit" />
 
 				</h:form>
 
@@ -70,8 +70,8 @@
 								<h:outputLabel for="policy"
 									value="#{messages.certificateConstraintPolicy}" />
 								<s:decorate>
-									<h:inputText id="policy" value="#{ts_trustDomain.certificatePolicy}"
-										required="true" />
+									<h:inputText id="policy"
+										value="#{ts_trustDomain.certificatePolicy}" required="true" />
 									<h:message for="policy" styleClass="error" />
 								</s:decorate>
 								<h:commandButton action="#{ts_trustDomain.addConstraintPolicy}"
@@ -83,129 +83,139 @@
 					</rich:tab>
 					<rich:tab label="#{messages.certificateConstraintKeyUsage}">
 
-						<h:form id="key_usage_form">
-							<rich:dataTable id="key_usage_data" var="item"
-								value="#{constraintsKeyUsage}">
-								<h:column>
-									<f:facet name="header">#{messages.certificateConstraintKeyUsage}</f:facet>
-									<h:outputText value="#{item.keyUsage}" />
-								</h:column>
-								<h:column>
-									<f:facet name="header">#{messages.allowed}</f:facet>
-									<h:selectBooleanCheckbox value="#{item.allowed}" />
-								</h:column>
-								<h:column>
-									<f:facet name="header">#{messages.remove}</f:facet>
-									<h:commandLink value="#{messages.remove}"
-										action="#{ts_trustDomain.removeConstraintKeyUsage}" immediate="true" />
-								</h:column>
-							</rich:dataTable>
-							<h:commandLink value="#{messages.save}"
-								action="#{ts_trustDomain.saveConstraintKeyUsage}" />
+						<a4j:form id="key_usage_form" ajaxSubmit="true"
+							reRender="key_usage_group">
+							<h:panelGroup id="key_usage_group" layout="block">
+								<rich:dataTable id="key_usage_data" var="item"
+									value="#{constraintsKeyUsage}">
+									<h:column>
+										<f:facet name="header">#{messages.certificateConstraintKeyUsage}</f:facet>
+										<h:outputText value="#{item.keyUsage}" />
+									</h:column>
+									<h:column>
+										<f:facet name="header">#{messages.allowed}</f:facet>
+										<h:selectBooleanCheckbox value="#{item.allowed}" />
+									</h:column>
+									<h:column>
+										<f:facet name="header">#{messages.remove}</f:facet>
+										<h:commandLink value="#{messages.remove}"
+											action="#{ts_trustDomain.removeConstraintKeyUsage}"
+											immediate="true" />
+									</h:column>
+								</rich:dataTable>
+								<h:commandLink value="#{messages.save}"
+									action="#{ts_trustDomain.saveConstraintKeyUsage}" />
 
-							<br />
+								<br />
 
-							<h:panelGrid columns="2" border="0">
-								<h:outputLabel for="key_usage"
-									value="#{messages.certificateConstraintKeyUsage}" />
-								<s:decorate>
-									<h:selectOneMenu id="key_usage" value="#{ts_trustDomain.keyUsage}"
-										required="true">
-										<f:selectItems value="#{keyUsageTypes}" />
-									</h:selectOneMenu>
-									<h:message for="key_usage" styleClass="error" />
-								</s:decorate>
+								<h:panelGrid columns="2" border="0">
+									<h:outputLabel for="key_usage"
+										value="#{messages.certificateConstraintKeyUsage}" />
+									<s:decorate>
+										<h:selectOneMenu id="key_usage"
+											value="#{ts_trustDomain.keyUsage}" required="true">
+											<f:selectItems value="#{keyUsageTypes}" />
+										</h:selectOneMenu>
+										<h:message for="key_usage" styleClass="error" />
+									</s:decorate>
 
-								<h:outputLabel for="allowed" value="#{messages.allowed}" />
-								<h:selectBooleanCheckbox value="#{ts_trustDomain.allowed}"
-									id="allowed" />
+									<h:outputLabel for="allowed" value="#{messages.allowed}" />
+									<h:selectBooleanCheckbox value="#{ts_trustDomain.allowed}"
+										id="allowed" />
 
-								<h:commandButton action="#{ts_trustDomain.addConstraintKeyUsage}"
-									id="add_key_usage" value="#{messages.add}" />
-							</h:panelGrid>
-
-						</h:form>
+									<h:commandButton action="#{ts_trustDomain.addConstraintKeyUsage}"
+										id="add_key_usage" value="#{messages.add}" />
+								</h:panelGrid>
+							</h:panelGroup>
+						</a4j:form>
 
 					</rich:tab>
 					<rich:tab label="#{messages.certificateConstraintDN}">
 
-						<h:form id="dn_form">
-							<h:panelGrid columns="3" border="0">
-								<h:outputLabel for="dn"
-									value="#{messages.certificateConstraintDN}" />
-								<s:decorate>
-									<h:inputText id="dn" value="#{ts_trustDomain.dn}"
-										required="true" />
-									<h:message for="dn" styleClass="error" />
-								</s:decorate>
-								<h:commandButton action="#{ts_trustDomain.addConstraintDn}"
-									id="add_dn" value="#{messages.add}" rendered="#{empty ts_trustDomain.dnConstraint}" />
-								<h:commandButton action="#{ts_trustDomain.saveConstraintDn}"
-									id="save_dn" value="#{messages.save}" rendered="#{!empty ts_trustDomain.dnConstraint}" />
-								<h:commandButton action="#{ts_trustDomain.removeConstraintDn}"
-									id="remove_dnc" value="#{messages.remove}" rendered="#{!empty ts_trustDomain.dnConstraint}"
-									immediate="true" />
-							</h:panelGrid>
-						</h:form>
+						<a4j:form id="dn_form" ajaxSubmit="true" reRender="dn_group">
+							<h:panelGroup id="dn_group" layout="block">
+								<h:panelGrid columns="3" border="0">
+									<h:outputLabel for="dn"
+										value="#{messages.certificateConstraintDN}" />
+									<s:decorate>
+										<h:inputText id="dn" value="#{ts_trustDomain.dn}"
+											required="true" />
+										<h:message for="dn" styleClass="error" />
+									</s:decorate>
+									<h:commandButton action="#{ts_trustDomain.addConstraintDn}"
+										id="add_dn" value="#{messages.add}" rendered="#{empty ts_trustDomain.dnConstraint}" />
+									<h:commandButton action="#{ts_trustDomain.saveConstraintDn}"
+										id="save_dn" value="#{messages.save}" rendered="#{!empty ts_trustDomain.dnConstraint}" />
+									<h:commandButton action="#{ts_trustDomain.removeConstraintDn}"
+										id="remove_dnc" value="#{messages.remove}" rendered="#{!empty ts_trustDomain.dnConstraint}"
+										immediate="true" />
+								</h:panelGrid>
+							</h:panelGroup>
+						</a4j:form>
 
 					</rich:tab>
 					<rich:tab label="#{messages.certificateConstraintEndEntity}">
 
-						<h:form id="end_entity_form">
+						<a4j:form id="end_entity_form" ajaxSubmit="true"
+							reRender="end_entity_group">
+							<h:panelGroup id="end_entity_group" layout="block">
 
-							<rich:dataTable id="end_entity_data" var="item"
-								value="#{constraintsEndEntity}">
-								<h:column>
-									<f:facet name="header">#{messages.issuer}</f:facet>
-									<h:outputText value="#{item.issuerName}" />
-								</h:column>
-								<h:column>
-									<f:facet name="header">#{messages.serialNumber}</f:facet>
-									<h:outputText value="#{item.serialNumber}" />
-								</h:column>
-								<h:column>
-									<f:facet name="header">#{messages.remove}</f:facet>
-									<h:commandLink value="#{messages.remove}"
-										action="#{ts_trustDomain.removeConstraintEndEntity}" immediate="true" />
-								</h:column>
-							</rich:dataTable>
+								<rich:dataTable id="end_entity_data" var="item"
+									value="#{constraintsEndEntity}">
+									<h:column>
+										<f:facet name="header">#{messages.issuer}</f:facet>
+										<h:outputText value="#{item.issuerName}" />
+									</h:column>
+									<h:column>
+										<f:facet name="header">#{messages.serialNumber}</f:facet>
+										<h:outputText value="#{item.serialNumber}" />
+									</h:column>
+									<h:column>
+										<f:facet name="header">#{messages.remove}</f:facet>
+										<h:commandLink value="#{messages.remove}"
+											action="#{ts_trustDomain.removeConstraintEndEntity}"
+											immediate="true" />
+									</h:column>
+								</rich:dataTable>
 
-							<h:panelGrid columns="2" border="0">
+								<h:panelGrid columns="2" border="0">
 
-								<h:outputLabel for="certificate" value="#{messages.certificate}" />
+									<h:outputLabel for="certificate" value="#{messages.certificate}" />
 
-								<rich:fileUpload fileUploadListener="#{ts_trustDomain.uploadListener}"
-									maxFilesQuantity="1" id="upload" immediateUpload="true">
-								</rich:fileUpload>
+									<rich:fileUpload fileUploadListener="#{ts_trustDomain.uploadListener}"
+										maxFilesQuantity="1" id="upload" immediateUpload="true">
+									</rich:fileUpload>
 
-							</h:panelGrid>
-							<h:commandButton action="#{ts_trustDomain.addConstraintEndEntity}"
-								value="#{messages.add}" />
-
-						</h:form>
+								</h:panelGrid>
+								<h:commandButton action="#{ts_trustDomain.addConstraintEndEntity}"
+									value="#{messages.add}" />
+							</h:panelGroup>
+						</a4j:form>
 
 					</rich:tab>
 
 					<rich:tab label="#{messages.certificateConstraintQCStatements}">
 
-						<h:form id="qc_form">
-							<h:panelGrid columns="3" border="0">
-								<h:outputLabel for="qc"
-									value="#{messages.certificateConstraintQCStatements}" />
-								<s:decorate>
-									<h:selectBooleanCheckbox value="#{ts_trustDomain.qc}"
-										id="qc" />
-									<h:message for="qc" styleClass="error" />
-								</s:decorate>
-								<h:commandButton action="#{ts_trustDomain.addConstraintQc}"
-									id="add_qc" value="#{messages.add}" rendered="#{empty ts_trustDomain.qcConstraint}" />
-								<h:commandButton action="#{ts_trustDomain.saveConstraintQc}"
-									id="save_qc" value="#{messages.save}" rendered="#{!empty ts_trustDomain.qcConstraint}" />
-								<h:commandButton action="#{ts_trustDomain.removeConstraintQc}"
-									id="remove_qc" value="#{messages.remove}" rendered="#{!empty ts_trustDomain.qcConstraint}"
-									immediate="true" />
-							</h:panelGrid>
-						</h:form>
+						<a4j:form id="qc_form" ajaxSubmit="true" reRender="qc_group">
+							<h:panelGroup id="qc_group" layout="block">
+								<h:panelGrid columns="3" border="0">
+									<h:outputLabel for="qc"
+										value="#{messages.certificateConstraintQCStatements}" />
+									<s:decorate>
+										<h:selectBooleanCheckbox value="#{ts_trustDomain.qc}"
+											id="qc" />
+										<h:message for="qc" styleClass="error" />
+									</s:decorate>
+									<h:commandButton action="#{ts_trustDomain.addConstraintQc}"
+										id="add_qc" value="#{messages.add}" rendered="#{empty ts_trustDomain.qcConstraint}" />
+									<h:commandButton action="#{ts_trustDomain.saveConstraintQc}"
+										id="save_qc" value="#{messages.save}" rendered="#{!empty ts_trustDomain.qcConstraint}" />
+									<h:commandButton action="#{ts_trustDomain.removeConstraintQc}"
+										id="remove_qc" value="#{messages.remove}" rendered="#{!empty ts_trustDomain.qcConstraint}"
+										immediate="true" />
+								</h:panelGrid>
+							</h:panelGroup>
+						</a4j:form>
 
 					</rich:tab>
 

@@ -66,7 +66,7 @@
 					</rich:tab>
 
 					<rich:tab label="#{messages.wsSecurityConfig}">
-						<h:form id="wssec_form">
+						<a4j:form id="wssec_form" ajaxSubmit="true" reRender="panel">
 							<h:panelGrid id="panel" columns="2" border="1">
 
 								<h:outputLabel for="signing" value="#{messages.wsSecuritySigning}" />
@@ -126,12 +126,12 @@
 								</f:facet>
 							</h:panelGrid>
 							<h:messages globalOnly="true" styleClass="error" />
-						</h:form>
+						</a4j:form>
 					</rich:tab>
 
 
 					<rich:tab label="#{messages.networkConfig}">
-						<h:form id="network_form">
+						<a4j:form id="network_form" ajaxSubmit="true" reRender="panel">
 							<h:panelGrid id="panel" columns="2" border="1">
 
 								<h:outputLabel for="host" value="#{messages.proxyHost}" />
@@ -160,11 +160,12 @@
 								</f:facet>
 							</h:panelGrid>
 							<h:messages globalOnly="true" styleClass="error" />
-						</h:form>
+						</a4j:form>
 					</rich:tab>
 
 					<rich:tab label="#{messages.clockDriftDetection}">
-						<h:form id="clockdrift_form">
+						<a4j:form id="clockdrift_form" ajaxSubmit="true"
+							reRender="panel">
 							<h:panelGrid id="panel" columns="2" border="1">
 
 								<h:outputLabel for="protocol" value="#{messages.protocol}" />
@@ -217,7 +218,7 @@
 								</f:facet>
 							</h:panelGrid>
 							<h:messages globalOnly="true" styleClass="error" />
-						</h:form>
+						</a4j:form>
 					</rich:tab>
 
 					<rich:tab label="#{messages.informationMessage}">
