@@ -250,8 +250,9 @@ public class XKMSPortImpl implements XKMSPortType {
 						trustDomain, timestampToken, returnRevocationData);
 			} else if (!attributeCertificates.isEmpty()) {
 				validationResult = this.trustService
-						.validateAttributeCertificates(attributeCertificates,
-								certificateChain);
+						.validateAttributeCertificates(trustDomain,
+								attributeCertificates, certificateChain,
+								returnRevocationData);
 			} else if (null == validationDate) {
 				validationResult = this.trustService.validate(trustDomain,
 						certificateChain, returnRevocationData);

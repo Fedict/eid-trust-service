@@ -69,6 +69,9 @@ public interface TrustService {
 	/**
 	 * Checks whether the given certificate chain was valid at the specified
 	 * {@link Date}, using the specified revocation data.
+	 * 
+	 * @param trustDomain
+	 *            optional, can be null. If so default trust domain is taken.
 	 */
 	ValidationResult validate(String trustDomain,
 			List<X509Certificate> certificateChain, Date validationDate,
@@ -80,6 +83,8 @@ public interface TrustService {
 	 * Validate the specified encoded {@link TimeStampToken} against the
 	 * specified trust domain
 	 * 
+	 * @param trustDomain
+	 *            optional, can be null. If so default trust domain is taken.
 	 * @param timestampToken
 	 *            encoded {@link TimeStampToken}.
 	 * @param returnRevocationData
@@ -94,10 +99,19 @@ public interface TrustService {
 
 	/**
 	 * Validate the specified encoded {@link X509V2AttributeCertificate}'s.
+	 * 
+	 * @param trustDomain
+	 *            optional, can be null. If so default trust domain is taken.
+	 * @param attributeCertificates
+	 *            the encoded attribute certificates
+	 * @param returnRevocationData
+	 *            if true, used revocation data will be filled in in the
+	 *            {@link ValidationResult} and no caching will be used.
 	 */
-	ValidationResult validateAttributeCertificates(
-			List<byte[]> attributeCertificate,
-			List<X509Certificate> certificateChain);
+	ValidationResult validateAttributeCertificates(String trustDomain,
+			List<byte[]> attributeCertificates,
+			List<X509Certificate> certificateChain, boolean returnRevocationDate)
+			throws TrustDomainNotFoundException;
 
 	/**
 	 * Returns the {@link WSSecurityConfigEntity}.

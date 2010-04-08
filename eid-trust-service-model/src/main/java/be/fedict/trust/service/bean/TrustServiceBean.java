@@ -53,7 +53,6 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.tsp.TimeStampToken;
 
-import be.fedict.trust.CertificateRepository;
 import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.PublicKeyTrustLinker;
@@ -285,20 +284,35 @@ public class TrustServiceBean implements TrustService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE_ATTRIBUTE_CERT)
 	public ValidationResult validateAttributeCertificates(
-			List<byte[]> encodedAttributeCertificates,
-			List<X509Certificate> certificatePath) {
+			String trustDomainName, List<byte[]> encodedAttributeCertificates,
+			List<X509Certificate> certificateChain, boolean returnRevocationData)
+			throws TrustDomainNotFoundException {
 
 		LOG.debug("validate attribute certificates");
 
-		TrustValidator trustValidator = getAttributeCertificateTrustValidator(certificatePath);
-		try {
-			trustValidator.isTrusted(encodedAttributeCertificates,
-					certificatePath);
-		} catch (CertPathValidatorException e) {
+		TrustLinkerResult lastResult = null;
+		RevocationData lastRevocationData = null;
+		for (TrustDomainEntity trustDomain : getTrustDomains(trustDomainName)) {
+
+			TrustValidator trustValidator = getTrustValidator(trustDomain,
+					returnRevocationData);
+			try {
+				trustValidator.isTrusted(encodedAttributeCertificates,
+						certificateChain);
+			} catch (CertPathValidatorException e) {
+			}
+
+			if (trustValidator.getResult().isValid()) {
+				LOG.debug("valid for trust domain: " + trustDomain.getName());
+				return new ValidationResult(trustValidator.getResult(),
+						trustValidator.getRevocationData());
+			}
+
+			lastResult = trustValidator.getResult();
+			lastRevocationData = trustValidator.getRevocationData();
 		}
 
-		return new ValidationResult(trustValidator.getResult(), trustValidator
-				.getRevocationData());
+		return new ValidationResult(lastResult, lastRevocationData);
 	}
 
 	/**
@@ -347,41 +361,6 @@ public class TrustServiceBean implements TrustService {
 		}
 
 		return getTrustValidator(trustDomain, trustLinker, returnRevocationData);
-	}
-
-	private TrustValidator getAttributeCertificateTrustValidator(
-			final List<X509Certificate> certificateChain) {
-
-		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
-
-		// XXX
-		TrustValidator trustValidator = new TrustValidator(
-				new CertificateRepository() {
-
-					public boolean isTrustPoint(X509Certificate certificate) {
-
-						return certificateChain.contains(certificate);
-					}
-				});
-
-		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
-
-		OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
-				networkConfig);
-
-		OnlineCrlRepository crlRepository = new OnlineCrlRepository(
-				networkConfig);
-		CachedCrlRepository cachedCrlRepository = new CachedCrlRepository(
-				crlRepository);
-
-		FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
-		fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(ocspRepository));
-		fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(
-				cachedCrlRepository));
-
-		trustValidator.addTrustLinker(fallbackTrustLinker);
-
-		return trustValidator;
 	}
 
 	/**
