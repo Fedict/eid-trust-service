@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{64A55716-BA00-4E4B-9B2B-33312A17EA50}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>eid_trust_service_sdk_dotnet</RootNamespace>
+    <AssemblyName>eid-trust-service-sdk-dotnet</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\main\cs\ValidationFailedException.cs" />
+    <Compile Include="src\main\cs\RevocationDataNotFoundException.cs" />
+    <Compile Include="src\main\cs\TrustDomainNotFoundException.cs" />
+    <Compile Include="src\main\cs\XkmsConstants.cs" />
+    <Compile Include="target\services\XMLKeyManagement.cs">
+      <Autogen>True</Autogen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="src\main\cs\KeyStoreUtil.cs" />
+    <Compile Include="src\main\cs\LoggingBehavior.cs" />
+    <Compile Include="src\main\cs\DnsIdentityVerifier.cs" />
+    <Compile Include="src\main\cs\WSSecurityBinding.cs" />
+    <Compile Include="src\main\cs\WCFUtil.cs" />
+    <Compile Include="src\main\cs\XkmsClient.cs" />
+    <Compile Include="src\main\cs\XkmsClientImpl.cs" />
+    <None Include="src\main\resources\*" />
+  </ItemGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets. -->
+  <Target Name="BeforeBuild">
+    <MakeDir Directories="target\services" />
+    <Exec Command="SvcUtil /namespace:*,XKMS2WSNamespace /directory:target\services src\main\resources\xkms.wsdl src\main\resources\xades.xsd src\main\resources\xkms.xsd src\main\resources\xenc-schema.xsd src\main\resources\xkms-extensions.xsd src\main\resources\xmldsig-core-schema.xsd" />
+  </Target>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+</Project>

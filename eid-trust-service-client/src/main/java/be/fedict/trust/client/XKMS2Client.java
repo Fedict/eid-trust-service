@@ -366,13 +366,14 @@ public class XKMS2Client {
 	 * @param certificateChain
 	 *            the certificate chain for the attribute certificate
 	 */
-	public void validate(List<X509Certificate> certificateChain,
+	public void validate(String trustDomain,
+			List<X509Certificate> certificateChain,
 			CertifiedRolesListType attributeCertificates)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException {
 
 		LOG.debug("validate attribute certificate");
-		validate(null, certificateChain, false, null, null, null,
+		validate(trustDomain, certificateChain, false, null, null, null,
 				revocationValues, null, attributeCertificates);
 	}
 
