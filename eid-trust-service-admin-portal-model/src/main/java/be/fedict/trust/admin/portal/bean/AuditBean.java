@@ -44,7 +44,8 @@ import be.fedict.trust.service.entity.AuditEntity;
 @LocalBinding(jndiBinding = AdminConstants.ADMIN_JNDI_CONTEXT + "AuditBean")
 public class AuditBean implements Audit {
 
-	private static final String AUDIT_LIST_NAME = "auditList";
+	private static final String AUDIT_LIST_NAME = AdminConstants.ADMIN_SEAM_PREFIX
+			+ "auditList";
 
 	@Logger
 	private Log log;

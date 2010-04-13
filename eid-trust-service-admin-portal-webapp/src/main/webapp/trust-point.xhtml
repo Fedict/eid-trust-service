@@ -10,7 +10,7 @@
 				<h2>#{messages.manageTrustPoints}</h2>
 
 				<h:form id="form">
-					<rich:dataTable id="data" var="item" value="#{trustPointList}"
+					<rich:dataTable id="data" var="item" value="#{ts_trustPointList}"
 						rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
 
 						<h:column>
@@ -56,11 +56,6 @@
 							</p>
 						</div>
 					</rich:modalPanel>
-
-					<!--
-						<p> <h:commandButton action="add" id="add" value="#{messages.add}"
-						immediate="true" styleClass="submit" /> </p>
-					-->
 
 					<h:messages styleClass="error" globalOnly="true" />
 

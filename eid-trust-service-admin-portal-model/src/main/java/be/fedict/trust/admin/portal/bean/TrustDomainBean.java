@@ -79,13 +79,19 @@ public class TrustDomainBean implements TrustDomain {
 
 	public static final String SELECTED_TRUST_DOMAIN = "selectedTrustDomain";
 	public static final String SELECTED_VIRTUAL_TRUST_DOMAIN = "selectedVirtualTrustDomain";
-	private static final String TRUST_DOMAIN_LIST_NAME = "trustDomainList";
-	private static final String VIRTUAL_TRUST_DOMAIN_LIST_NAME = "virtualTrustDomainList";
+	private static final String TRUST_DOMAIN_LIST_NAME = AdminConstants.ADMIN_SEAM_PREFIX
+			+ "trustDomainList";
+	private static final String VIRTUAL_TRUST_DOMAIN_LIST_NAME = AdminConstants.ADMIN_SEAM_PREFIX
+			+ "virtualTrustDomainList";
 
-	private static final String CONSTRAINTS_POLICY_LIST = "constraintsPolicies";
-	private static final String CONSTRAINTS_KEY_USAGE_LIST = "constraintsKeyUsage";
-	private static final String KEY_USAGE_TYPE_LIST = "keyUsageTypes";
-	private static final String CONSTRAINTS_END_ENTITY_LIST = "constraintsEndEntity";
+	private static final String CONSTRAINTS_POLICY_LIST = AdminConstants.ADMIN_SEAM_PREFIX
+			+ "constraintsPolicies";
+	private static final String CONSTRAINTS_KEY_USAGE_LIST = AdminConstants.ADMIN_SEAM_PREFIX
+			+ "constraintsKeyUsage";
+	private static final String KEY_USAGE_TYPE_LIST = AdminConstants.ADMIN_SEAM_PREFIX
+			+ "keyUsageTypes";
+	private static final String CONSTRAINTS_END_ENTITY_LIST = AdminConstants.ADMIN_SEAM_PREFIX
+			+ "constraintsEndEntity";
 
 	@Logger
 	private Log log;

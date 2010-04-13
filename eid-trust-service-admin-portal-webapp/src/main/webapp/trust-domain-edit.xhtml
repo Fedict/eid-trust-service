@@ -52,7 +52,7 @@
 
 						<h:form id="policy_form">
 							<rich:dataTable id="policy_data" var="item"
-								value="#{constraintsPolicies}">
+								value="#{ts_constraintsPolicies}">
 								<h:column>
 									<f:facet name="header">#{messages.certificateConstraintPolicy}</f:facet>
 									<h:outputText value="#{item.policy}" />
@@ -87,7 +87,7 @@
 							reRender="key_usage_group">
 							<h:panelGroup id="key_usage_group" layout="block">
 								<rich:dataTable id="key_usage_data" var="item"
-									value="#{constraintsKeyUsage}">
+									value="#{ts_constraintsKeyUsage}">
 									<h:column>
 										<f:facet name="header">#{messages.certificateConstraintKeyUsage}</f:facet>
 										<h:outputText value="#{item.keyUsage}" />
@@ -114,7 +114,7 @@
 									<s:decorate>
 										<h:selectOneMenu id="key_usage"
 											value="#{ts_trustDomain.keyUsage}" required="true">
-											<f:selectItems value="#{keyUsageTypes}" />
+											<f:selectItems value="#{ts_keyUsageTypes}" />
 										</h:selectOneMenu>
 										<h:message for="key_usage" styleClass="error" />
 									</s:decorate>
@@ -161,7 +161,7 @@
 							<h:panelGroup id="end_entity_group" layout="block">
 
 								<rich:dataTable id="end_entity_data" var="item"
-									value="#{constraintsEndEntity}">
+									value="#{ts_constraintsEndEntity}">
 									<h:column>
 										<f:facet name="header">#{messages.issuer}</f:facet>
 										<h:outputText value="#{item.issuerName}" />

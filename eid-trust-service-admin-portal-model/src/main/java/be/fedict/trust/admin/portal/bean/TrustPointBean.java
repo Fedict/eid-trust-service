@@ -63,8 +63,10 @@ public class TrustPointBean implements TrustPoint {
 
 	public static final String SELECTED_TRUST_POINT = "selectedTrustPoint";
 	private static final String UPLOADED_CERTIFICATE = "uploadedCertificate";
-	private static final String TRUST_POINT_LIST_NAME = "trustPointList";
-	private static final String TRUST_POINT_CA_LIST_NAME = "trustPointCAList";
+	private static final String TRUST_POINT_LIST_NAME = AdminConstants.ADMIN_SEAM_PREFIX
+			+ "trustPointList";
+	private static final String TRUST_POINT_CA_LIST_NAME = AdminConstants.ADMIN_SEAM_PREFIX
+			+ "trustPointCAList";
 
 	@Logger
 	private Log log;

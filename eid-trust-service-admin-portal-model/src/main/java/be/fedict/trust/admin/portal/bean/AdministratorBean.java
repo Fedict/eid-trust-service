@@ -53,7 +53,8 @@ import be.fedict.trust.service.exception.RemoveLastAdminException;
 		+ "AdministratorBean")
 public class AdministratorBean implements Administrator {
 
-	private static final String ADMIN_LIST_NAME = "adminList";
+	private static final String ADMIN_LIST_NAME = AdminConstants.ADMIN_SEAM_PREFIX
+			+ "adminList";
 	private static final String SELECTED_ADMIN = "selectedAdmin";
 
 	@Logger
