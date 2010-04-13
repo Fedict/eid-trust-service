@@ -435,7 +435,7 @@ public class TrustDomainBean implements TrustDomain {
 					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
 			return null;
 		}
-		return "success";
+		return "save";
 	}
 
 	/**
