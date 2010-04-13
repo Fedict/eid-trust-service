@@ -116,11 +116,22 @@ public class XKMS2Client {
 		this.invalidReasonURIs = new LinkedList<String>();
 
 		XKMSService xkmsService = XKMSServiceFactory.getInstance();
-		port = xkmsService.getXKMSPort();
+		this.port = xkmsService.getXKMSPort();
 
-		registeredWSSecurityHandler(port);
-		registerLoggerHandler(port);
+		registeredWSSecurityHandler(this.port);
+		registerLoggerHandler(this.port);
 		setEndpointAddress(location);
+	}
+
+	/**
+	 * Proxy configuration setting ( both http as https ).
+	 */
+	public void setProxy(String proxyHost, int proxyPort) {
+
+		System.setProperty("http.proxyHost", proxyHost);
+		System.setProperty("http.proxyPort", Integer.toString(proxyPort));
+		System.setProperty("https.proxyHost", proxyHost);
+		System.setProperty("https.proxyPort", Integer.toString(proxyPort));
 	}
 
 	/**
@@ -204,7 +215,7 @@ public class XKMS2Client {
 					+ sslContext.getProvider().getName());
 
 			// Setup TrustManager for validation
-			Map<String, Object> requestContext = ((BindingProvider) port)
+			Map<String, Object> requestContext = ((BindingProvider) this.port)
 					.getRequestContext();
 			requestContext.put(JAXWSProperties.SSL_SOCKET_FACTORY, sslContext
 					.getSocketFactory());
@@ -223,7 +234,7 @@ public class XKMS2Client {
 	private void setEndpointAddress(String location) {
 
 		LOG.debug("ws location=" + location);
-		BindingProvider bindingProvider = (BindingProvider) port;
+		BindingProvider bindingProvider = (BindingProvider) this.port;
 		bindingProvider.getRequestContext().put(
 				BindingProvider.ENDPOINT_ADDRESS_PROPERTY, location);
 	}
@@ -455,7 +466,7 @@ public class XKMS2Client {
 
 		}
 
-		ValidateResultType validateResult = port.validate(validateRequest);
+		ValidateResultType validateResult = this.port.validate(validateRequest);
 
 		if (null == validateResult) {
 			throw new RuntimeException("missing ValidateResult element");
