@@ -52,7 +52,6 @@ public class TSATest {
 
 	private static final Log LOG = LogFactory.getLog(TSATest.class);
 
-	private static final String location = "http://localhost:8080";
 	private static final String tsa_location = "http://tsa.belgium.be/connect";
 
 	@Before
@@ -97,7 +96,7 @@ public class TSATest {
 		}
 
 		// send token to trust service
-		XKMS2Client client = new XKMS2Client(location);
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
 		client.validate(TrustServiceConstants.BELGIAN_TSA_TRUST_DOMAIN,
 				tspResponse.getTimeStampToken());
 	}

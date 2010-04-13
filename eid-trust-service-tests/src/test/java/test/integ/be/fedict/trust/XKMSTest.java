@@ -48,8 +48,6 @@ public class XKMSTest {
 
 	private static final Log LOG = LogFactory.getLog(XKMSTest.class);
 
-	private static final String location = "http://localhost:8080";
-
 	// private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
 	// "proxy.yourict.net", 8080);
 	private static final NetworkConfig NETWORK_CONFIG = null;
@@ -66,7 +64,7 @@ public class XKMSTest {
 		List<X509Certificate> authnCertificateChain = TestUtils
 				.getAuthnCertificateChain();
 
-		XKMS2Client client = new XKMS2Client(location);
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
 		client.validate(authnCertificateChain);
 	}
 
@@ -77,7 +75,7 @@ public class XKMSTest {
 		List<X509Certificate> signCertificateChain = TestUtils
 				.getSignCertificateChain();
 
-		XKMS2Client client = new XKMS2Client(location);
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
 		client.validate(
 				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
 				signCertificateChain);
@@ -90,7 +88,7 @@ public class XKMSTest {
 		List<X509Certificate> nationalRegistryCertificateChain = TestUtils
 				.getNationalRegistryCertificateChain();
 
-		XKMS2Client client = new XKMS2Client(location);
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
 		client
 				.validate(
 						TrustServiceConstants.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN,
@@ -104,7 +102,7 @@ public class XKMSTest {
 		List<X509Certificate> authnCertificateChain = TestUtils
 				.getAuthnCertificateChain();
 
-		XKMS2Client client = new XKMS2Client(location);
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
 		try {
 			client.validate("f00", authnCertificateChain);
 		} catch (TrustDomainNotFoundException e) {
@@ -183,7 +181,7 @@ public class XKMSTest {
 		List<X509Certificate> authnCertificateChain = TestUtils
 				.getAuthnCertificateChain();
 
-		XKMS2Client client = new XKMS2Client(location);
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
 
 		long t0 = System.currentTimeMillis();
 		for (int idx = 0; idx < COUNT; idx++) {

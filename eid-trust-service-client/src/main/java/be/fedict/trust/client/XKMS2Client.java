@@ -31,7 +31,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
@@ -110,7 +109,7 @@ public class XKMS2Client {
 	 * Main constructor
 	 * 
 	 * @param location
-	 *            the location (host:port) of the XKMS2 web service
+	 *            location ( complete path ) of the XKMS2 web service
 	 */
 	public XKMS2Client(String location) {
 
@@ -118,12 +117,10 @@ public class XKMS2Client {
 
 		XKMSService xkmsService = XKMSServiceFactory.getInstance();
 		port = xkmsService.getXKMSPort();
-		String wsLocation = MessageFormat.format(
-				"{0}/eid-trust-service-ws/xkms2", location);
 
 		registeredWSSecurityHandler(port);
 		registerLoggerHandler(port);
-		setEndpointAddress(wsLocation);
+		setEndpointAddress(location);
 	}
 
 	/**

@@ -54,7 +54,6 @@ public class XKMSTrustTest {
 
 	private static final Log LOG = LogFactory.getLog(XKMSTrustTest.class);
 
-	private static final String hostname = "localhost";
 	private static final int port = 8443;
 
 	@Before
@@ -75,7 +74,7 @@ public class XKMSTrustTest {
 		 */
 		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
 			public boolean verify(String hostname, SSLSession session) {
-				if (hostname.equals(XKMSTrustTest.hostname)) {
+				if (hostname.equals(TestUtils.XKMS_WS_HOST)) {
 					return true;
 				}
 				return false;
@@ -85,7 +84,9 @@ public class XKMSTrustTest {
 		// setup
 		List<X509Certificate> signCertificateChain = TestUtils
 				.getSignCertificateChain();
-		XKMS2Client client = new XKMS2Client("https://" + hostname + ":" + port);
+		XKMS2Client client = new XKMS2Client("https://"
+				+ TestUtils.XKMS_WS_HOST + ":" + port
+				+ TestUtils.XKMS_WS_CONTEXT_PATH);
 		client.setServicePublicKey(keyPair.getPublic());
 
 		/*
@@ -110,7 +111,8 @@ public class XKMSTrustTest {
 		SSLTrustManager.initialize();
 		SSLSocketFactory factory = HttpsURLConnection
 				.getDefaultSSLSocketFactory();
-		SSLSocket socket = (SSLSocket) factory.createSocket(hostname, port);
+		SSLSocket socket = (SSLSocket) factory.createSocket(
+				TestUtils.XKMS_WS_HOST, port);
 		socket.startHandshake();
 		Certificate[] serverCerts = socket.getSession().getPeerCertificates();
 		PublicKey publicKey = serverCerts[0].getPublicKey();
@@ -123,7 +125,7 @@ public class XKMSTrustTest {
 		 */
 		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
 			public boolean verify(String hostname, SSLSession session) {
-				if (hostname.equals(XKMSTrustTest.hostname)) {
+				if (hostname.equals(TestUtils.XKMS_WS_HOST)) {
 					return true;
 				}
 				return false;
@@ -133,7 +135,9 @@ public class XKMSTrustTest {
 		// setup
 		List<X509Certificate> signCertificateChain = TestUtils
 				.getSignCertificateChain();
-		XKMS2Client client = new XKMS2Client("https://" + hostname + ":" + port);
+		XKMS2Client client = new XKMS2Client("https://"
+				+ TestUtils.XKMS_WS_HOST + ":" + port
+				+ TestUtils.XKMS_WS_CONTEXT_PATH);
 		client.setServicePublicKey(publicKey);
 
 		/*

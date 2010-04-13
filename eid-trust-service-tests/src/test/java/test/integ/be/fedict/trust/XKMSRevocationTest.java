@@ -60,8 +60,6 @@ public class XKMSRevocationTest {
 
 	private static final Log LOG = LogFactory.getLog(XKMSRevocationTest.class);
 
-	private static final String location = "http://localhost:8080";
-
 	@Before
 	public void setUp() {
 		Security.addProvider(new BouncyCastleProvider());
@@ -76,7 +74,7 @@ public class XKMSRevocationTest {
 		// setup
 		List<X509Certificate> signCertificateChain = TestUtils
 				.getSignCertificateChain();
-		XKMS2Client client = new XKMS2Client(location);
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
 		Date validationDate = new Date();
 
 		/*
