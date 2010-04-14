@@ -41,6 +41,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;
 
+import test.integ.be.fedict.trust.util.SSLTrustManager;
+import test.integ.be.fedict.trust.util.TestUtils;
+
 import be.fedict.trust.client.WSSecurityClientHandler;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.service.TrustServiceConstants;

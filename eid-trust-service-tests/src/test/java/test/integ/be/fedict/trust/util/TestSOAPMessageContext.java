@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package test.integ.be.fedict.trust;
+package test.integ.be.fedict.trust.util;
 
 import java.util.Collection;
 import java.util.HashMap;

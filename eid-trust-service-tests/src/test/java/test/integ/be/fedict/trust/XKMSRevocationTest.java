@@ -45,6 +45,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import sun.security.x509.X509CRLImpl;
+import test.integ.be.fedict.trust.util.TestUtils;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.client.exception.ValidationFailedException;
 import be.fedict.trust.service.TrustServiceConstants;

@@ -31,6 +31,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;
 
+import test.integ.be.fedict.trust.util.TestUtils;
+
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.TrustValidator;
