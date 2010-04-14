@@ -49,6 +49,7 @@
     <Compile Include="src\main\cs\ValidationFailedException.cs" />
     <Compile Include="src\main\cs\RevocationDataNotFoundException.cs" />
     <Compile Include="src\main\cs\TrustDomainNotFoundException.cs" />
+    <Compile Include="src\main\cs\WSSecurityBehavior.cs" />
     <Compile Include="src\main\cs\XkmsConstants.cs" />
     <Compile Include="target\services\XMLKeyManagement.cs">
       <Autogen>True</Autogen>

@@ -14,7 +14,8 @@ namespace eid_trust_service_sdk_dotnet.test.cs
     [TestFixture]
     public class TestXkms
     {
-        public static string TRUST_SERVICE_LOCATION = "https://sebeco-dev-11:8443";
+        public static string TRUST_SERVICE_LOCATION_SSL = "https://sebeco-dev-11:8443/eid-trust-service-ws/xkms2";
+        public static string TRUST_SERVICE_LOCATION = "http://sebeco-dev-11:8080/eid-trust-service-ws/xkms2";
         public static string CERT_DIRECTORY_PATH = "C:\\Users\\devel\\certificates\\";
         public static string SSL_CERT_PATH = CERT_DIRECTORY_PATH + "eidtrust_ssl.cer";
         public static string INVALID_SSL_CERT_PATH = CERT_DIRECTORY_PATH + "invalid_ssl.cer";
@@ -26,9 +27,9 @@ namespace eid_trust_service_sdk_dotnet.test.cs
         public void setup()
         {
             AsymmetricCipherKeyPair keyPair = KeyStoreUtil.GenerateKeyPair();
-            Org.BouncyCastle.X509.X509Certificate rootCertificate = KeyStoreUtil.CreateCert(keyPair.Public, keyPair.Private);
+            Org.BouncyCastle.X509.X509Certificate rootCertificate = KeyStoreUtil.CreateCert("CN=Root", keyPair.Public, keyPair.Private);
             AsymmetricCipherKeyPair clientKeyPair = KeyStoreUtil.GenerateKeyPair();
-            Org.BouncyCastle.X509.X509Certificate clientCertificate = KeyStoreUtil.CreateCert(clientKeyPair.Public, clientKeyPair.Private);
+            Org.BouncyCastle.X509.X509Certificate clientCertificate = KeyStoreUtil.CreateCert("CN=Client", clientKeyPair.Public, clientKeyPair.Private);
             this.invalidCertChain = new List<Org.BouncyCastle.X509.X509Certificate>();
             this.invalidCertChain.Add(rootCertificate);
             this.invalidCertChain.Add(clientCertificate);
@@ -39,7 +40,15 @@ namespace eid_trust_service_sdk_dotnet.test.cs
         {
 
             XkmsClient client = new XkmsClientImpl(TRUST_SERVICE_LOCATION);
-            client.validate(TEST_TRUST_DOMAIN, this.invalidCertChain);
+            try
+            {
+                client.validate(TEST_TRUST_DOMAIN, this.invalidCertChain);
+                Assert.Fail();
+            }
+            catch (ValidationFailedException e)
+            {
+                // expected
+            }
         }
 
         [Test]
@@ -62,15 +71,25 @@ namespace eid_trust_service_sdk_dotnet.test.cs
         public void TestInvalidChainValidTslAuthn()
         {
             X509Certificate2 sslCertificate = new X509Certificate2(SSL_CERT_PATH);
-            XkmsClient client = new XkmsClientImpl(TRUST_SERVICE_LOCATION, null, sslCertificate);
-            client.validate(TEST_TRUST_DOMAIN, this.invalidCertChain);
+            XkmsClient client = new XkmsClientImpl(TRUST_SERVICE_LOCATION_SSL);
+            client.configureSsl(sslCertificate);
+            try
+            {
+                client.validate(TEST_TRUST_DOMAIN, this.invalidCertChain);
+                Assert.Fail();
+            }
+            catch (ValidationFailedException e)
+            {
+                // expected
+            }
         }
 
         [Test]
         public void TestInvalidChainInvalidTslAuthn()
         {
             X509Certificate2 invalidSslCertificate = new X509Certificate2(INVALID_SSL_CERT_PATH);
-            XkmsClient client = new XkmsClientImpl(TRUST_SERVICE_LOCATION, null, invalidSslCertificate);
+            XkmsClient client = new XkmsClientImpl(TRUST_SERVICE_LOCATION_SSL);
+            client.configureSsl(invalidSslCertificate);
             try
             {
                 client.validate(TEST_TRUST_DOMAIN, this.invalidCertChain); 

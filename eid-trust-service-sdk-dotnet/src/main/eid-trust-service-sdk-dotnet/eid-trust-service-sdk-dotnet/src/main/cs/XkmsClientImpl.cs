@@ -13,6 +13,10 @@ using System.Collections.Generic;
 using Org.BouncyCastle.Ocsp;
 using Org.BouncyCastle.X509;
 using Org.BouncyCastle.Tsp;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Crypto.Parameters;
+using System.Security.Cryptography;
 
 namespace eid_trust_service_sdk_dotnet
 {
@@ -22,6 +26,10 @@ namespace eid_trust_service_sdk_dotnet
     public class XkmsClientImpl : XkmsClient
     {
         private X509Certificate2 sslCertificate;
+        private X509Certificate2 serverCertificate;
+        private X509Certificate2 clientCertificate;
+
+        private String location;
 
         private XKMSPortTypeClient client;
 
@@ -39,55 +47,90 @@ namespace eid_trust_service_sdk_dotnet
             return result;
         }
 
-        public XkmsClientImpl(string location, X509Certificate2 signingCertificate, X509Certificate2 sslCertificate)
-        {
-            /*
-             * Unilateral TLS authentication if SSL certificate is specified. 
-             */
-            this.sslCertificate = sslCertificate;
-            if (null != sslCertificate)
-            {
-                ServicePointManager.ServerCertificateValidationCallback =
-                    new RemoteCertificateValidationCallback(CertificateValidationCallback);
-            }
-            else
-            {
-                ServicePointManager.ServerCertificateValidationCallback =
-                    new RemoteCertificateValidationCallback(WCFUtil.AnyCertificateValidationCallback);
-            }
-
-            string address = location + "/eid-trust-service-ws/xkms2";
-            EndpointAddress remoteAddress = new EndpointAddress(address);
-
-            /*
-             * Validate WS-Security signature on response signed by eID Trust Service.
-             */
-            if (null != signingCertificate)
-            {
-                Console.WriteLine("WS-Security");
-                this.client = new XKMSPortTypeClient(new WSSecurityBinding(signingCertificate), remoteAddress);
-                this.client.ClientCredentials.ServiceCertificate.DefaultCertificate = signingCertificate;
-                // To override the validation for our self-signed test certificates
-                this.client.ClientCredentials.ServiceCertificate.Authentication.CertificateValidationMode =
-                    X509CertificateValidationMode.None;
-                this.client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.Sign;
-            }
-            else
-            {
-                this.client = new XKMSPortTypeClient(WCFUtil.BasicHttpOverSSLBinding(), remoteAddress);
-            }
-            this.client.Endpoint.Behaviors.Add(new LoggingBehavior());
-        }
-
+        /// <summary>
+        /// Default constructor.
+        /// 
+        /// Set the optional authentication modes (unilateral TLS and/or WS-Security) afterwards.
+        /// </summary>
+        /// <param name="location">Full path of the eID Trust Service</param>
         public XkmsClientImpl(string location)
         {
-            ServicePointManager.ServerCertificateValidationCallback =
-                new RemoteCertificateValidationCallback(WCFUtil.AnyCertificateValidationCallback);
+            this.location = location;
+        }
 
-            string address = location + "/eid-trust-service-ws/xkms2";
-            EndpointAddress remoteAddress = new EndpointAddress(address);
+        public void configureSsl(X509Certificate2 sslCertificate)
+        {
+            this.sslCertificate = sslCertificate;
+        }
 
-            this.client = new XKMSPortTypeClient(WCFUtil.BasicHttpOverSSLBinding(), remoteAddress);
+        public void configureWSSecurity(X509Certificate2 serverCertificate, X509Certificate2 clientCertificate)
+        {
+            this.serverCertificate = serverCertificate;
+            this.clientCertificate = clientCertificate;
+            if (null == this.clientCertificate)
+            {
+                // here we generate a temporary self-signed certificate and key pair for signing the request.
+                AsymmetricCipherKeyPair keyPair = KeyStoreUtil.GenerateKeyPair();
+                this.clientCertificate = new X509Certificate2(
+                    DotNetUtilities.ToX509Certificate(
+                    KeyStoreUtil.CreateCert("CN=Temp", keyPair.Public, keyPair.Private)));
+                this.clientCertificate.PrivateKey = KeyStoreUtil.getRSAPrivateKey(keyPair.Private, true);
+            }
+        }
+
+        private void setupClient()
+        {
+            EndpointAddress remoteAddress = new EndpointAddress(this.location);
+
+            bool sslLocation = this.location.StartsWith("https") ? true : false;
+            if (sslLocation)
+            {
+                if (null != this.sslCertificate)
+                {
+                    /*
+                     * Setup SSL validation
+                     */
+                    Console.WriteLine("SSL validation active");
+                    ServicePointManager.ServerCertificateValidationCallback =
+                        new RemoteCertificateValidationCallback(CertificateValidationCallback);
+                }
+                else
+                {
+                    ServicePointManager.ServerCertificateValidationCallback =
+                        new RemoteCertificateValidationCallback(WCFUtil.AnyCertificateValidationCallback);
+                }
+            }
+
+            if (null != this.serverCertificate)
+            {
+                /*
+                 * Setup WS-Security
+                 */
+                Console.WriteLine("WS-Security active");
+                this.client = new XKMSPortTypeClient(new WSSecurityBinding(sslLocation, this.serverCertificate), remoteAddress);
+                // set credentials
+                this.client.ClientCredentials.ServiceCertificate.DefaultCertificate = this.serverCertificate;
+                this.client.ClientCredentials.ServiceCertificate.Authentication.CertificateValidationMode =
+                    X509CertificateValidationMode.None;
+                this.client.ClientCredentials.ClientCertificate.Certificate = this.clientCertificate;
+                // set contract
+                this.client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.Sign;
+            }
+
+            if (null == this.client)
+            {
+                // Setup basic client without WS-Security binding
+                if (sslLocation)
+                {
+                    this.client = new XKMSPortTypeClient(WCFUtil.BasicHttpOverSSLBinding(), remoteAddress);
+                }
+                else
+                {
+                    this.client = new XKMSPortTypeClient(new BasicHttpBinding(), remoteAddress);
+                }
+            }
+
+            // add logging behaviour
             this.client.Endpoint.Behaviors.Add(new LoggingBehavior());
         }
 
@@ -96,7 +139,7 @@ namespace eid_trust_service_sdk_dotnet
             validate(certificateChain, null, false, DateTime.MinValue, null, null, null, null, null);
         }
 
-        public void validate(List<Org.BouncyCastle.X509.X509Certificate> certificateChain, 
+        public void validate(List<Org.BouncyCastle.X509.X509Certificate> certificateChain,
             bool returnRevocationData)
         {
             validate(certificateChain, null, returnRevocationData, DateTime.MinValue, null, null, null, null, null);
@@ -107,19 +150,19 @@ namespace eid_trust_service_sdk_dotnet
             validate(certificateChain, trustDomain, false, DateTime.MinValue, null, null, null, null, null);
         }
 
-        public void validate(string trustDomain, List<Org.BouncyCastle.X509.X509Certificate> certificateChain, 
+        public void validate(string trustDomain, List<Org.BouncyCastle.X509.X509Certificate> certificateChain,
             bool returnRevocationData)
         {
             validate(certificateChain, trustDomain, returnRevocationData, DateTime.MinValue, null, null, null, null, null);
         }
 
-        public void validate(string trustDomain, List<Org.BouncyCastle.X509.X509Certificate> certificateChain, 
+        public void validate(string trustDomain, List<Org.BouncyCastle.X509.X509Certificate> certificateChain,
             DateTime validationDate, List<OcspResp> ocspResponses, List<X509Crl> crls)
         {
             validate(certificateChain, trustDomain, false, validationDate, ocspResponses, crls, null, null, null);
         }
 
-        public void validate(string trustDomain, List<Org.BouncyCastle.X509.X509Certificate> certificateChain, 
+        public void validate(string trustDomain, List<Org.BouncyCastle.X509.X509Certificate> certificateChain,
             DateTime validationDate, RevocationValuesType revocationValues)
         {
             validate(certificateChain, trustDomain, false, validationDate, null, null, revocationValues, null, null);
@@ -130,7 +173,7 @@ namespace eid_trust_service_sdk_dotnet
             validate(null, trustDomain, false, DateTime.MinValue, null, null, null, timeStampToken, null);
         }
 
-        public void validate(string trustDomain, List<Org.BouncyCastle.X509.X509Certificate> certificateChain, 
+        public void validate(string trustDomain, List<Org.BouncyCastle.X509.X509Certificate> certificateChain,
             EncapsulatedPKIDataType[] attributeCertificates)
         {
             validate(certificateChain, trustDomain, false, DateTime.MinValue, null, null, null, null, attributeCertificates);
@@ -146,11 +189,18 @@ namespace eid_trust_service_sdk_dotnet
             return this.revocationValues;
         }
 
-        private void validate(List<Org.BouncyCastle.X509.X509Certificate> certificateChain, string trustDomain, 
-            bool returnRevocationData, DateTime validationDate, List<OcspResp> ocspResponses, List<X509Crl> crls, 
+        /*
+         * Validation
+         */
+        private void validate(List<Org.BouncyCastle.X509.X509Certificate> certificateChain, string trustDomain,
+            bool returnRevocationData, DateTime validationDate, List<OcspResp> ocspResponses, List<X509Crl> crls,
             RevocationValuesType revocationValues, TimeStampToken timeStampToken,
             EncapsulatedPKIDataType[] attributeCertificates)
         {
+            // setup the client
+            setupClient();
+
+            // validate
             ValidateRequestType validateRequest = new ValidateRequestType();
             QueryKeyBindingType queryKeyBinding = new QueryKeyBindingType();
             KeyInfoType keyInfo = new KeyInfoType();
@@ -247,7 +297,7 @@ namespace eid_trust_service_sdk_dotnet
             /*
              * Store reason URIs
              */
-            foreach(KeyBindingType keyBinding in validateResult.KeyBinding)
+            foreach (KeyBindingType keyBinding in validateResult.KeyBinding)
             {
                 if (KeyBindingEnum.httpwwww3org200203xkmsValid.Equals(keyBinding.Status.StatusValue))
                 {
@@ -257,7 +307,7 @@ namespace eid_trust_service_sdk_dotnet
                 {
                     this.invalidReasonURIs.AddLast(reason);
                 }
-                throw new ValidationFailedException(this.invalidReasonURIs); 
+                throw new ValidationFailedException(this.invalidReasonURIs);
             }
         }
 
@@ -335,7 +385,7 @@ namespace eid_trust_service_sdk_dotnet
                 revocationDataMessageExtension.RevocationValues = revocationValues;
             }
 
-            validateRequest.MessageExtension = 
+            validateRequest.MessageExtension =
                 new MessageExtensionAbstractType[] { revocationDataMessageExtension };
         }
 

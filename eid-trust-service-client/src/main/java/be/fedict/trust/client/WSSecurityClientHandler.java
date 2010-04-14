@@ -58,6 +58,12 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 	private static final Log LOG = LogFactory
 			.getLog(WSSecurityClientHandler.class);
 
+	public static final String ERROR_INVALID_SIGNATURE = "The signature or decryption was invalid";
+	public static final String ERROR_CERTIFICATE_MISMATCH = "The signing certificate does not match the specified server certificate";
+	public static final String ERROR_CERTIFICATE_MISSING = "Missing Certificate in WS-Security header";
+	public static final String ERROR_TIMESTAMP_MISSING = "Missing Timestamp in WS-Security header";
+	public static final String ERROR_TIMESTAMP_OFFSET = "WS-Security Created Timestamp offset exceeded";
+
 	public static final long defaultMaxTimestampOffset = 1000 * 60 * 5L;
 
 	private X509Certificate serverCertificate;
@@ -168,8 +174,8 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 			wsSecurityEngineResults = checkedWsSecurityEngineResults;
 		} catch (WSSecurityException e) {
 			LOG.debug("WS-Security error: " + e.getMessage(), e);
-			throw createSOAPFaultException(
-					"The signature or decryption was invalid", "FailedCheck");
+			throw createSOAPFaultException(ERROR_INVALID_SIGNATURE,
+					"FailedCheck");
 		}
 		LOG.debug("results: " + wsSecurityEngineResults);
 		if (null == wsSecurityEngineResults) {
@@ -203,29 +209,26 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 		}
 
 		if (null == signedElements)
-			throw createSOAPFaultException(
-					"The signature or decryption was invalid", "FailedCheck");
+			throw createSOAPFaultException(ERROR_INVALID_SIGNATURE,
+					"FailedCheck");
 		LOG.debug("signed elements: " + signedElements);
 
 		/*
 		 * Validate certificate
 		 */
 		if (null == signingCertificate)
-			throw createSOAPFaultException(
-					"Missing Certificate in WS-Security header",
+			throw createSOAPFaultException(ERROR_CERTIFICATE_MISSING,
 					"InvalidSecurity");
 		if (null != serverCertificate
 				&& !serverCertificate.equals(signingCertificate))
-			throw createSOAPFaultException(
-					"The signing certificate does not match the specified server certificate",
+			throw createSOAPFaultException(ERROR_CERTIFICATE_MISMATCH,
 					"FailedCheck");
 
 		/*
 		 * Check timestamp.
 		 */
 		if (null == timestamp)
-			throw createSOAPFaultException(
-					"missing Timestamp in WS-Security header",
+			throw createSOAPFaultException(ERROR_TIMESTAMP_MISSING,
 					"InvalidSecurity");
 		String timestampId = timestamp.getID();
 		if (false == signedElements.contains(timestampId))
@@ -240,8 +243,7 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 		if (offset > maxTimestampOffset) {
 			LOG.debug("timestamp offset: " + offset);
 			LOG.debug("maximum allowed offset: " + maxTimestampOffset);
-			throw createSOAPFaultException(
-					"WS-Security Created Timestamp offset exceeded",
+			throw createSOAPFaultException(ERROR_TIMESTAMP_OFFSET,
 					"FailedCheck");
 		}
 	}

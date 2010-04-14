@@ -18,6 +18,7 @@
 
 package test.integ.be.fedict.trust;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.security.KeyPair;
@@ -32,6 +33,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,6 +41,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;
 
+import be.fedict.trust.client.WSSecurityClientHandler;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.service.TrustServiceConstants;
 
@@ -147,4 +150,38 @@ public class XKMSTrustTest {
 				TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
 				signCertificateChain);
 	}
+
+	@Test
+	public void testValidateWSSecurityFails() throws Exception {
+
+		LOG
+				.debug("validate using WS-Security, fails due to certificate mismatch");
+
+		// setup
+		KeyPair fooKeyPair = TestUtils.generateKeyPair();
+		X509Certificate fooCertificate = TestUtils
+				.generateSelfSignedCertificate(fooKeyPair, "CN=f00");
+
+		List<X509Certificate> signCertificateChain = TestUtils
+				.getSignCertificateChain();
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+		client.setServerCertificate(fooCertificate);
+
+		/*
+		 * Operate: validate non repudiation
+		 */
+		try {
+			client
+					.validate(
+							TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+							signCertificateChain);
+			fail();
+		} catch (SOAPFaultException e) {
+			// expected
+			assertEquals(WSSecurityClientHandler.ERROR_CERTIFICATE_MISMATCH, e
+					.getMessage());
+		}
+
+	}
+
 }

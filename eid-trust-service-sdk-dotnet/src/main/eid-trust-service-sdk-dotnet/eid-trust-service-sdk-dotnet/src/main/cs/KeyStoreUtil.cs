@@ -34,22 +34,17 @@ namespace eid_trust_service_sdk_dotnet
             AsymmetricCipherKeyPair keyPair = RSAKeyPairGen.GenerateKeyPair();
             return keyPair;
         }
-        public static Org.BouncyCastle.X509.X509Certificate CreateCert(
+        public static Org.BouncyCastle.X509.X509Certificate CreateCert(String cn,
         AsymmetricKeyParameter pubKey,
         AsymmetricKeyParameter privKey)
         {
-            Hashtable attrs = new Hashtable();
-            attrs.Add(X509Name.CN, "Test");
-
-            ArrayList ord = new ArrayList(attrs.Keys);
-
             X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
 
             certGen.SetSerialNumber(BigInteger.One);
-            certGen.SetIssuerDN(new X509Name(ord, attrs));
+            certGen.SetIssuerDN(new X509Name(cn));
             certGen.SetNotBefore(DateTime.UtcNow.AddDays(-30));
             certGen.SetNotAfter(DateTime.UtcNow.AddDays(30));
-            certGen.SetSubjectDN(new X509Name(ord, attrs));
+            certGen.SetSubjectDN(new X509Name(cn));
             certGen.SetPublicKey(pubKey);
             certGen.SetSignatureAlgorithm("SHA1WithRSAEncryption");
 
@@ -91,13 +86,9 @@ namespace eid_trust_service_sdk_dotnet
             }
         }
 
-        public static RSACryptoServiceProvider GetPrivateKeyFromPem(String pemPath, bool useMachineKeyStore)
+        public static RSACryptoServiceProvider getRSAPrivateKey(AsymmetricKeyParameter privateKey, bool useMachineKeyStore)
         {
-
-            AsymmetricCipherKeyPair keyPair = (AsymmetricCipherKeyPair)new PemReader(new StreamReader(pemPath)).ReadObject();
-
-            RsaPrivateCrtKeyParameters rsaKeyParams = (RsaPrivateCrtKeyParameters)keyPair.Private;
-
+            RSAParameters keyParams = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)privateKey);
 
             RSACryptoServiceProvider key;
             if (useMachineKeyStore)
@@ -109,17 +100,15 @@ namespace eid_trust_service_sdk_dotnet
             else
                 key = new RSACryptoServiceProvider();
 
-            RSAParameters keyParams = new RSAParameters();
-            keyParams.Modulus = rsaKeyParams.Modulus.ToByteArrayUnsigned();
-            keyParams.Exponent = rsaKeyParams.PublicExponent.ToByteArrayUnsigned();
-            keyParams.D = rsaKeyParams.Exponent.ToByteArrayUnsigned(); // ?
-            keyParams.P = rsaKeyParams.P.ToByteArrayUnsigned();
-            keyParams.Q = rsaKeyParams.Q.ToByteArrayUnsigned();
-            keyParams.DP = rsaKeyParams.DP.ToByteArrayUnsigned();
-            keyParams.DQ = rsaKeyParams.DQ.ToByteArrayUnsigned();
-            keyParams.InverseQ = rsaKeyParams.QInv.ToByteArrayUnsigned();
             key.ImportParameters(keyParams);
             return key;
+        }
+
+        public static RSACryptoServiceProvider GetPrivateKeyFromPem(String pemPath, bool useMachineKeyStore)
+        {
+
+            AsymmetricCipherKeyPair keyPair = (AsymmetricCipherKeyPair)new PemReader(new StreamReader(pemPath)).ReadObject();
+            return getRSAPrivateKey(keyPair.Private, useMachineKeyStore);
         }
 
         public static X509Certificate2 loadCertificate(string pfxPath, string pfxPassword, bool useMachineKeyStore)

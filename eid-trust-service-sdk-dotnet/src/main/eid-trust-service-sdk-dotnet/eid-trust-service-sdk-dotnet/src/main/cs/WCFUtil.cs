@@ -28,19 +28,12 @@ namespace eid_trust_service_sdk_dotnet
 
 		/// <summary>
 		/// BasicHttpBinding with SSL Transport Security. Provides NO message integrity.
-		/// This binding can also be used, but the flag has to be set in the operator webapp.
 		/// </summary>
 		/// <returns></returns>
 		public static BasicHttpBinding BasicHttpOverSSLBinding() {
 			BasicHttpBinding binding = new BasicHttpBinding(BasicHttpSecurityMode.Transport);
 			BasicHttpSecurity security = binding.Security;
 			
-            /*
-			BasicHttpMessageSecurity messageSecurity = security.Message;
-			messageSecurity.ClientCredentialType = BasicHttpMessageCredentialType.Certificate;
-			messageSecurity.AlgorithmSuite = SecurityAlgorithmSuite.Default;
-            */
-             
 			HttpTransportSecurity transportSecurity = security.Transport;
 			transportSecurity.ClientCredentialType = HttpClientCredentialType.None;
 			transportSecurity.ProxyCredentialType = HttpProxyCredentialType.None;

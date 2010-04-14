@@ -4,56 +4,57 @@ using System.ServiceModel.Channels;
 using System.ServiceModel.Security;
 using System.ServiceModel.Security.Tokens;
 using System.Security.Cryptography.X509Certificates;
+using Org.BouncyCastle.Asn1.X509;
+using System.Collections;
 
 namespace eid_trust_service_sdk_dotnet
 {
 	/// <summary>
 	/// WSSecurityBinding.
 	/// 
-	/// This custom binding provides both transport security as message integrity.
+	/// This custom binding provides message integrity and optional transport security using 
+    /// HttpsTransportBindingElement, else HttpTransportBindingElement is used.
 	/// </summary>
 	public class WSSecurityBinding : Binding
 	{
+        private bool sslLocation;
+
 		private BindingElementCollection bindingElements;
 
-        public WSSecurityBinding(X509Certificate2 serviceCertificate)
+        public WSSecurityBinding(bool sslLocation, X509Certificate2 serviceCertificate)
         {
-			
-			// Get CN from service certificate, used to set Dns Identity Claim
-			string[] issuer = serviceCertificate.Issuer.Split(',');
-			string cn = issuer[0].Split('=')[1];
+            this.sslLocation = sslLocation;
 
-			HttpsTransportBindingElement httpsTransport = new HttpsTransportBindingElement();
+			// Get CN from service certificate, used to set Dns Identity Claim
+            string cn = null;
+            foreach (string issuerPart in serviceCertificate.Issuer.Split(','))
+            {
+                string[] parts = issuerPart.Split('=');
+                if (parts[0].ToUpperInvariant().EndsWith("CN")) 
+                {
+                    cn = parts[1]; 
+                }
+            }
+
 			TextMessageEncodingBindingElement encoding = new TextMessageEncodingBindingElement();
 			encoding.MessageVersion = MessageVersion.Soap11;
-
-            //AsymmetricSecurityBindingElement securityBinding = new AsymmetricSecurityBindingElement(new X509SecurityTokenParameters(X509KeyIdentifierClauseType.Any, SecurityTokenInclusionMode.AlwaysToInitiator, false));
-            //securityBinding.MessageSecurityVersion = MessageSecurityVersion.WSSecurity11WSTrustFebruary2005WSSecureConversationFebruary2005WSSecurityPolicy11;
-
-            
-            SymmetricSecurityBindingElement securityBinding = SecurityBindingElement.CreateAnonymousForCertificateBindingElement();
-            securityBinding.LocalClientSettings.IdentityVerifier = new DnsIdentityVerifier(new DnsEndpointIdentity(cn));
-            securityBinding.SecurityHeaderLayout = SecurityHeaderLayout.Lax;
-           
-
-            /*
-            SymmetricSecurityBindingElement securityBinding = new SymmetricSecurityBindingElement(new X509SecurityTokenParameters(X509KeyIdentifierClauseType.Thumbprint, SecurityTokenInclusionMode.Never));
-            securityBinding.MessageSecurityVersion = MessageSecurityVersion.WSSecurity11WSTrustFebruary2005WSSecureConversationFebruary2005WSSecurityPolicy11;
-            securityBinding.RequireSignatureConfirmation = true;
-            */
              
-            /*
 			AsymmetricSecurityBindingElement securityBinding = SecurityBindingElement.CreateMutualCertificateDuplexBindingElement();
 			securityBinding.LocalClientSettings.IdentityVerifier = new DnsIdentityVerifier(new DnsEndpointIdentity(cn));
 			securityBinding.AllowSerializedSigningTokenOnReply = true;
 			securityBinding.SecurityHeaderLayout = SecurityHeaderLayout.Lax;
-            securityBinding.InitiatorTokenParameters = null; 
-            */
              
 			this.bindingElements = new BindingElementCollection();
             this.bindingElements.Add(securityBinding);
 			this.bindingElements.Add(encoding);
-			this.bindingElements.Add(httpsTransport);
+            if (this.sslLocation)
+            {
+                this.bindingElements.Add(new HttpsTransportBindingElement());
+            }
+            else
+            {
+                this.bindingElements.Add(new HttpTransportBindingElement());
+            }
 		}
 		
 		public override BindingElementCollection CreateBindingElements() {
@@ -61,7 +62,14 @@ namespace eid_trust_service_sdk_dotnet
 		}
 		
 		public override string Scheme {
-			get { return "https"; }
+			get 
+            {
+                if (this.sslLocation)
+                {
+                    return "https";
+                }
+                else { return "http"; }
+            }
 		}
 		
 		public override IChannelFactory<TChannel> BuildChannelFactory<TChannel>(BindingParameterCollection parameters)
