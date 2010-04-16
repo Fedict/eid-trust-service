@@ -30,6 +30,33 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>64</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>64</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<testFailureIgnore>true</testFailureIgnore>
+							<!--
+								For running with a runtime without 32-bit mode support.
+							-->
+							<argLine>-d64</argLine>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 	<dependencies>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
@@ -68,6 +95,13 @@
 		<dependency>
 			<groupId>com.sun.xml.ws</groupId>
 			<artifactId>jaxws-rt</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- FIX for JAX-WS 2.2: https://jax-ws.dev.java.net/issues/show_bug.cgi?id=836 -->
+		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>policy</artifactId>
+			<version>2.2.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

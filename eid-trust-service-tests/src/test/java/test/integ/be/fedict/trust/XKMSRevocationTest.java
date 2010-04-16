@@ -23,7 +23,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
 import java.security.Security;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
@@ -44,7 +46,6 @@ import org.etsi.uri._01903.v1_3.RevocationValuesType;
 import org.junit.Before;
 import org.junit.Test;
 
-import sun.security.x509.X509CRLImpl;
 import test.integ.be.fedict.trust.util.TestUtils;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.client.exception.ValidationFailedException;
@@ -112,7 +113,11 @@ public class XKMSRevocationTest {
 		// verify CRL revocation data
 		EncapsulatedPKIDataType crlData = revocationValues.getCRLValues()
 				.getEncapsulatedCRLValue().get(0);
-		X509CRL crl = new X509CRLImpl(Base64.decode(crlData.getValue()));
+		CertificateFactory certificateFactory = CertificateFactory.getInstance(
+				"X.509", "BC");
+		ByteArrayInputStream bais = new ByteArrayInputStream(Base64
+				.decode(crlData.getValue()));
+		X509CRL crl = (X509CRL) certificateFactory.generateCRL(bais);
 		assertNotNull(crl);
 
 		/*
