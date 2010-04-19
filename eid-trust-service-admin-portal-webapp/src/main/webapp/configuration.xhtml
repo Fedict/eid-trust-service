@@ -9,7 +9,7 @@
 			<ui:define name="body">
 				<h2>#{messages.configuration}</h2>
 
-				<rich:tabPanel switchType="client">
+				<rich:tabPanel switchType="client" selectedTab="#{ts_config.selectedTab}">
 
 					<rich:tab label="#{messages.admin}">
 						<h:form id="admin_form">
@@ -65,7 +65,7 @@
 						</h:form>
 					</rich:tab>
 
-					<rich:tab label="#{messages.wsSecurityConfig}">
+					<rich:tab name="tab_wssec" label="#{messages.wsSecurityConfig}">
 						<a4j:form id="wssec_form" ajaxSubmit="true" reRender="panel">
 							<h:panelGrid id="panel" columns="2" border="1">
 
@@ -130,7 +130,7 @@
 					</rich:tab>
 
 
-					<rich:tab label="#{messages.networkConfig}">
+					<rich:tab name="tab_network" label="#{messages.networkConfig}">
 						<a4j:form id="network_form" ajaxSubmit="true" reRender="panel">
 							<h:panelGrid id="panel" columns="2" border="1">
 
@@ -163,7 +163,7 @@
 						</a4j:form>
 					</rich:tab>
 
-					<rich:tab label="#{messages.clockDriftDetection}">
+					<rich:tab name="tab_clock" label="#{messages.clockDriftDetection}">
 						<a4j:form id="clockdrift_form" ajaxSubmit="true"
 							reRender="panel">
 							<h:panelGrid id="panel" columns="2" border="1">
@@ -221,7 +221,7 @@
 						</a4j:form>
 					</rich:tab>
 
-					<rich:tab label="#{messages.informationMessage}">
+					<rich:tab name="tab_info" label="#{messages.informationMessage}">
 						<h:form id="loc_form">
 							<h:selectOneMenu value="#{ts_config.language}">
 								<f:selectItems value="#{supportedLanguages}" />

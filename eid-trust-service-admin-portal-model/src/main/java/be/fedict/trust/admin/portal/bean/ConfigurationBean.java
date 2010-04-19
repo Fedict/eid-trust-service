@@ -91,6 +91,10 @@ public class ConfigurationBean implements Configuration {
 	@Out(value = "language", required = false, scope = ScopeType.CONVERSATION)
 	private String language;
 
+	@In(value = "selectedTab", required = false)
+	@Out(value = "selectedTab", required = false, scope = ScopeType.CONVERSATION)
+	private String selectedTab = null;
+
 	private String informationMessage;
 
 	/**
@@ -107,6 +111,7 @@ public class ConfigurationBean implements Configuration {
 	 * {@inheritDoc}
 	 */
 	@PostConstruct
+	@Begin(join = true)
 	public void initialize() {
 
 		this.log.debug("#initialize");
@@ -140,6 +145,7 @@ public class ConfigurationBean implements Configuration {
 	/**
 	 * {@inheritDoc}
 	 */
+	@End
 	public String saveNetworkConfig() {
 
 		this.log.debug(
@@ -148,12 +154,14 @@ public class ConfigurationBean implements Configuration {
 
 		this.configurationService.saveNetworkConfig(proxyHost, proxyPort,
 				proxyEnabled);
+		this.selectedTab = "tab_network";
 		return "success";
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@End
 	public String saveWSSecurityConfig() {
 
 		this.log
@@ -176,12 +184,14 @@ public class ConfigurationBean implements Configuration {
 							.getMessage());
 			return null;
 		}
+		this.selectedTab = "tab_wssec";
 		return "success";
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@End
 	public String saveClockDriftConfig() {
 
 		this.log
@@ -201,7 +211,7 @@ public class ConfigurationBean implements Configuration {
 					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
 			return null;
 		}
-
+		this.selectedTab = "tab_clock";
 		return "success";
 	}
 
@@ -269,6 +279,14 @@ public class ConfigurationBean implements Configuration {
 			locales.add(new SelectItem(language, language));
 		}
 		return locales;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getSelectedTab() {
+
+		return this.selectedTab;
 	}
 
 	/**

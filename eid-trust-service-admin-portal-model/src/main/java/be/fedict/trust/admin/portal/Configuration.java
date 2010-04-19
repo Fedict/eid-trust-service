@@ -44,6 +44,8 @@ public interface Configuration {
 	/*
 	 * Accessors
 	 */
+	String getSelectedTab();
+
 	String getProxyHost();
 
 	void setProxyHost(String proxyHost);
