@@ -18,6 +18,7 @@
 
 package be.fedict.trust.portal.bean;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -75,7 +76,14 @@ public class LocalizationBean implements Localization {
 	 */
 	public List<SelectItem> getSupportedLocales() {
 
-		return this.localeSelector.getSupportedLocales();
+		List<SelectItem> selectItems = new LinkedList<SelectItem>();
+		for (SelectItem selectItem : this.localeSelector.getSupportedLocales()) {
+			if (selectItem.getLabel().equals("français")) {
+				selectItem.setLabel("Français");
+			}
+			selectItems.add(selectItem);
+		}
+		return selectItems;
 	}
 
 	/**

@@ -18,7 +18,7 @@
 		</authorgroup>
 		<abstract>
 			<para>This manual serves as an entry point for setting up the eID
-				Trust Service.</para>
+				Trust Service. The target audience is system administrators.</para>
 		</abstract>
 	</articleinfo>
 	<section>
@@ -29,6 +29,8 @@
 			as shown) are to be interpreted as described in
 			<ulink url="http://www.ietf.org/rfc/rfc2119.txt">[RFC2119]</ulink>
 			.
+		</para>
+		<para>
 			The eID Trust Service provides two major service artifacts:
 			<orderedlist>
 				<listitem>
@@ -62,7 +64,28 @@
 				over AJP. If such a setup is not possible this SHOULD be clearly
 				communicated in advance to the eID Trust Service development team so
 				they can properly configure the eID Applet Service that is used
-				within the eID Trust Service Portal.</para>
+				within the eID Trust Service Portal.
+			</para>
+			<para>
+				Add following configuration to your SSL site to accomplish this:
+				<programlisting><![CDATA[<IfModule mod_proxy_ajp.c>
+                ProxyRequests On
+                ProxyVia On
+
+                <Location /eid-trust-service-portal>
+                        Order allow,deny
+                        Allow from all
+                        ProxyPass ajp://localhost:8009/eid-trust-service-portal
+                </Location>
+
+                <Location /eid-trust-service-admin-portal>
+                        Order allow,deny
+                        Allow from all
+                        ProxyPass ajp://localhost:8009/eid-trust-service-admin-portal
+                </Location>
+</IfModule>]]></programlisting>
+
+			</para>
 		</section>
 		<section>
 			<title>eID Trust Service Validation Web Service</title>
@@ -76,7 +99,8 @@
 				the service
 				provides the possibility to sign the response messages
 				using
-				WS-Security.</para>
+				WS-Security. This can be configured in the Administrator portal.
+			</para>
 		</section>
 		<section>
 			<title>eID Trust Service Admin Portal</title>
@@ -92,7 +116,7 @@
 		</section>
 		<section>
 			<title>Database</title>
-			<para>The eID Trust Service product required a database to operate.
+			<para>The eID Trust Service product requires a database to operate.
 			</para>
 		</section>
 		<section>
@@ -118,54 +142,187 @@
 	</section>
 	<section>
 		<title>Installation</title>
+		<abstract>
+			This chapter explains how to install the Fedict eID Trust Service
+			application.
+		</abstract>
 		<para>
-			The Fedict eID Trust Service comes with support for HSQL, MySQL
-			and Oracle. This chapter explains how to initialize the database.
+			The Fedict eID Trust Service has to be run on the
+			<ulink url="http://www.jboss.org/jbossas">JBoss Application Server</ulink>
+			. version 6.0.0.M2.
+		</para>
+		<para>
+			The Fedict eID Trust Service application is delivered in a customized
+			database specific zip file. Unpacking this zip file you will notice 2
+			directories:
+			<code>./jboss</code>
+			and
+			<code>./sql</code>
+			. The JBoss directory contains the JBoss application server,
+			configured for your database and pre-packaged with the Fedict eID
+			Trust Service application. The sql directory contains the database
+			initialization scripts. MySQL and Oracle are supported.
+		</para>
+		<para>
+			It is also possible to run the Fedict eID Trust Service application
+			using HSQL, which is the default configured database for the JBoss
+			Application Server. You will have to use the JBoss distribution from
+			the Fedict eID Applet project. This customized distribution has all
+			necessary dependencies included to run the Fedict eID Trust Service.
+			To install simply unzip the eID applet JBoss zip and copy the .ear
+			file in
+			<code>./jboss-as-distribution/server/default/deploy</code>
+			.
+		</para>
+		<para>
+			Please not that it is not recommended to use this setup in a
+			production environment. As the HSQL database is in-memory and parsing
+			of large CRL's also is memory intensive, you will run quickly into
+			memory problems. 
 		</para>
 		<section>
-			<title>HSQL</title>
+			<title>Database setup</title>
 			<para>
-				If you wish to run the Fedict eID Trust Service using HSQL, you
-				can
-				use the JBoss distribution that comes with the Fedict eID Applet.
-				Simply execute
-				<code>mvn jboss:deploy</code>
-				in the eid-trust-service-deploy artifact and you are good to go.
-			</para>
-			<para>
-				Beware though, as parsing large CRL's might be memory
-				intensive, you can quickly run into memory issues on HSQL. Therefore
-				it is only recommended to use this during a test setup.
-			</para>
-		</section>
-		<section>
-			<title>MySQL</title>
-			<para>
-				If you wish to run the Fedict eID Trust Service using MySQL,
-				you can
-				use the eid-trust-service-mysql-distribution artifact.
-				After
-				unpacking you first have to initialize your database. To do so,
-				execute the sql scripts which can be found in
-				<code>/sql</code>
-				.
-				The default username/password for the
+				Before trying to start the JBoss Application Server you will have to
+				initialize your database. The initialization scripts can be found
+				in
+				the
+				<code>./sql</code>
+				directory. There are 3 scripts, one to create the database account,
+				one to create the Fedict eID Trust Service database and one to
+				initialize its tables. The default username/password for
 				<code>trust</code>
 				database is
 				<code>trust/trust</code>
-				. If you wish to change this, you will have to manually modify the
-				sql scripts and change the datasource in the jboss distribution. The
-				latter can be found in
+				. Please not that if you wish to change this, you will have to
+				manually modify the datasource in the JBoss distribution. The
+				configuration for this can be found in
 				<code>/jboss/server/default/deploy/trust-service-ds.xml</code>
 				.
 			</para>
+			<para>
+				The Fedict eID Trust Service has been successfully tested on:
+				<itemizedlist>
+					<listitem>
+						MySQL v5.0
+					</listitem>
+				</itemizedlist>
+			</para>
 		</section>
 		<section>
-			<title>Oracle</title>
-			<para>TBD</para>
+			<title>Resources</title>
+			<para>
+				As the harvesting of large CRLs can be memory intensive, the
+				JBoss
+				Application Server has been tweaked so the JVM can use more
+				memory.
+				By default it is set to reserve a total of 1GB of heap space.
+				The
+				configuration can be found in
+				<code>./jboss/bin/run.conf</code>
+				. More information on tweaking the JVM can be found @
+				<ulink
+					url="http://java.sun.com/javase/technologies/hotspot/gc/gc_tuning_6.html">JVM GC Tuning</ulink>
+				.
+			</para>
+			<para>
+				As to the amount of network traffic, this is highly related as
+				to how CRL caching is configured. 
+			</para>
 		</section>
 		<section>
-			<title>SQuirrel SQL</title>
+			<title>Starting</title>
+			<para>
+				After you have correctly setup your database, you can start the
+				application by executing following command:
+				<code>./jboss/bin/run.sh -b 0.0.0.0</code>
+				.
+			</para>
+			<para>
+				After the application has started, it will have initialized itself
+				with 4 trust domains.
+				<orderedlist>
+					<listitem>
+						eID Authentication Trust Domain
+					</listitem>
+					<listitem>
+						eID Non Repudiation Trust Domain
+					</listitem>
+					<listitem>
+						eID National Registry Trust Domain
+					</listitem>
+					<listitem>
+						Belgian TSA Trust Domain
+					</listitem>
+				</orderedlist>
+			</para>
+			<para>
+				The default trust domain will be set to the eID Authentication
+				Trust Domain. 
+			</para>
+			<para>
+				In order to function properly, the application needs to be able
+				to make outgoing calls for CRL, OCSP, TSP and NTP. If you are
+				running behind a proxy, you can setup the proxy using the
+				administration webapp.
+			</para>
+			<para>
+				CRL downloading (
+				<ulink url="http://en.wikipedia.org/wiki/Revocation_list">Certificate Revocation Lists</ulink>
+				) for the Belgian eID Trust Domains are typically something like
+				<code>http://crl.eid.belgium.be/eidc200501.crl</code>
+				. The URI is retrieved from the specific certificate.
+			</para>
+			<para>
+				OCSP requests (
+				<ulink url="http://en.wikipedia.org/wiki/OCSP">Online Certificate Status Protocol</ulink>
+				for the Belgian eID Trust Domains are sent to
+				<code>http://ocsp.eid.belgium.be</code>
+				. The URI is again retrieved from the specific certificate.
+			</para>
+			<para>
+				TSP requests (
+				<ulink url="http://en.wikipedia.org/wiki/Time_Stamp_Protocol">Timestamp Protocol</ulink>
+				can be used for clock drift detection and the location is
+				configurable in the Administrator portal.
+			</para>
+			<para>
+				The NTP protocol (
+				<ulink url="http://en.wikipedia.org/wiki/Network_Time_Protocol"></ulink>
+				can also be used for clock drift detection and again the location is
+				configurable in the Administrator portal.
+			</para>
+		</section>
+	</section>
+	<section>
+		<title>Configuration</title>
+		<section>
+			<title>Transaction timeouts</title>
+			<para>
+				The downloading and processing of large CRLs can sometimes take
+				alot
+				of time. This can lead to internal transaction timeouts. By
+				default,
+				the custom JBoss MySQL and Oracle Distributions have a
+				transaction
+				timeout configured of 1200 seconds or 20 minutes. Which should be
+				sufficient.
+				If this still proves to be insufficient, this can be
+				changed in
+				<code>jboss/server/default/deploy/transaction-jboss-beans.xml</code>
+				Look for following line and change accordingly:
+				<programlisting role="XML"><![CDATA[
+					<property name="defaultTimeout">1200</property>
+				]]></programlisting>
+				. After changing this the JBoss Application Server has to be
+				restarted.
+			</para>
+		</section>
+	</section>
+	<section>
+		<title>Administration</title>
+		<section>
+			<title>Database</title>
 			<para>
 				To view the contents of the database behind the FedICT eID Trust
 				Service, one can use the
@@ -176,7 +333,8 @@
 			<para>
 				To be able to connect to your HSQL/MySQL/Oracle
 				database you will
-				need to configure a JDBC driver. You can download
+				need
+				to configure a JDBC driver. You can download
 				the drivers @
 				<ulink url="http://www.mysql.com/downloads/connector/j/">MySQL JDBC Driver</ulink>
 				and
@@ -205,225 +363,174 @@
 			</para>
 		</section>
 		<section>
-			<title>Transaction timeouts</title>
-			<para>
-				The downloading and processing of large CRLs can sometimes take
-				alot
-				of time. This can lead to internal transaction timeouts. By
-				default,
-				the custom JBoss MySQL and Oracle Distributions have a
-				transaction
-				timeout configured of 1200 seconds or 20 minutes. Which should be
-				sufficient.
-				If this still proves to be insufficient, this can be
-				changed in
-				<code>jboss/server/default/deploy/transaction-jboss-beans.xml</code>
-				Look for following line and change accordingly:
-				<programlisting role="XML"><![CDATA[
-					<property name="defaultTimeout">1200</property>
-				]]></programlisting>
-			</para>
-		</section>
-	</section>
-	<section>
-		<title>Running</title>
-		<para>
-			After you have correctly setup your database, you can start the
-			application by
-			<code>./jboss/bin/run.sh -b 0.0.0.0</code>
-			. Note that in case you choose HSQL as your database, you will have
-			to first start the Fedict eID Applet JBoss distribution, followed by
-			running the command
-			<code>mvn jboss:deploy</code>
-			from the eid-trust-service-deploy artifact. The MySQL and Oracle
-			distribution have the Fedict eID Trust Service Application packaged
-			and will be started automatically.
-		</para>
-		<para>
-			After the application has started, it will have initialized itself
-			with 4 trust domains.
-			<orderedlist>
-				<listitem>
-					eID Authentication Trust Domain
-				</listitem>
-				<listitem>
-					eID Non Repudiation Trust Domain
-				</listitem>
-				<listitem>
-					eID National Registry Trust Domain
-				</listitem>
-				<listitem>
-					Belgian TSA Trust Domain
-				</listitem>
-			</orderedlist>
-		</para>
-		<para>
-			The default trust domain will be set to the eID Authentication
-			Trust
-			Domain. In order to function properly, the application needs to
-			be
-			able to make outgoing calls for CRL, OCSP, TSP and NTP. If you are
-			running behind a proxy, you can setup the proxy using the
-			administration webapp.
-		</para>
-	</section>
-	<section>
-		<title>Administration</title>
-		<para>
-			The Fedict eID Trust Service comes with an administration
-			portal. This portal allows you to setup your network proxy if any,
-			manage trust domains and other aspects of the service.
-		</para>
-		<section>
-			<title>Administrator registration</title>
-			<para>
-				To authenticate to the administrator portal, an eID
-				authentication
-				will be performed. If the service was freshly
-				installed, the first
-				successfull authentication will be
-				automatically
-				registered as
-				administrator. Subsequent administrators
-				will have to
-				be accepted by
-				this one. There are two ways to accomplish this:
-				<orderedlist>
-					<listitem>
-						<para>
-							Perform a login which will add you as a pending
-							administrator which can subsequently be approved by an
-							administrator.
+			<title>Administration Portal</title>
+			<abstract>
+				The Fedict eID Trust Service comes with an administration
+				portal. This
+				portal allows you to setup your network proxy if any,
+				manage trust
+				domains and other aspects of the service.
+			</abstract>
+			<section>
+				<title>Administrator registration</title>
+				<para>
+					To authenticate to the administrator portal, an eID
+					authentication
+					will be performed. If the service was freshly
+					installed, the first
+					successfull authentication will be
+					automatically
+					registered as
+					administrator. Subsequent administrators
+					will have to
+					be accepted by
+					this one. There are two ways to accomplish this:
+					<orderedlist>
+						<listitem>
+							<para>
+								Perform a login which will add you as a pending
+								administrator which can subsequently be approved by an
+								administrator.
 						</para>
-					</listitem>
-					<listitem>
-						<para>
-							Ask another administrator who is logged to register you from
-							within the admin portal. You can find this in the
-							<code>Configuration</code>
-							page.
-						</para>
-					</listitem>
-				</orderedlist>
-			</para>
-		</section>
-		<section>
-			<title>Configuration</title>
-			<section>
-				<title>Administrators</title>
-				<para>Here you can view existing and pending administrators, approve
-					pending administrators, remove administratos and register an
-					additional one. To register an additional one, a full eID
-					authentication has to be performed of this new administrator.
+						</listitem>
+						<listitem>
+							<para>
+								Ask another administrator who is logged to register you from
+								within the admin portal. You can find this in the
+								<code>Configuration</code>
+								page.
+							</para>
+						</listitem>
+					</orderedlist>
 				</para>
 			</section>
 			<section>
-				<title>WS Security Configuration</title>
+				<title>Configuration</title>
+				<section>
+					<title>Administrators</title>
+					<para>Here you can view existing and pending administrators,
+						approve
+						pending administrators, remove administratos and register an
+						additional one. To register an additional one, a full eID
+						authentication has to be performed of this new administrator.
+				</para>
+				</section>
+				<section>
+					<title>WS Security Configuration</title>
+					<para>
+						The eID Trust Service Validation Web Service has the
+						possibility to optionally sign its response message using
+						WS-Security. The keystore to be used for this can be configured
+						here. There is support for JKS, PKCS#11 and PKCS#12 keystores. The
+						keystore path in case of PKCS#11 is the path to the configuration
+						file which will be used by the Sun PKCS#11 provider. 
+				</para>
+				</section>
+				<section>
+					<title>Network Configuration</title>
+					<para>If you are operating behind a proxy, you can setup this in
+						here and enable or disable the proxy configuration.
+				</para>
+				</section>
+				<section>
+					<title>Clock Drift Detection</title>
+					<para>
+						The Fedict eID Trust Service comes with built in support for
+						NTP and TSP. TSP or Timestamp Protocol is a protocol used for
+						certifying timestamps. A timestamp request will be sent to the
+						configured TSA server, returning a timestamp response containing a
+						timestamp token. The received timestamp token will be used
+						for clock
+						drift detection.
+				</para>
+				</section>
+				<section>
+					<title>Information Message</title>
+					<para>
+						The information message to be shown on
+						$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal can be
+						configured here for all available languages of the FedICT eID
+						Trust
+						Service Portal.
+				</para>
+				</section>
+			</section>
+			<section>
+				<title>Virtual Trust Domains</title>
 				<para>
-					The eID Trust Service Validation Web Service has the
-					possibility to optionally sign its response message using
-					WS-Security. The keystore to be used for this can be configured
-					here. 
-				</para>
+					Virtual trust domains are a group of existing trust domains.
+					Users of the eID Trust Service Validation Web Service have the
+					possibility to specify a virtual trust domain to validate against
+					all of its trust domains configured.
+			</para>
 			</section>
 			<section>
-				<title>Network Configuration</title>
-				<para>If you are operating behind a proxy, you can setup this in
-					here and enable or disable the proxy configuration temporarily.
-				</para>
-			</section>
-			<section>
-				<title>Clock Drift Detection</title>
+				<title>Trust Domains</title>
 				<para>
-					The Fedict eID Trust Service comes with built in support for
-					NTP and TSP.
-				</para>
+					You can add, modify, remove trust domains here. Also you can
+					set the default trust domain for the FedICT eID Trust Service.
+					This
+					trust domain will be used in the eID Trust Service Validation Web
+					Service if no specific trust domain was specified.
+					For each trust
+					domain you can specify whether or not CRL caching should be used,
+					which trust points lie under this trust domain and which certificate
+					contraints are too be enforced when validating against this trust
+					domain.
+			</para>
 			</section>
 			<section>
-				<title>Information Message</title>
+				<title>Trust Points</title>
 				<para>
-					The information message to be shown on
-					$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal can be
-					configured here for all available languages of the FedICT eID Trust
-					Service Portal.
-				</para>
+					For each trust point, you can specify a cron expression for
+					specifying
+					the CRL cache refresh interval. Such a refresh includes
+					refreshing all
+					underlying CA's that have been cached. You can also
+					refresh the CRL cache immediately here for debugging purposes. For
+					each trust point you can see the list of CA's associated with
+					this
+					trust point and for each CA refresh the cache individually.
+			</para>
 			</section>
-		</section>
-		<section>
-			<title>Virtual Trust Domains</title>
-			<para>
-				Virtual trust domains are a group of existing trust domains.
-				Users of the eID Trust Service Validation Web Service have the
-				possibility to specify a virtual trust domain to validate against
-				all of its trust domains configured.
-			</para>
-		</section>
-		<section>
-			<title>Trust Domains</title>
-			<para>
-				You can add, modify, remove trust domains here. Also you can
-				set the default trust domain for the FedICT eID Trust Service.
-				This
-				trust domain will be used in the eID Trust Service Validation Web
-				Service if no specific trust domain was specified.
-				For each trust
-				domain you can specify whether or not CRL caching should be used,
-				which trust points lie under this trust domain and which certificate
-				contraints are too be enforced when validating against this trust
-				domain.
-			</para>
-		</section>
-		<section>
-			<title>Trust Points</title>
-			<para>
-				For each trust point, you can specify a cron expression for
-				specifying
-				the CRL cache refresh interval. Such a refresh includes
-				refreshing all
-				underlying CA's that have been cached. You can also
-				refresh the CRL cache immediately here for debugging purposes. For
-				each trust point you can see the list of CA's associated with
-				this
-				trust point and for each CA refresh the cache individually.
-			</para>
-		</section>
-		<section>
-			<title>SNMP</title>
-			<para>
-				The FedICT eID Trust Service has several SNMP counters
-				available.
-				These counters can be retrieved by invoking the command:
-				<programlisting role="XML"><![CDATA[
+			<section>
+				<title>SNMP</title>
+				<para>
+					The FedICT eID Trust Service has several SNMP counters
+					available.
+					These counters can be retrieved by invoking the command:
+					<programlisting role="XML"><![CDATA[
 					snmpget -v 2c -c public localhost:7894 1.3.6.1.4.1.7890.0.0
 				]]></programlisting>
-				. The available SNMP counters are:
-				<itemizedlist>
-					<listitem>
-						<para># of validations ( OID = 1.3.6.1.4.1.7890.0.0 )</para>
-					</listitem>
-					<listitem>
-						<para># of CRL cache refreshes ( OID = 1.3.6.1.4.1.7890.1.0 )
-						</para>
-					</listitem>
-					<listitem>
-						<para># of CRL cache hits ( OID = 1.3.6.1.4.1.7890.2.0 )</para>
-					</listitem>
-					<listitem>
-						<para># of CRL cache misses ( OID = 1.3.6.1.4.1.7890.3.0 )</para>
-					</listitem>
-					<listitem>
-						<para>CRL cache hit % ( OID = 1.3.6.1.4.1.7890.4.0 )</para>
-					</listitem>
-					<listitem>
-						<para># of CRL download failures ( OID = 1.3.6.1.4.1.7890.5.0 )
-						</para>
-					</listitem>
-					<listitem>
-						<para># of OCSP request failures ( OID = 1.3.6.1.4.1.7890.6.0 )
-						</para>
-					</listitem>
-				</itemizedlist>
-			</para>
+					. The available SNMP counters are:
+					<itemizedlist>
+						<listitem>
+							<para># of validations ( OID = 1.3.6.1.4.1.7890.0.0 )</para>
+						</listitem>
+						<listitem>
+							<para># of CRL cache refreshes ( OID = 1.3.6.1.4.1.7890.1.0 )
+							</para>
+						</listitem>
+						<listitem>
+							<para># of CRL cache hits ( OID = 1.3.6.1.4.1.7890.2.0 )</para>
+						</listitem>
+						<listitem>
+							<para># of CRL cache misses ( OID = 1.3.6.1.4.1.7890.3.0 )</para>
+						</listitem>
+						<listitem>
+							<para>CRL cache hit % ( OID = 1.3.6.1.4.1.7890.4.0 )</para>
+						</listitem>
+						<listitem>
+							<para># of CRL download failures ( OID = 1.3.6.1.4.1.7890.5.0 )
+							</para>
+						</listitem>
+						<listitem>
+							<para># of OCSP request failures ( OID = 1.3.6.1.4.1.7890.6.0 )
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+			</section>
 		</section>
 	</section>
 	<appendix>
