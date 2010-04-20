@@ -97,7 +97,10 @@
 			<artifactId>jaxws-rt</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- FIX for JAX-WS 2.2: https://jax-ws.dev.java.net/issues/show_bug.cgi?id=836 -->
+		<!--
+			FIX for JAX-WS 2.2:
+			https://jax-ws.dev.java.net/issues/show_bug.cgi?id=836
+		-->
 		<dependency>
 			<groupId>com.sun.xml.ws</groupId>
 			<artifactId>policy</artifactId>
@@ -127,6 +130,11 @@
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>jfree</groupId>
+			<artifactId>jfreechart</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
