@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
-import java.net.URI;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -38,9 +37,12 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.SignatureException;
+import java.security.cert.CRLException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateParsingException;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAKeyPairGenerator;
 import java.security.spec.RSAKeyGenParameterSpec;
@@ -58,24 +60,37 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.CRLNumber;
+import org.bouncycastle.asn1.x509.CRLReason;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.x509.X509V2CRLGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 
@@ -159,7 +174,7 @@ public class TestUtils {
 		X509Certificate certificate = generateCertificate(keyPair.getPublic(),
 				dn, keyPair.getPrivate(), null, notBefore, notAfter,
 				signatureAlgorithm, includeAuthorityKeyIdentifier, caCert,
-				timeStampingPurpose, null);
+				timeStampingPurpose, null, null, null);
 		return certificate;
 	}
 
@@ -168,9 +183,10 @@ public class TestUtils {
 			PrivateKey issuerPrivateKey, X509Certificate issuerCert,
 			DateTime notBefore, DateTime notAfter, String signatureAlgorithm,
 			boolean includeAuthorityKeyIdentifier, boolean caCert,
-			boolean timeStampingPurpose, URI ocspUri) throws IOException,
-			InvalidKeyException, IllegalStateException,
-			NoSuchAlgorithmException, SignatureException, CertificateException {
+			boolean timeStampingPurpose, String ocspUri, String crlUri,
+			KeyUsage keyUsage) throws IOException, InvalidKeyException,
+			IllegalStateException, NoSuchAlgorithmException,
+			SignatureException, CertificateException {
 
 		String finalSignatureAlgorithm = signatureAlgorithm;
 		if (null == signatureAlgorithm) {
@@ -219,12 +235,29 @@ public class TestUtils {
 
 		if (null != ocspUri) {
 			GeneralName ocspName = new GeneralName(
-					GeneralName.uniformResourceIdentifier, ocspUri.toString());
+					GeneralName.uniformResourceIdentifier, ocspUri);
 			AuthorityInformationAccess authorityInformationAccess = new AuthorityInformationAccess(
 					X509ObjectIdentifiers.ocspAccessMethod, ocspName);
 			certificateGenerator.addExtension(
 					X509Extensions.AuthorityInfoAccess.getId(), false,
 					authorityInformationAccess);
+		}
+
+		if (null != crlUri) {
+			GeneralName gn = new GeneralName(
+					GeneralName.uniformResourceIdentifier, new DERIA5String(
+							crlUri));
+			GeneralNames gns = new GeneralNames(new DERSequence(gn));
+			DistributionPointName dpn = new DistributionPointName(0, gns);
+			DistributionPoint distp = new DistributionPoint(dpn, null, null);
+			certificateGenerator.addExtension(
+					X509Extensions.CRLDistributionPoints, false,
+					new DERSequence(distp));
+		}
+
+		if (null != keyUsage) {
+			certificateGenerator.addExtension(X509Extensions.KeyUsage, true,
+					keyUsage);
 		}
 
 		X509Certificate certificate = certificateGenerator
@@ -418,6 +451,162 @@ public class TestUtils {
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		transformer.transform(source, result);
 		return stringWriter.toString();
+	}
+
+	public static String toPem(Object object) {
+
+		StringWriter buffer = new StringWriter();
+		try {
+			PEMWriter writer = new PEMWriter(buffer);
+			LOG.debug("toPem: " + object.getClass().getName());
+			writer.writeObject(object);
+			writer.close();
+			return buffer.toString();
+		} catch (Exception e) {
+			throw new RuntimeException("Cannot convert object to PEM format: "
+					+ e.getMessage(), e);
+		} finally {
+			IOUtils.closeQuietly(buffer);
+		}
+	}
+
+	public static class RevokedCertificate {
+		private final BigInteger serialNumber;
+		private final DateTime revocationDate;
+
+		public RevokedCertificate(BigInteger serialNumber,
+				DateTime revocationDate) {
+			this.serialNumber = serialNumber;
+			this.revocationDate = revocationDate;
+		}
+	}
+
+	public static X509CRL generateCrl2(PrivateKey issuerPrivateKey,
+			X509Certificate issuerCertificate, DateTime thisUpdate,
+			DateTime nextUpdate,
+			List<BigInteger> revokedCertificateSerialNumbers)
+			throws InvalidKeyException, CRLException, IllegalStateException,
+			NoSuchAlgorithmException, SignatureException,
+			CertificateParsingException {
+
+		List<RevokedCertificate> revokedCertificates = new LinkedList<RevokedCertificate>();
+		for (BigInteger revokedCertificateSerialNumber : revokedCertificateSerialNumbers) {
+			revokedCertificates.add(new RevokedCertificate(
+					revokedCertificateSerialNumber, thisUpdate));
+		}
+		return generateCrl(issuerPrivateKey, issuerCertificate, thisUpdate,
+				nextUpdate, null, false, revokedCertificates, "SHA1withRSA");
+	}
+
+	public static X509CRL generateCrl(PrivateKey issuerPrivateKey,
+			X509Certificate issuerCertificate, DateTime thisUpdate,
+			DateTime nextUpdate, String signatureAlgorithm,
+			BigInteger... revokedCertificateSerialNumbers)
+			throws InvalidKeyException, CRLException, IllegalStateException,
+			NoSuchAlgorithmException, SignatureException,
+			CertificateParsingException {
+
+		List<RevokedCertificate> revokedCertificates = new LinkedList<RevokedCertificate>();
+		for (BigInteger revokedCertificateSerialNumber : revokedCertificateSerialNumbers) {
+			revokedCertificates.add(new RevokedCertificate(
+					revokedCertificateSerialNumber, thisUpdate));
+		}
+		return generateCrl(issuerPrivateKey, issuerCertificate, thisUpdate,
+				nextUpdate, null, false, revokedCertificates,
+				signatureAlgorithm);
+	}
+
+	public static X509CRL generateCrl(PrivateKey issuerPrivateKey,
+			X509Certificate issuerCertificate, DateTime thisUpdate,
+			DateTime nextUpdate, List<RevokedCertificate> revokedCertificates)
+			throws InvalidKeyException, CRLException, IllegalStateException,
+			NoSuchAlgorithmException, SignatureException,
+			CertificateParsingException {
+
+		return generateCrl(issuerPrivateKey, issuerCertificate, thisUpdate,
+				nextUpdate, null, false, revokedCertificates, "SHA1withRSA");
+	}
+
+	public static X509CRL generateCrl(PrivateKey issuerPrivateKey,
+			X509Certificate issuerCertificate, DateTime thisUpdate,
+			DateTime nextUpdate, List<String> deltaCrlUris,
+			List<RevokedCertificate> revokedCertificates)
+			throws InvalidKeyException, CRLException, IllegalStateException,
+			NoSuchAlgorithmException, SignatureException,
+			CertificateParsingException {
+
+		return generateCrl(issuerPrivateKey, issuerCertificate, thisUpdate,
+				nextUpdate, deltaCrlUris, false, revokedCertificates,
+				"SHA1withRSA");
+	}
+
+	public static X509CRL generateCrl(PrivateKey issuerPrivateKey,
+			X509Certificate issuerCertificate, DateTime thisUpdate,
+			DateTime nextUpdate, List<String> deltaCrlUris, boolean deltaCrl,
+			List<RevokedCertificate> revokedCertificates)
+			throws InvalidKeyException, CRLException, IllegalStateException,
+			NoSuchAlgorithmException, SignatureException,
+			CertificateParsingException {
+
+		return generateCrl(issuerPrivateKey, issuerCertificate, thisUpdate,
+				nextUpdate, deltaCrlUris, deltaCrl, revokedCertificates,
+				"SHA1withRSA");
+	}
+
+	public static X509CRL generateCrl(PrivateKey issuerPrivateKey,
+			X509Certificate issuerCertificate, DateTime thisUpdate,
+			DateTime nextUpdate, List<String> deltaCrlUris, boolean deltaCrl,
+			List<RevokedCertificate> revokedCertificates,
+			String signatureAlgorithm) throws InvalidKeyException,
+			CRLException, IllegalStateException, NoSuchAlgorithmException,
+			SignatureException, CertificateParsingException {
+
+		X509V2CRLGenerator crlGenerator = new X509V2CRLGenerator();
+		crlGenerator.setThisUpdate(thisUpdate.toDate());
+		crlGenerator.setNextUpdate(nextUpdate.toDate());
+		crlGenerator.setSignatureAlgorithm(signatureAlgorithm);
+		crlGenerator.setIssuerDN(issuerCertificate.getSubjectX500Principal());
+
+		for (RevokedCertificate revokedCertificate : revokedCertificates) {
+			crlGenerator.addCRLEntry(revokedCertificate.serialNumber,
+					revokedCertificate.revocationDate.toDate(),
+					CRLReason.privilegeWithdrawn);
+		}
+
+		crlGenerator.addExtension(X509Extensions.AuthorityKeyIdentifier, false,
+				new AuthorityKeyIdentifierStructure(issuerCertificate));
+		crlGenerator.addExtension(X509Extensions.CRLNumber, false,
+				new CRLNumber(BigInteger.ONE));
+
+		if (null != deltaCrlUris && !deltaCrlUris.isEmpty()) {
+			DistributionPoint[] deltaCrlDps = new DistributionPoint[deltaCrlUris
+					.size()];
+			for (int i = 0; i < deltaCrlUris.size(); i++) {
+				deltaCrlDps[i] = getDistributionPoint(deltaCrlUris.get(i));
+			}
+			CRLDistPoint crlDistPoint = new CRLDistPoint(
+					(DistributionPoint[]) deltaCrlDps);
+			crlGenerator.addExtension(X509Extensions.FreshestCRL, false,
+					crlDistPoint);
+		}
+
+		if (deltaCrl) {
+			crlGenerator.addExtension(X509Extensions.DeltaCRLIndicator, true,
+					new CRLNumber(BigInteger.ONE));
+		}
+
+		X509CRL x509Crl = crlGenerator.generate(issuerPrivateKey);
+		return x509Crl;
+	}
+
+	public static DistributionPoint getDistributionPoint(String uri) {
+		GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier,
+				new DERIA5String(uri));
+		ASN1EncodableVector vec = new ASN1EncodableVector();
+		vec.add(gn);
+		GeneralNames gns = new GeneralNames(new DERSequence(vec));
+		DistributionPointName dpn = new DistributionPointName(0, gns);
+		return new DistributionPoint(dpn, null, null);
 	}
 
 }
