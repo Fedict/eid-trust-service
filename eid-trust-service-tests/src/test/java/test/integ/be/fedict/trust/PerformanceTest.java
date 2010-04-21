@@ -51,11 +51,16 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.block.BlockContainer;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.title.CompositeTitle;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.ui.HorizontalAlignment;
+import org.jfree.ui.RectangleEdge;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,10 +71,10 @@ public class PerformanceTest {
 
 	private static final Log LOG = LogFactory.getLog(PerformanceTest.class);
 
-	private static final String XKMS_LOCATION = "http://www.e-contract.be/eid-trust-service-ws/xkms2";
-
 	// private static final String XKMS_LOCATION =
-	// "http://192.168.1.101/eid-trust-service-ws/xkms2";
+	// "http://www.e-contract.be/eid-trust-service-ws/xkms2";
+
+	private static final String XKMS_LOCATION = "http://192.168.1.101/eid-trust-service-ws/xkms2";
 
 	private static final int INTERVAL_SIZE = 1000 * 10;
 
@@ -197,29 +202,48 @@ public class PerformanceTest {
 
 			performance.remove(performance.size() - 1);
 
+			int totalCount = 0;
+			int totalFailures = 0;
+
 			for (PerformanceData performanceEntry : performance) {
 				series.add(new Second(performanceEntry.getDate()),
 						performanceEntry.getCount());
+				totalCount += performanceEntry.getCount();
+
 				failureSeries.add(new Second(performanceEntry.getDate()),
 						performanceEntry.getFailures());
+				totalFailures += performanceEntry.getFailures();
 			}
 
 			TimeSeriesCollection dataset = new TimeSeriesCollection();
 			dataset.addSeries(series);
 			dataset.addSeries(failureSeries);
 			this.chart = ChartFactory.createTimeSeriesChart(
-					"eID Trust Service Performance History "
-							+ performance.get(0).getDate(),
+					"eID Trust Service Performance History",
 					"Time (interval size " + INTERVAL_SIZE + " msec)",
 					"Number of XKMS requests", dataset, true, false, false);
+			this.chart.addSubtitle(new TextTitle(performance.get(0).getDate()
+					.toString()));
+
+			TextTitle info = new TextTitle("Total number of requests: "
+					+ totalCount);
+			info.setTextAlignment(HorizontalAlignment.LEFT);
+			info.setPosition(RectangleEdge.BOTTOM);
+			this.chart.addSubtitle(info);
+			TextTitle info2 = new TextTitle("Total number of failures: "
+					+ totalFailures);
+			info2.setPosition(RectangleEdge.BOTTOM);
+			info2.setTextAlignment(HorizontalAlignment.LEFT);
+			this.chart.addSubtitle(info2);
 			this.chart.setBackgroundPaint(Color.WHITE);
 			XYPlot plot = this.chart.getXYPlot();
 			plot.setBackgroundPaint(Color.WHITE);
 			DateAxis axis = (DateAxis) plot.getDomainAxis();
-			axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:s"));
+			axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:ss"));
 			ValueAxis valueAxis = plot.getRangeAxis();
 			valueAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 			XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+			plot.setRangeGridlinePaint(Color.black);
 			plot.setRenderer(renderer);
 
 			ChartPanel chartPanel = new ChartPanel(this.chart);
@@ -236,7 +260,7 @@ public class PerformanceTest {
 			if (JFileChooser.APPROVE_OPTION == result) {
 				File file = fileChooser.getSelectedFile();
 				try {
-					ChartUtilities.saveChartAsPNG(file, this.chart, 800, 600);
+					ChartUtilities.saveChartAsPNG(file, this.chart, 1024, 768);
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(null,
 							"error saving to file: " + e.getMessage());
