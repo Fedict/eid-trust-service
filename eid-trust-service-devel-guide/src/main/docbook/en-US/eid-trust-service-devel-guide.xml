@@ -955,7 +955,7 @@ xkms2:ValidateRequest/xkms2:QueryKeyBinding/xkms2:UseKeyWith@Application=urn:be:
 		<title>Revision history</title>
 		<table>
 			<title>Revision history</title>
-			<tgroup cols="2">
+			<tgroup cols="3">
 				<colspec colwidth="1*" />
 				<colspec colwidth="1*" />
 				<colspec colwidth="2*" />
