@@ -107,7 +107,7 @@
 						</goals>
 						<configuration>
 							<includeTypes>jar</includeTypes>
-							<excludeScope>provided</excludeScope>
+							<includeScope>runtime</includeScope>
 							<outputDirectory>${project.build.directory}/dependency
 							</outputDirectory>
 						</configuration>
