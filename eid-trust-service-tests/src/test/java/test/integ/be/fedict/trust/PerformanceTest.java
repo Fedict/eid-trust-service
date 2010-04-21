@@ -66,6 +66,13 @@ public class PerformanceTest {
 
 	private static final Log LOG = LogFactory.getLog(PerformanceTest.class);
 
+	private static final String XKMS_LOCATION = "http://www.e-contract.be/eid-trust-service-ws/xkms2";
+
+	// private static final String XKMS_LOCATION =
+	// "http://192.168.1.101/eid-trust-service-ws/xkms2";
+
+	private static final int INTERVAL_SIZE = 1000 * 10;
+
 	@Before
 	public void setUp() {
 		Security.addProvider(new BouncyCastleProvider());
@@ -76,14 +83,20 @@ public class PerformanceTest {
 	private static class PerformanceData {
 		private final Date date;
 		private int count;
+		private int failures;
 
 		public PerformanceData() {
 			this.date = new Date();
 			this.count = 0;
+			this.failures = 0;
 		}
 
 		public void inc() {
 			this.count++;
+		}
+
+		public void incFailures() {
+			this.failures++;
 		}
 
 		public Date getDate() {
@@ -92,6 +105,10 @@ public class PerformanceTest {
 
 		public int getCount() {
 			return this.count;
+		}
+
+		public int getFailures() {
+			return this.failures;
 		}
 	}
 
@@ -106,10 +123,7 @@ public class PerformanceTest {
 
 		JOptionPane.showMessageDialog(null, "OK to remove eID card...");
 
-		XKMS2Client client = new XKMS2Client(
-				"http://192.168.1.101/eid-trust-service-ws/xkms2");
-
-		final int INTERVAL_SIZE = 1000 * 5;
+		XKMS2Client client = new XKMS2Client(XKMS_LOCATION);
 
 		List<PerformanceData> performance = new LinkedList<PerformanceData>();
 		PerformanceData currentPerformance = new PerformanceData();
@@ -129,7 +143,7 @@ public class PerformanceTest {
 				}
 			} catch (Exception e) {
 				LOG.error("error: " + e.getMessage(), e);
-				this.run = false;
+				currentPerformance.incFailures();
 			}
 		}
 
@@ -140,6 +154,8 @@ public class PerformanceTest {
 	}
 
 	private class WorkingFrame extends JFrame implements ActionListener {
+		private static final long serialVersionUID = 1L;
+
 		public WorkingFrame() {
 			super("Running performance tests");
 			setSize(400, 100);
@@ -161,6 +177,7 @@ public class PerformanceTest {
 
 	private class ResultDialog extends JDialog implements ActionListener {
 
+		private static final long serialVersionUID = 1L;
 		private JFreeChart chart;
 
 		public ResultDialog(List<PerformanceData> performance) {
@@ -175,23 +192,31 @@ public class PerformanceTest {
 			fileMenu.add(saveMenuItem);
 			saveMenuItem.addActionListener(this);
 
-			TimeSeries series = new TimeSeries("Serie 1");
+			TimeSeries series = new TimeSeries("Success");
+			TimeSeries failureSeries = new TimeSeries("Failures");
+
+			performance.remove(performance.size() - 1);
 
 			for (PerformanceData performanceEntry : performance) {
 				series.add(new Second(performanceEntry.getDate()),
 						performanceEntry.getCount());
+				failureSeries.add(new Second(performanceEntry.getDate()),
+						performanceEntry.getFailures());
 			}
 
 			TimeSeriesCollection dataset = new TimeSeriesCollection();
 			dataset.addSeries(series);
+			dataset.addSeries(failureSeries);
 			this.chart = ChartFactory.createTimeSeriesChart(
-					"eID Trust Service Performance History", "Time",
-					"Number of XKMS requests", dataset, false, false, false);
+					"eID Trust Service Performance History "
+							+ performance.get(0).getDate(),
+					"Time (interval size " + INTERVAL_SIZE + " msec)",
+					"Number of XKMS requests", dataset, true, false, false);
 			this.chart.setBackgroundPaint(Color.WHITE);
 			XYPlot plot = this.chart.getXYPlot();
 			plot.setBackgroundPaint(Color.WHITE);
 			DateAxis axis = (DateAxis) plot.getDomainAxis();
-			axis.setDateFormatOverride(new SimpleDateFormat("H:m:s"));
+			axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:s"));
 			ValueAxis valueAxis = plot.getRangeAxis();
 			valueAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 			XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
