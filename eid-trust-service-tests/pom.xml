@@ -25,6 +25,8 @@
 						have 64-bit mode
 					-->
 					<argLine>-d32</argLine>
+					<argLine>-Xmx1024m</argLine>
+					<forkMode>pertest</forkMode>
 				</configuration>
 			</plugin>
 		</plugins>

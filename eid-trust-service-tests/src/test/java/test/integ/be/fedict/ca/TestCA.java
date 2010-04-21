@@ -38,10 +38,11 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.ServletMapping;
 import org.mortbay.jetty.servlet.SessionHandler;
 
-import test.integ.be.fedict.ca.servlet.RootCACrlServlet;
 import test.integ.be.fedict.ca.servlet.InterCACrlServlet;
 import test.integ.be.fedict.ca.servlet.InterCAOcspServlet;
+import test.integ.be.fedict.ca.servlet.InterCAPrivateKeyServlet;
 import test.integ.be.fedict.ca.servlet.InterCAServlet;
+import test.integ.be.fedict.ca.servlet.RootCACrlServlet;
 import test.integ.be.fedict.ca.servlet.RootCAServlet;
 import test.integ.be.fedict.trust.util.TestUtils;
 
@@ -49,9 +50,12 @@ public class TestCA {
 
 	private static final Log LOG = LogFactory.getLog(TestCA.class);
 
+	public static final String CA_HOST = "sebeco-dev-11";
+
 	public static final String ROOT_CA_CONTEXT_PATH = "/rootca.crt";
 	public static final String ROOT_CA_CRL_CONTEXT_PATH = "/rootca.crl";
 	public static final String INTER_CA_CONTEXT_PATH = "/interca.crt";
+	public static final String INTER_CA_PRIVATE_KEY_CONTEXT_PATH = "/interca.key";
 	public static final String INTER_CA_CRL_CONTEXT_PATH = "/interca.crl";
 	public static final String INTER_CA_OCSP_CONTEXT_PATH = "/interca/ocsp";
 
@@ -77,6 +81,8 @@ public class TestCA {
 		addServlet(RootCAServlet.class, ROOT_CA_CONTEXT_PATH);
 		addServlet(RootCACrlServlet.class, ROOT_CA_CRL_CONTEXT_PATH);
 		addServlet(InterCAServlet.class, INTER_CA_CONTEXT_PATH);
+		addServlet(InterCAPrivateKeyServlet.class,
+				INTER_CA_PRIVATE_KEY_CONTEXT_PATH);
 		addServlet(InterCACrlServlet.class, INTER_CA_CRL_CONTEXT_PATH);
 		addServlet(InterCAOcspServlet.class, INTER_CA_OCSP_CONTEXT_PATH);
 
@@ -142,7 +148,7 @@ public class TestCA {
 	private void createSocketConnector() throws Exception {
 
 		SocketConnector connector = new SocketConnector();
-		connector.setHost("127.0.0.1");
+		connector.setHost(CA_HOST);
 		this.server.addConnector(connector);
 		if (this.server.isStarted()) {
 			connector.start();
@@ -150,7 +156,7 @@ public class TestCA {
 			connector.open();
 		}
 
-		this.path = "http://127.0.0.1:" + connector.getLocalPort();
+		this.path = "http://" + CA_HOST + ":" + connector.getLocalPort();
 	}
 
 	public String getPath() {

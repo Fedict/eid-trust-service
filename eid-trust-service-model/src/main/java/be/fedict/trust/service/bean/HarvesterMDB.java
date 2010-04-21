@@ -27,6 +27,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -64,6 +65,8 @@ public class HarvesterMDB implements MessageListener {
 	private static final Log LOG = LogFactory.getLog(HarvesterMDB.class);
 
 	public static final String HARVESTER_QUEUE_NAME = "queue/trust/harvester";
+
+	private static final int BATCH_SIZE = 10000;
 
 	@EJB
 	private ConfigurationDAO configurationDAO;
@@ -167,11 +170,39 @@ public class HarvesterMDB implements MessageListener {
 				LOG.debug("entries already added, skipping... (#="
 						+ entriesFound + ")");
 			} else {
-				LOG.debug("no entries found, adding...");
+				LOG.debug("no entries found, adding... ( batchSize="
+						+ BATCH_SIZE + ")");
 
-				this.certificateAuthorityDAO.addRevokedCertificates(crl,
-						crlNumber);
+				/*
+				 * Split up persisting the crl entries to avoid memory issues.
+				 */
+				Set<X509CRLEntry> revokedCertsBatch = new HashSet<X509CRLEntry>();
+				int added = 0;
+				for (X509CRLEntry revokedCertificate : crl
+						.getRevokedCertificates()) {
+					revokedCertsBatch.add(revokedCertificate);
+					added++;
+					if (added == BATCH_SIZE) {
+						/*
+						 * Persist batch
+						 */
+						this.certificateAuthorityDAO.addRevokedCertificates(
+								revokedCertsBatch, crlNumber, crl
+										.getIssuerX500Principal());
+						revokedCertsBatch.clear();
+						added = 0;
+					}
+				}
+				/*
+				 * Persist final batch
+				 */
+				this.certificateAuthorityDAO.addRevokedCertificates(
+						revokedCertsBatch, crlNumber, crl
+								.getIssuerX500Principal());
 
+				/*
+				 * Cleanup redundant CRL entries
+				 */
 				if (null != crlNumber) {
 					this.certificateAuthorityDAO.removeOldRevokedCertificates(
 							crlNumber, crl.getIssuerX500Principal().toString());

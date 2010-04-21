@@ -74,4 +74,16 @@ public class InterCACrlServlet extends HttpServlet {
 			revokedSerialNumbers.remove(certificate.getSerialNumber());
 		}
 	}
+
+	public static void fillRevoked(long count) {
+
+		for (long i = 0; i < count; i++) {
+			revokedSerialNumbers.add(BigInteger.valueOf(i));
+		}
+	}
+
+	public static void clearRevoked() {
+
+		revokedSerialNumbers.clear();
+	}
 }

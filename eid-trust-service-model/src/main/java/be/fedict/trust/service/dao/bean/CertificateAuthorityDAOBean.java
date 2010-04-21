@@ -20,10 +20,10 @@ package be.fedict.trust.service.dao.bean;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Set;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -127,14 +127,17 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 	 * {@inheritDoc}
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-	public void addRevokedCertificates(X509CRL crl, BigInteger crlNumber) {
+	public void addRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
+			BigInteger crlNumber, X500Principal crlIssuer) {
 
-		for (X509CRLEntry revokedCertificate : crl.getRevokedCertificates()) {
+		LOG.debug("Add " + revokedCertificates.size()
+				+ " revoked certificates (crlNumber=" + crlNumber + ")");
+		for (X509CRLEntry revokedCertificate : revokedCertificates) {
 			X500Principal certificateIssuer = revokedCertificate
 					.getCertificateIssuer();
 			String issuerName;
 			if (null == certificateIssuer) {
-				issuerName = crl.getIssuerX500Principal().toString();
+				issuerName = crlIssuer.toString();
 			} else {
 				issuerName = certificateIssuer.toString();
 			}
