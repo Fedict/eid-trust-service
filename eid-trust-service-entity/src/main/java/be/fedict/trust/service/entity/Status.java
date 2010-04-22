@@ -27,9 +27,13 @@ package be.fedict.trust.service.entity;
 public enum Status {
 
 	/**
-	 * Still processing the CRL
+	 * No cache yet, harvester not yet notified
 	 */
 	INACTIVE,
+	/**
+	 * Still processing the CRL
+	 */
+	PROCESSING,
 	/**
 	 * CRL processed and cached
 	 */

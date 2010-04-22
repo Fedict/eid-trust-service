@@ -41,8 +41,13 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.interceptor.Interceptors;
+import javax.jms.JMSException;
 import javax.jms.Queue;
+import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.jms.Session;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -78,6 +83,8 @@ import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.Status;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
 import be.fedict.trust.service.entity.WSSecurityConfigEntity;
@@ -169,6 +176,7 @@ public class TrustServiceBean implements TrustService {
 
 			if (trustValidator.getResult().isValid()) {
 				LOG.debug("valid for trust domain: " + trustDomain.getName());
+				harvest(trustDomain, certificateChain);
 				return new ValidationResult(trustValidator.getResult(),
 						trustValidator.getRevocationData());
 			}
@@ -267,6 +275,7 @@ public class TrustServiceBean implements TrustService {
 
 			if (trustValidator.getResult().isValid()) {
 				LOG.debug("valid for trust domain: " + trustDomain.getName());
+				harvest(trustDomain, certificateChain);
 				return new ValidationResult(trustValidator.getResult(),
 						trustValidator.getRevocationData());
 			}
@@ -304,6 +313,7 @@ public class TrustServiceBean implements TrustService {
 
 			if (trustValidator.getResult().isValid()) {
 				LOG.debug("valid for trust domain: " + trustDomain.getName());
+				harvest(trustDomain, certificateChain);
 				return new ValidationResult(trustValidator.getResult(),
 						trustValidator.getRevocationData());
 			}
@@ -356,8 +366,7 @@ public class TrustServiceBean implements TrustService {
 		TrustLinker trustLinker = null;
 		if (!returnRevocationData && trustDomain.isUseCaching()) {
 			// if returnRevocationData set, don't use cached revocation data
-			trustLinker = new TrustServiceTrustLinker(this.entityManager,
-					this.queueConnectionFactory, this.queue);
+			trustLinker = new TrustServiceTrustLinker(this.entityManager);
 		}
 
 		return getTrustValidator(trustDomain, trustLinker, returnRevocationData);
@@ -608,4 +617,63 @@ public class TrustServiceBean implements TrustService {
 
 		this.auditDAO.logAudit(message);
 	}
+
+	/**
+	 * Harvest the CRLs for specified certificate chain if caching is set for
+	 * the trust domain and no cache is yet active.
+	 */
+	private void harvest(TrustDomainEntity trustDomain,
+			List<X509Certificate> certificateChain) {
+
+		if (trustDomain.isUseCaching()) {
+			for (X509Certificate certificate : certificateChain) {
+				String issuerName = certificate.getIssuerX500Principal()
+						.toString();
+				CertificateAuthorityEntity certificateAuthority = this.entityManager
+						.find(CertificateAuthorityEntity.class, issuerName);
+				if (null != certificateAuthority
+						&& certificateAuthority.getStatus().equals(
+								Status.INACTIVE)) {
+					if (null != certificateAuthority.getCrlUrl()) {
+						certificateAuthority.setStatus(Status.PROCESSING);
+						try {
+							notifyHarvester(certificateAuthority.getName());
+						} catch (JMSException e) {
+							logAudit("Failed to notify harvester: "
+									+ e.getMessage());
+							LOG.error("could not notify harvester: "
+									+ e.getMessage(), e);
+						}
+					} else {
+						certificateAuthority.setStatus(Status.NONE);
+					}
+				}
+			}
+		}
+	}
+
+	private void notifyHarvester(String issuerName) throws JMSException {
+		QueueConnection queueConnection = this.queueConnectionFactory
+				.createQueueConnection();
+		try {
+			QueueSession queueSession = queueConnection.createQueueSession(
+					true, Session.AUTO_ACKNOWLEDGE);
+			try {
+				HarvestMessage harvestMessage = new HarvestMessage(issuerName,
+						false);
+				QueueSender queueSender = queueSession.createSender(this.queue);
+				try {
+					queueSender
+							.send(harvestMessage.getJMSMessage(queueSession));
+				} finally {
+					queueSender.close();
+				}
+			} finally {
+				queueSession.close();
+			}
+		} finally {
+			queueConnection.close();
+		}
+	}
+
 }

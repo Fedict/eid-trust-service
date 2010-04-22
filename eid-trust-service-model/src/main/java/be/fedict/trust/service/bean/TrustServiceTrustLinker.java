@@ -26,13 +26,6 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
-import javax.jms.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
@@ -66,26 +59,8 @@ public class TrustServiceTrustLinker implements TrustLinker {
 
 	private final EntityManager entityManager;
 
-	private final QueueConnectionFactory queueConnectionFactory;
-
-	private final Queue queue;
-
-	public TrustServiceTrustLinker(EntityManager entityManager,
-			QueueConnectionFactory queueConnectionFactory, Queue queue) {
+	public TrustServiceTrustLinker(EntityManager entityManager) {
 		this.entityManager = entityManager;
-		this.queueConnectionFactory = queueConnectionFactory;
-		this.queue = queue;
-	}
-
-	private static InitialContext getInitialContext() {
-
-		try {
-			return new InitialContext();
-		}
-
-		catch (NamingException e) {
-			throw new RuntimeException("naming error: " + e.getMessage(), e);
-		}
 	}
 
 	public TrustLinkerResult hasTrustLink(X509Certificate childCertificate,
@@ -93,8 +68,6 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			RevocationData revocationData) {
 
 		LOG.debug("certificate: " + childCertificate.getSubjectX500Principal());
-
-		this.entityManager.joinTransaction();
 
 		String issuerName = childCertificate.getIssuerX500Principal()
 				.toString();
@@ -109,6 +82,10 @@ public class TrustServiceTrustLinker implements TrustLinker {
 					SnmpConstants.SNMP_SERVICE, 1L);
 
 			URI crlUri = CrlTrustLinker.getCrlUri(childCertificate);
+			if (null == crlUri) {
+				LOG.warn("No CRL uri for: " + issuerName);
+				return null;
+			}
 			String crlUrl;
 			try {
 				crlUrl = crlUri.toURL().toString();
@@ -141,15 +118,6 @@ public class TrustServiceTrustLinker implements TrustLinker {
 				return null;
 			}
 			this.entityManager.persist(certificateAuthority);
-
-			// notify harvester
-			try {
-				notifyHarvester(issuerName);
-			} catch (JMSException e) {
-				logAudit("Failed to notify harvester: " + e.getMessage());
-				LOG.error("could not notify harvester: " + e.getMessage(), e);
-			}
-			LOG.debug("harvester notified.");
 			return null;
 		}
 		if (Status.ACTIVE != certificateAuthority.getStatus()) {
@@ -159,7 +127,6 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			 */
 			if (Status.NONE != certificateAuthority.getStatus()) {
 				// none means no CRL is available so not really a cache miss
-				// ...
 				SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
 						SnmpConstants.SNMP_SERVICE, 1L);
 			}
@@ -226,8 +193,9 @@ public class TrustServiceTrustLinker implements TrustLinker {
 	}
 
 	private void logAudit(String message) {
-		InitialContext initialContext = getInitialContext();
+
 		try {
+			InitialContext initialContext = new InitialContext();
 			AuditDAO auditDAO = (AuditDAO) initialContext
 					.lookup(AuditDAO.JNDI_BINDING);
 			auditDAO.logAudit(message);
@@ -251,30 +219,6 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			return null;
 		} else {
 			return revokedCertificates.get(0);
-		}
-	}
-
-	private void notifyHarvester(String issuerName) throws JMSException {
-		QueueConnection queueConnection = this.queueConnectionFactory
-				.createQueueConnection();
-		try {
-			QueueSession queueSession = queueConnection.createQueueSession(
-					true, Session.AUTO_ACKNOWLEDGE);
-			try {
-				HarvestMessage harvestMessage = new HarvestMessage(issuerName,
-						false);
-				QueueSender queueSender = queueSession.createSender(this.queue);
-				try {
-					queueSender
-							.send(harvestMessage.getJMSMessage(queueSession));
-				} finally {
-					queueSender.close();
-				}
-			} finally {
-				queueSession.close();
-			}
-		} finally {
-			queueConnection.close();
 		}
 	}
 }

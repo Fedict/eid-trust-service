@@ -105,12 +105,12 @@ public class HarvesterMDB implements MessageListener {
 			LOG.warn("unknown certificate authority: " + caName);
 			return;
 		}
-		if (!update && Status.INACTIVE != certificateAuthority.getStatus()) {
+		if (!update && Status.PROCESSING != certificateAuthority.getStatus()) {
 			/*
-			 * Possible that another harvester instance already activated the CA
-			 * cache in the meanwhile.
+			 * Possible that another harvester instance already activated or is
+			 * processing the CA cache in the meanwhile.
 			 */
-			LOG.debug("CA status not inactive");
+			LOG.debug("CA status not marked for processing");
 			return;
 		}
 		String crlUrl = certificateAuthority.getCrlUrl();
