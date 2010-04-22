@@ -33,6 +33,8 @@ import javax.jms.QueueConnectionFactory;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 import javax.jms.Session;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -45,6 +47,7 @@ import be.fedict.trust.TrustLinkerResult;
 import be.fedict.trust.TrustLinkerResultReason;
 import be.fedict.trust.crl.CrlTrustLinker;
 import be.fedict.trust.service.SnmpConstants;
+import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.Status;
@@ -74,11 +77,25 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		this.queue = queue;
 	}
 
+	private static InitialContext getInitialContext() {
+
+		try {
+			return new InitialContext();
+		}
+
+		catch (NamingException e) {
+			throw new RuntimeException("naming error: " + e.getMessage(), e);
+		}
+	}
+
 	public TrustLinkerResult hasTrustLink(X509Certificate childCertificate,
 			X509Certificate certificate, Date validationDate,
 			RevocationData revocationData) {
 
 		LOG.debug("certificate: " + childCertificate.getSubjectX500Principal());
+
+		this.entityManager.joinTransaction();
+
 		String issuerName = childCertificate.getIssuerX500Principal()
 				.toString();
 		CertificateAuthorityEntity certificateAuthority = this.entityManager
@@ -108,8 +125,8 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			CertificateAuthorityEntity parentCertificateAuthority = this.entityManager
 					.find(CertificateAuthorityEntity.class, parentIssuerName);
 			if (null == parentCertificateAuthority) {
+				logAudit("CA not found for " + parentIssuerName);
 				LOG.error("CA not found for " + parentIssuerName + " ?!");
-				// XXX: audit?
 				return null;
 			}
 
@@ -129,8 +146,8 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			try {
 				notifyHarvester(issuerName);
 			} catch (JMSException e) {
+				logAudit("Failed to notify harvester: " + e.getMessage());
 				LOG.error("could not notify harvester: " + e.getMessage(), e);
-				// XXX: audit
 			}
 			LOG.debug("harvester notified.");
 			return null;
@@ -141,7 +158,8 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			 * Harvester is still busy processing the first CRL.
 			 */
 			if (Status.NONE != certificateAuthority.getStatus()) {
-				// none means no CRL is available so not really a cache miss ...
+				// none means no CRL is available so not really a cache miss
+				// ...
 				SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
 						SnmpConstants.SNMP_SERVICE, 1L);
 			}
@@ -205,6 +223,18 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		return new TrustLinkerResult(false,
 				TrustLinkerResultReason.INVALID_REVOCATION_STATUS,
 				"certificate revoked by cached CRL");
+	}
+
+	private void logAudit(String message) {
+		InitialContext initialContext = getInitialContext();
+		try {
+			AuditDAO auditDAO = (AuditDAO) initialContext
+					.lookup(AuditDAO.JNDI_BINDING);
+			auditDAO.logAudit(message);
+		} catch (NamingException e) {
+			LOG.error("Failed to log audit message: " + message, e);
+		}
+
 	}
 
 	@SuppressWarnings("unchecked")

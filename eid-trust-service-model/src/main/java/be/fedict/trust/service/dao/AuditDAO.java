@@ -33,6 +33,8 @@ import be.fedict.trust.service.entity.AuditEntity;
 @Local
 public interface AuditDAO {
 
+	public static final String JNDI_BINDING = "fedict/eid/trust/AuditDAOBean";
+
 	/**
 	 * Returns list of logged audit events.
 	 */

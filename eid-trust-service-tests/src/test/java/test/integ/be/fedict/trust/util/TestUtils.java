@@ -110,7 +110,7 @@ public class TestUtils {
 
 	private static final Log LOG = LogFactory.getLog(TestUtils.class);
 
-	public static final String XKMS_WS_HOST = "sebeco-dev-11";
+	public static final String XKMS_WS_HOST = "localhost";
 	public static final String XKMS_WS_CONTEXT_PATH = "/eid-trust-service-ws/xkms2";
 	public static final String XKMS_WS_LOCATION = "http://" + XKMS_WS_HOST
 			+ ":8080" + XKMS_WS_CONTEXT_PATH;

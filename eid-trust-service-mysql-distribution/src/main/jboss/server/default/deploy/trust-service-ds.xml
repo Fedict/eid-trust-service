@@ -30,6 +30,11 @@
 		<valid-connection-checker-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLValidConnectionChecker
 		</valid-connection-checker-class-name>
 
+		<transaction-isolation>TRANSACTION_READ_COMMITTED
+		</transaction-isolation>
+
+		<idle-timeout-minutes>5</idle-timeout-minutes>
+		
 		<!--
 			Whether to check all statements are closed when the connection is
 			returned to the pool, this is a debugging feature that should be

@@ -28,6 +28,7 @@ import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.ejb3.annotation.LocalBinding;
 
 import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.entity.AuditEntity;
@@ -39,6 +40,7 @@ import be.fedict.trust.service.entity.AuditEntity;
  * 
  */
 @Stateless
+@LocalBinding(jndiBinding = AuditDAO.JNDI_BINDING)
 public class AuditDAOBean implements AuditDAO {
 
 	private static final Log LOG = LogFactory.getLog(AuditDAOBean.class);
