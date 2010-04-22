@@ -29,6 +29,7 @@ import javax.ejb.Stateless;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.SecurityDomain;
+import org.quartz.CronTrigger;
 
 import be.fedict.trust.service.ConfigurationService;
 import be.fedict.trust.service.KeyStoreUtils;
@@ -44,6 +45,8 @@ import be.fedict.trust.service.entity.NetworkConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
 import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
+import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
 
 /**
@@ -104,9 +107,26 @@ public class ConfigurationServiceBean implements ConfigurationService {
 	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
 	public void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
 			int timeout, int maxClockOffset, String cron, boolean enabled)
-			throws InvalidCronExpressionException {
+			throws InvalidCronExpressionException, InvalidTimeoutException,
+			InvalidMaxClockOffsetException {
 
 		LOG.debug("save clock drift detection config");
+
+		// input validation
+		if (timeout <= 0) {
+			throw new InvalidTimeoutException();
+		}
+		if (maxClockOffset < 0) {
+			throw new InvalidMaxClockOffsetException();
+		}
+		try {
+			new CronTrigger("name", "group", cron);
+		} catch (Exception e) {
+			LOG.error("invalid cron expression");
+			throw new InvalidCronExpressionException(e);
+		}
+
+		// save
 		ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
 				.setClockDriftConfig(timeProtocol, server, timeout,
 						maxClockOffset, cron);

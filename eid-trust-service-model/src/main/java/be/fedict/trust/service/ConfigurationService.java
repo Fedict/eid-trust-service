@@ -29,6 +29,8 @@ import be.fedict.trust.service.entity.NetworkConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
 import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
+import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
 
 /**
@@ -47,10 +49,6 @@ public interface ConfigurationService {
 
 	/**
 	 * Save the {@link NetworkConfigEntity}.
-	 * 
-	 * @param proxyHost
-	 * @param proxyPort
-	 * @param enabled
 	 */
 	void saveNetworkConfig(String proxyHost, int proxyPort, boolean enabled);
 
@@ -61,19 +59,11 @@ public interface ConfigurationService {
 
 	/**
 	 * Save the {@link ClockDriftConfigEntity}.
-	 * 
-	 * @param timeProtocol
-	 * @param server
-	 * @param timeout
-	 * @param maxClockOffset
-	 * @param cron
-	 * @param enabled
-	 * 
-	 * @throws InvalidCronExpressionException
 	 */
 	void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
 			int timeout, int maxClockOffset, String cron, boolean enabled)
-			throws InvalidCronExpressionException;
+			throws InvalidCronExpressionException, InvalidTimeoutException,
+			InvalidMaxClockOffsetException;
 
 	/**
 	 * Returns the {@link WSSecurityConfigEntity}.
@@ -82,15 +72,6 @@ public interface ConfigurationService {
 
 	/**
 	 * Save the {@link WSSecurityConfigEntity}.
-	 * 
-	 * @param signing
-	 * @param keyStoreType
-	 * @param keyStorePath
-	 * @param keyStorePassword
-	 * @param keyEntryPassword
-	 * @param alias
-	 * 
-	 * @throws KeyStoreLoadException
 	 */
 	void saveWSSecurityConfig(boolean signing, KeyStoreType keyStoreType,
 			String keyStorePath, String keyStorePassword,
@@ -98,26 +79,17 @@ public interface ConfigurationService {
 
 	/**
 	 * List the languages available for the specified key.
-	 * 
-	 * @param key
 	 */
 	List<String> listLanguages(String key);
 
 	/**
 	 * Return the localization text for specified key and {@link Locale}.
 	 * Returns <code>null</code> if not found.
-	 * 
-	 * @param key
-	 * @param locale
 	 */
 	String findText(String key, Locale locale);
 
 	/**
 	 * Save the specified localization text.
-	 * 
-	 * @param key
-	 * @param locale
-	 * @param text
 	 */
 	void saveText(String key, Locale locale, String text);
 }

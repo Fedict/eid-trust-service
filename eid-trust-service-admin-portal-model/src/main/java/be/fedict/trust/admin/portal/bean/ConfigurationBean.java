@@ -52,6 +52,8 @@ import be.fedict.trust.service.entity.NetworkConfigEntity;
 import be.fedict.trust.service.entity.TimeProtocol;
 import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
+import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
 
 @Stateful
@@ -209,6 +211,14 @@ public class ConfigurationBean implements Configuration {
 		} catch (InvalidCronExpressionException e) {
 			this.facesMessages.addToControlFromResourceBundle("cron",
 					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
+			return null;
+		} catch (InvalidTimeoutException e) {
+			this.facesMessages.addToControlFromResourceBundle("timeout",
+					StatusMessage.Severity.ERROR, "errorTimeoutInvalid");
+			return null;
+		} catch (InvalidMaxClockOffsetException e) {
+			this.facesMessages.addToControlFromResourceBundle("maxClockOffset",
+					StatusMessage.Severity.ERROR, "errorMaxClockOffsetInvalid");
 			return null;
 		}
 		this.selectedTab = "tab_clock";
