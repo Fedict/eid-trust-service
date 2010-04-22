@@ -51,10 +51,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.BlockContainer;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.chart.title.CompositeTitle;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
@@ -74,7 +72,9 @@ public class PerformanceTest {
 	// private static final String XKMS_LOCATION =
 	// "http://www.e-contract.be/eid-trust-service-ws/xkms2";
 
-	private static final String XKMS_LOCATION = "http://192.168.1.101/eid-trust-service-ws/xkms2";
+	private static final String XKMS_LOCATION =
+	 "http://192.168.1.101/eid-trust-service-ws/xkms2";
+	//private static final String XKMS_LOCATION = "http://sebeco-dev-11:8080/eid-trust-service-ws/xkms2";
 
 	private static final int INTERVAL_SIZE = 1000 * 10;
 
