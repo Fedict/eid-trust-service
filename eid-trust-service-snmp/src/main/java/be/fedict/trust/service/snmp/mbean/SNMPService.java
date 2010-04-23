@@ -107,7 +107,7 @@ public class SNMPService implements SNMPServiceMBean {
 	/**
 	 * Initialized the {@link SNMPAgent} if not yet done so.
 	 */
-	private void initSNMPAgent() {
+	private synchronized void initSNMPAgent() {
 
 		if (null == this.snmpAgent) {
 			LOG.debug("Start SNMP agent @ address=" + this.address);

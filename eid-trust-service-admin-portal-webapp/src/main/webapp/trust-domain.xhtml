@@ -24,18 +24,18 @@
 								</h:column>
 								<h:column>
 									<f:facet name="header">#{messages.default}</f:facet>
-									<h:selectBooleanCheckbox disabled="true"
-										value="#{item.defaultDomain}" />
+									<div class="center">
+										<h:selectBooleanCheckbox disabled="true"
+											value="#{item.defaultDomain}" rendered="#{item.defaultDomain}" />
+									</div>
 									<h:commandButton id="setDefault" value="#{messages.setDefault}"
-										action="#{ts_trustDomain.setDefault}" />
+										action="#{ts_trustDomain.setDefault}" rendered="#{!item.defaultDomain}" />
 								</h:column>
 								<h:column>
-									<f:facet name="header">#{messages.modify}</f:facet>
 									<h:commandLink id="modify" value="#{messages.modify}"
 										action="#{ts_trustDomain.modify}" immediate="true" />
 								</h:column>
 								<h:column>
-									<f:facet name="header">#{messages.remove}</f:facet>
 									<a4j:commandLink action="#{ts_trustDomain.select}"
 										immediate="true" id="remove" value="#{messages.remove}"
 										onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
@@ -88,10 +88,10 @@
 
 							<h:messages styleClass="error" globalOnly="true" />
 						</a4j:form>
-						
+
 					</rich:tab>
 				</rich:tabPanel>
-				
+
 			</ui:define>
 		</ui:composition>
 	</body>

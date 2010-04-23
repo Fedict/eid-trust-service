@@ -31,11 +31,6 @@
 									<h:commandLink id="register" value="#{messages.approve}"
 										action="#{ts_admin.registerPending}" rendered="#{item.pending}" />
 								</h:column>
-								<f:facet name="footer">
-									<rich:datascroller for="data" pageIndexVar="pageIndex"
-										pagesVar="pages" fastControls="hide">
-									</rich:datascroller>
-								</f:facet>
 							</rich:dataTable>
 
 							<rich:modalPanel id="removeConfirm">
@@ -67,11 +62,7 @@
 
 					<rich:tab name="tab_wssec" label="#{messages.wsSecurityConfig}">
 						<a4j:form id="wssec_form" ajaxSubmit="true" reRender="panel">
-							<h:panelGrid id="panel" columns="2" border="1">
-
-								<h:outputLabel for="signing" value="#{messages.wsSecuritySigning}" />
-								<h:selectBooleanCheckbox id="signing"
-									value="#{ts_config.wsSecuritySigning}" />
+							<h:panelGrid id="panel" columns="2" border="0">
 
 								<h:outputLabel for="wssec_type"
 									value="#{messages.wsSecurityKeyStoreType}" />
@@ -118,6 +109,10 @@
 									<h:message for="wssec_alias" styleClass="error" />
 								</s:decorate>
 
+								<h:outputLabel for="signing" value="#{messages.wsSecuritySigning}" />
+								<h:selectBooleanCheckbox id="signing"
+									value="#{ts_config.wsSecuritySigning}" />
+
 								<f:facet name="footer">
 									<h:panelGroup style="display:block; text-align:center">
 										<h:commandButton id="submit" value="#{messages.save}"
@@ -132,7 +127,7 @@
 
 					<rich:tab name="tab_network" label="#{messages.networkConfig}">
 						<a4j:form id="network_form" ajaxSubmit="true" reRender="panel">
-							<h:panelGrid id="panel" columns="2" border="1">
+							<h:panelGrid id="panel" columns="2" border="0">
 
 								<h:outputLabel for="host" value="#{messages.proxyHost}" />
 								<s:decorate>
@@ -166,7 +161,7 @@
 					<rich:tab name="tab_clock" label="#{messages.clockDriftDetection}">
 						<a4j:form id="clockdrift_form" ajaxSubmit="true"
 							reRender="panel">
-							<h:panelGrid id="panel" columns="2" border="1">
+							<h:panelGrid id="panel" columns="2" border="0">
 
 								<h:outputLabel for="protocol" value="#{messages.protocol}" />
 								<s:decorate>

@@ -140,6 +140,7 @@ public class TrustPointBean implements TrustPoint {
 	public String modify() {
 
 		this.log.debug("modify: #0", this.selectedTrustPoint.getName());
+		this.crlRefreshCron = this.selectedTrustPoint.getCrlRefreshCron();
 		return "modify";
 	}
 
@@ -175,14 +176,18 @@ public class TrustPointBean implements TrustPoint {
 	@End
 	public String save() {
 
-		this.log.debug("save trust point: #0", this.selectedTrustPoint
-				.getName());
-		try {
-			this.trustDomainService.save(this.selectedTrustPoint);
-		} catch (InvalidCronExpressionException e) {
-			this.facesMessages.addToControlFromResourceBundle("cron",
-					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
-			return null;
+		if (null != this.selectedTrustPoint) {
+			this.log.debug("save trust point: #0", this.selectedTrustPoint
+					.getName());
+			try {
+				this.trustDomainService.save(this.selectedTrustPoint);
+			} catch (InvalidCronExpressionException e) {
+				this.facesMessages.addToControlFromResourceBundle("cron",
+						StatusMessage.Severity.ERROR,
+						"errorCronExpressionInvalid");
+				return null;
+			}
+			this.crlRefreshCron = null;
 		}
 		if (null != this.selectedTrustDomain) {
 			return "success_trustdomain";
