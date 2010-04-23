@@ -6,7 +6,7 @@
 	<articleinfo>
 		<title>Fedict eID Trust Service Administrator Manual</title>
 		<copyright>
-			<year>2008-2010</year>
+			<year>2010</year>
 			<holder>Fedict</holder>
 		</copyright>
 		<releaseinfo>16 Mar 2010</releaseinfo>
@@ -49,21 +49,82 @@
 			Besides these two service artifacts, the eID Trust Service also comes
 			with an Admin portal that allows administrators to manage the eID
 			Trust Service via an easy to use web portal interface. In the
-			following paragraphs we will use $EID_TRUST_SERVICE_ADDRESS as the
-			(internal) web address where the eID Trust Service product has been
+			following paragraphs we will use
+			<code>$EID_TRUST_SERVICE_ADDRESS</code>
+			as the
+			(internal) web address where the eID Trust Service product has
+			been
 			deployed.
 		</para>
+		<para>
+			The source code of the Fedict eID Trust Service is publicly available
+			and can be found at
+			<ulink url="http://code.google.com/p/eid-trust-service/source/checkout">eID Trust Service Source Code</ulink>
+			. Please not that the Fedict eID Trust Service has dependencies on
+			jTrust, a java library for trust validation of X509 certificates
+			which can be found at
+			<ulink url="http://code.google.com/p/jtrust/source/checkout">jTrust source code</ulink>
+			.
+		</para>
+		<section>
+			<title>Apache configuration under Redhat (Fedora)</title>
+			<para>
+				Active the Apache HTTP Service via:
+				<programlisting><![CDATA[
+			sudo chkconfig --level 345 httpd
+			checkconfig --list httpd
+			sudo /etc/init.d/httpd restart
+			]]></programlisting>
+				Install the SSL via:
+				<programlisting><![CDATA[
+				sudo yum install mod_ssl.i686
+			]]></programlisting>
+				Open up the iptables firewall on the Apache server to allow for both
+				HTTP (port 80) and HTTPS (port 443).
+				Relevant iptables config lines
+				are:
+				<programlisting><![CDATA[
+					-A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+					-A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
+				]]></programlisting>
+				Check the firewall setting on Redhat (Fedora) via:
+				<programlisting><![CDATA[
+					sudo cat /etc/sysconfig/iptables
+				]]></programlisting>
+				Disable the NetworkManager via:
+				<programlisting><![CDATA[
+					sudo /etc/init.d/NetworkManager stop
+					sudo chkconfig --level 2345 NetworkManager off
+					chkconfig --list NetworkManager
+					sudo reboot
+				]]></programlisting>
+				Enable the (static) network management via:
+				<programlisting><![CDATA[
+					sudo chkconfig --level 345 network on
+					chkconfig --list network
+				]]></programlisting>
+			</para>
+		</section>
 		<section>
 			<title>eID Trust Service Portal</title>
-			<para>After deployment of the eID Trust Service product, the eID
-				Trust Service Portal is available at
-				$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal/. This web
-				portal MUST be accessed over unilateral SSL. The SSL SHOULD be
-				terminated on the front-end Apache HTTPD service so that the SSL
-				information can be communicated to the JBoss Application Service
-				over AJP. If such a setup is not possible this SHOULD be clearly
-				communicated in advance to the eID Trust Service development team so
-				they can properly configure the eID Applet Service that is used
+			<para>
+				After deployment of the eID Trust Service product, the eID
+				Trust
+				Service Portal is available at
+				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal/</code>
+				. This web
+				portal MUST be accessed over unilateral SSL. The SSL
+				SHOULD be
+				terminated on the front-end Apache HTTPD service so that
+				the SSL
+				information can be communicated to the JBoss Application
+				Service
+				over AJP. If such a setup is not possible this SHOULD be
+				clearly
+				communicated in advance to the eID Trust Service development
+				team so
+				they can properly configure the eID Applet Service that is
+				used
 				within the eID Trust Service Portal.
 			</para>
 			<para>
@@ -83,15 +144,25 @@
                         Allow from all
                         ProxyPass ajp://localhost:8009/eid-trust-service-admin-portal
                 </Location>
-</IfModule>]]></programlisting>
 
+                <Location /eid-trust-service-ws>
+                        Order allow,deny
+                        Allow from all
+                        ProxyPass ajp://localhost:8009/eid-trust-service-ws
+                </Location>
+</IfModule>]]></programlisting>
+				For Redhat (Fedora) you add this file under
+				<code>/etc/httpd/conf.d/trust-service.conf</code>
+				.
 			</para>
 		</section>
 		<section>
 			<title>eID Trust Service Validation Web Service</title>
-			<para>After deployment of the eID Trust Service product, the eID
-				Trust Service validation web service is available at
-				$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-ws/xkms2
+			<para>
+				After deployment of the eID Trust Service product, the eID
+				Trust
+				Service validation web service is available at
+				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-ws/xkms2</code>
 				This web
 				service MUST be accessible via both HTTP and HTTPS (thus
 				unilateral
@@ -99,15 +170,20 @@
 				the service
 				provides the possibility to sign the response messages
 				using
-				WS-Security. This can be configured in the Administrator portal.
+				WS-Security. This can be configured in the Administrator
+				portal.
 			</para>
 		</section>
 		<section>
 			<title>eID Trust Service Admin Portal</title>
-			<para>After deployment of the eID Trust Service, the eID Trust
-				Service Admin Portal is available via:
-				EID_TRUST_SERVICE_ADDRESS/eid-trust-service-admin-portal/. This web
-				portal MUST be accessed over unilateral SSL.</para>
+			<para>
+				After deployment of the eID Trust Service, the eID Trust
+				Service
+				Admin Portal is available via:
+				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-admin-portal/
+				</code>
+				. This web portal MUST be accessed over unilateral SSL.
+			</para>
 		</section>
 		<section>
 			<title>SNMP</title>
@@ -117,6 +193,34 @@
 		<section>
 			<title>Database</title>
 			<para>The eID Trust Service product requires a database to operate.
+			</para>
+		</section>
+		<section>
+			<title>Java Virtual Machine</title>
+			<para>
+				You need to have Java Sun 1.6.0_20 or higher installed. JDK or JRE
+				are sufficient.
+				These can be found at:
+				<ulink url="http://www.java.com/en/download/index.jsp">Java download</ulink>
+				.
+				After installation you will have to make sure the environment
+				variable
+				<code>$JAVA_HOME</code>
+				is properly set and the
+				<code>java</code>
+				program is available in the
+				<code>$PATH</code>
+				. Under Redhat (Fedora) you can create a
+				<code>/etc/profile.d/java.sh</code>
+				file containing the following:
+				<programlisting><![CDATA[
+					export JAVA_HOME=/usr/local/jdk1.6
+					export PATH=$JAVA_HOME/bin:$PATH
+				]]></programlisting>
+				Check whether the correct JVM is active via the following command:
+				<programlisting><![CDATA[
+					java -version
+				]]></programlisting>
 			</para>
 		</section>
 		<section>
@@ -158,10 +262,17 @@
 			<code>./jboss</code>
 			and
 			<code>./sql</code>
-			. The JBoss directory contains the JBoss application server,
-			configured for your database and pre-packaged with the Fedict eID
-			Trust Service application. The sql directory contains the database
-			initialization scripts. MySQL and Oracle are supported.
+			. The
+			<code>./jboss</code>
+			directory contains the JBoss application server,
+			configured for your
+			database and pre-packaged with the Fedict eID
+			Trust Service
+			application. The
+			<code>./sql</code>
+			directory contains the database
+			initialization scripts. MySQL and
+			Oracle are supported.
 		</para>
 		<para>
 			It is also possible to run the Fedict eID Trust Service application
@@ -175,7 +286,7 @@
 			.
 		</para>
 		<para>
-			Please not that it is not recommended to use this setup in a
+			Please note that it is not recommended to use this setup in a
 			production environment. As the HSQL database is in-memory and parsing
 			of large CRL's also is memory intensive, you will run quickly into
 			memory problems. 
@@ -194,7 +305,7 @@
 				<code>trust</code>
 				database is
 				<code>trust/trust</code>
-				. Please not that if you wish to change this, you will have to
+				. Please note that if you wish to change this, you will have to
 				manually modify the datasource in the JBoss distribution. The
 				configuration for this can be found in
 				<code>/jboss/server/default/deploy/trust-service-ds.xml</code>
@@ -204,9 +315,38 @@
 				The Fedict eID Trust Service has been successfully tested on:
 				<itemizedlist>
 					<listitem>
-						MySQL v5.0
+						MySQL v5.0 and v5.1
 					</listitem>
 				</itemizedlist>
+			</para>
+		</section>
+		<section>
+			<title>MySQL database setup on Redhat (Fedora)</title>
+			<para>
+				Following is needed for setting up the MySQL database on Redhat
+				(Fedora):
+				<programlisting><![CDATA[
+					sudo yum install mysql-server.i686
+					sudo /etc/init.d/mysqld start
+					sudo mysqladmin -u root password 'secret'
+					mysql -u root -p < mysql-create-account.sql
+					mysql -u trust -p < mysql-create-database.sql
+					mysql -u trust -p trust < mysql-trust-service-ddl.sql
+				]]></programlisting>
+				Check the database via:
+				<programlisting><![CDATA[
+					mysql -u trust -p trust
+					SHOW tables;
+					QUIT;
+				]]></programlisting>
+				Check whether the MySQL service will be started at boot time via:
+				<programlisting><![CDATA[
+					chkconfig --list mysqld
+				]]></programlisting>
+				Enable the MySQL service via:
+				<programlisting><![CDATA[
+					sudo chkconfig --level 345 mysqld on
+				]]></programlisting>
 			</para>
 		</section>
 		<section>
@@ -220,10 +360,9 @@
 				The
 				configuration can be found in
 				<code>./jboss/bin/run.conf</code>
-				. More information on tweaking the JVM can be found @
-				<ulink
-					url="http://java.sun.com/javase/technologies/hotspot/gc/gc_tuning_6.html">JVM GC Tuning</ulink>
-				.
+				See
+				<link linkend="links">Useful links</link>
+				for more info.
 			</para>
 			<para>
 				As to the amount of network traffic, this is highly related as
@@ -235,24 +374,30 @@
 			<para>
 				After you have correctly setup your database, you can start the
 				application by executing following command:
-				<code>./jboss/bin/run.sh -b 0.0.0.0</code>
-				.
+				<programlisting><![CDATA[
+					./jboss/bin/run.sh -b 0.0.0.0
+				]]></programlisting>
+				. The option
+				<code>-b 0.0.0.0</code>
+				is to change the bind address of the server so its available to all
+				interfaces.
 			</para>
 			<para>
 				After the application has started, it will have initialized itself
 				with 4 trust domains.
 				<orderedlist>
 					<listitem>
-						eID Authentication Trust Domain
+						eID Authentication Trust Domain ( machine domain name BE-AUTH )
 					</listitem>
 					<listitem>
-						eID Non Repudiation Trust Domain
+						eID Non Repudiation Trust Domain ( machine domain name BE )
 					</listitem>
 					<listitem>
-						eID National Registry Trust Domain
+						eID National Registry Trust Domain ( machine domain name
+						BE-NAT-REG )
 					</listitem>
 					<listitem>
-						Belgian TSA Trust Domain
+						Belgian TSA Trust Domain ( machine domain name BE-TSA )
 					</listitem>
 				</orderedlist>
 			</para>
@@ -267,30 +412,42 @@
 				administration webapp.
 			</para>
 			<para>
-				CRL downloading (
-				<ulink url="http://en.wikipedia.org/wiki/Revocation_list">Certificate Revocation Lists</ulink>
-				) for the Belgian eID Trust Domains are typically something like
+				CRL downloading for the Belgian eID Trust Domains are typically
+				something like
 				<code>http://crl.eid.belgium.be/eidc200501.crl</code>
 				. The URI is retrieved from the specific certificate.
 			</para>
 			<para>
-				OCSP requests (
-				<ulink url="http://en.wikipedia.org/wiki/OCSP">Online Certificate Status Protocol</ulink>
+				OCSP requests
 				for the Belgian eID Trust Domains are sent to
 				<code>http://ocsp.eid.belgium.be</code>
 				. The URI is again retrieved from the specific certificate.
 			</para>
 			<para>
-				TSP requests (
-				<ulink url="http://en.wikipedia.org/wiki/Time_Stamp_Protocol">Timestamp Protocol</ulink>
-				can be used for clock drift detection and the location is
-				configurable in the Administrator portal.
+				TSP requests
+				can be used for clock drift detection and the
+				location is
+				configurable
+				in the Administrator portal.
 			</para>
 			<para>
-				The NTP protocol (
-				<ulink url="http://en.wikipedia.org/wiki/Network_Time_Protocol"></ulink>
-				can also be used for clock drift detection and again the location is
+				The NTP protocol
+				can also be used for clock drift detection and
+				again the location is
 				configurable in the Administrator portal.
+			</para>
+		</section>
+		<section>
+			<title>Stopping</title>
+			<para>
+				Graceful shutdown can be accomplished via:
+				<programlisting><![CDATA[
+					./jboss/bin/shutdown -s
+				]]></programlisting>
+				After this you can check if shutdown completed properly via:
+				<programlisting><![CDATA[
+					ps -ef | grep java
+				]]></programlisting>
 			</para>
 		</section>
 	</section>
@@ -300,7 +457,7 @@
 			<title>Transaction timeouts</title>
 			<para>
 				The downloading and processing of large CRLs can sometimes take
-				alot
+				a lot
 				of time. This can lead to internal transaction timeouts. By
 				default,
 				the custom JBoss MySQL and Oracle Distributions have a
@@ -315,7 +472,76 @@
 					<property name="defaultTimeout">1200</property>
 				]]></programlisting>
 				. After changing this the JBoss Application Server has to be
-				restarted.
+				restarted as followed:
+				<programlisting><![CDATA[
+					./jboss/bin/shutdown -s
+					./jboss/bin/run.sh -b 0.0.0.0
+				]]></programlisting>
+				Please note to check if shutdown was completed before starting.
+			</para>
+		</section>
+		<section>
+			<title>Configuring Redhat (Fedora) as an eID Trust Service</title>
+			<para>
+				The network interface should not be managed by the NetworkManager
+				but should start at boot time. Check that
+				<code>/etc/sysconfig/network_scripts/ifcfg_eth0</code>
+				contains following lines:
+				<programlisting><![CDATA[
+					ONBOOT=yes
+					NM_CONTROLLED=no
+					USERCTL=no
+				]]></programlisting>
+				Disable the graphical user interface at startup by setting the
+				runlevel in
+				<code>/etc/inittab</code>
+				to 3:
+				<programlisting><![CDATA[
+					id:3:initdefault:
+				]]></programlisting>
+			</para>
+		</section>
+		<section>
+			<title>Configuration of the NTP-client on Redhat (Fedora)</title>
+			<para>
+				Configure your NTP servers via
+				<code>/etc/ntp.conf</code>
+				.
+				Configure the NTP service via:
+				<programlisting><![CDATA[
+					sudo chkconfig --level 345 ntpd on
+					chkconfig --list ntpd
+				]]></programlisting>
+				Start the NTP service via:
+				<programlisting><![CDATA[
+					sudo /etc/init.d/ntpd start
+				]]></programlisting>
+				.
+			</para>
+		</section>
+		<section>
+			<title>JBoss Logging</title>
+			<para>
+				The JBoss Application Server's logging configuration can be found in
+				<code>./jboss/server/default/deploy/jboss-logging.xml</code>
+				.
+				All logging from the Fedict eID Trust Service is configured to a
+				seperate log file which can be found in
+				<code>./jboss/server/default/log/fedict.log</code>
+				.
+				By default the logging granularity is set to
+				<code>DEBUG</code>
+				. You can change this by changing the level of the configured Fedict
+				logger:
+				<programlisting><![CDATA[
+  					<logger category="be.fedict">
+      					<level name="DEBUG" />
+      					<handlers>
+         					<handler-ref name="FEDICT" />
+      					</handlers>
+   					</logger>
+   				]]></programlisting>
+				In the same way here you can change JBoss' logging too.
 			</para>
 		</section>
 	</section>
@@ -366,9 +592,11 @@
 			<title>Administration Portal</title>
 			<abstract>
 				The Fedict eID Trust Service comes with an administration
-				portal. This
+				portal.
+				This
 				portal allows you to setup your network proxy if any,
-				manage trust
+				manage
+				trust
 				domains and other aspects of the service.
 			</abstract>
 			<section>
@@ -397,8 +625,8 @@
 							<para>
 								Ask another administrator who is logged to register you from
 								within the admin portal. You can find this in the
-								<code>Configuration</code>
-								page.
+								<link linkend="config_admin" endterm="config_admin.title" />
+								.
 							</para>
 						</listitem>
 					</orderedlist>
@@ -406,17 +634,18 @@
 			</section>
 			<section>
 				<title>Configuration</title>
-				<section>
-					<title>Administrators</title>
+				<section id="config_admin">
+					<title id="config_admin.title">Administrators</title>
 					<para>Here you can view existing and pending administrators,
 						approve
-						pending administrators, remove administratos and register an
+						pending administrators, remove administrators and register
+						an
 						additional one. To register an additional one, a full eID
 						authentication has to be performed of this new administrator.
-				</para>
+					</para>
 				</section>
 				<section>
-					<title>WS Security Configuration</title>
+					<title>WS-Security Configuration</title>
 					<para>
 						The eID Trust Service Validation Web Service has the
 						possibility to optionally sign its response message using
@@ -440,7 +669,8 @@
 						certifying timestamps. A timestamp request will be sent to the
 						configured TSA server, returning a timestamp response containing a
 						timestamp token. The received timestamp token will be used
-						for clock
+						for
+						clock
 						drift detection.
 				</para>
 				</section>
@@ -448,11 +678,13 @@
 					<title>Information Message</title>
 					<para>
 						The information message to be shown on
-						$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal can be
-						configured here for all available languages of the FedICT eID
+						<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal</code>
+						can be
+						configured here for all available languages of the FedICT
+						eID
 						Trust
 						Service Portal.
-				</para>
+					</para>
 				</section>
 			</section>
 			<section>
@@ -474,8 +706,10 @@
 					Service if no specific trust domain was specified.
 					For each trust
 					domain you can specify whether or not CRL caching should be used,
-					which trust points lie under this trust domain and which certificate
-					contraints are too be enforced when validating against this trust
+					which trust points lie under this trust domain and which
+					certificate
+					contraints are too be enforced when validating against
+					this trust
 					domain.
 			</para>
 			</section>
@@ -533,6 +767,29 @@
 			</section>
 		</section>
 	</section>
+	<appendix id="links">
+		<title>Useful links</title>
+		<para>
+			<itemizedlist>
+				<listitem>
+					<ulink
+						url="http://java.sun.com/javase/technologies/hotspot/gc/gc_tuning_6.html">JVM GC Tuning</ulink>
+				</listitem>
+				<listitem>
+					<ulink url="http://en.wikipedia.org/wiki/Revocation_list">Certificate Revocation Lists</ulink>
+				</listitem>
+				<listitem>
+					<ulink url="http://en.wikipedia.org/wiki/OCSP">Online Certificate Status Protocol</ulink>
+				</listitem>
+				<listitem>
+					<ulink url="http://en.wikipedia.org/wiki/Time_Stamp_Protocol">Timestamp Protocol</ulink>
+				</listitem>
+				<listitem>
+					<ulink url="http://en.wikipedia.org/wiki/Network_Time_Protocol">Network Time Protocol</ulink>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</appendix>
 	<appendix>
 		<title>eID Trust Service Admin Manual License</title>
 		<para>
@@ -622,6 +879,11 @@
 						<entry>16 Mar 2010</entry>
 						<entry>Wim Vandenhaute</entry>
 						<entry>Initial version.</entry>
+					</row>
+					<row>
+						<entry>22 Apr 2010</entry>
+						<entry>Wim Vandenhaute</entry>
+						<entry>Feedback FedICT.</entry>
 					</row>
 				</tbody>
 			</tgroup>
