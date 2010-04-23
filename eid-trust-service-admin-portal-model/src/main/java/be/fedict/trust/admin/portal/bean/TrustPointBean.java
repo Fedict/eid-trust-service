@@ -177,6 +177,7 @@ public class TrustPointBean implements TrustPoint {
 	public String save() {
 
 		if (null != this.selectedTrustPoint) {
+			this.selectedTrustPoint.setCrlRefreshCron(this.crlRefreshCron);
 			this.log.debug("save trust point: #0", this.selectedTrustPoint
 					.getName());
 			try {

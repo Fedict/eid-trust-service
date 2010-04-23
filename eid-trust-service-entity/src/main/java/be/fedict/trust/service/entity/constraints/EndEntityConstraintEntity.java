@@ -20,6 +20,7 @@ package be.fedict.trust.service.entity.constraints;
 
 import java.math.BigInteger;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -61,6 +62,7 @@ public class EndEntityConstraintEntity extends CertificateConstraintEntity {
 		this.issuerName = issuerName;
 	}
 
+	@Column(precision = 50)
 	public BigInteger getSerialNumber() {
 
 		return this.serialNumber;

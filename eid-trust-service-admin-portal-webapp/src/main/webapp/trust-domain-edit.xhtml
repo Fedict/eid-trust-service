@@ -15,7 +15,7 @@
 						<h:outputLabel for="cache" value="#{messages.useCaching}" />
 						<s:decorate>
 							<h:selectBooleanCheckbox id="cache"
-								value="#{selectedTrustDomain.useCaching}" />
+								value="#{ts_trustDomain.useCaching}" />
 							<h:message for="cache" styleClass="error" />
 						</s:decorate>
 						<h:commandButton action="#{ts_trustDomain.save}"
@@ -47,8 +47,9 @@
 
 				<h3>#{messages.certificateConstraints}</h3>
 
-				<rich:tabPanel switchType="client">
-					<rich:tab label="#{messages.certificateConstraintPolicy}">
+				<rich:tabPanel switchType="client"
+					selectedTab="#{ts_trustDomain.selectedTab}">
+					<rich:tab name="tab_policy" label="#{messages.certificateConstraintPolicy}">
 
 						<h:form id="policy_form">
 							<rich:dataTable id="policy_data" var="item"
@@ -81,7 +82,7 @@
 						</h:form>
 
 					</rich:tab>
-					<rich:tab label="#{messages.certificateConstraintKeyUsage}">
+					<rich:tab name="tab_keyusage" label="#{messages.certificateConstraintKeyUsage}">
 
 						<a4j:form id="key_usage_form" ajaxSubmit="true"
 							reRender="key_usage_group">
@@ -98,12 +99,12 @@
 									</h:column>
 									<h:column>
 										<f:facet name="header">#{messages.remove}</f:facet>
-										<h:commandLink value="#{messages.remove}"
+										<a4j:commandLink value="#{messages.remove}"
 											action="#{ts_trustDomain.removeConstraintKeyUsage}"
 											immediate="true" />
 									</h:column>
 								</rich:dataTable>
-								<h:commandLink value="#{messages.save}"
+								<a4j:commandLink value="#{messages.save}"
 									action="#{ts_trustDomain.saveConstraintKeyUsage}" />
 
 								<br />
@@ -130,7 +131,7 @@
 						</a4j:form>
 
 					</rich:tab>
-					<rich:tab label="#{messages.certificateConstraintDN}">
+					<rich:tab name="tab_dn" label="#{messages.certificateConstraintDN}">
 
 						<a4j:form id="dn_form" ajaxSubmit="true" reRender="dn_group">
 							<h:panelGroup id="dn_group" layout="block">
@@ -154,7 +155,8 @@
 						</a4j:form>
 
 					</rich:tab>
-					<rich:tab label="#{messages.certificateConstraintEndEntity}">
+					<rich:tab name="tab_endentity"
+						label="#{messages.certificateConstraintEndEntity}">
 
 						<a4j:form id="end_entity_form" ajaxSubmit="true"
 							reRender="end_entity_group">
@@ -172,7 +174,7 @@
 									</h:column>
 									<h:column>
 										<f:facet name="header">#{messages.remove}</f:facet>
-										<h:commandLink value="#{messages.remove}"
+										<a4j:commandLink value="#{messages.remove}"
 											action="#{ts_trustDomain.removeConstraintEndEntity}"
 											immediate="true" />
 									</h:column>
@@ -194,7 +196,8 @@
 
 					</rich:tab>
 
-					<rich:tab label="#{messages.certificateConstraintQCStatements}">
+					<rich:tab name="tab_qc"
+						label="#{messages.certificateConstraintQCStatements}">
 
 						<a4j:form id="qc_form" ajaxSubmit="true" reRender="qc_group">
 							<h:panelGroup id="qc_group" layout="block">
@@ -219,7 +222,7 @@
 
 					</rich:tab>
 
-					<rich:tab label="#{messages.certificateConstraintTSA}">
+					<rich:tab name="tab_tsa" label="#{messages.certificateConstraintTSA}">
 
 						<a4j:form id="tsa_form" ajaxSubmit="true" reRender="tsa_group">
 							<h:panelGroup id="tsa_group" layout="block">

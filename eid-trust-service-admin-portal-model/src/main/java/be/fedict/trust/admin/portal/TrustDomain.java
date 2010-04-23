@@ -64,6 +64,10 @@ public interface TrustDomain {
 
 	void setName(String name);
 
+	boolean isUseCaching();
+
+	void setUseCaching(boolean useCaching);
+
 	String getNameVirtual();
 
 	void setNameVirtual(String nameVirtual);
@@ -109,6 +113,8 @@ public interface TrustDomain {
 	QCStatementsConstraintEntity getQcConstraint();
 
 	TSAConstraintEntity getTsaConstraint();
+
+	String getSelectedTab();
 
 	/*
 	 * Actions

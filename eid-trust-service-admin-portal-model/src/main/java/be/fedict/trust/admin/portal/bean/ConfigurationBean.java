@@ -62,6 +62,10 @@ import be.fedict.trust.service.exception.KeyStoreLoadException;
 		+ "ConfigurationBean")
 public class ConfigurationBean implements Configuration {
 
+	enum ConfigurationTab {
+		tab_network, tab_wssec, tab_clock
+	}
+
 	@Logger
 	private Log log;
 
@@ -156,7 +160,7 @@ public class ConfigurationBean implements Configuration {
 
 		this.configurationService.saveNetworkConfig(proxyHost, proxyPort,
 				proxyEnabled);
-		this.selectedTab = "tab_network";
+		this.selectedTab = ConfigurationTab.tab_network.name();
 		return "success";
 	}
 
@@ -186,7 +190,7 @@ public class ConfigurationBean implements Configuration {
 							.getMessage());
 			return null;
 		}
-		this.selectedTab = "tab_wssec";
+		this.selectedTab = ConfigurationTab.tab_wssec.name();
 		return "success";
 	}
 
@@ -221,7 +225,7 @@ public class ConfigurationBean implements Configuration {
 					StatusMessage.Severity.ERROR, "errorMaxClockOffsetInvalid");
 			return null;
 		}
-		this.selectedTab = "tab_clock";
+		this.selectedTab = ConfigurationTab.tab_clock.name();
 		return "success";
 	}
 

@@ -93,6 +93,11 @@ public class TrustDomainBean implements TrustDomain {
 	private static final String CONSTRAINTS_END_ENTITY_LIST = AdminConstants.ADMIN_SEAM_PREFIX
 			+ "constraintsEndEntity";
 
+	enum ConstraintTab {
+
+		tab_policy, tab_keyusage, tab_dn, tab_endentity, tab_qc, tab_tsa
+	}
+
 	@Logger
 	private Log log;
 
@@ -123,6 +128,10 @@ public class TrustDomainBean implements TrustDomain {
 	@Out(value = TrustPointBean.SELECTED_TRUST_POINT, required = false, scope = ScopeType.CONVERSATION)
 	private TrustPointEntity selectedTrustPoint;
 
+	@In(value = "selectedTab", required = false)
+	@Out(value = "selectedTab", required = false, scope = ScopeType.CONVERSATION)
+	private String selectedTab = null;
+
 	private TreeNode<TrustPointEntity> rootNode = null;
 	private TreeNode<TrustDomainEntity> rootNodeVirtual = null;
 
@@ -151,6 +160,7 @@ public class TrustDomainBean implements TrustDomain {
 	private EndEntityConstraintEntity selectedEndEntityConstraint;
 
 	private String name;
+	private boolean useCaching;
 	private String nameVirtual;
 	private String certificatePolicy;
 	private String keyUsage;
@@ -214,6 +224,7 @@ public class TrustDomainBean implements TrustDomain {
 
 		this.log.debug("modify trust domain: #0", this.selectedTrustDomain
 				.getName());
+		this.useCaching = this.selectedTrustDomain.isUseCaching();
 		for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
 				.getCertificateConstraints()) {
 			if (certificateConstraint instanceof DNConstraintEntity) {
@@ -250,6 +261,7 @@ public class TrustDomainBean implements TrustDomain {
 		try {
 			this.selectedTrustDomain = this.trustDomainService
 					.addTrustDomain(this.name);
+			this.useCaching = this.selectedTrustDomain.isUseCaching();
 		} catch (TrustDomainAlreadyExistsException e) {
 			this.facesMessages.addToControlFromResourceBundle("name",
 					StatusMessage.Severity.ERROR,
@@ -357,13 +369,15 @@ public class TrustDomainBean implements TrustDomain {
 
 	private void addNodes(String path, TreeNode<TrustPointEntity> node) {
 
-		List<TrustPointEntity> trustPoints = this.trustDomainService
-				.listTrustPoints(this.selectedTrustDomain);
+		if (null != this.selectedTrustDomain) {
+			List<TrustPointEntity> trustPoints = this.trustDomainService
+					.listTrustPoints(this.selectedTrustDomain);
 
-		for (TrustPointEntity trustPoint : trustPoints) {
-			TreeNodeImpl<TrustPointEntity> nodeImpl = new TreeNodeImpl<TrustPointEntity>();
-			nodeImpl.setData(trustPoint);
-			node.addChild(trustPoint.getName(), nodeImpl);
+			for (TrustPointEntity trustPoint : trustPoints) {
+				TreeNodeImpl<TrustPointEntity> nodeImpl = new TreeNodeImpl<TrustPointEntity>();
+				nodeImpl.setData(trustPoint);
+				node.addChild(trustPoint.getName(), nodeImpl);
+			}
 		}
 	}
 
@@ -426,14 +440,18 @@ public class TrustDomainBean implements TrustDomain {
 	@End
 	public String save() {
 
-		this.log.debug("save trust domain: #0 ", this.selectedTrustDomain
-				.getName());
-		try {
-			this.trustDomainService.save(selectedTrustDomain);
-		} catch (InvalidCronExpressionException e) {
-			this.facesMessages.addToControlFromResourceBundle("cron",
-					StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
-			return null;
+		if (null != this.selectedTrustDomain) {
+			this.selectedTrustDomain.setUseCaching(this.useCaching);
+			this.log.debug("save trust domain: #0 ", this.selectedTrustDomain
+					.getName());
+			try {
+				this.trustDomainService.save(selectedTrustDomain);
+			} catch (InvalidCronExpressionException e) {
+				this.facesMessages.addToControlFromResourceBundle("cron",
+						StatusMessage.Severity.ERROR,
+						"errorCronExpressionInvalid");
+				return null;
+			}
 		}
 		return "save";
 	}
@@ -621,13 +639,15 @@ public class TrustDomainBean implements TrustDomain {
 	@Factory(CONSTRAINTS_POLICY_LIST)
 	public void constraintsPolicyFactory() {
 
-		this.log.debug("certificate policy constraints factory");
-		this.policyConstraints = new LinkedList<PolicyConstraintEntity>();
-		for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
-				.getCertificateConstraints()) {
-			if (certificateConstraint instanceof PolicyConstraintEntity) {
-				this.policyConstraints
-						.add((PolicyConstraintEntity) certificateConstraint);
+		if (null != this.selectedTrustDomain) {
+			this.log.debug("certificate policy constraints factory");
+			this.policyConstraints = new LinkedList<PolicyConstraintEntity>();
+			for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
+					.getCertificateConstraints()) {
+				if (certificateConstraint instanceof PolicyConstraintEntity) {
+					this.policyConstraints
+							.add((PolicyConstraintEntity) certificateConstraint);
+				}
 			}
 		}
 	}
@@ -646,6 +666,7 @@ public class TrustDomainBean implements TrustDomain {
 					this.selectedPolicyConstraint);
 			constraintsPolicyFactory();
 		}
+		this.selectedTab = ConstraintTab.tab_policy.name();
 		return "success";
 	}
 
@@ -662,6 +683,7 @@ public class TrustDomainBean implements TrustDomain {
 					policyConstraint);
 			constraintsPolicyFactory();
 		}
+		this.selectedTab = ConstraintTab.tab_policy.name();
 		return "success";
 	}
 
@@ -685,13 +707,15 @@ public class TrustDomainBean implements TrustDomain {
 	@Factory(CONSTRAINTS_KEY_USAGE_LIST)
 	public void constraintsKeyUsageFactory() {
 
-		this.log.debug("key usage constraints factory");
-		this.keyUsageConstraints = new LinkedList<KeyUsageConstraintEntity>();
-		for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
-				.getCertificateConstraints()) {
-			if (certificateConstraint instanceof KeyUsageConstraintEntity) {
-				this.keyUsageConstraints
-						.add((KeyUsageConstraintEntity) certificateConstraint);
+		if (null != this.selectedTrustDomain) {
+			this.log.debug("key usage constraints factory");
+			this.keyUsageConstraints = new LinkedList<KeyUsageConstraintEntity>();
+			for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
+					.getCertificateConstraints()) {
+				if (certificateConstraint instanceof KeyUsageConstraintEntity) {
+					this.keyUsageConstraints
+							.add((KeyUsageConstraintEntity) certificateConstraint);
+				}
 			}
 		}
 	}
@@ -709,6 +733,7 @@ public class TrustDomainBean implements TrustDomain {
 					keyUsageConstraint);
 			constraintsKeyUsageFactory();
 		}
+		this.selectedTab = ConstraintTab.tab_keyusage.name();
 		return "success";
 	}
 
@@ -726,6 +751,7 @@ public class TrustDomainBean implements TrustDomain {
 					this.selectedKeyUsageConstraint);
 			constraintsKeyUsageFactory();
 		}
+		this.selectedTab = ConstraintTab.tab_keyusage.name();
 		return "success";
 	}
 
@@ -737,6 +763,7 @@ public class TrustDomainBean implements TrustDomain {
 		this.log.debug("save key usage constraints");
 		this.trustDomainService
 				.saveKeyUsageConstraints(this.keyUsageConstraints);
+		this.selectedTab = ConstraintTab.tab_keyusage.name();
 		return "success";
 	}
 
@@ -748,6 +775,7 @@ public class TrustDomainBean implements TrustDomain {
 		this.log.debug("Add DN Statements constraint: #0", this.dn);
 		this.dnConstraint = this.trustDomainService.addDNConstraint(
 				this.selectedTrustDomain, this.dn);
+		this.selectedTab = ConstraintTab.tab_dn.name();
 		return "success";
 	}
 
@@ -763,6 +791,7 @@ public class TrustDomainBean implements TrustDomain {
 			this.dnConstraint = null;
 			this.dn = null;
 		}
+		this.selectedTab = ConstraintTab.tab_dn.name();
 		return "success";
 	}
 
@@ -774,6 +803,7 @@ public class TrustDomainBean implements TrustDomain {
 		this.log.debug("Save DN Statements constraint: #0", this.dn);
 		this.dnConstraint.setDn(this.dn);
 		this.trustDomainService.saveDNConstraint(this.dnConstraint);
+		this.selectedTab = ConstraintTab.tab_dn.name();
 		return "success";
 	}
 
@@ -783,13 +813,15 @@ public class TrustDomainBean implements TrustDomain {
 	@Factory(CONSTRAINTS_END_ENTITY_LIST)
 	public void constraintsEndEntityFactory() {
 
-		this.log.debug("end entity constraints factory");
-		this.endEntityConstraints = new LinkedList<EndEntityConstraintEntity>();
-		for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
-				.getCertificateConstraints()) {
-			if (certificateConstraint instanceof EndEntityConstraintEntity) {
-				this.endEntityConstraints
-						.add((EndEntityConstraintEntity) certificateConstraint);
+		if (null != this.selectedTrustDomain) {
+			this.log.debug("end entity constraints factory");
+			this.endEntityConstraints = new LinkedList<EndEntityConstraintEntity>();
+			for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
+					.getCertificateConstraints()) {
+				if (certificateConstraint instanceof EndEntityConstraintEntity) {
+					this.endEntityConstraints
+							.add((EndEntityConstraintEntity) certificateConstraint);
+				}
 			}
 		}
 	}
@@ -814,6 +846,7 @@ public class TrustDomainBean implements TrustDomain {
 					endEntityConstraint);
 			constraintsEndEntityFactory();
 		}
+		this.selectedTab = ConstraintTab.tab_endentity.name();
 		return "success";
 	}
 
@@ -832,6 +865,7 @@ public class TrustDomainBean implements TrustDomain {
 					this.selectedEndEntityConstraint);
 			constraintsEndEntityFactory();
 		}
+		this.selectedTab = ConstraintTab.tab_endentity.name();
 		return "success";
 	}
 
@@ -843,6 +877,7 @@ public class TrustDomainBean implements TrustDomain {
 		this.log.debug("Add QC Statements constraint: #0", this.qc);
 		this.qcConstraint = this.trustDomainService.addQCConstraint(
 				this.selectedTrustDomain, this.qc);
+		this.selectedTab = ConstraintTab.tab_qc.name();
 		return "success";
 	}
 
@@ -856,7 +891,9 @@ public class TrustDomainBean implements TrustDomain {
 			this.trustDomainService
 					.removeCertificateConstraint(this.qcConstraint);
 			this.qcConstraint = null;
+			this.qc = false;
 		}
+		this.selectedTab = ConstraintTab.tab_qc.name();
 		return "success";
 	}
 
@@ -868,6 +905,7 @@ public class TrustDomainBean implements TrustDomain {
 		this.log.debug("Save QC Statements constraint: #0", this.qc);
 		this.qcConstraint.setQcComplianceFilter(this.qc);
 		this.trustDomainService.saveQCConstraint(this.qcConstraint);
+		this.selectedTab = ConstraintTab.tab_qc.name();
 		return "success";
 	}
 
@@ -879,6 +917,7 @@ public class TrustDomainBean implements TrustDomain {
 		this.log.debug("Add TSA constraint");
 		this.tsaConstraint = this.trustDomainService
 				.addTSAConstraint(this.selectedTrustDomain);
+		this.selectedTab = ConstraintTab.tab_tsa.name();
 		return "success";
 	}
 
@@ -893,6 +932,7 @@ public class TrustDomainBean implements TrustDomain {
 					.removeCertificateConstraint(this.tsaConstraint);
 			this.tsaConstraint = null;
 		}
+		this.selectedTab = ConstraintTab.tab_tsa.name();
 		return "success";
 	}
 
@@ -1036,6 +1076,22 @@ public class TrustDomainBean implements TrustDomain {
 	/**
 	 * {@inheritDoc}
 	 */
+	public boolean isUseCaching() {
+
+		return this.useCaching;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setUseCaching(boolean useCaching) {
+
+		this.useCaching = useCaching;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getNameVirtual() {
 
 		return this.nameVirtual;
@@ -1048,4 +1104,13 @@ public class TrustDomainBean implements TrustDomain {
 
 		this.nameVirtual = nameVirtual;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getSelectedTab() {
+
+		return this.selectedTab;
+	}
+
 }
