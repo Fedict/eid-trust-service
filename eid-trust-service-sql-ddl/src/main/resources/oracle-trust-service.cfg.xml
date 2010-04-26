@@ -5,8 +5,7 @@
     <!ENTITY trust-service-cfg SYSTEM "${basedir}/src/main/resources/trust-service-cfg.xml"> ]>
 <hibernate-configuration>
 	<session-factory>
-		<property name="dialect">
-			be.fedict.trust.service.hibernate.dialect.Oracle11Dialect </property>
+		<property name="dialect">org.hibernate.dialect.Oracle10gDialect</property>
 		&trust-service-cfg;
 	</session-factory>
 </hibernate-configuration>

@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<assembly xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.0.0.xsd">
+
+
+	<!-- ================== -->
+	<!-- BASE CONFIGURATION -->
+	<!-- ================== -->
+
+	<fileSets>
+
+		<!--
+			Exclude default DS config
+		-->
+		<fileSet>
+			<directory>target/files/jboss-as-distribution</directory>
+			<outputDirectory>jboss</outputDirectory>
+
+			<excludes>
+				<!-- Exclude the default HSQL configuration. -->
+				<exclude>common/lib/hsqldb.jar</exclude>
+				<exclude>common/lib/hsqldb-plugin.jar</exclude>
+				<exclude>server/default/deploy/hsqldb-ds.xml</exclude>
+				<exclude>server/default/deploy/messaging/hsqldb-persistence-service.xml
+				</exclude>
+
+				<exclude>bin/run.sh</exclude>
+				<exclude>bin/shutdown.sh</exclude>
+			</excludes>
+		</fileSet>
+
+		<fileSet>
+			<directory>target/files/jboss-as-distribution</directory>
+			<outputDirectory>jboss</outputDirectory>
+			<includes>
+				<include>bin/run.sh</include>
+				<include>bin/shutdown.sh</include>
+			</includes>
+			<fileMode>0500</fileMode>
+
+		</fileSet>
+
+		<fileSet>
+			<directory>target/classes/jboss</directory>
+			<outputDirectory>jboss</outputDirectory>
+
+			<excludes>
+				<exclude>server/default/deploy/messaging/*-persistence-service.xml
+				</exclude>
+			</excludes>
+		</fileSet>
+
+		<!--
+			This artifact's EAR dependencies -> /jboss/server/default/lib
+		-->
+		<fileSet>
+			<directory>target/deploy</directory>
+			<outputDirectory>jboss/server/default/deploy</outputDirectory>
+		</fileSet>
+
+		<!--
+			This MySQL connector -> /jboss/common/lib
+		-->
+		<fileSet>
+			<directory>target/dependency</directory>
+			<outputDirectory>jboss/common/lib</outputDirectory>
+		</fileSet>
+
+	</fileSets>
+
+	<files>
+		<!--
+			The Oracle initialization scripts -> /sql 
+		 -->
+		<file>
+			<source>target/files/oracle-trust-service-ddl.sql</source>
+			<outputDirectory>sql</outputDirectory>
+		</file>
+		<file>
+			<source>target/files/resources/oracle-create-tablespace.sql</source>
+			<outputDirectory>sql</outputDirectory>
+		</file>
+		<file>
+			<source>target/files/resources/oracle-create-account.sql</source>
+			<outputDirectory>sql</outputDirectory>
+		</file>
+		<file>
+			<source>target/files/resources/oracle-init-trust-service.sql</source>
+			<outputDirectory>sql</outputDirectory>
+		</file>
+		
+		<!-- Admin manual -> /manual -->
+		<file>
+			<source>target/files/eid-trust-service-admin-manual.pdf</source>
+			<outputDirectory>manual</outputDirectory>
+		</file>
+
+	</files>
+
+	<formats>
+		<format>zip</format>
+	</formats>
+
+</assembly>

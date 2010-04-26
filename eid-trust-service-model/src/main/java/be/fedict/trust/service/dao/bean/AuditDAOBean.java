@@ -79,8 +79,8 @@ public class AuditDAOBean implements AuditDAO {
 
 		AuditEntity audit = new AuditEntity(new Date(), message);
 		this.entityManager.persist(audit);
-		LOG.error("audit: date=" + audit.getDate().toString() + " message="
-				+ audit.getMessage());
+		LOG.error("audit: date=" + audit.getAuditDate().toString()
+				+ " message=" + audit.getMessage());
 		return audit;
 	}
 }

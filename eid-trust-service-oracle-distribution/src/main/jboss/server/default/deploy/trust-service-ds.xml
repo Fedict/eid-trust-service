@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!-- The MySQL embedded database JCA connection factory config -->
+
+<datasources>
+	<local-tx-datasource>
+
+		<!-- The jndi name of the DataSource, it is prefixed with java:/ -->
+		<!-- Datasources are not available outside the virtual machine -->
+		<jndi-name>DefaultDS</jndi-name>
+
+		<connection-url>jdbc:oracle:thin:@localhost:1521:xe</connection-url>
+		<driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+
+		<user-name>trust</user-name>
+		<password>trust</password>
+
+		<!--
+			The minimum connections in a pool/sub-pool. Pools are lazily
+			constructed on first use
+		-->
+		<min-pool-size>5</min-pool-size>
+
+		<!-- The maximum connections in a pool/sub-pool -->
+		<max-pool-size>20</max-pool-size>
+
+
+		<exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter</exception-sorter-class-name>
+
+
+		<transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
+
+		<idle-timeout-minutes>5</idle-timeout-minutes>
+		
+		<!--
+			Whether to check all statements are closed when the connection is
+			returned to the pool, this is a debugging feature that should be
+			turned off in production
+		-->
+		<track-statements />
+
+
+		<prepared-statement-cache-size>32</prepared-statement-cache-size>
+
+
+		<!--
+			corresponding type-mapping in the standardjbosscmp-jdbc.xml
+			(optional)
+		-->
+		<metadata>
+			<type-mapping>Oracle9i</type-mapping>
+		</metadata>
+
+
+	</local-tx-datasource>
+
+</datasources>

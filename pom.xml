@@ -71,6 +71,24 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>oracle</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>prod-oracle</value>
+				</property>
+			</activation>
+			<properties>
+				<hibernate.dialect>org.hibernate.dialect.Oracle10gDialect
+				</hibernate.dialect>
+				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
+			</properties>
+			<modules>
+				<module>eid-trust-service-oracle-distribution</module>
+				<module>eid-trust-service-admin-manual</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>sdk</id>
 			<activation>
 				<property>
@@ -153,6 +171,11 @@
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
 				<version>5.1.12</version>
+			</dependency>
+			<dependency>
+				<groupId>com.oracle.jdbc</groupId>
+				<artifactId>ojdbc5</artifactId>
+				<version>11.1.0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.jbossas</groupId>

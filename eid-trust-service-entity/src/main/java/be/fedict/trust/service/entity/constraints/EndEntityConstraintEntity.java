@@ -62,7 +62,7 @@ public class EndEntityConstraintEntity extends CertificateConstraintEntity {
 		this.issuerName = issuerName;
 	}
 
-	@Column(precision = 50)
+	@Column(precision = 38)
 	public BigInteger getSerialNumber() {
 
 		return this.serialNumber;

@@ -32,7 +32,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "audit")
+@Table(name = "ts_audit")
 @NamedQueries( {
 		@NamedQuery(name = AuditEntity.QUERY_LIST_ALL, query = "FROM AuditEntity"),
 		@NamedQuery(name = AuditEntity.REMOVE_ALL, query = "DELETE FROM AuditEntity") })
@@ -45,7 +45,7 @@ public class AuditEntity implements Serializable {
 
 	private long id;
 
-	private Date date;
+	private Date auditDate;
 	private String message;
 
 	/**
@@ -58,9 +58,9 @@ public class AuditEntity implements Serializable {
 	/**
 	 * Main constructor.
 	 */
-	public AuditEntity(Date date, String message) {
+	public AuditEntity(Date auditDate, String message) {
 
-		this.date = date;
+		this.auditDate = auditDate;
 		this.message = message;
 	}
 
@@ -77,14 +77,14 @@ public class AuditEntity implements Serializable {
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)
-	public Date getDate() {
+	public Date getAuditDate() {
 
-		return this.date;
+		return this.auditDate;
 	}
 
-	public void setDate(Date date) {
+	public void setAuditDate(Date auditDate) {
 
-		this.date = date;
+		this.auditDate = auditDate;
 	}
 
 	public String getMessage() {
