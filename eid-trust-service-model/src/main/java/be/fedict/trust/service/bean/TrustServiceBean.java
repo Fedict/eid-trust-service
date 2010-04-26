@@ -81,6 +81,7 @@ import be.fedict.trust.service.SnmpConstants;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.dao.AuditDAO;
+import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
@@ -125,6 +126,9 @@ public class TrustServiceBean implements TrustService {
 
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
+
+	@EJB
+	private CertificateAuthorityDAO certificateAuthorityDAO;
 
 	@EJB
 	private AuditDAO auditDAO;
@@ -629,8 +633,8 @@ public class TrustServiceBean implements TrustService {
 			for (X509Certificate certificate : certificateChain) {
 				String issuerName = certificate.getIssuerX500Principal()
 						.toString();
-				CertificateAuthorityEntity certificateAuthority = this.entityManager
-						.find(CertificateAuthorityEntity.class, issuerName);
+				CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
+						.findCertificateAuthority(issuerName);
 				if (null != certificateAuthority
 						&& certificateAuthority.getStatus().equals(
 								Status.INACTIVE)) {
