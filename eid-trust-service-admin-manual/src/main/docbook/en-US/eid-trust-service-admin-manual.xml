@@ -317,6 +317,9 @@
 					<listitem>
 						MySQL v5.0 and v5.1
 					</listitem>
+					<listitem>
+						Oracle 10.2.0.1.0
+					</listitem>
 				</itemizedlist>
 			</para>
 		</section>
@@ -346,6 +349,30 @@
 				Enable the MySQL service via:
 				<programlisting><![CDATA[
 					sudo chkconfig --level 345 mysqld on
+				]]></programlisting>
+			</para>
+		</section>
+		<section>
+			<title>Oracle database setup on Debian</title>
+			<para>
+				Download the Oracle 10g Release 2 package @
+				<ulink
+					url="http://www.oracle.com/technology/software/products/database/xe/htdocs/102xelinsoft.html">Oracle 10g Release 2</ulink>
+				. For further installation please check out
+				<ulink
+					url="http://www.oracle.com/technology/tech/linux/install/xe-on-kubuntu.html">Oracle installation on Debian</ulink>
+				. The
+				<code>./sql</code>
+				directory contains initialization scripts for setting up an Oracle
+				tablespace in the default XE database. Simply execute: 
+				<programlisting><![CDATA[
+					sqlplus @oracle-init-trust-service.sql
+				]]></programlisting>
+				Check the database via:
+				<programlisting><![CDATA[
+					sqlplus trust/trust;
+					SQL> select table_name from user_tables;
+					SQL> exit
 				]]></programlisting>
 			</para>
 		</section>
