@@ -18,9 +18,13 @@
 
 package test.integ.be.fedict.trust;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -36,10 +40,13 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,9 +79,9 @@ public class PerformanceTest {
 	// private static final String XKMS_LOCATION =
 	// "http://www.e-contract.be/eid-trust-service-ws/xkms2";
 
+	private static final String XKMS_LOCATION = "http://192.168.1.101/eid-trust-service-ws/xkms2";
 	// private static final String XKMS_LOCATION =
-	// "http://192.168.1.101/eid-trust-service-ws/xkms2";
-	private static final String XKMS_LOCATION = "http://sebeco-dev-12:8080/eid-trust-service-ws/xkms2";
+	// "http://sebeco-dev-12:8080/eid-trust-service-ws/xkms2";
 
 	private static final int INTERVAL_SIZE = 1000 * 10;
 
@@ -84,6 +91,10 @@ public class PerformanceTest {
 	}
 
 	private boolean run = true;
+
+	private int count = 0;
+
+	private int intervalCount = 0;
 
 	private static class PerformanceData {
 		private final Date date;
@@ -141,10 +152,12 @@ public class PerformanceTest {
 			try {
 				client.validate(authnCertificateChain);
 				currentPerformance.inc();
+				this.count++;
 				if (System.currentTimeMillis() > nextIntervalT) {
 					currentPerformance = new PerformanceData();
 					nextIntervalT = System.currentTimeMillis() + INTERVAL_SIZE;
 					performance.add(currentPerformance);
+					this.intervalCount++;
 				}
 			} catch (Exception e) {
 				LOG.error("error: " + e.getMessage(), e);
@@ -158,25 +171,85 @@ public class PerformanceTest {
 		}
 	}
 
-	private class WorkingFrame extends JFrame implements ActionListener {
+	private class WorkingFrame extends JFrame implements ActionListener,
+			Runnable {
 		private static final long serialVersionUID = 1L;
+
+		private final JLabel countLabel;
+		private final JLabel performanceCountLabel;
+
+		private final Thread updateThread;
 
 		public WorkingFrame() {
 			super("Running performance tests");
 			setSize(400, 100);
 
 			Container container = getContentPane();
+
+			JPanel infoPanel = new JPanel(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			c.gridx = 0;
+			c.gridy = 0;
+			c.anchor = GridBagConstraints.NORTHWEST;
+			c.ipadx = 15;
+			infoPanel.add(new JLabel("Request count:"), c);
+
+			c.gridx++;
+			this.countLabel = new JLabel("0");
+			infoPanel.add(this.countLabel, c);
+
+			c.gridx = 0;
+			c.gridy++;
+			infoPanel.add(new JLabel("Interval count:"), c);
+
+			c.gridx++;
+			this.performanceCountLabel = new JLabel("0");
+			infoPanel.add(this.performanceCountLabel, c);
+
+			container.add(infoPanel, BorderLayout.CENTER);
+
+			JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			JButton quitButton = new JButton("End");
-			container.add(quitButton);
+			buttonPanel.add(quitButton);
+			container.add(buttonPanel, BorderLayout.SOUTH);
 			quitButton.addActionListener(this);
 
 			setVisible(true);
+
+			this.updateThread = new Thread(this);
+			this.updateThread.start();
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent event) {
 			PerformanceTest.this.run = false;
+			try {
+				this.updateThread.join();
+			} catch (InterruptedException e) {
+				throw new RuntimeException("thread joining error: "
+						+ e.getMessage(), e);
+			}
 			setVisible(false);
 			dispose();
+		}
+
+		public void run() {
+			while (PerformanceTest.this.run) {
+				SwingUtilities.invokeLater(new Runnable() {
+
+					public void run() {
+						WorkingFrame.this.countLabel.setText(Integer
+								.toString(PerformanceTest.this.count));
+						WorkingFrame.this.performanceCountLabel.setText(Integer
+								.toString(PerformanceTest.this.intervalCount));
+					}
+				});
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(
+							"sleep error: " + e.getMessage(), e);
+				}
+			}
 		}
 	}
 
@@ -201,6 +274,11 @@ public class PerformanceTest {
 			TimeSeries failureSeries = new TimeSeries("Failures");
 
 			performance.remove(performance.size() - 1);
+			if (performance.isEmpty()) {
+				JOptionPane.showMessageDialog(null,
+						"test did not run long enough");
+				return;
+			}
 
 			int totalCount = 0;
 			int totalFailures = 0;
@@ -222,11 +300,12 @@ public class PerformanceTest {
 					"eID Trust Service Performance History",
 					"Time (interval size " + INTERVAL_SIZE + " msec)",
 					"Number of XKMS requests", dataset, true, false, false);
+
 			this.chart.addSubtitle(new TextTitle(performance.get(0).getDate()
 					.toString()));
 
-			TextTitle info = new TextTitle("Total number of requests: "
-					+ totalCount);
+			TextTitle info = new TextTitle(
+					"Total number of successful requests: " + totalCount);
 			info.setTextAlignment(HorizontalAlignment.LEFT);
 			info.setPosition(RectangleEdge.BOTTOM);
 			this.chart.addSubtitle(info);
@@ -244,6 +323,7 @@ public class PerformanceTest {
 			valueAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 			XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
 			plot.setRangeGridlinePaint(Color.black);
+			plot.setDomainGridlinePaint(Color.black);
 			plot.setRenderer(renderer);
 
 			ChartPanel chartPanel = new ChartPanel(this.chart);
