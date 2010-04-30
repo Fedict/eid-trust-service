@@ -364,7 +364,7 @@
 				. The
 				<code>./sql</code>
 				directory contains initialization scripts for setting up an Oracle
-				tablespace in the default XE database. Simply execute: 
+				tablespace in the default XE database. Simply execute:
 				<programlisting><![CDATA[
 					sqlplus @oracle-init-trust-service.sql
 				]]></programlisting>
@@ -389,12 +389,138 @@
 				<code>./jboss/bin/run.conf</code>
 				See
 				<link linkend="links">Useful links</link>
-				for more info.
+				for more info on tweaking this.
 			</para>
 			<para>
 				As to the amount of network traffic, this is highly related as
 				to how CRL caching is configured. 
 			</para>
+		</section>
+		<section>
+			<title>Clustering</title>
+			<para>
+				Following is needed for a basic clustering with load balancing
+				setup. Since JBoss 6 M1, clustering has been simplified as
+				<code>mod_cluster</code>
+				. Unlike
+				<code>mod_jk</code>
+				and
+				<code>mod_proxy</code>
+				,
+				<code>mod_cluster</code>
+				leverages an additional connection between the application server
+				nodes and httpd. The application server nodes use this connection to
+				transmit server-side load balance factors and lifecycle events back
+				to httpd via a custom set of HTTP methods, affectionately called the
+				Mod-Cluster Management Protocol (MCMP). This additional feedback
+				channel allows mod_cluster to offer a level of intelligence and
+				granularity not found in other load balancing solutions.
+			</para>
+			<section>
+				<title>JBoss Configuration</title>
+				<para>
+					Since JBoss 6 M1 clustering has been included in all of its
+					profiles. Activating clustered mode for your JBoss AS as follows:
+					<programlisting><![CDATA[
+						> vim jboss/server/default/deploy/jbossweb.sar/META-INF/jboss-beans.xml
+						// uncomment: <!--depends>ModClusterListener</depends-->
+						
+						> vim jboss/server/default/deploy/mod_cluster.sar/META-INF/mod_cluster-jboss-beans.xml
+						// change: 
+						//   <parameter><inject bean="ModClusterService"/></parameter>
+						// to:
+						//   <parameter><inject bean="HAModClusterService"/></parameter>
+						//
+						// change:
+						//  <property name="advertise">${jboss.mod_cluster.advertise.enabled:false}</property>
+						// to:
+						// <property name="advertise">true</property>
+					]]></programlisting>
+					The advertise property is to make sure the
+					<code>HAModClusterService</code>
+					discovers the httpd front-end through the
+					<code>mod_advertise</code>
+					module. It is also possible to specify the httpd servers statically
+					if wanted using:
+					<programlisting><![CDATA[
+					  <property name="proxyList">${jboss.mod_cluster.proxyList:}</property>
+					]]></programlisting>
+					Now different JBoss AS's within the same network will auto-discover
+					each other and form a cluster.
+				</para>
+				<para>
+					By default sticky sessions will be enabled. Yet at the time of
+					writing their is an issue in
+					<code>mod_cluster</code>
+					if you do not explicitely specify a
+					<code>jvmRoute</code>
+					. See
+					<ulink url="https://jira.jboss.org/jira/browse/MODCLUSTER-146">MODCLUSTER-146</ulink>
+					for more info. Do this as follows:
+					<programlisting><![CDATA[
+					  > vim jboss/server/all/deploy/jbossweb.sar/server.xml
+					  // add jvmRoute="node01" in <Engine name="jboss.web" ... >
+					]]></programlisting>
+				</para>
+			</section>
+			<section>
+				<title>Httpd Configuration</title>
+				<para>
+					First you will have to download the
+					<code>mod_cluster</code>
+					's needed modules @
+					<ulink url="http://www.jboss.org/mod_cluster">mod_cluster</ulink>
+					.
+					After having completed the installation, here is a basic
+					<code>httpd.conf</code>
+					setup:
+					<programlisting><![CDATA[
+					  LoadModule proxy_module /opt/jboss/httpd/lib/httpd/modules/mod_proxy.so
+LoadModule proxy_ajp_module /opt/jboss/httpd/lib/httpd/modules/mod_proxy_ajp.so
+LoadModule slotmem_module /opt/jboss/httpd/lib/httpd/modules/mod_slotmem.so
+LoadModule manager_module /opt/jboss/httpd/lib/httpd/modules/mod_manager.so
+LoadModule proxy_cluster_module /opt/jboss/httpd/lib/httpd/modules/mod_proxy_cluster.so
+LoadModule advertise_module /opt/jboss/httpd/lib/httpd/modules/mod_advertise.so
+
+LogLevel debug
+
+CreateBalancers 1
+
+<VirtualHost *:80>
+
+  <Location /mod_cluster-manager>
+    SetHandler mod_cluster-manager
+
+    Order deny,allow
+    Deny from all
+    Allow from all
+#    Allow from 192.168.7.
+  </Location>
+
+  <Directory />
+     Order deny,allow
+     Deny from all
+     Allow from all
+  </Directory>
+
+  ProxyPass /eid-trust-service-admin-portal balancer://mycluster/eid-trust-service-admin-portal
+
+  KeepAliveTimeout 60
+  MaxKeepAliveRequests 0
+  ManagerBalancerName mycluster
+  AdvertiseFrequency 5
+
+</VirtualHost>
+
+					]]></programlisting>
+					Beware in this setup the mod_cluster-manager is set open for
+					testing purposes. This way you can view the connected nodes @
+					<code>./mod_cluster-manager</code>
+					. More information on more advanced setups can be found in the
+					<link linkend="links">Useful links</link>
+					section.
+				</para>
+			</section>
 		</section>
 		<section>
 			<title>Starting</title>
@@ -813,6 +939,13 @@
 				</listitem>
 				<listitem>
 					<ulink url="http://en.wikipedia.org/wiki/Network_Time_Protocol">Network Time Protocol</ulink>
+				</listitem>
+				<listitem>
+					<ulink
+						url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Server_Configuration_Guide/beta500/html-single/index.html#cluster.chapt">JBoss Clustering</ulink>
+				</listitem>
+				<listitem>
+					<ulink url="http://www.jboss.org/mod_cluster.html">JBoss mod_cluster</ulink>
 				</listitem>
 			</itemizedlist>
 		</para>

@@ -81,7 +81,7 @@ public class PerformanceTest {
 
 	private static final String XKMS_LOCATION = "http://192.168.1.101/eid-trust-service-ws/xkms2";
 	// private static final String XKMS_LOCATION =
-	// "http://sebeco-dev-12:8080/eid-trust-service-ws/xkms2";
+	// "http://sebeco-dev-11/eid-trust-service-ws/xkms2";
 
 	private static final int INTERVAL_SIZE = 1000 * 10;
 

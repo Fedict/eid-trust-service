@@ -1,5 +1,5 @@
---- server/default/deploy/transaction-jboss-beans.xml.orig	2010-03-23 12:07:50.000000000 +0100
-+++ server/default/deploy/transaction-jboss-beans.xml		2010-03-23 12:03:39.000000000 +0100
+--- server/all/deploy/transaction-jboss-beans.xml.orig	2010-03-23 12:07:50.000000000 +0100
++++ server/all/deploy/transaction-jboss-beans.xml		2010-03-23 12:03:39.000000000 +0100
 @@ -104,7 +104,7 @@
          <constructor factoryClass="com.arjuna.ats.arjuna.common.arjPropertyManager" factoryMethod="getCoordinatorEnvironmentBean"/>
  

@@ -20,8 +20,8 @@
 				<!-- Exclude the default HSQL configuration. -->
 				<exclude>common/lib/hsqldb.jar</exclude>
 				<exclude>common/lib/hsqldb-plugin.jar</exclude>
-				<exclude>server/default/deploy/hsqldb-ds.xml</exclude>
-				<exclude>server/default/deploy/messaging/hsqldb-persistence-service.xml
+				<exclude>server/all/deploy/hsqldb-ds.xml</exclude>
+				<exclude>server/all/deploy/messaging/hsqldb-persistence-service.xml
 				</exclude>
 
 				<exclude>bin/run.sh</exclude>
@@ -45,17 +45,17 @@
 			<outputDirectory>jboss</outputDirectory>
 
 			<excludes>
-				<exclude>server/default/deploy/messaging/*-persistence-service.xml
+				<exclude>server/all/deploy/messaging/*-persistence-service.xml
 				</exclude>
 			</excludes>
 		</fileSet>
 
 		<!--
-			This artifact's EAR dependencies -> /jboss/server/default/lib
+			This artifact's EAR dependencies -> /jboss/server/all/lib
 		-->
 		<fileSet>
 			<directory>target/deploy</directory>
-			<outputDirectory>jboss/server/default/deploy</outputDirectory>
+			<outputDirectory>jboss/server/all/deploy</outputDirectory>
 		</fileSet>
 
 		<!--

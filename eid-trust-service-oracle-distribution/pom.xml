@@ -84,7 +84,7 @@
 
 					<!--
 						Copy EAR dependencies into /deploy. maven-assembly-plugin will
-						move them to /jboss/server/default/deploy.
+						move them to /jboss/server/all/deploy.
 					-->
 					<execution>
 						<id>copy-ear</id>
