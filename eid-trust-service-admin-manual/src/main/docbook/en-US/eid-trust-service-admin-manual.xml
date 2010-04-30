@@ -528,7 +528,7 @@ CreateBalancers 1
 				After you have correctly setup your database, you can start the
 				application by executing following command:
 				<programlisting><![CDATA[
-					./jboss/bin/run.sh -b 0.0.0.0
+					./jboss/bin/run.sh -b 0.0.0.0 -c all
 				]]></programlisting>
 				. The option
 				<code>-b 0.0.0.0</code>
@@ -628,7 +628,7 @@ CreateBalancers 1
 				restarted as followed:
 				<programlisting><![CDATA[
 					./jboss/bin/shutdown -s
-					./jboss/bin/run.sh -b 0.0.0.0
+					./jboss/bin/run.sh -b 0.0.0.0 -c all
 				]]></programlisting>
 				Please note to check if shutdown was completed before starting.
 			</para>

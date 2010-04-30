@@ -636,8 +636,9 @@ public class TrustServiceBean implements TrustService {
 				CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
 						.findCertificateAuthority(issuerName);
 				if (null != certificateAuthority
-						&& certificateAuthority.getStatus().equals(
-								Status.INACTIVE)) {
+						&& (certificateAuthority.getStatus().equals(
+								Status.INACTIVE) || certificateAuthority
+								.getStatus().equals(Status.NONE))) {
 					if (null != certificateAuthority.getCrlUrl()) {
 						certificateAuthority.setStatus(Status.PROCESSING);
 						try {

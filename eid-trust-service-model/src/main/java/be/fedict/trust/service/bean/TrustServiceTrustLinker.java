@@ -81,19 +81,6 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
 					SnmpConstants.SNMP_SERVICE, 1L);
 
-			URI crlUri = CrlTrustLinker.getCrlUri(childCertificate);
-			if (null == crlUri) {
-				LOG.warn("No CRL uri for: " + issuerName);
-				return null;
-			}
-			String crlUrl;
-			try {
-				crlUrl = crlUri.toURL().toString();
-			} catch (MalformedURLException e) {
-				LOG.warn("malformed URL: " + e.getMessage(), e);
-				return null;
-			}
-
 			/*
 			 * Lookup Root CA's trust point via parent certificates' CA entity.
 			 */
@@ -109,8 +96,8 @@ public class TrustServiceTrustLinker implements TrustLinker {
 
 			// create new CA
 			try {
-				certificateAuthority = new CertificateAuthorityEntity(crlUrl,
-						certificate);
+				certificateAuthority = new CertificateAuthorityEntity(
+						getCrlUrl(childCertificate), certificate);
 				certificateAuthority.setTrustPoint(parentCertificateAuthority
 						.getTrustPoint());
 			} catch (CertificateEncodingException e) {
@@ -125,6 +112,10 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			/*
 			 * Harvester is still busy processing the first CRL.
 			 */
+			if (null == certificateAuthority.getCrlUrl()) {
+				certificateAuthority.setCrlUrl(getCrlUrl(childCertificate));
+			}
+
 			if (Status.NONE != certificateAuthority.getStatus()) {
 				// none means no CRL is available so not really a cache miss
 				SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
@@ -190,6 +181,22 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		return new TrustLinkerResult(false,
 				TrustLinkerResultReason.INVALID_REVOCATION_STATUS,
 				"certificate revoked by cached CRL");
+	}
+
+	private String getCrlUrl(X509Certificate childCertificate) {
+
+		URI crlUri = CrlTrustLinker.getCrlUri(childCertificate);
+		if (null == crlUri) {
+			LOG.warn("No CRL uri for: "
+					+ childCertificate.getIssuerX500Principal().toString());
+			return null;
+		}
+		try {
+			return crlUri.toURL().toString();
+		} catch (MalformedURLException e) {
+			LOG.warn("malformed URL: " + e.getMessage(), e);
+			return null;
+		}
 	}
 
 	private void logAudit(String message) {

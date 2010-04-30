@@ -166,8 +166,8 @@ public class InitializationServiceBean implements InitializationService {
 		CertificateAuthorityEntity rootCa = this.certificateAuthorityDAO
 				.findCertificateAuthority(rootCaCertificate);
 		if (null == rootCa) {
-			rootCa = this.certificateAuthorityDAO
-					.addCertificateAuthority(rootCaCertificate);
+			rootCa = this.certificateAuthorityDAO.addCertificateAuthority(
+					rootCaCertificate, "http://crl.eid.belgium.be/belgium.crl");
 		}
 
 		if (null == rootCa.getTrustPoint()) {
@@ -181,8 +181,9 @@ public class InitializationServiceBean implements InitializationService {
 		CertificateAuthorityEntity rootCa2 = this.certificateAuthorityDAO
 				.findCertificateAuthority(rootCa2Certificate);
 		if (null == rootCa2) {
-			rootCa2 = this.certificateAuthorityDAO
-					.addCertificateAuthority(rootCa2Certificate);
+			rootCa2 = this.certificateAuthorityDAO.addCertificateAuthority(
+					rootCa2Certificate,
+					"http://crl.eid.belgium.be/belgium2.crl");
 		}
 
 		if (null == rootCa2.getTrustPoint()) {
@@ -305,8 +306,8 @@ public class InitializationServiceBean implements InitializationService {
 		CertificateAuthorityEntity rootCa = this.certificateAuthorityDAO
 				.findCertificateAuthority(rootCertificate);
 		if (null == rootCa) {
-			rootCa = this.certificateAuthorityDAO
-					.addCertificateAuthority(rootCertificate);
+			rootCa = this.certificateAuthorityDAO.addCertificateAuthority(
+					rootCertificate, null);
 		}
 
 		if (null == rootCa.getTrustPoint()) {

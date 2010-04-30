@@ -81,13 +81,13 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 	 * {@inheritDoc}
 	 */
 	public CertificateAuthorityEntity addCertificateAuthority(
-			X509Certificate certificate) {
+			X509Certificate certificate, String crlUrl) {
 
 		LOG.debug("add  CA: "
 				+ certificate.getSubjectX500Principal().toString());
 		CertificateAuthorityEntity certificateAuthority;
 		try {
-			certificateAuthority = new CertificateAuthorityEntity(null,
+			certificateAuthority = new CertificateAuthorityEntity(crlUrl,
 					certificate);
 		} catch (CertificateEncodingException e) {
 			LOG.error("Certificate encoding exception: " + e.getMessage());

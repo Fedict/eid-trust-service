@@ -43,25 +43,18 @@ public interface CertificateAuthorityDAO {
 	/**
 	 * Return {@link CertificateAuthorityEntity} from specified name. Returns
 	 * <code>null</code> if not found.
-	 * 
-	 * @param name
 	 */
 	CertificateAuthorityEntity findCertificateAuthority(String name);
 
 	/**
 	 * Create a new {@link CertificateAuthorityEntity}.
-	 * 
-	 * @param rootCaCertificate
 	 */
 	CertificateAuthorityEntity addCertificateAuthority(
-			X509Certificate certificate);
+			X509Certificate certificate, String crlUrl);
 
 	/**
 	 * Returns {@link CertificateAuthorityEntity} from the specified
 	 * {@link X509Certificate}. Returns <code>null</code> if not found.
-	 * 
-	 * @param certificate
-	 * @return
 	 */
 	CertificateAuthorityEntity findCertificateAuthority(
 			X509Certificate certificate);
@@ -69,18 +62,11 @@ public interface CertificateAuthorityDAO {
 	/**
 	 * Remove {@link CertificateAuthorityEntity}'s related to the specified
 	 * {@link TrustPointEntity}.
-	 * 
-	 * @param trustPoint
 	 */
 	void removeCertificateAuthorities(TrustPointEntity trustPoint);
 
 	/**
 	 * Add a {@link RevokedCertificateEntity} entry.
-	 * 
-	 * @param issuerName
-	 * @param serialNumber
-	 * @param revocationDate
-	 * @param crlNumber
 	 */
 	RevokedCertificateEntity addRevokedCertificate(String issuerName,
 			BigInteger serialNumber, Date revocationDate, BigInteger crlNumber);
@@ -88,9 +74,6 @@ public interface CertificateAuthorityDAO {
 	/**
 	 * Returns number of {@link RevokedCertificateEntity}'s for the specified
 	 * crl number and issuer.
-	 * 
-	 * @param crlNumber
-	 * @param issuerName
 	 */
 	long countRevokedCertificates(BigInteger crlNumber, String issuerName);
 
@@ -98,8 +81,6 @@ public interface CertificateAuthorityDAO {
 	 * Remove {@link RevokedCertificateEntity}'s for the specified issuer that
 	 * are older then the specified crl number.
 	 * 
-	 * @param crlNumber
-	 * @param issuerName
 	 * @return # of {@link RevokedCertificateEntity}'s removed.
 	 */
 	int removeOldRevokedCertificates(BigInteger crlNumber, String issuerName);

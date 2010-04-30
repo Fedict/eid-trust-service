@@ -271,7 +271,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 			throw new TrustPointAlreadyExistsException();
 		}
 		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
-				.addCertificateAuthority(certificate);
+				.addCertificateAuthority(certificate, null);
 
 		// add trust point
 		TrustPointEntity trustPoint = this.trustDomainDAO.addTrustPoint(
