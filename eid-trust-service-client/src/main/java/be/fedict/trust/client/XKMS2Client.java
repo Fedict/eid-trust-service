@@ -490,6 +490,7 @@ public class XKMS2Client {
 		}
 
 		// store reason URIs
+		this.invalidReasonURIs.clear();
 		List<KeyBindingType> keyBindings = validateResult.getKeyBinding();
 		for (KeyBindingType keyBinding : keyBindings) {
 			StatusType status = keyBinding.getStatus();

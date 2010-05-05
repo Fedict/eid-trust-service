@@ -24,7 +24,7 @@
 						Have to run in 32-bit mode for Mac OS X as ccid driver does not
 						have 64-bit mode
 					-->
-					<argLine>-d32 -Xmx1024m</argLine>
+					<argLine>-d32 -Xms512m -Xmx1024m</argLine>
 					<forkMode>pertest</forkMode>
 				</configuration>
 			</plugin>
