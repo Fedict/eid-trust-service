@@ -4,14 +4,6 @@
     "http://www.jboss.org/j2ee/dtd/jboss-service_5_0.dtd">
 <server>
 
-	<mbean code="org.jboss.jms.server.destination.QueueService" name="trust:service=Queue,name=harvester"
-		xmbean-dd="xmdesc/Queue-xmbean.xml">
-		<attribute name="JNDIName">queue/trust/harvester</attribute>
-		<depends optional-attribute-name="ServerPeer">
-			jboss.messaging:service=ServerPeer</depends>
-		<depends>jboss.messaging:service=PostOffice </depends>
-	</mbean>
-
 	<mbean code="org.jboss.security.auth.login.DynamicLoginConfig"
 		name="trust:service=DynamicLoginConfig">
 		<attribute name="AuthConfig">

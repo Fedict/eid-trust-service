@@ -21,8 +21,6 @@
 				<exclude>common/lib/hsqldb.jar</exclude>
 				<exclude>common/lib/hsqldb-plugin.jar</exclude>
 				<exclude>server/all/deploy/hsqldb-ds.xml</exclude>
-				<exclude>server/all/deploy/messaging/hsqldb-persistence-service.xml
-				</exclude>
 
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>
@@ -43,11 +41,6 @@
 		<fileSet>
 			<directory>target/classes/jboss</directory>
 			<outputDirectory>jboss</outputDirectory>
-
-			<excludes>
-				<exclude>server/all/deploy/messaging/*-persistence-service.xml
-				</exclude>
-			</excludes>
 		</fileSet>
 
 		<!--
