@@ -86,6 +86,16 @@
 									<hbm2ddl export="false" format="true"
 										outputfilename="oracle-trust-service-ddl.sql" />
 								</hibernatetool>
+								<hibernatetool destdir="${project.build.directory}/classes">
+									<classpath>
+										<path refid="jpatoolslib" />
+									</classpath>
+									<!-- jpaconfiguration can directly use the PAR -->
+									<annotationconfiguration
+										configurationfile="${project.build.directory}/classes/resources/postgresql-trust-service.cfg.xml" />
+									<hbm2ddl export="false" format="true"
+										outputfilename="postgresql-trust-service-ddl.sql" />
+								</hibernatetool>
 							</tasks>
 						</configuration>
 					</execution>
