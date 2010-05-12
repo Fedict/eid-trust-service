@@ -658,6 +658,7 @@ public class TrustServiceBean implements TrustService {
 	}
 
 	private void notifyHarvester(String issuerName) throws JMSException {
+		LOG.debug("notify harvester: " + issuerName);
 		QueueConnection queueConnection = this.queueConnectionFactory
 				.createQueueConnection();
 		try {

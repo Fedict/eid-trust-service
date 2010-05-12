@@ -34,6 +34,10 @@ import javax.annotation.PostConstruct;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.interceptor.Interceptors;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -59,6 +63,8 @@ import be.fedict.trust.service.snmp.SNMPInterceptor;
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
 		@ActivationConfigProperty(propertyName = "destination", propertyValue = HarvesterMDB.HARVESTER_QUEUE_NAME) })
+@TransactionManagement(value = TransactionManagementType.CONTAINER)
+@TransactionAttribute(value = TransactionAttributeType.REQUIRED)
 @Interceptors(SNMPInterceptor.class)
 public class HarvesterMDB implements MessageListener {
 

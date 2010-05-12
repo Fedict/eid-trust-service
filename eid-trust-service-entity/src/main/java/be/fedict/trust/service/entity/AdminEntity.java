@@ -37,6 +37,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Type;
+
 @Entity
 @Table(name = "admin")
 @NamedQueries( { @NamedQuery(name = AdminEntity.QUERY_LIST_ALL, query = "FROM AdminEntity") })
@@ -100,6 +102,7 @@ public class AdminEntity implements Serializable {
 	}
 
 	@Lob
+	@Type(type = "org.hibernate.type.PrimitiveByteArrayBlobType")
 	@Basic(fetch = FetchType.LAZY)
 	public byte[] getEncodedPublicKey() {
 		return this.encodedPublicKey;

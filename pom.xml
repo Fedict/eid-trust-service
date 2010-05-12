@@ -89,6 +89,24 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>postgresql</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>prod-postgresql</value>
+				</property>
+			</activation>
+			<properties>
+				<hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
+				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
+				<hibernate.jdbc.use_streams_for_binary>false</hibernate.jdbc.use_streams_for_binary>
+			</properties>
+			<modules>
+				<module>eid-trust-service-postgresql-distribution</module>
+				<module>eid-trust-service-admin-manual</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>sdk</id>
 			<activation>
 				<property>
@@ -178,6 +196,11 @@
 				<version>11.1.0.6.0</version>
 			</dependency>
 			<dependency>
+				<groupId>postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>8.4-701.jdbc4</version>
+			</dependency>
+			<dependency>
 				<groupId>org.jboss.jbossas</groupId>
 				<artifactId>jboss-as-system</artifactId>
 				<version>6.0.0.20100216-M2</version>
@@ -220,6 +243,7 @@
 		<hibernate.dialect>org.hibernate.dialect.HSQLDialect
 		</hibernate.dialect>
 		<hibernate.hbm2ddl.auto>create-drop</hibernate.hbm2ddl.auto>
+		<hibernate.jdbc.use_streams_for_binary>true</hibernate.jdbc.use_streams_for_binary>
 	</properties>
 
 </project>

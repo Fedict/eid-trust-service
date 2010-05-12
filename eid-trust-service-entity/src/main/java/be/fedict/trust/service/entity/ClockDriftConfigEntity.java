@@ -30,6 +30,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "clock_drift")
@@ -143,6 +144,7 @@ public class ClockDriftConfigEntity implements Serializable {
 	}
 
 	@Lob
+	@Type(type = "org.hibernate.type.PrimitiveByteArrayBlobType")
 	public TimerHandle getTimerHandle() {
 
 		return this.timerHandle;

@@ -9,7 +9,7 @@
 			<year>2010</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>16 Mar 2010</releaseinfo>
+		<releaseinfo>12 May 2010</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Wim</firstname>
@@ -69,17 +69,17 @@
 		<section>
 			<title>Apache configuration under Redhat (Fedora)</title>
 			<para>
-				Active the Apache HTTP Service via:
+				Activate the Apache HTTP Service via:
 				<programlisting><![CDATA[
-			sudo chkconfig --level 345 httpd
-			checkconfig --list httpd
+			sudo chkconfig --level 345 httpd on
+			chkconfig --list httpd
 			sudo /etc/init.d/httpd restart
 			]]></programlisting>
 				Install the SSL via:
 				<programlisting><![CDATA[
 				sudo yum install mod_ssl.i686
 			]]></programlisting>
-				Open up the iptables firewall on the Apache server to allow for both
+				Open up the iptables (under <code>/etc/sysconfig/iptables</code>) firewall on the Apache server to allow for both
 				HTTP (port 80) and HTTPS (port 443).
 				Relevant iptables config lines
 				are:
@@ -103,6 +103,7 @@
 					sudo chkconfig --level 345 network on
 					chkconfig --list network
 				]]></programlisting>
+				and check whether the levels 3, 4, and 5 are on.
 			</para>
 		</section>
 		<section>
@@ -192,7 +193,7 @@
 		</section>
 		<section>
 			<title>Database</title>
-			<para>The eID Trust Service product requires a database to operate.
+			<para>The eID Trust Service product requires a relational database with JDBC driver to operate.
 			</para>
 		</section>
 		<section>
@@ -282,7 +283,7 @@
 			necessary dependencies included to run the Fedict eID Trust Service.
 			To install simply unzip the eID applet JBoss zip and copy the .ear
 			file in
-			<code>./jboss-as-distribution/server/default/deploy</code>
+			<code>./jboss-as-distribution/server/all/deploy</code>
 			.
 		</para>
 		<para>
@@ -308,7 +309,7 @@
 				. Please note that if you wish to change this, you will have to
 				manually modify the datasource in the JBoss distribution. The
 				configuration for this can be found in
-				<code>/jboss/server/default/deploy/trust-service-ds.xml</code>
+				<code>/jboss/server/all/deploy/trust-service-ds.xml</code>
 				.
 			</para>
 			<para>
@@ -373,6 +374,42 @@
 					sqlplus trust/trust;
 					SQL> select table_name from user_tables;
 					SQL> exit
+				]]></programlisting>
+			</para>
+		</section>
+		<section>
+			<title>PostgreSQL database setup on Redhat (Fedora)</title>
+			<para>
+				Following is needed for setting up the PostgreSQL database on Redhat
+				(Fedora):
+				<programlisting><![CDATA[
+					sudo yum install postgresql-server.i686
+					sudo service postgresql initdb
+					sudo /etc/init.d/postgresql start
+					sudo passwd postgres
+				]]></programlisting>
+			</para>
+			<para>As JPA requires prepared transactions we need to enable this feature on the PostgreSQL database.
+			Change the PostgreSQL configuration file <code>/var/lib/pgsql/data/postgresql.conf</code>:
+			<programlisting><![CDATA[
+					max_prepared_transactions = 10]]></programlisting>
+			</para>
+			<para>Change the PostgreSQL client authentication by editing the following lines in
+			<code>/var/lib/pgsql/data/pg_hba.conf</code>:
+			<programlisting><![CDATA[
+					local	all 	all						trust
+					host	all		all 	127.0.0.1/32	trust]]></programlisting>
+			</para>
+			<para>
+				Create a PostgreSQL user and database via:
+				<programlisting><![CDATA[
+					psql -U postgres < postgres-create-account-database.sql
+				]]></programlisting>
+			</para>
+			<para>
+				Create the eID Trust Service tables in the PostgreSQL trust database via:
+				<programlisting><![CDATA[
+					psql -d trust -U trust -W -f postgresql-trust-service-ddl.sql
 				]]></programlisting>
 			</para>
 		</section>
@@ -595,7 +632,7 @@ CreateBalancers 1
 			<para>
 				Graceful shutdown can be accomplished via:
 				<programlisting><![CDATA[
-					./jboss/bin/shutdown -s
+					./jboss/bin/shutdown.sh -S
 				]]></programlisting>
 				After this you can check if shutdown completed properly via:
 				<programlisting><![CDATA[
@@ -627,7 +664,7 @@ CreateBalancers 1
 				. After changing this the JBoss Application Server has to be
 				restarted as followed:
 				<programlisting><![CDATA[
-					./jboss/bin/shutdown -s
+					./jboss/bin/shutdown.sh -S
 					./jboss/bin/run.sh -b 0.0.0.0 -c all
 				]]></programlisting>
 				Please note to check if shutdown was completed before starting.
@@ -1044,6 +1081,11 @@ CreateBalancers 1
 						<entry>22 Apr 2010</entry>
 						<entry>Wim Vandenhaute</entry>
 						<entry>Feedback FedICT.</entry>
+					</row>
+					<row>
+						<entry>12 May 2010</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>PostgreSQL.</entry>
 					</row>
 				</tbody>
 			</tgroup>

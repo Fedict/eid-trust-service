@@ -43,6 +43,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Type;
+
 @Entity
 @Table(name = "certificate_authorities")
 @NamedQueries( {
@@ -125,6 +127,7 @@ public class CertificateAuthorityEntity implements Serializable {
 	@Lob
 	@Column(length = 4 * 1024)
 	@Basic(fetch = FetchType.LAZY)
+	@Type(type = "org.hibernate.type.PrimitiveByteArrayBlobType")
 	public byte[] getEncodedCertificate() {
 		return this.encodedCertificate;
 	}

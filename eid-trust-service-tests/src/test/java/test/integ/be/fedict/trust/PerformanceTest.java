@@ -79,11 +79,12 @@ public class PerformanceTest {
 	// private static final String XKMS_LOCATION =
 	// "http://www.e-contract.be/eid-trust-service-ws/xkms2";
 
+	//private static final String XKMS_LOCATION = "http://192.168.1.101/eid-trust-service-ws/xkms2";
+	private static final String XKMS_LOCATION = "http://localhost/eid-trust-service-ws/xkms2";
 	// private static final String XKMS_LOCATION =
-	// "http://192.168.1.101/eid-trust-service-ws/xkms2";
-	private static final String XKMS_LOCATION = "http://sebeco-dev-11:8080/eid-trust-service-ws/xkms2";
+	// "http://sebeco-dev-11:8080/eid-trust-service-ws/xkms2";
 
-	private static final int INTERVAL_SIZE = 1000 * 100;
+	private static final int INTERVAL_SIZE = 1000 * 60;
 
 	@Before
 	public void setUp() {
@@ -302,7 +303,10 @@ public class PerformanceTest {
 					"Number of XKMS requests", dataset, true, false, false);
 
 			this.chart.addSubtitle(new TextTitle(performance.get(0).getDate()
-					.toString()));
+					.toString()
+					+ " - "
+					+ performance.get(performance.size() - 1).getDate()
+							.toString()));
 
 			TextTitle info = new TextTitle(
 					"Total number of successful requests: " + totalCount);
