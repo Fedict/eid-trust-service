@@ -9,7 +9,7 @@
 			<year>2010</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>12 May 2010</releaseinfo>
+		<releaseinfo>3 Jun 2010</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Wim</firstname>
@@ -79,8 +79,11 @@
 				<programlisting><![CDATA[
 				sudo yum install mod_ssl.i686
 			]]></programlisting>
-				Open up the iptables (under <code>/etc/sysconfig/iptables</code>) firewall on the Apache server to allow for both
-				HTTP (port 80) and HTTPS (port 443).
+				Open up the iptables (under
+				<code>/etc/sysconfig/iptables</code>
+				) firewall on the Apache server to allow for both
+				HTTP (port 80) and
+				HTTPS (port 443).
 				Relevant iptables config lines
 				are:
 				<programlisting><![CDATA[
@@ -193,7 +196,8 @@
 		</section>
 		<section>
 			<title>Database</title>
-			<para>The eID Trust Service product requires a relational database with JDBC driver to operate.
+			<para>The eID Trust Service product requires a relational database
+				with JDBC driver to operate.
 			</para>
 		</section>
 		<section>
@@ -218,7 +222,7 @@
 					export JAVA_HOME=/usr/local/jdk1.6
 					export PATH=$JAVA_HOME/bin:$PATH
 				]]></programlisting>
-				Check whether the correct JVM is active via the following command:
+				Ensure Sun Java 1.6.0_20+ is installed via the following command:
 				<programlisting><![CDATA[
 					java -version
 				]]></programlisting>
@@ -393,14 +397,21 @@
 					sudo /etc/init.d/postgresql start
 				]]></programlisting>
 			</para>
-			<para>As JPA requires prepared transactions we need to enable this feature on the PostgreSQL database.
-			Change the PostgreSQL configuration file <code>/var/lib/pgsql/data/postgresql.conf</code>:
-			<programlisting><![CDATA[
+			<para>
+				As JPA requires prepared transactions we need to enable this feature
+				on the PostgreSQL database.
+				Change the PostgreSQL configuration file
+				<code>/var/lib/pgsql/data/postgresql.conf</code>
+				:
+				<programlisting><![CDATA[
 					max_prepared_transactions = 10]]></programlisting>
 			</para>
-			<para>Change the PostgreSQL client authentication by editing the following lines in
-			<code>/var/lib/pgsql/data/pg_hba.conf</code>:
-			<programlisting><![CDATA[
+			<para>
+				Change the PostgreSQL client authentication by editing the following
+				lines in
+				<code>/var/lib/pgsql/data/pg_hba.conf</code>
+				:
+				<programlisting><![CDATA[
 					local	all 	all						trust
 					host	all		all 	127.0.0.1/32	trust]]></programlisting>
 			</para>
@@ -411,7 +422,8 @@
 				]]></programlisting>
 			</para>
 			<para>
-				Create the eID Trust Service tables in the PostgreSQL trust database via:
+				Create the eID Trust Service tables in the PostgreSQL trust database
+				via:
 				<programlisting><![CDATA[
 					psql -d trust -U trust -W -f postgresql-trust-service-ddl.sql
 				]]></programlisting>
@@ -644,6 +656,28 @@ CreateBalancers 1
 				]]></programlisting>
 			</para>
 		</section>
+		<section>
+			<title>Init script for Redhat (Fedora)</title>
+			<para>
+				Copied orginal supplied init script:
+				<programlisting><![CDATA[cp $JBOSS_HOME/bin/jboss_init_redhat.sh /etc/init.d/jboss]]></programlisting>
+				Changed permissions on new jboss init script:
+				<programlisting><![CDATA[sudo chmod 755 /etc/init.d/jboss]]></programlisting>
+				You might need to changed the following in the JBoss script:
+				<programlisting><![CDATA[JBOSS_HOME="location of your JBoss distribution"
+JBOSS_USER="the user that will be used to run the JBoss application server under"
+JAVAPTH="the location of your JVM"
+JBOSS_CONF="all"]]></programlisting>
+				To bind to the correct IP address, this line modified:
+				<programlisting><![CDATA[JBOSS_BIND_ADDR=${JBOSS_HOST:+"-b $JBOSS_HOST"}]]></programlisting>
+				to
+				<programlisting><![CDATA[JBOSS_BIND_ADDR=${JBOSS_BIND_ADDR:-"-b your.ip.address.here"}]]></programlisting>
+				To get a log file, this line modified:
+				<programlisting><![CDATA[JBOSS_CONSOLE=${JBOSS_CONSOLE:-"/dev/null"}]]></programlisting>
+				to
+				<programlisting><![CDATA[JBOSS_CONSOLE=${JBOSS_CONSOLE:-"/location/of/your/logs/jboss-console.log"]]></programlisting>
+			</para>
+		</section>
 	</section>
 	<section>
 		<title>Configuration</title>
@@ -736,6 +770,16 @@ CreateBalancers 1
    					</logger>
    				]]></programlisting>
 				In the same way here you can change JBoss' logging too.
+				<note>
+					<title>Production configuration</title>
+					<para>
+						For production configurations you should change the logging from
+						<code>DEBUG</code>
+						to
+						<code>ERROR</code>
+						.
+					</para>
+				</note>
 			</para>
 		</section>
 	</section>
@@ -1090,6 +1134,11 @@ CreateBalancers 1
 						<entry>12 May 2010</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>PostgreSQL.</entry>
+					</row>
+					<row>
+						<entry>3 Jun 2010</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>JVM, logging, init scripts.</entry>
 					</row>
 				</tbody>
 			</tgroup>

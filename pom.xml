@@ -82,6 +82,7 @@
 				<hibernate.dialect>org.hibernate.dialect.Oracle10gDialect
 				</hibernate.dialect>
 				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
+				<eid-applet.SkipSecureConnectionCheck>true</eid-applet.SkipSecureConnectionCheck>
 			</properties>
 			<modules>
 				<module>eid-trust-service-oracle-distribution</module>
@@ -244,6 +245,7 @@
 		</hibernate.dialect>
 		<hibernate.hbm2ddl.auto>create-drop</hibernate.hbm2ddl.auto>
 		<hibernate.jdbc.use_streams_for_binary>true</hibernate.jdbc.use_streams_for_binary>
+		<eid-applet.SkipSecureConnectionCheck>false</eid-applet.SkipSecureConnectionCheck>
 	</properties>
 
 </project>
