@@ -52,7 +52,7 @@
 		</fileSet>
 
 		<!--
-			This MySQL connector -> /jboss/common/lib
+			The Oracle JDBC connector -> /jboss/common/lib
 		-->
 		<fileSet>
 			<directory>target/dependency</directory>

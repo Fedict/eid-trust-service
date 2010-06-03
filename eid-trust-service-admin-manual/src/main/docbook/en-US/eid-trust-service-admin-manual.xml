@@ -369,6 +369,11 @@
 				<programlisting><![CDATA[
 					sqlplus @oracle-init-trust-service.sql
 				]]></programlisting>
+				This might require settings some environment variables:
+				<programlisting><![CDATA[
+					export ORACLE_HOME=/usr/lib/oracle/xe/app/oracle/product/10.2.0/server
+					export PATH=$ORACLE_HOME/bin:$PATH
+				]]></programlisting>
 				Check the database via:
 				<programlisting><![CDATA[
 					sqlplus trust/trust;
@@ -386,7 +391,6 @@
 					sudo yum install postgresql-server.i686
 					sudo service postgresql initdb
 					sudo /etc/init.d/postgresql start
-					sudo passwd postgres
 				]]></programlisting>
 			</para>
 			<para>As JPA requires prepared transactions we need to enable this feature on the PostgreSQL database.
@@ -403,7 +407,7 @@
 			<para>
 				Create a PostgreSQL user and database via:
 				<programlisting><![CDATA[
-					psql -U postgres < postgres-create-account-database.sql
+					psql -U postgres < postgresql-create-account-database.sql
 				]]></programlisting>
 			</para>
 			<para>
