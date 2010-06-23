@@ -94,9 +94,11 @@ import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 
+import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
+import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
 
@@ -425,18 +427,27 @@ public class TestUtils {
 			return null;
 		}
 
-		public void progressIndication(int max, int current) {
-			this.log.debug("progress " + current + " of " + max);
-		}
-
-		public void setStatusMessage(Status status, String statusMessage) {
-			this.log.debug(status.toString() + ": " + statusMessage);
-		}
-
 		public boolean privacyQuestion(boolean includeAddress,
 				boolean includePhoto, String arg2) {
 
 			return true;
+		}
+
+		public void addTestResult(DiagnosticTests arg0, boolean arg1,
+				String arg2) {
+		}
+
+		public void increaseProgress() {
+		}
+
+		public void resetProgress(int arg0) {
+		}
+
+		public void setProgressIndeterminate() {
+		}
+
+		public void setStatusMessage(Status status, MESSAGE_ID messageId) {
+			this.log.info(status.name() + ": " + messageId.name());
 		}
 	}
 
