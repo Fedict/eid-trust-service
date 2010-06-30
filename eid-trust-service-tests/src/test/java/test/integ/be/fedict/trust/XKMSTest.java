@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import test.integ.be.fedict.trust.util.TestUtils;
-
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.TrustValidator;
@@ -50,9 +49,10 @@ public class XKMSTest {
 
 	private static final Log LOG = LogFactory.getLog(XKMSTest.class);
 
-	// private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
-	// "proxy.yourict.net", 8080);
-	private static final NetworkConfig NETWORK_CONFIG = null;
+	private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
+			"proxy.yourict.net", 8080);
+
+	// private static final NetworkConfig NETWORK_CONFIG = null;
 
 	@Before
 	public void setUp() {

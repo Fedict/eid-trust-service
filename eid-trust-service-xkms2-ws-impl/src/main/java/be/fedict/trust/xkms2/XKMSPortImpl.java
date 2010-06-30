@@ -48,17 +48,17 @@ import org.etsi.uri._01903.v1_3.CRLValuesType;
 import org.etsi.uri._01903.v1_3.EncapsulatedPKIDataType;
 import org.etsi.uri._01903.v1_3.OCSPValuesType;
 import org.etsi.uri._01903.v1_3.RevocationValuesType;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
-import org.w3._2000._09.xmldsig_.X509DataType;
-import org.w3._2002._03.xkms_.KeyBindingType;
-import org.w3._2002._03.xkms_.MessageExtensionAbstractType;
-import org.w3._2002._03.xkms_.ObjectFactory;
-import org.w3._2002._03.xkms_.QueryKeyBindingType;
-import org.w3._2002._03.xkms_.StatusType;
-import org.w3._2002._03.xkms_.UseKeyWithType;
-import org.w3._2002._03.xkms_.ValidateRequestType;
-import org.w3._2002._03.xkms_.ValidateResultType;
-import org.w3._2002._03.xkms_wsdl.XKMSPortType;
+import org.w3._2000._09.xmldsig.KeyInfoType;
+import org.w3._2000._09.xmldsig.X509DataType;
+import org.w3._2002._03.xkms.KeyBindingType;
+import org.w3._2002._03.xkms.MessageExtensionAbstractType;
+import org.w3._2002._03.xkms.ObjectFactory;
+import org.w3._2002._03.xkms.QueryKeyBindingType;
+import org.w3._2002._03.xkms.StatusType;
+import org.w3._2002._03.xkms.UseKeyWithType;
+import org.w3._2002._03.xkms.ValidateRequestType;
+import org.w3._2002._03.xkms.ValidateResultType;
+import org.w3._2002._03.xkms.XKMSPortType;
 
 import be.fedict.trust.CRLRevocationData;
 import be.fedict.trust.OCSPRevocationData;
@@ -76,7 +76,7 @@ import be.fedict.trust.xkms.extensions.TSAMessageExtensionType;
  * @author fcorneli
  * 
  */
-@WebService(endpointInterface = "org.w3._2002._03.xkms_wsdl.XKMSPortType")
+@WebService(endpointInterface = "org.w3._2002._03.xkms.XKMSPortType")
 @ServiceConsumer
 @HandlerChain(file = "ws-handlers.xml")
 public class XKMSPortImpl implements XKMSPortType {

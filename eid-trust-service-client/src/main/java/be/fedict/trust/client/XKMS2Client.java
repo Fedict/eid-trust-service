@@ -58,19 +58,19 @@ import org.etsi.uri._01903.v1_3.CertifiedRolesListType;
 import org.etsi.uri._01903.v1_3.EncapsulatedPKIDataType;
 import org.etsi.uri._01903.v1_3.OCSPValuesType;
 import org.etsi.uri._01903.v1_3.RevocationValuesType;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
-import org.w3._2000._09.xmldsig_.X509DataType;
-import org.w3._2002._03.xkms_.KeyBindingType;
-import org.w3._2002._03.xkms_.MessageExtensionAbstractType;
-import org.w3._2002._03.xkms_.ObjectFactory;
-import org.w3._2002._03.xkms_.QueryKeyBindingType;
-import org.w3._2002._03.xkms_.StatusType;
-import org.w3._2002._03.xkms_.TimeInstantType;
-import org.w3._2002._03.xkms_.UseKeyWithType;
-import org.w3._2002._03.xkms_.ValidateRequestType;
-import org.w3._2002._03.xkms_.ValidateResultType;
-import org.w3._2002._03.xkms_wsdl.XKMSPortType;
-import org.w3._2002._03.xkms_wsdl.XKMSService;
+import org.w3._2000._09.xmldsig.KeyInfoType;
+import org.w3._2000._09.xmldsig.X509DataType;
+import org.w3._2002._03.xkms.KeyBindingType;
+import org.w3._2002._03.xkms.MessageExtensionAbstractType;
+import org.w3._2002._03.xkms.ObjectFactory;
+import org.w3._2002._03.xkms.QueryKeyBindingType;
+import org.w3._2002._03.xkms.StatusType;
+import org.w3._2002._03.xkms.TimeInstantType;
+import org.w3._2002._03.xkms.UseKeyWithType;
+import org.w3._2002._03.xkms.ValidateRequestType;
+import org.w3._2002._03.xkms.ValidateResultType;
+import org.w3._2002._03.xkms.XKMSPortType;
+import org.w3._2002._03.xkms.XKMSService;
 
 import sun.security.timestamp.TimestampToken;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
@@ -398,7 +398,7 @@ public class XKMS2Client {
 		LOG.debug("validate");
 
 		ObjectFactory objectFactory = new ObjectFactory();
-		org.w3._2000._09.xmldsig_.ObjectFactory xmldsigObjectFactory = new org.w3._2000._09.xmldsig_.ObjectFactory();
+		org.w3._2000._09.xmldsig.ObjectFactory xmldsigObjectFactory = new org.w3._2000._09.xmldsig.ObjectFactory();
 
 		ValidateRequestType validateRequest = objectFactory
 				.createValidateRequestType();

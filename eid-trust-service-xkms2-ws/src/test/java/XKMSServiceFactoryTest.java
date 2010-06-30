@@ -19,7 +19,7 @@
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
-import org.w3._2002._03.xkms_wsdl.XKMSService;
+import org.w3._2002._03.xkms.XKMSService;
 
 import be.fedict.trust.xkms2.XKMSServiceFactory;
 

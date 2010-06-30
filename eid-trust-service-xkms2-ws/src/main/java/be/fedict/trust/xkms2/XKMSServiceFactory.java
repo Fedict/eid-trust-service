@@ -22,7 +22,7 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 
-import org.w3._2002._03.xkms_wsdl.XKMSService;
+import org.w3._2002._03.xkms.XKMSService;
 
 /**
  * Factory for the JAX-WS based XKMS2 Service.
