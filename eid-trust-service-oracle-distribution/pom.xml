@@ -203,7 +203,7 @@
 
 		<!-- Specific Dependencies: Persistence Provider -->
 		<dependency>
-			<groupId>com.oracle.jdbc</groupId>
+			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
 			<scope>runtime</scope>
 		</dependency>

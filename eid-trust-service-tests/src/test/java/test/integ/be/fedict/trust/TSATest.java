@@ -71,6 +71,7 @@ public class TSATest {
 		byte[] requestData = request.getEncoded();
 
 		HttpClient httpClient = new HttpClient();
+		httpClient.getHostConfiguration().setProxy("proxy.yourict.net", 8080);
 		PostMethod postMethod = new PostMethod(tsa_location);
 		postMethod.setRequestEntity(new ByteArrayRequestEntity(requestData,
 				"application/timestamp-query"));
