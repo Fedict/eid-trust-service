@@ -64,7 +64,7 @@
 								<artifactItem>
 									<groupId>be.fedict.eid-applet</groupId>
 									<artifactId>eid-applet-jboss-as</artifactId>
-									<version>1.0.1-SNAPSHOT</version>
+									<version>${eid-applet.version}</version>
 									<type>zip</type>
 								</artifactItem>
 								<artifactItem>
@@ -174,7 +174,7 @@
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-jboss-as</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>${eid-applet.version}</version>
 			<scope>provided</scope>
 			<type>zip</type>
 		</dependency>
