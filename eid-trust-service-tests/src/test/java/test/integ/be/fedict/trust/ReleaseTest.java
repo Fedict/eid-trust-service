@@ -120,30 +120,27 @@ public class ReleaseTest {
 				projectVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
+			// parent POM version
+			projectVersionTextNode = XPathAPI
+					.selectSingleNode(
+							pomDocument.getDocumentElement(),
+							"/:project[:groupId[text() = 'be.fedict'] and :artifactId[contains(text(), 'eid-trust-service')]]/:version/text()",
+							pomDocument.getDocumentElement());
+			if (null != projectVersionTextNode) {
+				assertEquals(CURRENT_VERSION, projectVersionTextNode
+						.getNodeValue());
+				projectVersionTextNode.setNodeValue(NEW_VERSION);
+			}
+
 			Node parentVersionTextNode = XPathAPI
 					.selectSingleNode(
 							pomDocument.getDocumentElement(),
-							"/:project/:parent[:groupId[contains(text(), 'be.fedict')]]/:version/text()",
+							"/:project/:parent[:groupId[contains(text(), 'be.fedict')] and :artifactId[contains(text(), 'eid-trust-service')]]/:version/text()",
 							pomDocument.getDocumentElement());
 			if (null != parentVersionTextNode) {
 				assertEquals(CURRENT_VERSION, parentVersionTextNode
 						.getNodeValue());
 				parentVersionTextNode.setNodeValue(NEW_VERSION);
-			}
-
-			NodeList pluginVersionTextNodeList = XPathAPI
-					.selectNodeList(
-							pomDocument.getDocumentElement(),
-							"//:plugins//:plugin[:groupId/text()='be.fedict.eid-trust-service']/:version/text()",
-							pomDocument.getDocumentElement());
-			LOG.debug("# plugin nodes: "
-					+ pluginVersionTextNodeList.getLength());
-			for (int idx = 0; idx < pluginVersionTextNodeList.getLength(); idx++) {
-				Node pluginVersionTextNode = pluginVersionTextNodeList
-						.item(idx);
-				assertEquals(CURRENT_VERSION, pluginVersionTextNode
-						.getNodeValue());
-				pluginVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
 			storeDocument(pomDocument, pomFile);

@@ -1,16 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0.RC1</version>
 	</parent>
 	<name>FedICT eID Trust Service MBean Services</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-service</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0.RC1</version>
 	<packaging>jboss-sar</packaging>
 	<build>
 		<plugins>
@@ -31,24 +29,20 @@
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-model</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0.RC1</version>
 			<type>ejb-client</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-snmp</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0.RC1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.security</groupId>
 			<artifactId>jbosssx-client</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging-api</artifactId>
 		</dependency>
 	</dependencies>
 </project>

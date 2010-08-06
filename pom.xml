@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>FedICT eID Trust Service Project</name>
 	<parent>
@@ -11,11 +9,11 @@
 		-->
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1.RC2</version>
 	</parent>
 	<groupId>be.fedict</groupId>
 	<artifactId>eid-trust-service</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0.RC1</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2009</inceptionYear>
 	<scm>
@@ -260,7 +258,7 @@
 
 	<!-- Default properties -->
 	<properties>
-		<eid-applet.version>1.0.1-SNAPSHOT</eid-applet.version>
+		<eid-applet.version>1.0.1.RC2</eid-applet.version>
 		<trust-service.data.source.user>trust
 		</trust-service.data.source.user>
 		<trust-service.data.source.pass>trust
@@ -272,4 +270,12 @@
 		<eid-applet.SkipSecureConnectionCheck>false</eid-applet.SkipSecureConnectionCheck>
 	</properties>
 
+
+	<distributionManagement>
+		<repository>
+			<id>e-contract-deploy</id>
+			<url>scp://e-contract.be/maven2</url>
+			<uniqueVersion>false</uniqueVersion>
+		</repository>
+	</distributionManagement>
 </project>
