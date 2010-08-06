@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.0.RC1</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service MBean Services</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-service</artifactId>
-	<version>1.0.0.RC1</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jboss-sar</packaging>
 	<build>
 		<plugins>
@@ -29,14 +29,14 @@
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-model</artifactId>
-			<version>1.0.0.RC1</version>
+			<version>1.0.0-SNAPSHOT</version>
 			<type>ejb-client</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-snmp</artifactId>
-			<version>1.0.0.RC1</version>
+			<version>1.0.0-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
