@@ -31,7 +31,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.ocsp.OCSPResp;
 import org.bouncycastle.tsp.TimeStampToken;
-import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.x509.X509V2AttributeCertificate;
 import org.w3._2000._09.xmldsig.KeyInfoType;
 import org.w3._2000._09.xmldsig.X509DataType;
@@ -492,8 +491,7 @@ public class XKMS2Client {
                 EncapsulatedPKIDataType ocspValue = xadesObjectFactory
                         .createEncapsulatedPKIDataType();
                 try {
-                    ocspValue
-                            .setValue(Base64.encode(ocspResponse.getEncoded()));
+                    ocspValue.setValue(ocspResponse.getEncoded());
                 } catch (IOException e) {
                     LOG.error("IOException: " + e.getMessage(), e);
                     throw new RuntimeException(e);
@@ -508,7 +506,7 @@ public class XKMS2Client {
                 EncapsulatedPKIDataType crlValue = xadesObjectFactory
                         .createEncapsulatedPKIDataType();
                 try {
-                    crlValue.setValue(Base64.encode(crl.getEncoded()));
+                    crlValue.setValue(crl.getEncoded());
                 } catch (CRLException e) {
                     LOG.error("CRLException: " + e.getMessage(), e);
                     throw new RuntimeException(e);
