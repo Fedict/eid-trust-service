@@ -52,7 +52,7 @@ public class LocalizationKeyEntity implements Serializable {
 	/**
 	 * Main constructor.
 	 * 
-	 * @param key
+	 * @param keyName
 	 */
 	public LocalizationKeyEntity(String keyName) {
 
