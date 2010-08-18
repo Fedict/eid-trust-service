@@ -25,6 +25,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 
+import be.fedict.trust.client.TrustServiceDomains;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
@@ -99,7 +100,7 @@ public class TSATest {
 
 		// send token to trust service
 		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
-		client.validate(TrustServiceConstants.BELGIAN_TSA_TRUST_DOMAIN,
+		client.validate(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN,
 				tspResponse.getTimeStampToken());
 	}
 }

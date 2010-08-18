@@ -18,6 +18,7 @@
 
 package be.fedict.trust.service.bean;
 
+import be.fedict.trust.client.TrustServiceDomains;
 import be.fedict.trust.service.InitializationService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
@@ -142,9 +143,10 @@ public class InitializationServiceBean implements InitializationService {
 
     }
 
-    /**
+    /*
      * Initialize the Belgian eID trust points.
      */
+
     private List<TrustPointEntity> initBelgianEidTrustPoints() {
 
         List<TrustPointEntity> trustPoints = new LinkedList<TrustPointEntity>();
@@ -189,18 +191,19 @@ public class InitializationServiceBean implements InitializationService {
         return trustPoints;
     }
 
-    /**
+    /*
      * Initialize the Belgian eID authentication trust domain.
      */
+
     private void initBelgianEidAuthTrustDomain(
             List<TrustPointEntity> trustPoints) {
 
         TrustDomainEntity trustDomain = this.trustDomainDAO
-                .findTrustDomain(TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN);
+                .findTrustDomain(TrustServiceDomains.BELGIAN_EID_AUTH_TRUST_DOMAIN);
         if (null == trustDomain) {
             LOG.debug("create Belgian eID authentication trust domain");
             trustDomain = this.trustDomainDAO
-                    .addTrustDomain(TrustServiceConstants.BELGIAN_EID_AUTH_TRUST_DOMAIN);
+                    .addTrustDomain(TrustServiceDomains.BELGIAN_EID_AUTH_TRUST_DOMAIN);
             this.trustDomainDAO.setDefaultTrustDomain(trustDomain);
         }
         trustDomain.setTrustPoints(trustPoints);
@@ -227,11 +230,11 @@ public class InitializationServiceBean implements InitializationService {
             List<TrustPointEntity> trustPoints) {
 
         TrustDomainEntity trustDomain = this.trustDomainDAO
-                .findTrustDomain(TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN);
+                .findTrustDomain(TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN);
         if (null == trustDomain) {
             LOG.debug("create Belgian eID Non Repudiation trust domain");
             trustDomain = this.trustDomainDAO
-                    .addTrustDomain(TrustServiceConstants.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN);
+                    .addTrustDomain(TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN);
         }
         trustDomain.setTrustPoints(trustPoints);
 
@@ -259,11 +262,11 @@ public class InitializationServiceBean implements InitializationService {
             List<TrustPointEntity> trustPoints) {
 
         TrustDomainEntity trustDomain = this.trustDomainDAO
-                .findTrustDomain(TrustServiceConstants.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN);
+                .findTrustDomain(TrustServiceDomains.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN);
         if (null == trustDomain) {
             LOG.debug("create Belgian eID national registry trust domain");
             trustDomain = this.trustDomainDAO
-                    .addTrustDomain(TrustServiceConstants.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN);
+                    .addTrustDomain(TrustServiceDomains.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN);
         }
         trustDomain.setTrustPoints(trustPoints);
 
@@ -312,11 +315,11 @@ public class InitializationServiceBean implements InitializationService {
 
         // Belgian TSA trust domain
         TrustDomainEntity trustDomain = this.trustDomainDAO
-                .findTrustDomain(TrustServiceConstants.BELGIAN_TSA_TRUST_DOMAIN);
+                .findTrustDomain(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN);
         if (null == trustDomain) {
             LOG.debug("create Belgian TSA Repudiation trust domain");
             trustDomain = this.trustDomainDAO
-                    .addTrustDomain(TrustServiceConstants.BELGIAN_TSA_TRUST_DOMAIN);
+                    .addTrustDomain(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN);
         }
         trustDomain.setTrustPoints(trustPoints);
 
@@ -350,9 +353,8 @@ public class InitializationServiceBean implements InitializationService {
         try {
             CertificateFactory certificateFactory = CertificateFactory
                     .getInstance("X.509");
-            X509Certificate certificate = (X509Certificate) certificateFactory
+            return (X509Certificate) certificateFactory
                     .generateCertificate(certificateInputStream);
-            return certificate;
         } catch (CertificateException e) {
             throw new RuntimeException("X509 error: " + e.getMessage(), e);
         }
