@@ -131,7 +131,7 @@ public class SchedulingServiceBean implements SchedulingService {
 
         // the trustPoint apparently has another timer still running
         // we just return without setting this timer again
-        if (!trustPoint.getTimerHandle().equals(timer.getHandle())) {
+        if (!timer.getHandle().equals(trustPoint.getTimerHandle())) {
             LOG.debug("Ignoring duplicate timer for: " + trustPoint.getName());
             return;
         }

@@ -34,14 +34,18 @@
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging-api</artifactId>
 		</dependency>
-		<dependency>
+                <dependency>
+                        <groupId>org.jboss.javaee</groupId>
+                        <artifactId>jboss-ejb-api_3.1</artifactId>
+                </dependency>
+		<!--dependency>
 			<groupId>javax.ejb</groupId>
 			<artifactId>ejb-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.ejb3</groupId>
 			<artifactId>jboss-ejb3-ext-api</artifactId>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>

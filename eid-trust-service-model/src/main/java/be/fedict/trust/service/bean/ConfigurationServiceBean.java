@@ -18,205 +18,202 @@
 
 package be.fedict.trust.service.bean;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.SecurityDomain;
-import org.quartz.CronTrigger;
-
 import be.fedict.trust.service.ConfigurationService;
 import be.fedict.trust.service.KeyStoreUtils;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.LocalizationDAO;
-import be.fedict.trust.service.entity.ClockDriftConfigEntity;
-import be.fedict.trust.service.entity.KeyStoreType;
-import be.fedict.trust.service.entity.LocalizationKeyEntity;
-import be.fedict.trust.service.entity.LocalizationTextEntity;
-import be.fedict.trust.service.entity.NetworkConfigEntity;
-import be.fedict.trust.service.entity.TimeProtocol;
-import be.fedict.trust.service.entity.WSSecurityConfigEntity;
+import be.fedict.trust.service.entity.*;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
 import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.jboss.ejb3.annotation.SecurityDomain;
+import org.quartz.CronTrigger;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Configuration Service Bean implementation.
- * 
+ *
  * @author wvdhaute
- * 
  */
 @Stateless
 @SecurityDomain(TrustServiceConstants.ADMIN_SECURITY_DOMAIN)
 public class ConfigurationServiceBean implements ConfigurationService {
 
-	private static final Log LOG = LogFactory
-			.getLog(ConfigurationServiceBean.class);
+    private static final Log LOG = LogFactory
+            .getLog(ConfigurationServiceBean.class);
 
-	@EJB
-	private ConfigurationDAO configurationDAO;
+    @EJB
+    private ConfigurationDAO configurationDAO;
 
-	@EJB
-	private LocalizationDAO localizationDAO;
+    @EJB
+    private LocalizationDAO localizationDAO;
 
-	@EJB
-	private SchedulingService schedulingService;
+    @EJB
+    private SchedulingService schedulingService;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public NetworkConfigEntity getNetworkConfig() {
+    @EJB(mappedName = "foo")
+    private CrlRepositoryServiceBean crlRepositoryServiceBean;
 
-		return this.configurationDAO.getNetworkConfigEntity();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public NetworkConfigEntity getNetworkConfig() {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void saveNetworkConfig(String proxyHost, int proxyPort,
-			boolean enabled) {
+        return this.configurationDAO.getNetworkConfigEntity();
+    }
 
-		LOG.debug("save network config");
-		this.configurationDAO.setNetworkConfig(proxyHost, proxyPort);
-		this.configurationDAO.setNetworkConfigEnabled(enabled);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public void saveNetworkConfig(String proxyHost, int proxyPort,
+                                  boolean enabled) {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public ClockDriftConfigEntity getClockDriftDetectionConfig() {
+        LOG.debug("save network config");
+        this.configurationDAO.setNetworkConfig(proxyHost, proxyPort);
+        this.configurationDAO.setNetworkConfigEnabled(enabled);
 
-		return this.configurationDAO.getClockDriftConfig();
-	}
+        // reset the CRL cache on new network configuration.
+        crlRepositoryServiceBean.resetCachedCrlRepository();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
-			int timeout, int maxClockOffset, String cron, boolean enabled)
-			throws InvalidCronExpressionException, InvalidTimeoutException,
-			InvalidMaxClockOffsetException {
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public ClockDriftConfigEntity getClockDriftDetectionConfig() {
 
-		LOG.debug("save clock drift detection config");
+        return this.configurationDAO.getClockDriftConfig();
+    }
 
-		// input validation
-		if (timeout <= 0) {
-			throw new InvalidTimeoutException();
-		}
-		if (maxClockOffset < 0) {
-			throw new InvalidMaxClockOffsetException();
-		}
-		try {
-			new CronTrigger("name", "group", cron);
-		} catch (Exception e) {
-			LOG.error("invalid cron expression");
-			throw new InvalidCronExpressionException(e);
-		}
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
+                                     int timeout, int maxClockOffset, String cron, boolean enabled)
+            throws InvalidCronExpressionException, InvalidTimeoutException,
+            InvalidMaxClockOffsetException {
 
-		// save
-		ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
-				.setClockDriftConfig(timeProtocol, server, timeout,
-						maxClockOffset, cron);
-		this.configurationDAO.setClockDriftConfigEnabled(enabled);
-		if (enabled) {
-			this.schedulingService.startTimer(clockDriftConfig, false);
-		} else {
-			this.schedulingService.cancelTimers(clockDriftConfig);
-		}
-	}
+        LOG.debug("save clock drift detection config");
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public List<String> listLanguages(String key) {
+        // input validation
+        if (timeout <= 0) {
+            throw new InvalidTimeoutException();
+        }
+        if (maxClockOffset < 0) {
+            throw new InvalidMaxClockOffsetException();
+        }
+        try {
+            new CronTrigger("name", "group", cron);
+        } catch (Exception e) {
+            LOG.error("invalid cron expression");
+            throw new InvalidCronExpressionException(e);
+        }
 
-		LOG.debug("list languages for: " + key);
-		List<String> languages = new LinkedList<String>();
-		LocalizationKeyEntity localizationKey = this.localizationDAO
-				.findLocalization(key);
-		if (null != localizationKey) {
-			for (LocalizationTextEntity text : localizationKey.getTexts()) {
-				languages.add(text.getLanguage());
-			}
-		}
-		return languages;
-	}
+        // save
+        ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
+                .setClockDriftConfig(timeProtocol, server, timeout,
+                        maxClockOffset, cron);
+        this.configurationDAO.setClockDriftConfigEnabled(enabled);
+        if (enabled) {
+            this.schedulingService.startTimer(clockDriftConfig, false);
+        } else {
+            this.schedulingService.cancelTimers(clockDriftConfig);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public String findText(String key, Locale locale) {
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public List<String> listLanguages(String key) {
 
-		LOG.debug("find text for key=" + key + " language="
-				+ locale.getLanguage());
-		LocalizationKeyEntity localizationKey = this.localizationDAO
-				.findLocalization(key);
-		for (LocalizationTextEntity text : localizationKey.getTexts()) {
-			if (text.getLanguage().equals(locale.getLanguage()))
-				return text.getText();
-		}
-		return null;
-	}
+        LOG.debug("list languages for: " + key);
+        List<String> languages = new LinkedList<String>();
+        LocalizationKeyEntity localizationKey = this.localizationDAO
+                .findLocalization(key);
+        if (null != localizationKey) {
+            for (LocalizationTextEntity text : localizationKey.getTexts()) {
+                languages.add(text.getLanguage());
+            }
+        }
+        return languages;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void saveText(String key, Locale locale, String text) {
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public String findText(String key, Locale locale) {
 
-		LOG.debug("save text for key=" + key + " language="
-				+ locale.getLanguage());
-		LocalizationKeyEntity localizationKey = this.localizationDAO
-				.findLocalization(key);
-		for (LocalizationTextEntity localizationText : localizationKey
-				.getTexts()) {
-			if (localizationText.getLanguage().equals(locale.getLanguage()))
-				localizationText.setText(text);
-		}
-	}
+        LOG.debug("find text for key=" + key + " language="
+                + locale.getLanguage());
+        LocalizationKeyEntity localizationKey = this.localizationDAO
+                .findLocalization(key);
+        for (LocalizationTextEntity text : localizationKey.getTexts()) {
+            if (text.getLanguage().equals(locale.getLanguage()))
+                return text.getText();
+        }
+        return null;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public WSSecurityConfigEntity getWSSecurityConfig() {
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public void saveText(String key, Locale locale, String text) {
 
-		return this.configurationDAO.getWSSecurityConfig();
-	}
+        LOG.debug("save text for key=" + key + " language="
+                + locale.getLanguage());
+        LocalizationKeyEntity localizationKey = this.localizationDAO
+                .findLocalization(key);
+        for (LocalizationTextEntity localizationText : localizationKey
+                .getTexts()) {
+            if (localizationText.getLanguage().equals(locale.getLanguage()))
+                localizationText.setText(text);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void saveWSSecurityConfig(boolean signing,
-			KeyStoreType keyStoreType, String keyStorePath,
-			String keyStorePassword, String keyEntryPassword, String alias)
-			throws KeyStoreLoadException {
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public WSSecurityConfigEntity getWSSecurityConfig() {
 
-		/*
-		 * Check if valid keystore configuration
-		 */
-		if (null != keyStorePath) {
-			KeyStoreUtils.loadPrivateKeyEntry(keyStoreType, keyStorePath,
-					keyStorePassword, keyEntryPassword, alias);
-		}
+        return this.configurationDAO.getWSSecurityConfig();
+    }
 
-		this.configurationDAO.setWSSecurityConfig(signing, keyStoreType,
-				keyStorePath, keyStorePassword, keyEntryPassword, alias);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public void saveWSSecurityConfig(boolean signing,
+                                     KeyStoreType keyStoreType, String keyStorePath,
+                                     String keyStorePassword, String keyEntryPassword, String alias)
+            throws KeyStoreLoadException {
+
+        /*
+           * Check if valid keystore configuration
+           */
+        if (null != keyStorePath) {
+            KeyStoreUtils.loadPrivateKeyEntry(keyStoreType, keyStorePath,
+                    keyStorePassword, keyEntryPassword, alias);
+        }
+
+        this.configurationDAO.setWSSecurityConfig(signing, keyStoreType,
+                keyStorePath, keyStorePassword, keyEntryPassword, alias);
+    }
 }

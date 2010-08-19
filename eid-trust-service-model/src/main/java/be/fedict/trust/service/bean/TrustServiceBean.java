@@ -100,6 +100,9 @@ public class TrustServiceBean implements TrustService {
     @EJB
     private SchedulingService schedulingService;
 
+    @EJB
+    private CrlRepositoryServiceBean crlRepositoryService;
+
     @SNMP(oid = SnmpConstants.CACHE_HITS)
     private Long cacheHits;
 
@@ -371,10 +374,14 @@ public class TrustServiceBean implements TrustService {
         OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
                 networkConfig);
 
-        OnlineCrlRepository crlRepository = new OnlineCrlRepository(
-                networkConfig);
-        CachedCrlRepository cachedCrlRepository = new CachedCrlRepository(
-                crlRepository);
+        // TODO: use singleton here
+        CachedCrlRepository cachedCrlRepository = crlRepositoryService.getCachedCrlRepository();
+        if (null == cachedCrlRepository) {
+            OnlineCrlRepository crlRepository = new OnlineCrlRepository(
+                    networkConfig);
+            cachedCrlRepository = new CachedCrlRepository(crlRepository);
+            crlRepositoryService.setCachedCrlRepository(cachedCrlRepository);
+        }
 
         FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
         if (null != trustLinker) {
