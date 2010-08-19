@@ -50,7 +50,7 @@ public class TrustServiceCrlTrustLinker extends CrlTrustLinker {
 		TrustLinkerResult result = super.hasTrustLink(childCertificate,
 				certificate, validationDate, revocationData);
 		if (null == result) {
-			SNMPInterceptor.increment(SnmpConstants.OCSP_FAILURES,
+			SNMPInterceptor.increment(SnmpConstants.CRL_DOWNLOAD_FAILURES,
 					SnmpConstants.SNMP_SERVICE, 1L);
 		}
 

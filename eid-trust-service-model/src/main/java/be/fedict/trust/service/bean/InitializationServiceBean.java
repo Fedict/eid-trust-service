@@ -183,11 +183,6 @@ public class InitializationServiceBean implements InitializationService {
         }
         trustPoints.add(rootCa2.getTrustPoint());
 
-        for (TrustPointEntity trustPoint : trustPoints) {
-            // start timer
-            initTrustPointScheduling(trustPoint);
-        }
-
         return trustPoints;
     }
 
@@ -308,11 +303,6 @@ public class InitializationServiceBean implements InitializationService {
         }
         trustPoints.add(rootCa.getTrustPoint());
 
-        for (TrustPointEntity trustPoint : trustPoints) {
-            // start timer
-            initTrustPointScheduling(trustPoint);
-        }
-
         // Belgian TSA trust domain
         TrustDomainEntity trustDomain = this.trustDomainDAO
                 .findTrustDomain(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN);
@@ -325,19 +315,6 @@ public class InitializationServiceBean implements InitializationService {
 
         // Add TSA certificate constraint
         this.trustDomainDAO.addTSAConstraint(trustDomain);
-    }
-
-    private void initTrustPointScheduling(TrustPointEntity trustPoint) {
-
-        // Belgian eID trust domain timer
-        LOG.debug("start timer for trust point " + trustPoint.getName());
-        try {
-            this.schedulingService.startTimer(trustPoint, false);
-        } catch (InvalidCronExpressionException e) {
-            LOG.error("Failed to start timer for trust point: "
-                    + trustPoint.getName(), e);
-            throw new RuntimeException(e);
-        }
     }
 
     private static X509Certificate loadCertificate(String resourceName) {

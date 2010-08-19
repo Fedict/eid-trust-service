@@ -18,92 +18,88 @@
 
 package be.fedict.trust.service;
 
-import javax.ejb.Local;
-import javax.ejb.Timer;
-import javax.jms.JMSException;
-
 import be.fedict.trust.service.bean.HarvesterMDB;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 
+import javax.ejb.Local;
+import javax.ejb.Timer;
+import javax.jms.JMSException;
+
 /**
  * Scheduler service.
- * 
+ *
  * @author wvdhaute
- * 
  */
 @Local
 public interface SchedulingService {
 
-	/**
-	 * Timer has timeout, scheduler will notify the {@link HarvesterMDB} and
-	 * create a new timer for the next update.
-	 * 
-	 * @param timer
-	 */
-	void timeOut(Timer timer);
+    /**
+     * Timer has timeout, scheduler will notify the {@link HarvesterMDB} and
+     * create a new timer for the next update.
+     *
+     * @param timer
+     */
+    void timeOut(Timer timer);
 
-	/**
-	 * Start a new timer for the specified {@link TrustPointEntity}.
-	 * 
-	 * If update is set to <code>false</code>, it will ignore a previously set
-	 * timer's fireDate
-	 * 
-	 * @param trustPoint
-	 * @param update
-	 * 
-	 * @throws InvalidCronExpressionException
-	 */
-	void startTimer(TrustPointEntity trustPoint, boolean update)
-			throws InvalidCronExpressionException;
+    /**
+     * Start a new timer for the specified {@link TrustPointEntity}.
+     * <p/>
+     * If update is set to <code>false</code>, it will ignore a previously set
+     * timer's fireDate
+     *
+     * @param trustPoint
+     * @param update
+     * @throws InvalidCronExpressionException
+     */
+    void startTimer(TrustPointEntity trustPoint, boolean update)
+            throws InvalidCronExpressionException;
 
-	/**
-	 * Starts a new timer for the specified {@link TrustPointEntity}
-	 * immediately.
-	 * 
-	 * @param trustPoint
-	 */
-	void startTimerNow(TrustPointEntity trustPoint);
+    /**
+     * Starts a new timer for the specified {@link TrustPointEntity}
+     * immediately.
+     *
+     * @param trustPoint
+     */
+    void startTimerNow(TrustPointEntity trustPoint);
 
-	/**
-	 * Start a new timer for the specified {@link ClockDriftConfigEntity}.
-	 * 
-	 * If update is set to <code>false</code>, it will ignore a previously set
-	 * timer's fireDate
-	 * 
-	 * @param clockDriftDetectionConfig
-	 * @param update
-	 * 
-	 * @throws InvalidCronExpressionException
-	 */
-	void startTimer(ClockDriftConfigEntity clockDriftDetectionConfig,
-			boolean update) throws InvalidCronExpressionException;
+    /**
+     * Start a new timer for the specified {@link ClockDriftConfigEntity}.
+     * <p/>
+     * If update is set to <code>false</code>, it will ignore a previously set
+     * timer's fireDate
+     *
+     * @param clockDriftDetectionConfig
+     * @param update
+     * @throws InvalidCronExpressionException
+     */
+    void startTimer(ClockDriftConfigEntity clockDriftDetectionConfig,
+                    boolean update) throws InvalidCronExpressionException;
 
-	/**
-	 * Cancel running {@link Timer}'s for the specified timer info. This is or
-	 * the {@link TrustPointEntity}'s name, or {@value
-	 * TrustServiceConstants.CLOCK_DRIFT_TIMER}
-	 * 
-	 * @param timerInfo
-	 */
-	void cancelTimers(String timerInfo);
+    /**
+     * Cancel running {@link Timer}'s for the specified timer info. This is or
+     * the {@link TrustPointEntity}'s name, or {@link TrustServiceConstants#CLOCK_DRIFT_TIMER}
+     *
+     * @param timerInfo
+     */
+    void cancelTimers(String timerInfo);
 
-	/**
-	 * Cancel running {@link Timer}'s for the specified
-	 * {@link ClockDriftConfigEntity}.
-	 * 
-	 * @param clockDriftConfig
-	 */
-	void cancelTimers(ClockDriftConfigEntity clockDriftConfig);
+    /**
+     * Cancel running {@link Timer}'s for the specified
+     * {@link ClockDriftConfigEntity}.
+     *
+     * @param clockDriftConfig
+     */
+    void cancelTimers(ClockDriftConfigEntity clockDriftConfig);
 
-	/**
-	 * Refresh the revocation cache of the specified
-	 * {@link CertificateAuthorityEntity} immediately.
-	 * 
-	 * @param ca
-	 * @throws JMSException
-	 */
-	void refreshCA(CertificateAuthorityEntity ca) throws JMSException;
+    /**
+     * Refresh the revocation cache of the specified
+     * {@link CertificateAuthorityEntity} immediately.
+     *
+     * @param ca
+     * @throws JMSException
+     */
+    void refreshCA(CertificateAuthorityEntity ca) throws JMSException;
 }
