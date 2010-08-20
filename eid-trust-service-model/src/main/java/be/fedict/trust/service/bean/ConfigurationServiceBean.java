@@ -62,7 +62,7 @@ public class ConfigurationServiceBean implements ConfigurationService {
     @EJB
     private SchedulingService schedulingService;
 
-    @EJB(mappedName = "foo")
+    @EJB
     private CrlRepositoryServiceBean crlRepositoryServiceBean;
 
     /**
