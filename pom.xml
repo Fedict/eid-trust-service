@@ -11,7 +11,7 @@
 		-->
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.1.RC2</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>be.fedict</groupId>
 	<artifactId>eid-trust-service</artifactId>
@@ -270,7 +270,7 @@
 
 	<!-- Default properties -->
 	<properties>
-		<eid-applet.version>1.0.1.RC2</eid-applet.version>
+		<eid-applet.version>1.0.1-SNAPSHOT</eid-applet.version>
 		<trust-service.data.source.user>trust
 		</trust-service.data.source.user>
 		<trust-service.data.source.pass>trust
