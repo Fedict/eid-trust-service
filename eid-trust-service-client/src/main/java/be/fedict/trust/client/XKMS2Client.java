@@ -344,7 +344,7 @@ public class XKMS2Client {
                 revocationValues, null, attributeCertificates);
     }
 
-    private void validate(String trustDomain,
+    protected void validate(String trustDomain,
                           List<X509Certificate> certificateChain,
                           boolean returnRevocationData, Date validationDate,
                           List<OCSPResp> ocspResponses, List<X509CRL> crls,
