@@ -21,10 +21,10 @@ package be.fedict.trust.xkms2;
 import be.fedict.trust.CRLRevocationData;
 import be.fedict.trust.OCSPRevocationData;
 import be.fedict.trust.RevocationData;
-import be.fedict.trust.client.jaxb.xades.v1_3.CRLValuesType;
-import be.fedict.trust.client.jaxb.xades.v1_3.EncapsulatedPKIDataType;
-import be.fedict.trust.client.jaxb.xades.v1_3.OCSPValuesType;
-import be.fedict.trust.client.jaxb.xades.v1_3.RevocationValuesType;
+import be.fedict.trust.client.jaxb.xades132.CRLValuesType;
+import be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType;
+import be.fedict.trust.client.jaxb.xades132.OCSPValuesType;
+import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
 import be.fedict.trust.client.jaxb.xkms.*;
 import be.fedict.trust.client.jaxb.xmldsig.KeyInfoType;
 import be.fedict.trust.client.jaxb.xmldsig.X509DataType;
@@ -38,6 +38,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.tsp.TSPException;
+import org.w3._2002._03.xkms.XKMSPortType;
 
 import javax.ejb.EJB;
 import javax.jws.HandlerChain;
@@ -60,7 +61,7 @@ import java.util.List;
  *
  * @author fcorneli
  */
-@WebService(endpointInterface = "be.fedict.trust.client.jaxb.xkms.XKMSPortType")
+@WebService(endpointInterface = "org.w3._2002._03.xkms.XKMSPortType")
 @ServiceConsumer
 @HandlerChain(file = "ws-handlers.xml")
 public class XKMSPortImpl implements XKMSPortType {
@@ -68,7 +69,7 @@ public class XKMSPortImpl implements XKMSPortType {
     private static final Log LOG = LogFactory.getLog(XKMSPortImpl.class);
 
     private static final QName X509_CERT_QNAME = new QName(
-            "http://trust.fedict.be/client/jaxb/xmldsig#", "X509Certificate");
+            "http://www.w3.org/2000/09/xmldsig#", "X509Certificate");
 
     @EJB
     private TrustService trustService;
@@ -451,7 +452,7 @@ public class XKMSPortImpl implements XKMSPortType {
         be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
         RevocationDataMessageExtensionType revocationDataMessageExtension = extensionsObjectFactory
                 .createRevocationDataMessageExtensionType();
-        be.fedict.trust.client.jaxb.xades.v1_3.ObjectFactory xadesObjectFactory = new be.fedict.trust.client.jaxb.xades.v1_3.ObjectFactory();
+        be.fedict.trust.client.jaxb.xades132.ObjectFactory xadesObjectFactory = new be.fedict.trust.client.jaxb.xades132.ObjectFactory();
         RevocationValuesType revocationValues = xadesObjectFactory
                 .createRevocationValuesType();
 

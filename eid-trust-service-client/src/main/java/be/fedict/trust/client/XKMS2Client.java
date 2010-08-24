@@ -21,7 +21,7 @@ package be.fedict.trust.client;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.client.exception.ValidationFailedException;
-import be.fedict.trust.client.jaxb.xades.v1_3.*;
+import be.fedict.trust.client.jaxb.xades132.*;
 import be.fedict.trust.client.jaxb.xkms.*;
 import be.fedict.trust.client.jaxb.xmldsig.KeyInfoType;
 import be.fedict.trust.client.jaxb.xmldsig.X509DataType;
@@ -35,6 +35,8 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.ocsp.OCSPResp;
 import org.bouncycastle.tsp.TimeStampToken;
 import org.bouncycastle.x509.X509V2AttributeCertificate;
+import org.w3._2002._03.xkms.XKMSPortType;
+import org.w3._2002._03.xkms.XKMSService;
 import sun.security.timestamp.TimestampToken;
 
 import javax.net.ssl.SSLContext;
@@ -327,7 +329,7 @@ public class XKMS2Client {
     }
 
     /**
-     * Validate the specified {@link be.fedict.trust.client.jaxb.xades.v1_3.EncapsulatedPKIDataType} holding the
+     * Validate the specified {@link be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType} holding the
      * {@link X509V2AttributeCertificate}.
      *
      * @param certificateChain the certificate chain for the attribute certificate
@@ -481,7 +483,8 @@ public class XKMS2Client {
         if (null != revocationData) {
             revocationDataMessageExtension.setRevocationValues(revocationData);
         } else {
-            be.fedict.trust.client.jaxb.xades.v1_3.ObjectFactory xadesObjectFactory = new be.fedict.trust.client.jaxb.xades.v1_3.ObjectFactory();
+            be.fedict.trust.client.jaxb.xades132.ObjectFactory xadesObjectFactory =
+                    new be.fedict.trust.client.jaxb.xades132.ObjectFactory();
             RevocationValuesType revocationValues = xadesObjectFactory
                     .createRevocationValuesType();
 
@@ -531,7 +534,7 @@ public class XKMS2Client {
                                    TimeStampToken timeStampToken) {
 
         be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
-        be.fedict.trust.client.jaxb.xades.v1_3.ObjectFactory xadesObjectFactory = new be.fedict.trust.client.jaxb.xades.v1_3.ObjectFactory();
+        be.fedict.trust.client.jaxb.xades132.ObjectFactory xadesObjectFactory = new be.fedict.trust.client.jaxb.xades132.ObjectFactory();
 
         TSAMessageExtensionType tsaMessageExtension = extensionsObjectFactory
                 .createTSAMessageExtensionType();

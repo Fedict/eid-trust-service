@@ -18,35 +18,32 @@
 
 package be.fedict.trust.xkms2;
 
-import java.net.URL;
+import org.w3._2002._03.xkms.XKMSService;
 
 import javax.xml.namespace.QName;
-
-import be.fedict.trust.client.jaxb.xkms.XKMSService;
+import java.net.URL;
 
 /**
  * Factory for the JAX-WS based XKMS2 Service.
- * 
+ *
  * @author fcorneli
- * 
  */
 public class XKMSServiceFactory {
 
-	public static final String WSDL_RESOURCE = "/xkms.wsdl";
+    public static final String WSDL_RESOURCE = "/xkms.wsdl";
 
-	private XKMSServiceFactory() {
-		super();
-	}
+    private XKMSServiceFactory() {
+        super();
+    }
 
-	public static XKMSService getInstance() {
-		URL wsdlLocation = XKMSServiceFactory.class.getResource(WSDL_RESOURCE);
-		if (null == wsdlLocation) {
-			throw new RuntimeException("WSDL location not valid: "
-					+ WSDL_RESOURCE);
-		}
-		QName serviceName = new QName("http://trust.fedict.be/client/jaxb/xkms#wsdl",
-				"XKMSService");
-		XKMSService service = new XKMSService(wsdlLocation, serviceName);
-		return service;
-	}
+    public static XKMSService getInstance() {
+        URL wsdlLocation = XKMSServiceFactory.class.getResource(WSDL_RESOURCE);
+        if (null == wsdlLocation) {
+            throw new RuntimeException("WSDL location not valid: "
+                    + WSDL_RESOURCE);
+        }
+        QName serviceName = new QName("http://www.w3.org/2002/03/xkms#wsdl",
+                "XKMSService");
+        return new XKMSService(wsdlLocation, serviceName);
+    }
 }

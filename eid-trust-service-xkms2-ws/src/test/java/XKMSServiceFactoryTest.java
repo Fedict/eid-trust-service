@@ -16,21 +16,20 @@
  * http://www.gnu.org/licenses/.
  */
 
-import static org.junit.Assert.assertNotNull;
-
-import be.fedict.trust.client.jaxb.xkms.XKMSService;
-import org.junit.Test;
-
 import be.fedict.trust.xkms2.XKMSServiceFactory;
+import org.junit.Test;
+import org.w3._2002._03.xkms.XKMSService;
+
+import static org.junit.Assert.assertNotNull;
 
 public class XKMSServiceFactoryTest {
 
-	@Test
-	public void testGetInstance() throws Exception {
-		// operate
-		XKMSService service = XKMSServiceFactory.getInstance();
+    @Test
+    public void testGetInstance() throws Exception {
+        // operate
+        XKMSService service = XKMSServiceFactory.getInstance();
 
-		// verify
-		assertNotNull(service);
-	}
+        // verify
+        assertNotNull(service);
+    }
 }

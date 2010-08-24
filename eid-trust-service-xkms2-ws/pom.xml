@@ -28,6 +28,11 @@
                     <sei/>
                     <verbose>true</verbose>
                     <xdebug>true</xdebug>
+                    <catalog>src/wsdl/catalog.cat</catalog>
+                    <bindingDirectory>src/wsdl</bindingDirectory>
+                    <bindingFiles>
+                        <bindingFile>bindings.xml</bindingFile>
+                    </bindingFiles>
                 </configuration>
                 <dependencies>
                     <dependency>
