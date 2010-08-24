@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <wsdl:definitions name="XMLKeyManagement"
-	targetNamespace="http://www.w3.org/2002/03/xkms#wsdl" xmlns:tns="http://www.w3.org/2002/03/xkms#wsdl"
+	targetNamespace="http://trust.fedict.be/client/jaxb/xkms#wsdl" xmlns:tns="http://trust.fedict.be/client/jaxb/xkms#wsdl"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://schemas.xmlsoap.org/wsdl/"
-	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xkms="http://www.w3.org/2002/03/xkms#"
+	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xkms="http://trust.fedict.be/client/jaxb/xkms#"
 	xmlns:xkmsext="urn:be:fedict:trust:xkms:extensions">
 
 	<types>
 		<schema xmlns="http://www.w3.org/2001/XMLSchema">
-			<import namespace="http://www.w3.org/2002/03/xkms#"
+			<import namespace="http://trust.fedict.be/client/jaxb/xkms#"
 				schemaLocation="xkms.xsd" />
 			<import namespace="urn:be:fedict:trust:xkms:extensions"
 				schemaLocation="xkms-extensions.xsd" />

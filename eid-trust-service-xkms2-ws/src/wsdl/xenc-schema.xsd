@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schema xmlns='http://www.w3.org/2001/XMLSchema' version='1.0'
-        xmlns:xenc='http://www.w3.org/2001/04/xmlenc#'
-        xmlns:ds='http://www.w3.org/2000/09/xmldsig#'
-        targetNamespace='http://www.w3.org/2001/04/xmlenc#'
+        xmlns:xenc='http://trust.fedict.be/client/jaxb/xmlenc#'
+        xmlns:ds='http://trust.fedict.be/client/jaxb/xmldsig#'
+        targetNamespace='http://trust.fedict.be/client/jaxb/xmlenc#'
         elementFormDefault='qualified'>
 
-  <import namespace="http://www.w3.org/2000/09/xmldsig#"
+  <import namespace="http://trust.fedict.be/client/jaxb/xmldsig#"
           schemaLocation="xmldsig-core-schema.xsd"/>
 
   <complexType name='EncryptedType' abstract='true'>

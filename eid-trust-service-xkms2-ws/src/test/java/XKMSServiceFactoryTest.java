@@ -18,8 +18,8 @@
 
 import static org.junit.Assert.assertNotNull;
 
+import be.fedict.trust.client.jaxb.xkms.XKMSService;
 import org.junit.Test;
-import org.w3._2002._03.xkms.XKMSService;
 
 import be.fedict.trust.xkms2.XKMSServiceFactory;
 

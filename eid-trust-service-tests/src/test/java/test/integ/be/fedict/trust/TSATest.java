@@ -18,14 +18,8 @@
 
 package test.integ.be.fedict.trust;
 
-import java.math.BigInteger;
-import java.security.Security;
-import java.security.cert.CertStore;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.Collection;
-
 import be.fedict.trust.client.TrustServiceDomains;
+import be.fedict.trust.client.XKMS2Client;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
@@ -39,68 +33,69 @@ import org.bouncycastle.tsp.TimeStampRequestGenerator;
 import org.bouncycastle.tsp.TimeStampResponse;
 import org.junit.Before;
 import org.junit.Test;
-
 import test.integ.be.fedict.trust.util.TestUtils;
-import be.fedict.trust.client.XKMS2Client;
-import be.fedict.trust.service.TrustServiceConstants;
+
+import java.math.BigInteger;
+import java.security.Security;
+import java.security.cert.CertStore;
+import java.security.cert.Certificate;
+import java.util.Collection;
 
 /**
  * TSA Test.
- * 
+ *
  * @author wvdhaute
- * 
  */
 public class TSATest {
 
-	private static final Log LOG = LogFactory.getLog(TSATest.class);
+    private static final Log LOG = LogFactory.getLog(TSATest.class);
 
-	private static final String tsa_location = "http://tsa.belgium.be/connect";
+    private static final String tsa_location = "http://tsa.belgium.be/connect";
 
-	@Before
-	public void setUp() {
-		Security.addProvider(new BouncyCastleProvider());
-	}
+    @Before
+    public void setUp() {
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
-	@Test
-	public void testTSA() throws Exception {
+    @Test
+    public void testTSA() throws Exception {
 
-		// setup
-		TimeStampRequestGenerator requestGen = new TimeStampRequestGenerator();
-		requestGen.setCertReq(true);
-		TimeStampRequest request = requestGen.generate(TSPAlgorithms.SHA1,
-				new byte[20], BigInteger.valueOf(100));
-		byte[] requestData = request.getEncoded();
+        // setup
+        TimeStampRequestGenerator requestGen = new TimeStampRequestGenerator();
+        requestGen.setCertReq(true);
+        TimeStampRequest request = requestGen.generate(TSPAlgorithms.SHA1,
+                new byte[20], BigInteger.valueOf(100));
+        byte[] requestData = request.getEncoded();
 
-		HttpClient httpClient = new HttpClient();
-		httpClient.getHostConfiguration().setProxy("proxy.yourict.net", 8080);
-		PostMethod postMethod = new PostMethod(tsa_location);
-		postMethod.setRequestEntity(new ByteArrayRequestEntity(requestData,
-				"application/timestamp-query"));
+        HttpClient httpClient = new HttpClient();
+        httpClient.getHostConfiguration().setProxy("proxy.yourict.net", 8080);
+        PostMethod postMethod = new PostMethod(tsa_location);
+        postMethod.setRequestEntity(new ByteArrayRequestEntity(requestData,
+                "application/timestamp-query"));
 
-		// operate
-		int statusCode = httpClient.executeMethod(postMethod);
-		if (statusCode != HttpStatus.SC_OK) {
-			LOG.error("Error contacting TSP server " + tsa_location);
-			throw new Exception("Error contacting TSP server " + tsa_location);
-		}
+        // operate
+        int statusCode = httpClient.executeMethod(postMethod);
+        if (statusCode != HttpStatus.SC_OK) {
+            LOG.error("Error contacting TSP server " + tsa_location);
+            throw new Exception("Error contacting TSP server " + tsa_location);
+        }
 
-		TimeStampResponse tspResponse = new TimeStampResponse(postMethod
-				.getResponseBodyAsStream());
-		postMethod.releaseConnection();
+        TimeStampResponse tspResponse = new TimeStampResponse(postMethod
+                .getResponseBodyAsStream());
+        postMethod.releaseConnection();
 
-		CertStore certStore = tspResponse.getTimeStampToken()
-				.getCertificatesAndCRLs("Collection", "BC");
+        CertStore certStore = tspResponse.getTimeStampToken()
+                .getCertificatesAndCRLs("Collection", "BC");
 
-		Collection<? extends Certificate> certificates = certStore
-				.getCertificates(null);
-		for (Certificate certificate : certificates) {
-			LOG.debug("certificate: "
-					+ ((X509Certificate) certificate).toString());
-		}
+        Collection<? extends Certificate> certificates = certStore
+                .getCertificates(null);
+        for (Certificate certificate : certificates) {
+            LOG.debug("certificate: " + certificate.toString());
+        }
 
-		// send token to trust service
-		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
-		client.validate(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN,
-				tspResponse.getTimeStampToken());
-	}
+        // send token to trust service
+        XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+        client.validate(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN,
+                tspResponse.getTimeStampToken());
+    }
 }

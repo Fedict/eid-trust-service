@@ -47,10 +47,9 @@ public class XKMSTest {
 
     private static final Log LOG = LogFactory.getLog(XKMSTest.class);
 
-    private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
-            "proxy.yourict.net", 8080);
-
-    // private static final NetworkConfig NETWORK_CONFIG = null;
+//    private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
+//            "proxy.yourict.net", 8080);
+    private static final NetworkConfig NETWORK_CONFIG = null;
 
     @Before
     public void setUp() {

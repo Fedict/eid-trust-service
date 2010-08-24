@@ -122,10 +122,7 @@ public class XKMSTrustTest {
            */
         HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
             public boolean verify(String hostname, SSLSession session) {
-                if (hostname.equals(TestUtils.XKMS_WS_HOST)) {
-                    return true;
-                }
-                return false;
+                return hostname.equals(TestUtils.XKMS_WS_HOST);
             }
         });
 

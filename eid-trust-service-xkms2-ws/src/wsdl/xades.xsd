@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema targetNamespace="http://trust.fedict.be/client/jaxb/xades/v1.3.2#"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://trust.fedict.be/client/jaxb/xades/v1.3.2#"
-            xmlns:ds="http://www.w3.org/2000/09/xmldsig#" elementFormDefault="qualified">
+            xmlns:ds="http://trust.fedict.be/client/jaxb/xmldsig#" elementFormDefault="qualified">
 
     <!--
          Make sure schemaLocation is the same location as in other xsd's that
          xkms.wsdl includes, else we get SAXParseExceptions on duplicate
          elements
      -->
-    <xsd:import namespace="http://www.w3.org/2000/09/xmldsig#"
+    <xsd:import namespace="http://trust.fedict.be/client/jaxb/xmldsig#"
                 schemaLocation="xmldsig-core-schema.xsd">
     </xsd:import>
     <!--

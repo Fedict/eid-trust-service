@@ -22,7 +22,7 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 
-import org.w3._2002._03.xkms.XKMSService;
+import be.fedict.trust.client.jaxb.xkms.XKMSService;
 
 /**
  * Factory for the JAX-WS based XKMS2 Service.
@@ -44,7 +44,7 @@ public class XKMSServiceFactory {
 			throw new RuntimeException("WSDL location not valid: "
 					+ WSDL_RESOURCE);
 		}
-		QName serviceName = new QName("http://www.w3.org/2002/03/xkms#wsdl",
+		QName serviceName = new QName("http://trust.fedict.be/client/jaxb/xkms#wsdl",
 				"XKMSService");
 		XKMSService service = new XKMSService(wsdlLocation, serviceName);
 		return service;

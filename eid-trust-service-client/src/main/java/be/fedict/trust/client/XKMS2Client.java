@@ -22,6 +22,9 @@ import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.client.exception.ValidationFailedException;
 import be.fedict.trust.client.jaxb.xades.v1_3.*;
+import be.fedict.trust.client.jaxb.xkms.*;
+import be.fedict.trust.client.jaxb.xmldsig.KeyInfoType;
+import be.fedict.trust.client.jaxb.xmldsig.X509DataType;
 import be.fedict.trust.xkms.extensions.AttributeCertificateMessageExtensionType;
 import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
 import be.fedict.trust.xkms.extensions.TSAMessageExtensionType;
@@ -32,10 +35,6 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.ocsp.OCSPResp;
 import org.bouncycastle.tsp.TimeStampToken;
 import org.bouncycastle.x509.X509V2AttributeCertificate;
-import org.w3._2000._09.xmldsig.KeyInfoType;
-import org.w3._2000._09.xmldsig.X509DataType;
-import org.w3._2002._03.xkms.*;
-import org.w3._2002._03.xkms.ObjectFactory;
 import sun.security.timestamp.TimestampToken;
 
 import javax.net.ssl.SSLContext;
@@ -345,19 +344,21 @@ public class XKMS2Client {
     }
 
     protected void validate(String trustDomain,
-                          List<X509Certificate> certificateChain,
-                          boolean returnRevocationData, Date validationDate,
-                          List<OCSPResp> ocspResponses, List<X509CRL> crls,
-                          RevocationValuesType revocationValues,
-                          TimeStampToken timeStampToken,
-                          CertifiedRolesListType attributeCertificates)
+                            List<X509Certificate> certificateChain,
+                            boolean returnRevocationData, Date validationDate,
+                            List<OCSPResp> ocspResponses, List<X509CRL> crls,
+                            RevocationValuesType revocationValues,
+                            TimeStampToken timeStampToken,
+                            CertifiedRolesListType attributeCertificates)
             throws CertificateEncodingException, TrustDomainNotFoundException,
             RevocationDataNotFoundException, ValidationFailedException {
 
         LOG.debug("validate");
 
-        ObjectFactory objectFactory = new ObjectFactory();
-        org.w3._2000._09.xmldsig.ObjectFactory xmldsigObjectFactory = new org.w3._2000._09.xmldsig.ObjectFactory();
+        be.fedict.trust.client.jaxb.xkms.ObjectFactory objectFactory =
+                new be.fedict.trust.client.jaxb.xkms.ObjectFactory();
+        be.fedict.trust.client.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory =
+                new be.fedict.trust.client.jaxb.xmldsig.ObjectFactory();
 
         ValidateRequestType validateRequest = objectFactory
                 .createValidateRequestType();

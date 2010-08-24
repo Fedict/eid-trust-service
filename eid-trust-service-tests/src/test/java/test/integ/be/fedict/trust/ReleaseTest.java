@@ -167,8 +167,7 @@ public class ReleaseTest {
 		documentBuilderFactory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder = documentBuilderFactory
 				.newDocumentBuilder();
-		Document document = documentBuilder.parse(documentInputStream);
-		return document;
+        return documentBuilder.parse(documentInputStream);
 	}
 
 	private void storeDocument(Document document, File file)

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:be:fedict:trust:xkms:extensions"
-        xmlns:tns="urn:be:fedict:trust:xkms:extensions" xmlns:xkms="http://www.w3.org/2002/03/xkms#"
-        xmlns:xades="http://trust.fedict.be/client/jaxb/xades/v1.3.2#" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+        xmlns:tns="urn:be:fedict:trust:xkms:extensions" xmlns:xkms="http://trust.fedict.be/client/jaxb/xkms#"
+        xmlns:xades="http://trust.fedict.be/client/jaxb/xades/v1.3.2#"
+        xmlns:ds="http://trust.fedict.be/client/jaxb/xmldsig#"
         elementFormDefault="qualified">
 
     <annotation>
@@ -13,11 +14,11 @@
         </documentation>
     </annotation>
 
-    <import namespace="http://www.w3.org/2002/03/xkms#"
+    <import namespace="http://trust.fedict.be/client/jaxb/xkms#"
             schemaLocation="xkms.xsd"/>
     <import namespace="http://trust.fedict.be/client/jaxb/xades/v1.3.2#"
             schemaLocation="xades.xsd"/>
-    <import namespace="http://www.w3.org/2000/09/xmldsig#"
+    <import namespace="http://trust.fedict.be/client/jaxb/xmldsig#"
             schemaLocation="xmldsig-core-schema.xsd"/>
 
     <element name="RevocationDataMessageExtension" type="tns:RevocationDataMessageExtensionType"/>
