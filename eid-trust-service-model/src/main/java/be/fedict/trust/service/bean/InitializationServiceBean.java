@@ -28,7 +28,6 @@ import be.fedict.trust.service.dao.LocalizationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.*;
 import be.fedict.trust.service.entity.constraints.KeyUsageType;
-import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -122,25 +121,13 @@ public class InitializationServiceBean implements InitializationService {
         ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
                 .findClockDriftConfig();
         if (null == clockDriftConfig) {
-            clockDriftConfig = this.configurationDAO.setClockDriftConfig(
+            this.configurationDAO.setClockDriftConfig(
                     TimeProtocol.NTP,
                     TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER,
                     TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
                     TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET,
-                    TrustServiceConstants.DEFAULT_CRON);
+                    TrustServiceConstants.DEFAULT_CRON_INTERVAL);
         }
-
-        // Clock drift timer
-        if (clockDriftConfig.isEnabled()) {
-            LOG.debug("start timer for clock drift");
-            try {
-                this.schedulingService.startTimer(clockDriftConfig, false);
-            } catch (InvalidCronExpressionException e) {
-                LOG.error("Failed to start timer for clock drift", e);
-                throw new RuntimeException(e);
-            }
-        }
-
     }
 
     /*
@@ -162,7 +149,7 @@ public class InitializationServiceBean implements InitializationService {
 
         if (null == rootCa.getTrustPoint()) {
             TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
-                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON, rootCa);
+                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON_INTERVAL, rootCa);
             rootCa.setTrustPoint(rootCaTrustPoint);
         }
         trustPoints.add(rootCa.getTrustPoint());
@@ -178,7 +165,7 @@ public class InitializationServiceBean implements InitializationService {
 
         if (null == rootCa2.getTrustPoint()) {
             TrustPointEntity rootCa2TrustPoint = this.trustDomainDAO
-                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON, rootCa2);
+                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON_INTERVAL, rootCa2);
             rootCa2.setTrustPoint(rootCa2TrustPoint);
         }
         trustPoints.add(rootCa2.getTrustPoint());
@@ -298,7 +285,7 @@ public class InitializationServiceBean implements InitializationService {
 
         if (null == rootCa.getTrustPoint()) {
             TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
-                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON, rootCa);
+                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON_INTERVAL, rootCa);
             rootCa.setTrustPoint(rootCaTrustPoint);
         }
         trustPoints.add(rootCa.getTrustPoint());

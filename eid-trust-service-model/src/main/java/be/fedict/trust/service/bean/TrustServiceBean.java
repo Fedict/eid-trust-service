@@ -37,7 +37,6 @@ import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.*;
 import be.fedict.trust.service.entity.constraints.*;
-import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.snmp.SNMP;
 import be.fedict.trust.service.snmp.SNMPCounter;
@@ -604,18 +603,12 @@ public class TrustServiceBean implements TrustService {
                         try {
                             notifyHarvester(certificateAuthority.getName());
                             if (null != certificateAuthority.getTrustPoint()
-                                    && null == certificateAuthority.getTrustPoint().getTimerHandle()) {
-                                schedulingService.startTimer(certificateAuthority.getTrustPoint(), false);
+                                    && null == certificateAuthority.getTrustPoint().getFireDate()) {
+                                schedulingService.startTimer(certificateAuthority.getTrustPoint());
                             }
                         } catch (JMSException e) {
                             logAudit("Failed to notify harvester: " + e.getMessage());
                             LOG.error("could not notify harvester: " + e.getMessage(), e);
-                        } catch (InvalidCronExpressionException e) {
-                            String message = "Invalid cron expression for trustpoint: "
-                                    + certificateAuthority.getTrustPoint().getName()
-                                    + " (cron=" + certificateAuthority.getTrustPoint().getCrlRefreshCron() + ")";
-                            logAudit(message);
-                            LOG.error(message, e);
                         }
                     } else {
                         certificateAuthority.setStatus(Status.NONE);

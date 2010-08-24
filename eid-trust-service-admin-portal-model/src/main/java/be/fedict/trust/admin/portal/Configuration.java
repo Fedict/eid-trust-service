@@ -17,113 +17,112 @@
  */
 package be.fedict.trust.admin.portal;
 
-import java.util.List;
-
 import javax.ejb.Local;
 import javax.faces.model.SelectItem;
+import java.util.List;
 
 @Local
 public interface Configuration {
 
-	/*
-	 * Lifecycle.
-	 */
-	void destroyCallback();
+    /*
+      * Lifecycle.
+      */
+    void destroyCallback();
 
-	void initialize();
+    void initialize();
 
-	/*
-	 * Factory
-	 */
-	List<SelectItem> clockDriftProtocolFactory();
+    /*
+      * Factory
+      */
+    List<SelectItem> clockDriftProtocolFactory();
 
-	List<SelectItem> keyStoreTypeFactory();
+    List<SelectItem> keyStoreTypeFactory();
 
-	List<SelectItem> supportedLanguagesFactory();
+    List<SelectItem> supportedLanguagesFactory();
 
-	/*
-	 * Accessors
-	 */
-	String getSelectedTab();
+    /*
+      * Accessors
+      */
+    String getSelectedTab();
 
-	String getProxyHost();
+    String getProxyHost();
 
-	void setProxyHost(String proxyHost);
+    void setProxyHost(String proxyHost);
 
-	int getProxyPort();
+    int getProxyPort();
 
-	void setProxyPort(int proxyPort);
+    void setProxyPort(int proxyPort);
 
-	boolean isProxyEnabled();
+    boolean isProxyEnabled();
 
-	void setProxyEnabled(boolean enabled);
+    void setProxyEnabled(boolean enabled);
 
-	String getClockDriftProtocol();
+    String getClockDriftProtocol();
 
-	void setClockDriftProtocol(String clockDriftProtocol);
+    void setClockDriftProtocol(String clockDriftProtocol);
 
-	String getClockDriftServer();
+    String getClockDriftServer();
 
-	void setClockDriftServer(String clockDriftServer);
+    void setClockDriftServer(String clockDriftServer);
 
-	int getClockDriftTimeout();
+    int getClockDriftTimeout();
 
-	void setClockDriftTimeout(int clockDriftTimeout);
+    void setClockDriftTimeout(int clockDriftTimeout);
 
-	int getClockDriftMaxClockOffset();
+    int getClockDriftMaxClockOffset();
 
-	void setClockDriftMaxClockOffset(int clockDriftMaxClockOffset);
+    void setClockDriftMaxClockOffset(int clockDriftMaxClockOffset);
 
-	String getClockDriftCron();
+    long getClockDriftInterval();
 
-	void setClockDriftCron(String clockDriftCron);
+    void setClockDriftInterval(long clockDriftInterval);
 
-	boolean isClockDriftEnabled();
+    boolean isClockDriftEnabled();
 
-	void setClockDriftEnabled(boolean enabled);
+    void setClockDriftEnabled(boolean enabled);
 
-	String getLanguage();
+    String getLanguage();
 
-	void setLanguage(String language);
+    void setLanguage(String language);
 
-	String getInformationMessage();
+    String getInformationMessage();
 
-	void setInformationMessage(String informationMessage);
+    void setInformationMessage(String informationMessage);
 
-	boolean isWsSecuritySigning();
+    boolean isWsSecuritySigning();
 
-	void setWsSecuritySigning(boolean signing);
+    void setWsSecuritySigning(boolean signing);
 
-	String getWsSecurityKeyStoreType();
+    String getWsSecurityKeyStoreType();
 
-	void setWsSecurityKeyStoreType(String type);
+    void setWsSecurityKeyStoreType(String type);
 
-	String getWsSecurityKeyStorePath();
+    String getWsSecurityKeyStorePath();
 
-	void setWsSecurityKeyStorePath(String path);
+    void setWsSecurityKeyStorePath(String path);
 
-	String getWsSecurityKeyStorePassword();
+    String getWsSecurityKeyStorePassword();
 
-	void setWsSecurityKeyStorePassword(String password);
+    void setWsSecurityKeyStorePassword(String password);
 
-	String getWsSecurityKeyEntryPassword();
+    String getWsSecurityKeyEntryPassword();
 
-	void setWsSecurityKeyEntryPassword(String password);
+    void setWsSecurityKeyEntryPassword(String password);
 
-	String getWsSecurityAlias();
+    String getWsSecurityAlias();
 
-	void setWsSecurityAlias(String alias);
+    void setWsSecurityAlias(String alias);
 
-	/*
-	 * Actions
-	 */
-	String saveNetworkConfig();
+    /*
+      * Actions
+      */
+    String saveNetworkConfig();
 
-	String saveWSSecurityConfig();
+    String saveWSSecurityConfig();
 
-	String saveClockDriftConfig();
+    String saveClockDriftConfig();
 
-	String editInfoMessage();
+    String editInfoMessage();
 
-	String saveInfoMessage();
+    String saveInfoMessage();
 }

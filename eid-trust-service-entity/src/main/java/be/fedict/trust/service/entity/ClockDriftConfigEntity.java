@@ -18,160 +18,141 @@
 
 package be.fedict.trust.service.entity;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import javax.ejb.TimerHandle;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.Type;
+
+import javax.ejb.TimerHandle;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "ts_clock_drift")
 public class ClockDriftConfigEntity implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private String name;
+    private String name;
 
-	private TimeProtocol timeProtocol;
-	private String server;
-	private int timeout;
-	private int maxClockOffset;
+    private TimeProtocol timeProtocol;
+    private String server;
+    private int timeout;
+    private int maxClockOffset;
 
-	private boolean enabled = false;
+    private boolean enabled = false;
 
-	private String cron;
-	private TimerHandle timerHandle;
-	private Date fireDate;
+    private long clockDriftInterval;
+    private Date fireDate;
 
-	/**
-	 * Default constructor.
-	 */
-	public ClockDriftConfigEntity() {
+    /**
+     * Default constructor.
+     */
+    public ClockDriftConfigEntity() {
 
-		super();
-	}
+        super();
+    }
 
-	/**
-	 * Main constructor.
-	 */
-	public ClockDriftConfigEntity(String name, TimeProtocol timeProtocol,
-			String server, int timeout, int maxClockOffset, String cron) {
+    /**
+     * Main constructor.
+     */
+    public ClockDriftConfigEntity(String name, TimeProtocol timeProtocol,
+                                  String server, int timeout, int maxClockOffset, long clockDriftInterval) {
 
-		this.name = name;
-		this.timeProtocol = timeProtocol;
-		this.server = server;
-		this.timeout = timeout;
-		this.maxClockOffset = maxClockOffset;
-		this.cron = cron;
-	}
+        this.name = name;
+        this.timeProtocol = timeProtocol;
+        this.server = server;
+        this.timeout = timeout;
+        this.maxClockOffset = maxClockOffset;
+        this.clockDriftInterval = clockDriftInterval;
+    }
 
-	@Id
-	public String getName() {
+    @Id
+    public String getName() {
 
-		return this.name;
-	}
+        return this.name;
+    }
 
-	public void setName(String name) {
+    public void setName(String name) {
 
-		this.name = name;
-	}
+        this.name = name;
+    }
 
-	@Enumerated(EnumType.STRING)
-	public TimeProtocol getTimeProtocol() {
+    @Enumerated(EnumType.STRING)
+    public TimeProtocol getTimeProtocol() {
 
-		return this.timeProtocol;
-	}
+        return this.timeProtocol;
+    }
 
-	public void setTimeProtocol(TimeProtocol timeProtocol) {
+    public void setTimeProtocol(TimeProtocol timeProtocol) {
 
-		this.timeProtocol = timeProtocol;
-	}
+        this.timeProtocol = timeProtocol;
+    }
 
-	public String getServer() {
+    public String getServer() {
 
-		return this.server;
-	}
+        return this.server;
+    }
 
-	public void setServer(String server) {
+    public void setServer(String server) {
 
-		this.server = server;
-	}
+        this.server = server;
+    }
 
-	public int getTimeout() {
+    public int getTimeout() {
 
-		return this.timeout;
-	}
+        return this.timeout;
+    }
 
-	public void setTimeout(int timeout) {
+    public void setTimeout(int timeout) {
 
-		this.timeout = timeout;
-	}
+        this.timeout = timeout;
+    }
 
-	public int getMaxClockOffset() {
+    public int getMaxClockOffset() {
 
-		return this.maxClockOffset;
-	}
+        return this.maxClockOffset;
+    }
 
-	public void setMaxClockOffset(int maxClockOffset) {
+    public void setMaxClockOffset(int maxClockOffset) {
 
-		this.maxClockOffset = maxClockOffset;
-	}
+        this.maxClockOffset = maxClockOffset;
+    }
 
-	public String getCron() {
+    public long getClockDriftInterval() {
 
-		return this.cron;
-	}
+        return this.clockDriftInterval;
+    }
 
-	public void setCron(String cron) {
+    public void setClockDriftInterval(long clockDriftInterval) {
 
-		this.cron = cron;
-	}
+        this.clockDriftInterval = clockDriftInterval;
+    }
 
-	public boolean isEnabled() {
-		return this.enabled;
-	}
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
-	@Lob
-	@Type(type = "org.hibernate.type.PrimitiveByteArrayBlobType")
-	public TimerHandle getTimerHandle() {
+    public Date getFireDate() {
 
-		return this.timerHandle;
-	}
+        return this.fireDate;
+    }
 
-	public void setTimerHandle(TimerHandle timerHandle) {
+    public void setFireDate(Date fireDate) {
 
-		this.timerHandle = timerHandle;
-	}
+        this.fireDate = fireDate;
+    }
 
-	public Date getFireDate() {
+    @Override
+    public String toString() {
 
-		return this.fireDate;
-	}
-
-	public void setFireDate(Date fireDate) {
-
-		this.fireDate = fireDate;
-	}
-
-	@Override
-	public String toString() {
-
-		return new ToStringBuilder(this).append("protocol",
-				this.timeProtocol.name()).append("server", this.server).append(
-				"timeout", this.timeout).append("maxClockOffset",
-				this.maxClockOffset).toString();
-	}
+        return new ToStringBuilder(this).append("protocol",
+                this.timeProtocol.name()).append("server", this.server).append(
+                "timeout", this.timeout).append("maxClockOffset",
+                this.maxClockOffset).toString();
+    }
 
 }

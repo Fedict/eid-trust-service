@@ -18,141 +18,120 @@
 
 package be.fedict.trust.service.entity;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import javax.ejb.TimerHandle;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import javax.ejb.TimerHandle;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+
 @Entity
 @Table(name = "ts_trust_point")
-@NamedQueries( { @NamedQuery(name = TrustPointEntity.QUERY_ALL, query = "FROM TrustPointEntity") })
+@NamedQueries({@NamedQuery(name = TrustPointEntity.QUERY_ALL, query = "FROM TrustPointEntity")})
 public class TrustPointEntity implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final String QUERY_ALL = "ts_tp.q.all";
+    public static final String QUERY_ALL = "ts_tp.q.all";
 
-	private String name;
+    private String name;
 
-	private String crlRefreshCron;
-	private TimerHandle timerHandle;
-	private Date fireDate;
+    private long crlRefreshInterval;
+    private Date fireDate;
 
-	private CertificateAuthorityEntity certificateAuthority;
+    private CertificateAuthorityEntity certificateAuthority;
 
-	/**
-	 * Default constructor.
-	 */
-	public TrustPointEntity() {
-		super();
-	}
+    /**
+     * Default constructor.
+     */
+    public TrustPointEntity() {
+        super();
+    }
 
-	/**
-	 * Main constructor.
-	 * 
-	 * @param crlRefreshCron
-	 * @param trustDomain
-	 * @param certificateAuthority
-	 */
-	public TrustPointEntity(String crlRefreshCron,
-			CertificateAuthorityEntity certificateAuthority) {
-		this.name = certificateAuthority.getName();
-		this.certificateAuthority = certificateAuthority;
-		this.crlRefreshCron = crlRefreshCron;
-	}
+    /**
+     * Main constructor.
+     *
+     * @param crlRefreshInterval
+     * @param certificateAuthority
+     */
+    public TrustPointEntity(long crlRefreshInterval,
+                            CertificateAuthorityEntity certificateAuthority) {
+        this.name = certificateAuthority.getName();
+        this.certificateAuthority = certificateAuthority;
+        this.crlRefreshInterval = crlRefreshInterval;
+    }
 
-	@Id
-	public String getName() {
-		return this.name;
-	}
+    @Id
+    public String getName() {
+        return this.name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@OneToOne(optional = false, cascade = CascadeType.REMOVE)
-	public CertificateAuthorityEntity getCertificateAuthority() {
+    @OneToOne(optional = false, cascade = CascadeType.REMOVE)
+    public CertificateAuthorityEntity getCertificateAuthority() {
 
-		return this.certificateAuthority;
-	}
+        return this.certificateAuthority;
+    }
 
-	public void setCertificateAuthority(
-			CertificateAuthorityEntity certificateAuthority) {
+    public void setCertificateAuthority(
+            CertificateAuthorityEntity certificateAuthority) {
 
-		this.certificateAuthority = certificateAuthority;
-	}
+        this.certificateAuthority = certificateAuthority;
+    }
 
-	public String getCrlRefreshCron() {
+    public long getCrlRefreshInterval() {
 
-		return this.crlRefreshCron;
-	}
+        return this.crlRefreshInterval;
+    }
 
-	public void setCrlRefreshCron(String crlRefreshCron) {
+    public void setCrlRefreshInterval(long crlRefreshInterval) {
 
-		this.crlRefreshCron = crlRefreshCron;
-	}
+        this.crlRefreshInterval = crlRefreshInterval;
+    }
 
-	@Lob
-	public TimerHandle getTimerHandle() {
+    public Date getFireDate() {
 
-		return this.timerHandle;
-	}
+        return this.fireDate;
+    }
 
-	public void setTimerHandle(TimerHandle timerHandle) {
+    public void setFireDate(Date fireDate) {
 
-		this.timerHandle = timerHandle;
-	}
+        this.fireDate = fireDate;
+    }
 
-	public Date getFireDate() {
+    @Override
+    public boolean equals(Object obj) {
 
-		return this.fireDate;
-	}
+        if (this == obj) {
+            return true;
+        }
+        if (null == obj) {
+            return false;
+        }
+        if (!(obj instanceof TrustPointEntity)) {
+            return false;
+        }
+        TrustPointEntity rhs = (TrustPointEntity) obj;
+        return new EqualsBuilder().append(this.name, rhs.name).isEquals();
 
-	public void setFireDate(Date fireDate) {
+    }
 
-		this.fireDate = fireDate;
-	}
+    @Override
+    public int hashCode() {
 
-	@Override
-	public boolean equals(Object obj) {
+        return new HashCodeBuilder().append(this.name).toHashCode();
+    }
 
-		if (this == obj) {
-			return true;
-		}
-		if (null == obj) {
-			return false;
-		}
-		if (false == obj instanceof TrustPointEntity) {
-			return false;
-		}
-		TrustPointEntity rhs = (TrustPointEntity) obj;
-		return new EqualsBuilder().append(this.name, rhs.name).isEquals();
+    @Override
+    public String toString() {
 
-	}
-
-	@Override
-	public int hashCode() {
-
-		return new HashCodeBuilder().append(this.name).toHashCode();
-	}
-
-	@Override
-	public String toString() {
-
-		return new ToStringBuilder(this).append("name", this.name).append(
-				"crlRefresh", this.crlRefreshCron).toString();
+        return new ToStringBuilder(this).append("name", this.name).append(
+                "crlRefresh", this.crlRefreshInterval).toString();
 	}
 
 }

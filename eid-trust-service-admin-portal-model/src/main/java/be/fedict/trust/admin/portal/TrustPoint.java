@@ -42,9 +42,9 @@ public interface TrustPoint {
 	/*
 	 * Accessors
 	 */
-	String getCrlRefreshCron();
+	long getCrlRefreshInterval();
 
-	void setCrlRefreshCron(String crlRefreshCron);
+	void setCrlRefreshInterval(long crlRefreshInterval);
 
 	/*
 	 * Actions

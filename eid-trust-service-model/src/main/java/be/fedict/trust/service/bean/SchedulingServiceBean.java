@@ -28,10 +28,8 @@ import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.entity.Status;
 import be.fedict.trust.service.entity.TrustPointEntity;
-import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.CronTrigger;
 
 import javax.annotation.Resource;
 import javax.ejb.*;
@@ -91,48 +89,24 @@ public class SchedulingServiceBean implements SchedulingService {
 
         LOG.debug("scheduler timeout for: " + timerInfo);
         if (timerInfo.equals(TrustServiceConstants.CLOCK_DRIFT_TIMER)) {
-            handleClockDriftTimeout(timer);
+            handleClockDriftTimeout();
         } else {
-            handleTrustPointTimeout(timerInfo, timer);
+            handleTrustPointTimeout(timerInfo);
         }
     }
 
-    private void handleClockDriftTimeout(Timer timer) {
-
-        ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
-                .getClockDriftConfig();
-
-        // the clock drift apparently has another timer still running
-        // we just return without setting this timer again
-        if (!clockDriftConfig.getTimerHandle().equals(timer.getHandle())) {
-            LOG.debug("Ignoring duplicate timer for clock drift");
-            return;
-        }
+    private void handleClockDriftTimeout() {
 
         // perform clock drift detection
         this.clockDriftService.execute();
-
-        // start timer
-        try {
-            startTimer(clockDriftConfig, true);
-        } catch (InvalidCronExpressionException e) {
-            this.auditDAO.logAudit("Exception starting timer for clock drift");
-        }
     }
 
-    private void handleTrustPointTimeout(String name, Timer timer) {
+    private void handleTrustPointTimeout(String name) {
 
         TrustPointEntity trustPoint = this.entityManager.find(
                 TrustPointEntity.class, name);
         if (null == trustPoint) {
             LOG.warn("unknown trust point: " + name);
-            return;
-        }
-
-        // the trustPoint apparently has another timer still running
-        // we just return without setting this timer again
-        if (!timer.getHandle().equals(trustPoint.getTimerHandle())) {
-            LOG.debug("Ignoring duplicate timer for: " + trustPoint.getName());
             return;
         }
 
@@ -150,59 +124,64 @@ public class SchedulingServiceBean implements SchedulingService {
                         + certificateAuthority.getName());
             }
         }
-
-        // start timer
-        try {
-            startTimer(trustPoint, true);
-        } catch (InvalidCronExpressionException e) {
-            this.auditDAO.logAudit("Exception starting timer for trust point: "
-                    + trustPoint.getName());
-        }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void startTimer(ClockDriftConfigEntity clockDriftConfig,
-                           boolean update) throws InvalidCronExpressionException {
+    public void startTimer(ClockDriftConfigEntity clockDriftConfig
+    ) {
         LOG.debug("start timer for clock drift detection");
 
-        if (null == clockDriftConfig.getCron()) {
-            LOG.debug("no CRL refresh set for clock drift, ignoring...");
+        if (0 == clockDriftConfig.getClockDriftInterval()) {
+            LOG.debug("no interval set for clock drift, ignoring...");
             return;
         }
-
-        Date fireDate = getFireDate(clockDriftConfig.getCron(), update,
-                clockDriftConfig.getFireDate());
 
         // remove old timers
         cancelTimers(TrustServiceConstants.CLOCK_DRIFT_TIMER);
 
-        Timer timer = this.timerService.createTimer(fireDate,
-                TrustServiceConstants.CLOCK_DRIFT_TIMER);
-        LOG.debug("created timer for clock drift at " + fireDate.toString());
-        clockDriftConfig.setFireDate(fireDate);
-        clockDriftConfig.setTimerHandle(timer.getHandle());
+        TimerConfig timerConfig = new TimerConfig();
+        timerConfig.setInfo(TrustServiceConstants.CLOCK_DRIFT_TIMER);
+        timerConfig.setPersistent(true);
+
+        long interval = 1000 * 60 * clockDriftConfig.getClockDriftInterval();
+
+        Timer timer = this.timerService.createIntervalTimer(new Date().getTime() + interval,
+                interval, timerConfig);
+
+        LOG.debug("created timer for clock drift at " + timer.getNextTimeout().toString());
+        clockDriftConfig.setFireDate(timer.getNextTimeout());
     }
 
     /**
      * {@inheritDoc}
      */
-    public void startTimer(TrustPointEntity trustPoint, boolean update)
-            throws InvalidCronExpressionException {
+    public void startTimer(TrustPointEntity trustPoint) {
 
         LOG.debug("start timer for " + trustPoint.getName());
 
-        if (null == trustPoint.getCrlRefreshCron()) {
+        if (0 == trustPoint.getCrlRefreshInterval()) {
             LOG.debug("no CRL refresh set for trust point "
                     + trustPoint.getName() + " ignoring...");
             return;
         }
 
-        Date fireDate = getFireDate(trustPoint.getCrlRefreshCron(), update,
-                trustPoint.getFireDate());
+        // remove old timers
+        cancelTimers(trustPoint.getName());
 
-        startTimer(trustPoint, fireDate);
+        TimerConfig timerConfig = new TimerConfig();
+        timerConfig.setInfo(trustPoint.getName());
+        timerConfig.setPersistent(true);
+
+        long interval = 1000 * 60 * trustPoint.getCrlRefreshInterval();
+
+        Timer timer = this.timerService.createIntervalTimer(new Date().getTime() +
+                interval, interval, timerConfig);
+
+        LOG.debug("created timer for trustpoint " + trustPoint.getName()
+                + " at " + timer.getNextTimeout().toString());
+        trustPoint.setFireDate(timer.getNextTimeout());
     }
 
     /**
@@ -210,40 +189,14 @@ public class SchedulingServiceBean implements SchedulingService {
      */
     public void startTimerNow(TrustPointEntity trustPoint) {
 
-        Date fireDate = new Date(new Date().getTime() + (1000 * 10));
-        startTimer(trustPoint, fireDate);
-    }
+        TimerConfig timerConfig = new TimerConfig();
+        timerConfig.setInfo(trustPoint.getName());
+        timerConfig.setPersistent(true);
 
-    private void startTimer(TrustPointEntity trustPoint, Date fireDate) {
+        Timer timer = this.timerService.createSingleActionTimer(1000 * 10, timerConfig);
 
-        // remove old timers
-        cancelTimers(trustPoint.getName());
-
-        Timer timer = this.timerService.createTimer(fireDate, trustPoint
-                .getName());
-        LOG.debug("created timer for " + trustPoint.getName() + " at "
-                + fireDate.toString());
-        trustPoint.setFireDate(fireDate);
-        trustPoint.setTimerHandle(timer.getHandle());
-        this.entityManager.flush();
-    }
-
-    private Date getFireDate(String cron, boolean update, Date prevFireDate)
-            throws InvalidCronExpressionException {
-        CronTrigger cronTrigger;
-        try {
-            cronTrigger = new CronTrigger("name", "group", cron);
-        } catch (Exception e) {
-            LOG.error("invalid cron expression");
-            throw new InvalidCronExpressionException(e);
-        }
-
-        Date fireDate = cronTrigger.computeFirstFireTime(null);
-        if (update && fireDate.equals(prevFireDate)) {
-            cronTrigger.triggered(null);
-            fireDate = cronTrigger.getNextFireTime();
-        }
-        return fireDate;
+        LOG.debug("created single action timer for trustpoint " + trustPoint.getName()
+                + " at " + timer.getNextTimeout().toString());
     }
 
     /**

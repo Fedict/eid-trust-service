@@ -18,277 +18,258 @@
 
 package be.fedict.trust.service;
 
-import java.security.cert.CertificateException;
-import java.util.List;
-
-import javax.ejb.Local;
-import javax.ejb.Timer;
-import javax.jms.JMSException;
-
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
-import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
-import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
-import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
-import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
-import be.fedict.trust.service.entity.constraints.KeyUsageType;
-import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
-import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
-import be.fedict.trust.service.entity.constraints.TSAConstraintEntity;
-import be.fedict.trust.service.exception.InvalidCronExpressionException;
-import be.fedict.trust.service.exception.TrustDomainAlreadyExistsException;
-import be.fedict.trust.service.exception.TrustDomainNotFoundException;
-import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
-import be.fedict.trust.service.exception.VirtualTrustDomainAlreadyExistsException;
-import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
+import be.fedict.trust.service.entity.constraints.*;
+import be.fedict.trust.service.exception.*;
+
+import javax.ejb.Local;
+import javax.ejb.Timer;
+import javax.jms.JMSException;
+import java.security.cert.CertificateException;
+import java.util.List;
 
 /**
  * Trust domain service.
- * 
+ *
  * @author wvdhaute
- * 
  */
 @Local
 public interface TrustDomainService {
 
-	/**
-	 * List all {@link TrustDomainEntity}'s.
-	 */
-	List<TrustDomainEntity> listTrustDomains();
+    /**
+     * List all {@link TrustDomainEntity}'s.
+     */
+    List<TrustDomainEntity> listTrustDomains();
 
-	/**
-	 * List all {@link VirtualTrustDomainEntity}'s.
-	 */
-	List<VirtualTrustDomainEntity> listVirtualTrustDomains();
+    /**
+     * List all {@link VirtualTrustDomainEntity}'s.
+     */
+    List<VirtualTrustDomainEntity> listVirtualTrustDomains();
 
-	/**
-	 * List all {@link TrustPointEntity}'s.
-	 */
-	List<TrustPointEntity> listTrustPoints();
+    /**
+     * List all {@link TrustPointEntity}'s.
+     */
+    List<TrustPointEntity> listTrustPoints();
 
-	/**
-	 * List all {@link CertificateAuthorityEntity}'s related to the specified
-	 * {@link TrustPointEntity}.
-	 * 
-	 * @param trustPoint
-	 */
-	List<CertificateAuthorityEntity> listTrustPointCAs(
-			TrustPointEntity trustPoint);
+    /**
+     * List all {@link CertificateAuthorityEntity}'s related to the specified
+     * {@link TrustPointEntity}.
+     *
+     * @param trustPoint
+     */
+    List<CertificateAuthorityEntity> listTrustPointCAs(
+            TrustPointEntity trustPoint);
 
-	/**
-	 * List all {@link TrustPointEntity}'s for the specified
-	 * {@link TrustDomainEntity}.
-	 * 
-	 * @param trustDomain
-	 */
-	List<TrustPointEntity> listTrustPoints(TrustDomainEntity trustDomain);
+    /**
+     * List all {@link TrustPointEntity}'s for the specified
+     * {@link TrustDomainEntity}.
+     *
+     * @param trustDomain
+     */
+    List<TrustPointEntity> listTrustPoints(TrustDomainEntity trustDomain);
 
-	/**
-	 * Save the changes to the specified {@link TrustDomainEntity}
-	 * 
-	 * @param trustDomain
-	 * 
-	 * @throws InvalidCronExpressionException
-	 */
-	void save(TrustDomainEntity trustDomain)
-			throws InvalidCronExpressionException;
+    /**
+     * Save the changes to the specified {@link TrustDomainEntity}
+     *
+     * @param trustDomain
+     */
+    void save(TrustDomainEntity trustDomain);
 
-	/**
-	 * Save the changes to the specified {@link TrustPointEntity}
-	 * 
-	 * @param trustPoint
-	 * 
-	 * @throws InvalidCronExpressionException
-	 */
-	void save(TrustPointEntity trustPoint)
-			throws InvalidCronExpressionException;
+    /**
+     * Save the changes to the specified {@link TrustPointEntity}
+     *
+     * @param trustPoint
+     */
+    void save(TrustPointEntity trustPoint);
 
-	/**
-	 * Add a new {@link TrustPointEntity}.
-	 * 
-	 * @param crlRefreshCron
-	 * @param certificateBytes
-	 * 
-	 * @throws TrustPointAlreadyExistsException
-	 * @throws CertificateException
-	 * @throws InvalidCronExpressionException
-	 */
-	TrustPointEntity addTrustPoint(String crlRefreshCron,
-			byte[] certificateBytes) throws TrustPointAlreadyExistsException,
-			CertificateException, InvalidCronExpressionException;
+    /**
+     * Add a new {@link TrustPointEntity}.
+     *
+     * @param crlRefreshInterval
+     * @param certificateBytes
+     * @throws TrustPointAlreadyExistsException
+     *
+     * @throws CertificateException
+     */
+    TrustPointEntity addTrustPoint(long crlRefreshInterval,
+                                   byte[] certificateBytes) throws TrustPointAlreadyExistsException,
+            CertificateException;
 
-	/**
-	 * Sets the specified {@link TrustDomainEntity} as default.
-	 * 
-	 * @param trustDomain
-	 */
-	void setDefault(TrustDomainEntity trustDomain);
+    /**
+     * Sets the specified {@link TrustDomainEntity} as default.
+     *
+     * @param trustDomain
+     */
+    void setDefault(TrustDomainEntity trustDomain);
 
-	/**
-	 * Removes the selected {@link TrustPointEntity} and all related
-	 * {@link CertificateAuthorityEntity}'s. Removes existing {@link Timer}'s.
-	 * 
-	 * @param trustPoint
-	 */
-	void removeTrustPoint(TrustPointEntity trustPoint);
+    /**
+     * Removes the selected {@link TrustPointEntity} and all related
+     * {@link CertificateAuthorityEntity}'s. Removes existing {@link Timer}'s.
+     *
+     * @param trustPoint
+     */
+    void removeTrustPoint(TrustPointEntity trustPoint);
 
-	/**
-	 * Finds the {@link TrustPointEntity} from the specified name. Returns
-	 * <code>null</code> if not found.
-	 * 
-	 * @param name
-	 */
-	TrustPointEntity findTrustPoint(String name);
+    /**
+     * Finds the {@link TrustPointEntity} from the specified name. Returns
+     * <code>null</code> if not found.
+     *
+     * @param name
+     */
+    TrustPointEntity findTrustPoint(String name);
 
-	/**
-	 * Sets the {@link TrustPointEntity}'s for the specified
-	 * {@link TrustDomainEntity}.
-	 * 
-	 * @param trustDomain
-	 * @param trustPointNames
-	 * 
-	 * @throws TrustDomainNotFoundException
-	 */
-	void setTrustPoints(TrustDomainEntity trustDomain,
-			List<String> trustPointNames) throws TrustDomainNotFoundException;
+    /**
+     * Sets the {@link TrustPointEntity}'s for the specified
+     * {@link TrustDomainEntity}.
+     *
+     * @param trustDomain
+     * @param trustPointNames
+     * @throws TrustDomainNotFoundException
+     */
+    void setTrustPoints(TrustDomainEntity trustDomain,
+                        List<String> trustPointNames) throws TrustDomainNotFoundException;
 
-	/**
-	 * Sets the {@link TrustDomainEntity}'s for the specified
-	 * {@link VirtualTrustDomainEntity}.
-	 * 
-	 * @param virtualTrustDomain
-	 * @param trustDomainNames
-	 * 
-	 * @throws VirtualTrustDomainNotFoundException
-	 */
-	VirtualTrustDomainEntity setTrustDomains(
-			VirtualTrustDomainEntity virtualTrustDomain,
-			List<String> trustDomainNames)
-			throws VirtualTrustDomainNotFoundException;
+    /**
+     * Sets the {@link TrustDomainEntity}'s for the specified
+     * {@link VirtualTrustDomainEntity}.
+     *
+     * @param virtualTrustDomain
+     * @param trustDomainNames
+     * @throws VirtualTrustDomainNotFoundException
+     *
+     */
+    VirtualTrustDomainEntity setTrustDomains(
+            VirtualTrustDomainEntity virtualTrustDomain,
+            List<String> trustDomainNames)
+            throws VirtualTrustDomainNotFoundException;
 
-	/**
-	 * Add a new {@link PolicyConstraintEntity} to the specified
-	 * {@link TrustDomainEntity}.
-	 * 
-	 * @param trustDomain
-	 * @param policy
-	 * @return the persisted {@link PolicyConstraintEntity}
-	 */
-	PolicyConstraintEntity addCertificatePolicy(TrustDomainEntity trustDomain,
-			String policy);
+    /**
+     * Add a new {@link PolicyConstraintEntity} to the specified
+     * {@link TrustDomainEntity}.
+     *
+     * @param trustDomain
+     * @param policy
+     * @return the persisted {@link PolicyConstraintEntity}
+     */
+    PolicyConstraintEntity addCertificatePolicy(TrustDomainEntity trustDomain,
+                                                String policy);
 
-	/**
-	 * Add a new {@link KeyUsageConstraintEntity} to the specified
-	 * {@link TrustDomainEntity}.
-	 * 
-	 * @param trustDomain
-	 * @param keyUsage
-	 * @param allowed
-	 * @return the persisted {@link KeyUsageConstraintEntity}
-	 */
-	KeyUsageConstraintEntity addKeyUsageConstraint(
-			TrustDomainEntity trustDomain, KeyUsageType keyUsage,
-			boolean allowed);
+    /**
+     * Add a new {@link KeyUsageConstraintEntity} to the specified
+     * {@link TrustDomainEntity}.
+     *
+     * @param trustDomain
+     * @param keyUsage
+     * @param allowed
+     * @return the persisted {@link KeyUsageConstraintEntity}
+     */
+    KeyUsageConstraintEntity addKeyUsageConstraint(
+            TrustDomainEntity trustDomain, KeyUsageType keyUsage,
+            boolean allowed);
 
-	/**
-	 * Save the specified {@link KeyUsageConstraintEntity}'s.
-	 */
-	void saveKeyUsageConstraints(
-			List<KeyUsageConstraintEntity> keyUsageConstraints);
+    /**
+     * Save the specified {@link KeyUsageConstraintEntity}'s.
+     */
+    void saveKeyUsageConstraints(
+            List<KeyUsageConstraintEntity> keyUsageConstraints);
 
-	/**
-	 * Add a new {@link EndEntityConstraintEntity} to the specified
-	 * {@link TrustDomainEntity}.
-	 */
-	EndEntityConstraintEntity addEndEntityConstraint(
-			TrustDomainEntity trustDomain, byte[] certificateBytes)
-			throws CertificateException;
+    /**
+     * Add a new {@link EndEntityConstraintEntity} to the specified
+     * {@link TrustDomainEntity}.
+     */
+    EndEntityConstraintEntity addEndEntityConstraint(
+            TrustDomainEntity trustDomain, byte[] certificateBytes)
+            throws CertificateException;
 
-	/**
-	 * Add a new {@link QCStatementsConstraintEntity} to the specified
-	 * {@link TrustDomainEntity}.
-	 */
-	QCStatementsConstraintEntity addQCConstraint(TrustDomainEntity trustDomain,
-			boolean qc);
+    /**
+     * Add a new {@link QCStatementsConstraintEntity} to the specified
+     * {@link TrustDomainEntity}.
+     */
+    QCStatementsConstraintEntity addQCConstraint(TrustDomainEntity trustDomain,
+                                                 boolean qc);
 
-	/**
-	 * Save the specified {@link QCStatementsConstraintEntity}.
-	 */
-	void saveQCConstraint(QCStatementsConstraintEntity qcConstraint);
+    /**
+     * Save the specified {@link QCStatementsConstraintEntity}.
+     */
+    void saveQCConstraint(QCStatementsConstraintEntity qcConstraint);
 
-	/**
-	 * Add a new {@link DNConstraintEntity} to the specified
-	 * {@link TrustDomainEntity}.
-	 */
-	DNConstraintEntity addDNConstraint(TrustDomainEntity trustDomain, String dn);
+    /**
+     * Add a new {@link DNConstraintEntity} to the specified
+     * {@link TrustDomainEntity}.
+     */
+    DNConstraintEntity addDNConstraint(TrustDomainEntity trustDomain, String dn);
 
-	/**
-	 * Save the specified {@link DNConstraintEntity}.
-	 */
-	void saveDNConstraint(DNConstraintEntity dnConstraint);
+    /**
+     * Save the specified {@link DNConstraintEntity}.
+     */
+    void saveDNConstraint(DNConstraintEntity dnConstraint);
 
-	/**
-	 * Add a new {@link TSAConstraintEntity} to the specified
-	 * {@link TrustDomainEntity}.
-	 */
-	TSAConstraintEntity addTSAConstraint(TrustDomainEntity trustDomain);
+    /**
+     * Add a new {@link TSAConstraintEntity} to the specified
+     * {@link TrustDomainEntity}.
+     */
+    TSAConstraintEntity addTSAConstraint(TrustDomainEntity trustDomain);
 
-	/**
-	 * Remove the specified {@link CertificateConstraintEntity}.
-	 */
-	void removeCertificateConstraint(
-			CertificateConstraintEntity certificateConstraint);
+    /**
+     * Remove the specified {@link CertificateConstraintEntity}.
+     */
+    void removeCertificateConstraint(
+            CertificateConstraintEntity certificateConstraint);
 
-	/**
-	 * Add a new {@link TrustDomainEntity}.
-	 * 
-	 * @param name
-	 * @throws TrustDomainAlreadyExistsException
-	 */
-	TrustDomainEntity addTrustDomain(String name)
-			throws TrustDomainAlreadyExistsException;
+    /**
+     * Add a new {@link TrustDomainEntity}.
+     *
+     * @param name
+     * @throws TrustDomainAlreadyExistsException
+     *
+     */
+    TrustDomainEntity addTrustDomain(String name)
+            throws TrustDomainAlreadyExistsException;
 
-	/**
-	 * Add a new {@link VirtualTrustDomainEntity}.
-	 * 
-	 * @param name
-	 * @throws VirtualTrustDomainAlreadyExistsException
-	 * @throws TrustDomainAlreadyExistsException
-	 */
-	VirtualTrustDomainEntity addVirtualTrustDomain(String name)
-			throws VirtualTrustDomainAlreadyExistsException,
-			TrustDomainAlreadyExistsException;
+    /**
+     * Add a new {@link VirtualTrustDomainEntity}.
+     *
+     * @param name
+     * @throws VirtualTrustDomainAlreadyExistsException
+     *
+     * @throws TrustDomainAlreadyExistsException
+     *
+     */
+    VirtualTrustDomainEntity addVirtualTrustDomain(String name)
+            throws VirtualTrustDomainAlreadyExistsException,
+            TrustDomainAlreadyExistsException;
 
-	/**
-	 * Remove the specified {@link TrustDomainEntity}.
-	 * 
-	 * @param trustDomain
-	 */
-	void removeTrustDomain(TrustDomainEntity trustDomain);
+    /**
+     * Remove the specified {@link TrustDomainEntity}.
+     *
+     * @param trustDomain
+     */
+    void removeTrustDomain(TrustDomainEntity trustDomain);
 
-	/**
-	 * Remove the specified {@link VirtualTrustDomainEntity}.
-	 * 
-	 * @param virtualTrustDomain
-	 */
-	void removeVirtualTrustDomain(VirtualTrustDomainEntity virtualTrustDomain);
+    /**
+     * Remove the specified {@link VirtualTrustDomainEntity}.
+     *
+     * @param virtualTrustDomain
+     */
+    void removeVirtualTrustDomain(VirtualTrustDomainEntity virtualTrustDomain);
 
-	/**
-	 * Refresh the specified {@link TrustPointEntity}'s revocation cache
-	 * immediately.
-	 * 
-	 * @param trustPoint
-	 */
-	void refreshTrustPointCache(TrustPointEntity trustPoint);
+    /**
+     * Refresh the specified {@link TrustPointEntity}'s revocation cache
+     * immediately.
+     *
+     * @param trustPoint
+     */
+    void refreshTrustPointCache(TrustPointEntity trustPoint);
 
-	/**
-	 * Refresh the specified {@link CertificateAuthorityEntity}'s revocation
-	 * cache immediately.
-	 * 
-	 * @param ca
-	 * @throws JMSException
-	 */
-	void refreshCACache(CertificateAuthorityEntity ca) throws JMSException;
+    /**
+     * Refresh the specified {@link CertificateAuthorityEntity}'s revocation
+     * cache immediately.
+     *
+     * @param ca
+     * @throws JMSException
+     */
+    void refreshCACache(CertificateAuthorityEntity ca) throws JMSException;
 }

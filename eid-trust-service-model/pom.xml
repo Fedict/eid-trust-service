@@ -58,10 +58,6 @@
 			<artifactId>jtrust</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>quartz</groupId>
-			<artifactId>quartz</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bctsp-jdk16</artifactId>
 		</dependency>
@@ -79,13 +75,9 @@
 			<artifactId>commons-logging-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.javaee</groupId>
-			<artifactId>jboss-ejb-api_3.1</artifactId>
+			<groupId>org.jboss.spec.javax.ejb</groupId>
+			<artifactId>jboss-ejb-api_3.1_spec</artifactId>
 		</dependency>
-		<!--dependency>
-			<groupId>javax.ejb</groupId>
-			<artifactId>ejb-api</artifactId>
-		</dependency-->
 		<dependency>
 			<groupId>org.jboss.ejb3</groupId>
 			<artifactId>jboss-ejb3-ext-api</artifactId>

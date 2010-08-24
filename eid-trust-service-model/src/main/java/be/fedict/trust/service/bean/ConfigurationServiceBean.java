@@ -25,14 +25,12 @@ import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.LocalizationDAO;
 import be.fedict.trust.service.entity.*;
-import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
 import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.SecurityDomain;
-import org.quartz.CronTrigger;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
@@ -103,9 +101,8 @@ public class ConfigurationServiceBean implements ConfigurationService {
      */
     @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
-                                     int timeout, int maxClockOffset, String cron, boolean enabled)
-            throws InvalidCronExpressionException, InvalidTimeoutException,
-            InvalidMaxClockOffsetException {
+                                     int timeout, int maxClockOffset, long interval, boolean enabled)
+            throws InvalidTimeoutException, InvalidMaxClockOffsetException {
 
         LOG.debug("save clock drift detection config");
 
@@ -116,20 +113,14 @@ public class ConfigurationServiceBean implements ConfigurationService {
         if (maxClockOffset < 0) {
             throw new InvalidMaxClockOffsetException();
         }
-        try {
-            new CronTrigger("name", "group", cron);
-        } catch (Exception e) {
-            LOG.error("invalid cron expression");
-            throw new InvalidCronExpressionException(e);
-        }
 
         // save
         ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
                 .setClockDriftConfig(timeProtocol, server, timeout,
-                        maxClockOffset, cron);
+                        maxClockOffset, interval);
         this.configurationDAO.setClockDriftConfigEnabled(enabled);
         if (enabled) {
-            this.schedulingService.startTimer(clockDriftConfig, false);
+            this.schedulingService.startTimer(clockDriftConfig);
         } else {
             this.schedulingService.cancelTimers(clockDriftConfig);
         }

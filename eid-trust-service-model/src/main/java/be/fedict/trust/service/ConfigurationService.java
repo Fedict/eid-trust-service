@@ -18,78 +18,71 @@
 
 package be.fedict.trust.service;
 
-import java.util.List;
-import java.util.Locale;
-
-import javax.ejb.Local;
-
-import be.fedict.trust.service.entity.ClockDriftConfigEntity;
-import be.fedict.trust.service.entity.KeyStoreType;
-import be.fedict.trust.service.entity.NetworkConfigEntity;
-import be.fedict.trust.service.entity.TimeProtocol;
-import be.fedict.trust.service.entity.WSSecurityConfigEntity;
-import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.entity.*;
 import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
 import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
 
+import javax.ejb.Local;
+import java.util.List;
+import java.util.Locale;
+
 /**
  * Configuration service.
- * 
+ *
  * @author wvdhaute
- * 
  */
 @Local
 public interface ConfigurationService {
 
-	/**
-	 * Returns the {@link NetworkConfigEntity}.
-	 */
-	NetworkConfigEntity getNetworkConfig();
+    /**
+     * Returns the {@link NetworkConfigEntity}.
+     */
+    NetworkConfigEntity getNetworkConfig();
 
-	/**
-	 * Save the {@link NetworkConfigEntity}.
-	 */
-	void saveNetworkConfig(String proxyHost, int proxyPort, boolean enabled);
+    /**
+     * Save the {@link NetworkConfigEntity}.
+     */
+    void saveNetworkConfig(String proxyHost, int proxyPort, boolean enabled);
 
-	/**
-	 * Returns the {@link ClockDriftConfigEntity}.
-	 */
-	ClockDriftConfigEntity getClockDriftDetectionConfig();
+    /**
+     * Returns the {@link ClockDriftConfigEntity}.
+     */
+    ClockDriftConfigEntity getClockDriftDetectionConfig();
 
-	/**
-	 * Save the {@link ClockDriftConfigEntity}.
-	 */
-	void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
-			int timeout, int maxClockOffset, String cron, boolean enabled)
-			throws InvalidCronExpressionException, InvalidTimeoutException,
-			InvalidMaxClockOffsetException;
+    /**
+     * Save the {@link ClockDriftConfigEntity}.
+     */
+    void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
+                              int timeout, int maxClockOffset, long interval, boolean enabled)
+            throws InvalidTimeoutException,
+            InvalidMaxClockOffsetException;
 
-	/**
-	 * Returns the {@link WSSecurityConfigEntity}.
-	 */
-	WSSecurityConfigEntity getWSSecurityConfig();
+    /**
+     * Returns the {@link WSSecurityConfigEntity}.
+     */
+    WSSecurityConfigEntity getWSSecurityConfig();
 
-	/**
-	 * Save the {@link WSSecurityConfigEntity}.
-	 */
-	void saveWSSecurityConfig(boolean signing, KeyStoreType keyStoreType,
-			String keyStorePath, String keyStorePassword,
-			String keyEntryPassword, String alias) throws KeyStoreLoadException;
+    /**
+     * Save the {@link WSSecurityConfigEntity}.
+     */
+    void saveWSSecurityConfig(boolean signing, KeyStoreType keyStoreType,
+                              String keyStorePath, String keyStorePassword,
+                              String keyEntryPassword, String alias) throws KeyStoreLoadException;
 
-	/**
-	 * List the languages available for the specified key.
-	 */
-	List<String> listLanguages(String key);
+    /**
+     * List the languages available for the specified key.
+     */
+    List<String> listLanguages(String key);
 
-	/**
-	 * Return the localization text for specified key and {@link Locale}.
-	 * Returns <code>null</code> if not found.
-	 */
-	String findText(String key, Locale locale);
+    /**
+     * Return the localization text for specified key and {@link Locale}.
+     * Returns <code>null</code> if not found.
+     */
+    String findText(String key, Locale locale);
 
-	/**
-	 * Save the specified localization text.
-	 */
-	void saveText(String key, Locale locale, String text);
+    /**
+     * Save the specified localization text.
+     */
+    void saveText(String key, Locale locale, String text);
 }
