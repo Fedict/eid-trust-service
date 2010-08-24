@@ -30,7 +30,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "locali_text")
+@Table(name = "ts_locali_text")
 public class LocalizationTextEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

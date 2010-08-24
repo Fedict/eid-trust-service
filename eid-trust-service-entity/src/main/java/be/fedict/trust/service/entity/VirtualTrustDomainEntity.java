@@ -31,7 +31,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "virt_trust_domain")
+@Table(name = "ts_virt_trust_domain")
 @NamedQueries( {
 		@NamedQuery(name = VirtualTrustDomainEntity.QUERY_LIST_ALL, query = "FROM VirtualTrustDomainEntity"),
 		@NamedQuery(name = VirtualTrustDomainEntity.QUERY_LIST_TRUST_DOMAINS, query = "SELECT vtd.trustDomains "
@@ -40,8 +40,8 @@ public class VirtualTrustDomainEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String QUERY_LIST_ALL = "vtd.list.all";
-	public static final String QUERY_LIST_TRUST_DOMAINS = "vtd.list.td";
+	public static final String QUERY_LIST_ALL = "ts_vtd.list.all";
+	public static final String QUERY_LIST_TRUST_DOMAINS = "ts_vtd.list.td";
 
 	private String name;
 

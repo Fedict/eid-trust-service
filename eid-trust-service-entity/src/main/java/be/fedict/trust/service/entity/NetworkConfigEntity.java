@@ -25,7 +25,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "network_config")
+@Table(name = "ts_network_config")
 public class NetworkConfigEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "clock_drift")
+@Table(name = "ts_clock_drift")
 public class ClockDriftConfigEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

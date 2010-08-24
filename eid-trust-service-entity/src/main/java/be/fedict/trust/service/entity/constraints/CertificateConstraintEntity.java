@@ -41,7 +41,7 @@ import be.fedict.trust.service.entity.TrustDomainEntity;
  * @author wvdhaute
  */
 @Entity
-@Table(name = "cert_contraint")
+@Table(name = "ts_cert_contraint")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class CertificateConstraintEntity implements Serializable {
 

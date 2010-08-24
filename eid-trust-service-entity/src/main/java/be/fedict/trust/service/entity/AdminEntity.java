@@ -40,13 +40,13 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "admin")
+@Table(name = "ts_admin")
 @NamedQueries( { @NamedQuery(name = AdminEntity.QUERY_LIST_ALL, query = "FROM AdminEntity") })
 public class AdminEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String QUERY_LIST_ALL = "admin.all";
+	public static final String QUERY_LIST_ALL = "ts_admin.all";
 
 	private String id;
 	private String name;

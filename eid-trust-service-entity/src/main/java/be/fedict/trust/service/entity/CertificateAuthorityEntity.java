@@ -46,7 +46,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "certificate_authorities")
+@Table(name = "ts_cert_authorities")
 @NamedQueries( {
 		@NamedQuery(name = CertificateAuthorityEntity.QUERY_WHERE_TRUST_POINT, query = "SELECT ca FROM CertificateAuthorityEntity AS ca "
 				+ "WHERE ca.trustPoint = :trustPoint"),
@@ -56,8 +56,8 @@ public class CertificateAuthorityEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String QUERY_WHERE_TRUST_POINT = "ca.q.w.tp";
-	public static final String DELETE_WHERE_TRUST_POINT = "ca.d.w.tp";
+	public static final String QUERY_WHERE_TRUST_POINT = "ts_ca.q.w.tp";
+	public static final String DELETE_WHERE_TRUST_POINT = "ts_ca.d.w.tp";
 
 	private String name;
 

@@ -40,8 +40,8 @@ public class AuditEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String QUERY_LIST_ALL = "audit.all";
-	public static final String REMOVE_ALL = "audit.rem.all";
+	public static final String QUERY_LIST_ALL = "ts_audit.all";
+	public static final String REMOVE_ALL = "ts_audit.rem.all";
 
 	private long id;
 

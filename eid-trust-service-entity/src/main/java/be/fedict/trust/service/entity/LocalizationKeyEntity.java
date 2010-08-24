@@ -31,7 +31,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "locali_key")
+@Table(name = "ts_locali_key")
 public class LocalizationKeyEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

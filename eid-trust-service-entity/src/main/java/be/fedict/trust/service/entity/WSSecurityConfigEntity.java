@@ -27,7 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "wssec_config")
+@Table(name = "ts_wssec_config")
 public class WSSecurityConfigEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

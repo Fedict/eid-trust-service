@@ -36,13 +36,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Entity
-@Table(name = "trust_point")
+@Table(name = "ts_trust_point")
 @NamedQueries( { @NamedQuery(name = TrustPointEntity.QUERY_ALL, query = "FROM TrustPointEntity") })
 public class TrustPointEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String QUERY_ALL = "tp.q.all";
+	public static final String QUERY_ALL = "ts_tp.q.all";
 
 	private String name;
 
