@@ -34,12 +34,16 @@
 			The eID Trust Service provides two major service artifacts:
 			<orderedlist>
 				<listitem>
+					<para>
 					eID Trust Service portal
+					</para>
 					<para>Via this web portal citizens can check the validity of their
 						eID certificates.</para>
 				</listitem>
 				<listitem>
+					<para>
 					eID Trust Service validation web service
+					</para>
 					<para>Via this SOAP web service Relying Parties (aka Service
 						Providers) can check the validity of certificate paths. This web
 						service is constructed according to the W3C XKMS2 web service
@@ -234,13 +238,13 @@
 				The JBoss Application Server offers:
 				<itemizedlist>
 					<listitem>
-						AJP at port: 8009
+						<para>AJP at port: 8009</para>
 					</listitem>
 					<listitem>
-						HTTP at port: 8080
+						<para>HTTP at port: 8080</para>
 					</listitem>
 					<listitem>
-						HTTPS at port: 8443
+						<para>HTTPS at port: 8443</para>
 					</listitem>
 				</itemizedlist>
 				AJP is preferred for the connection between the front-end Apache
@@ -251,10 +255,10 @@
 	</section>
 	<section>
 		<title>Installation</title>
-		<abstract>
+		<para>
 			This chapter explains how to install the Fedict eID Trust Service
 			application.
-		</abstract>
+		</para>
 		<para>
 			The Fedict eID Trust Service has to be run on the
 			<ulink url="http://www.jboss.org/jbossas">JBoss Application Server</ulink>
@@ -320,10 +324,10 @@
 				The Fedict eID Trust Service has been successfully tested on:
 				<itemizedlist>
 					<listitem>
-						MySQL v5.0 and v5.1
+						<para>MySQL v5.0 and v5.1</para>
 					</listitem>
 					<listitem>
-						Oracle 10.2.0.1.0
+						<para>Oracle 10.2.0.1.0</para>
 					</listitem>
 				</itemizedlist>
 			</para>
@@ -355,6 +359,10 @@
 				<programlisting><![CDATA[
 					sudo chkconfig --level 345 mysqld on
 				]]></programlisting>
+				Drop an existing MySQL database via:
+				<programlisting><![CDATA[mysql -u trust -p
+DROP DATABASE trust;
+QUIT;]]></programlisting>
 			</para>
 		</section>
 		<section>
@@ -427,6 +435,18 @@
 				<programlisting><![CDATA[
 					psql -d trust -U trust -W -f postgresql-trust-service-ddl.sql
 				]]></programlisting>
+			</para>
+			<para>
+				Check the database via:
+				<programlisting><![CDATA[psql -d trust -U trust
+SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+\q]]></programlisting>
+			</para>
+			<para>
+				Drop an existing database via:
+				<programlisting><![CDATA[psql -U postgres
+DROP DATABASE trust;
+\q]]></programlisting>
 			</para>
 		</section>
 		<section>
@@ -593,17 +613,17 @@ CreateBalancers 1
 				with 4 trust domains.
 				<orderedlist>
 					<listitem>
-						eID Authentication Trust Domain ( machine domain name BE-AUTH )
+						<para>eID Authentication Trust Domain ( machine domain name BE-AUTH )</para>
 					</listitem>
 					<listitem>
-						eID Non Repudiation Trust Domain ( machine domain name BE )
+						<para>eID Non Repudiation Trust Domain ( machine domain name BE )</para>
 					</listitem>
 					<listitem>
-						eID National Registry Trust Domain ( machine domain name
-						BE-NAT-REG )
+						<para>eID National Registry Trust Domain ( machine domain name
+						BE-NAT-REG )</para>
 					</listitem>
 					<listitem>
-						Belgian TSA Trust Domain ( machine domain name BE-TSA )
+						<para>Belgian TSA Trust Domain ( machine domain name BE-TSA )</para>
 					</listitem>
 				</orderedlist>
 			</para>
@@ -828,7 +848,7 @@ JBOSS_CONF="all"]]></programlisting>
 		</section>
 		<section>
 			<title>Administration Portal</title>
-			<abstract>
+			<para>
 				The Fedict eID Trust Service comes with an administration
 				portal.
 				This
@@ -836,7 +856,7 @@ JBOSS_CONF="all"]]></programlisting>
 				manage
 				trust
 				domains and other aspects of the service.
-			</abstract>
+			</para>
 			<section>
 				<title>Administrator registration</title>
 				<para>
@@ -1010,27 +1030,41 @@ JBOSS_CONF="all"]]></programlisting>
 		<para>
 			<itemizedlist>
 				<listitem>
+					<para>
 					<ulink
 						url="http://java.sun.com/javase/technologies/hotspot/gc/gc_tuning_6.html">JVM GC Tuning</ulink>
+					</para>
 				</listitem>
 				<listitem>
+					<para>
 					<ulink url="http://en.wikipedia.org/wiki/Revocation_list">Certificate Revocation Lists</ulink>
+					</para>
 				</listitem>
 				<listitem>
+					<para>
 					<ulink url="http://en.wikipedia.org/wiki/OCSP">Online Certificate Status Protocol</ulink>
+					</para>
 				</listitem>
 				<listitem>
+					<para>
 					<ulink url="http://en.wikipedia.org/wiki/Time_Stamp_Protocol">Timestamp Protocol</ulink>
+					</para>
 				</listitem>
 				<listitem>
+					<para>
 					<ulink url="http://en.wikipedia.org/wiki/Network_Time_Protocol">Network Time Protocol</ulink>
+					</para>
 				</listitem>
 				<listitem>
+					<para>
 					<ulink
 						url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Server_Configuration_Guide/beta500/html-single/index.html#cluster.chapt">JBoss Clustering</ulink>
+					</para>
 				</listitem>
 				<listitem>
+					<para>
 					<ulink url="http://www.jboss.org/mod_cluster.html">JBoss mod_cluster</ulink>
+					</para>
 				</listitem>
 			</itemizedlist>
 		</para>
