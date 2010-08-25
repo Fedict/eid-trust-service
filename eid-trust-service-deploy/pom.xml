@@ -121,7 +121,7 @@
 				<artifactId>cargo-maven2-plugin</artifactId>
 				<configuration>
 					<container>
-						<containerId>jboss4x</containerId>
+						<containerId>jboss6x</containerId>
 						<type>remote</type>
 					</container>
 				</configuration>
