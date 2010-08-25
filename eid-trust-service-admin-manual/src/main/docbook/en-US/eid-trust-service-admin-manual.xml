@@ -406,6 +406,18 @@ QUIT;]]></programlisting>
 				]]></programlisting>
 			</para>
 			<para>
+				Check whether the PostgreSQL service will be started at boot time via:
+				<programlisting><![CDATA[
+					chkconfig --list postgresql
+				]]></programlisting>
+			</para>
+			<para>
+				Enable the PostgreSQL service via:
+				<programlisting><![CDATA[
+					sudo chkconfig --level 345 postgresql on
+				]]></programlisting>
+			</para>
+			<para>
 				As JPA requires prepared transactions we need to enable this feature
 				on the PostgreSQL database.
 				Change the PostgreSQL configuration file
