@@ -28,13 +28,11 @@ import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
 import be.fedict.trust.xkms2.XKMSConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.ocsp.OCSPResp;
 import org.bouncycastle.tsp.TimeStampToken;
 
 import javax.xml.ws.WebServiceException;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Date;
@@ -70,7 +68,7 @@ public class HAXKMS2Client extends XKMS2Client {
     protected void validate(String trustDomain,
                             List<X509Certificate> certificateChain,
                             boolean returnRevocationData, Date validationDate,
-                            List<OCSPResp> ocspResponses, List<X509CRL> crls,
+                            List<byte[]> ocspResponses, List<byte[]> crls,
                             RevocationValuesType revocationValues,
                             TimeStampToken timeStampToken,
                             CertifiedRolesListType attributeCertificates)
