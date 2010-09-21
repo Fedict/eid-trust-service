@@ -21,8 +21,8 @@ package test.integ.be.fedict.trust;
 import be.fedict.trust.client.TrustServiceDomains;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.client.exception.ValidationFailedException;
-import be.fedict.trust.client.jaxb.xades.v1_3.EncapsulatedPKIDataType;
-import be.fedict.trust.client.jaxb.xades.v1_3.RevocationValuesType;
+import be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType;
+import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
 import be.fedict.trust.xkms2.XKMSConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -94,7 +94,8 @@ public class XKMSRevocationTest {
         // verify OCSP response revocation data
         EncapsulatedPKIDataType ocspData = revocationValues.getOCSPValues()
                 .getEncapsulatedOCSPValue().get(0);
-        OCSPResp ocspResp = new OCSPResp(Base64.decode(ocspData.getValue()));
+//        OCSPResp ocspResp = new OCSPResp(Base64.decode(ocspData.getValue()));
+        OCSPResp ocspResp = new OCSPResp(ocspData.getValue());
         assertNotNull(ocspResp);
         assertEquals(OCSPResponseStatus.SUCCESSFUL, ocspResp.getStatus());
         BasicOCSPResp basicOCSPResp = (BasicOCSPResp) ocspResp
