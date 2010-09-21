@@ -44,6 +44,10 @@ import static org.junit.Assert.fail;
 
 /**
  * eID Trust Service XKMS2 Integration Tests.
+ * <p/>
+ * <p/>
+ * !! Important !!
+ * WS-Security needs to be setup on the eID Trust Service Host testing against for all tests to fail.
  *
  * @author wvdhaute
  */

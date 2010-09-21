@@ -261,6 +261,8 @@ public class InitializationServiceBean implements InitializationService {
 
             this.trustDomainDAO.addCertificatePolicy(trustDomain,
                     "2.16.56.1.1.1.4");
+            this.trustDomainDAO.addCertificatePolicy(trustDomain,
+                    "2.16.56.9.1.1.4");
 
             this.trustDomainDAO.addDNConstraint(trustDomain,
                     "CN=RRN, O=RRN, C=BE");

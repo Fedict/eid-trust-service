@@ -31,7 +31,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.ocsp.BasicOCSPResp;
 import org.bouncycastle.ocsp.OCSPResp;
 import org.bouncycastle.ocsp.SingleResp;
-import org.bouncycastle.util.encoders.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import test.integ.be.fedict.trust.util.TestUtils;
@@ -94,7 +93,6 @@ public class XKMSRevocationTest {
         // verify OCSP response revocation data
         EncapsulatedPKIDataType ocspData = revocationValues.getOCSPValues()
                 .getEncapsulatedOCSPValue().get(0);
-//        OCSPResp ocspResp = new OCSPResp(Base64.decode(ocspData.getValue()));
         OCSPResp ocspResp = new OCSPResp(ocspData.getValue());
         assertNotNull(ocspResp);
         assertEquals(OCSPResponseStatus.SUCCESSFUL, ocspResp.getStatus());
@@ -111,8 +109,7 @@ public class XKMSRevocationTest {
                 .getEncapsulatedCRLValue().get(0);
         CertificateFactory certificateFactory = CertificateFactory.getInstance(
                 "X.509", "BC");
-        ByteArrayInputStream bais = new ByteArrayInputStream(Base64
-                .decode(crlData.getValue()));
+        ByteArrayInputStream bais = new ByteArrayInputStream(crlData.getValue());
         X509CRL crl = (X509CRL) certificateFactory.generateCRL(bais);
         assertNotNull(crl);
 
@@ -154,7 +151,7 @@ public class XKMSRevocationTest {
             fail();
         } catch (ValidationFailedException e) {
             // expected
-            assertEquals(XKMSConstants.KEY_BINDING_REASON_ISSUER_TRUST_URI, e
+            assertEquals(XKMSConstants.KEY_BINDING_REASON_VALIDITY_INTERVAL_URI, e
                     .getReasons().get(0));
         }
     }
