@@ -74,11 +74,12 @@ public class HAXKMS2Client extends XKMS2Client {
                             RevocationValuesType revocationValues,
                             TimeStampToken timeStampToken,
                             CertifiedRolesListType attributeCertificates)
-            throws CertificateEncodingException, ValidationFailedException, TrustDomainNotFoundException,
-            RevocationDataNotFoundException {
+            throws CertificateEncodingException, ValidationFailedException,
+            TrustDomainNotFoundException, RevocationDataNotFoundException {
 
         try {
-            super.validate(trustDomain, certificateChain, returnRevocationData, validationDate, ocspResponses, crls,
+            super.validate(trustDomain, certificateChain, returnRevocationData,
+                    validationDate, ocspResponses, crls,
                     revocationValues, timeStampToken, attributeCertificates);
         } catch (WebServiceException e) {
 
@@ -87,7 +88,8 @@ public class HAXKMS2Client extends XKMS2Client {
         }
     }
 
-    private void fallbackValidate(List<X509Certificate> certificateChain, Date validationDate, CertifiedRolesListType attributeCertificates) throws ValidationFailedException {
+    private void fallbackValidate(List<X509Certificate> certificateChain, Date validationDate,
+                                  CertifiedRolesListType attributeCertificates) throws ValidationFailedException {
 
         LOG.debug("eID Trust Service not available, falling back to specified Trust Validator");
 
@@ -113,7 +115,8 @@ public class HAXKMS2Client extends XKMS2Client {
 
 
         } catch (CertPathValidatorException e) {
-            throw new ValidationFailedException(Collections.singletonList(XKMSConstants.KEY_BINDING_REASON_ISSUER_TRUST_URI));
+            throw new ValidationFailedException(
+                    Collections.singletonList(XKMSConstants.KEY_BINDING_REASON_ISSUER_TRUST_URI));
         }
 
     }

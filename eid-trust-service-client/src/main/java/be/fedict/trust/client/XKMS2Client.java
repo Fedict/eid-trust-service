@@ -114,6 +114,8 @@ public class XKMS2Client {
     /**
      * Set the maximum offset of the WS-Security timestamp ( in ms ). If not
      * specified this will be defaulted to 5 minutes.
+     *
+     * @param maxWSSecurityTimestampOffset maximum WS Security Timestamp offset
      */
     public void setMaxWSSecurityTimestampOffset(
             long maxWSSecurityTimestampOffset) {
@@ -125,6 +127,8 @@ public class XKMS2Client {
     /**
      * If set, unilateral TLS authentication will occurs, verifying the server
      * {@link X509Certificate} specified {@link PublicKey}.
+     *
+     * @param publicKey public key to validate server TLS certificate against.
      */
     public void setServicePublicKey(final PublicKey publicKey) {
 
@@ -144,8 +148,9 @@ public class XKMS2Client {
                         + serverCertificate.getSubjectX500Principal()
                         .toString());
                 LOG.debug("authentication type: " + authType);
-                if (null == publicKey)
+                if (null == publicKey) {
                     return;
+                }
 
                 try {
                     serverCertificate.verify(publicKey);
@@ -274,8 +279,40 @@ public class XKMS2Client {
      * domain using historical validation using the specified revocation data.
      */
     public void validate(String trustDomain,
-                         List<X509Certificate> certificateChain, Date validationDate,
-                         List<OCSPResp> ocspResponses, List<X509CRL> crls)
+                          List<X509Certificate> certificateChain, Date validationDate,
+                          List<OCSPResp> ocspResponses, List<X509CRL> crls)
+            throws CertificateEncodingException, TrustDomainNotFoundException,
+            RevocationDataNotFoundException, ValidationFailedException {
+
+        try {
+            List<byte[]> encodedOcspResponses = new LinkedList<byte[]>();
+            List<byte[]> encodedCrls = new LinkedList<byte[]>();
+            for (OCSPResp ocspResponse : ocspResponses) {
+                encodedOcspResponses.add(ocspResponse.getEncoded());
+            }
+            for (X509CRL crl : crls) {
+                encodedCrls.add(crl.getEncoded());
+            }
+
+            validate(trustDomain, certificateChain, false, validationDate,
+                    encodedOcspResponses, encodedCrls, null, null, null);
+        } catch (IOException e) {
+            LOG.error("Failed to get encoded OCSPResponse: " + e.getMessage(), e);
+            throw new RuntimeException(e);
+        } catch (CRLException e) {
+            LOG.error("Failed to get encoded CRL: " + e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Validate the specified certificate chain against the specified trust
+     * domain using historical validation using the specified revocation data.
+     */
+    public void validateEncoded(String trustDomain,
+                                List<X509Certificate> certificateChain,
+                                Date validationDate,
+                                List<byte[]> ocspResponses, List<byte[]> crls)
             throws CertificateEncodingException, TrustDomainNotFoundException,
             RevocationDataNotFoundException, ValidationFailedException {
 
@@ -348,7 +385,7 @@ public class XKMS2Client {
     protected void validate(String trustDomain,
                             List<X509Certificate> certificateChain,
                             boolean returnRevocationData, Date validationDate,
-                            List<OCSPResp> ocspResponses, List<X509CRL> crls,
+                            List<byte[]> ocspResponses, List<byte[]> crls,
                             RevocationValuesType revocationValues,
                             TimeStampToken timeStampToken,
                             CertifiedRolesListType attributeCertificates)
@@ -473,7 +510,7 @@ public class XKMS2Client {
      * {@link X509CRL} objects or from specified {@link RevocationValuesType}.
      */
     private void addRevocationData(ValidateRequestType validateRequest,
-                                   List<OCSPResp> ocspResponses, List<X509CRL> crls,
+                                   List<byte[]> ocspResponses, List<byte[]> crls,
                                    RevocationValuesType revocationData) {
 
         be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
@@ -491,30 +528,20 @@ public class XKMS2Client {
             // OCSP
             OCSPValuesType ocspValues = xadesObjectFactory
                     .createOCSPValuesType();
-            for (OCSPResp ocspResponse : ocspResponses) {
+            for (byte[] ocspResponse : ocspResponses) {
                 EncapsulatedPKIDataType ocspValue = xadesObjectFactory
                         .createEncapsulatedPKIDataType();
-                try {
-                    ocspValue.setValue(ocspResponse.getEncoded());
-                } catch (IOException e) {
-                    LOG.error("IOException: " + e.getMessage(), e);
-                    throw new RuntimeException(e);
-                }
+                ocspValue.setValue(ocspResponse);
                 ocspValues.getEncapsulatedOCSPValue().add(ocspValue);
             }
             revocationValues.setOCSPValues(ocspValues);
 
             // CRL
             CRLValuesType crlValues = xadesObjectFactory.createCRLValuesType();
-            for (X509CRL crl : crls) {
+            for (byte[] crl : crls) {
                 EncapsulatedPKIDataType crlValue = xadesObjectFactory
                         .createEncapsulatedPKIDataType();
-                try {
-                    crlValue.setValue(crl.getEncoded());
-                } catch (CRLException e) {
-                    LOG.error("CRLException: " + e.getMessage(), e);
-                    throw new RuntimeException(e);
-                }
+                crlValue.setValue(crl);
                 crlValues.getEncapsulatedCRLValue().add(crlValue);
             }
             revocationValues.setCRLValues(crlValues);
