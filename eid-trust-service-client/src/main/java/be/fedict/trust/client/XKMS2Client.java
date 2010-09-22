@@ -279,10 +279,15 @@ public class XKMS2Client {
      * domain using historical validation using the specified revocation data.
      */
     public void validate(String trustDomain,
-                          List<X509Certificate> certificateChain, Date validationDate,
-                          List<OCSPResp> ocspResponses, List<X509CRL> crls)
+                         List<X509Certificate> certificateChain, Date validationDate,
+                         List<OCSPResp> ocspResponses, List<X509CRL> crls)
             throws CertificateEncodingException, TrustDomainNotFoundException,
             RevocationDataNotFoundException, ValidationFailedException {
+
+        if ((null == ocspResponses || ocspResponses.isEmpty()) && (null == crls || crls.isEmpty())) {
+            LOG.error("No revocation data for historical validation.");
+            throw new RevocationDataNotFoundException();
+        }
 
         try {
             List<byte[]> encodedOcspResponses = new LinkedList<byte[]>();
@@ -316,6 +321,11 @@ public class XKMS2Client {
             throws CertificateEncodingException, TrustDomainNotFoundException,
             RevocationDataNotFoundException, ValidationFailedException {
 
+        if ((null == ocspResponses || ocspResponses.isEmpty()) && (null == crls || crls.isEmpty())) {
+            LOG.error("No revocation data for historical validation.");
+            throw new RevocationDataNotFoundException();
+        }
+
         validate(trustDomain, certificateChain, false, validationDate,
                 ocspResponses, crls, null, null, null);
     }
@@ -329,6 +339,11 @@ public class XKMS2Client {
                          RevocationValuesType revocationValues)
             throws CertificateEncodingException, TrustDomainNotFoundException,
             RevocationDataNotFoundException, ValidationFailedException {
+
+        if (null == revocationValues) {
+            LOG.error("No revocation data for historical validation.");
+            throw new RevocationDataNotFoundException();
+        }
 
         validate(trustDomain, certificateChain, false, validationDate, null,
                 null, revocationValues, null, null);

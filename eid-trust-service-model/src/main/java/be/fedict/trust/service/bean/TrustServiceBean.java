@@ -406,7 +406,7 @@ public class TrustServiceBean implements TrustService {
             CertificateException, NoSuchProviderException, CRLException {
 
         LOG
-                .debug("get trust validator using specified ocsp repsonses and crls");
+                .debug("get trust validator using specified ocsp responses and crls");
 
         TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(
                 trustDomain);

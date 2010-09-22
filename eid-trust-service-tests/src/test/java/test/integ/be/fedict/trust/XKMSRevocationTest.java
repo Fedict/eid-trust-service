@@ -20,6 +20,7 @@ package test.integ.be.fedict.trust;
 
 import be.fedict.trust.client.TrustServiceDomains;
 import be.fedict.trust.client.XKMS2Client;
+import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.ValidationFailedException;
 import be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType;
 import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
@@ -40,10 +41,7 @@ import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -59,6 +57,66 @@ public class XKMSRevocationTest {
     @Before
     public void setUp() {
         Security.addProvider(new BouncyCastleProvider());
+    }
+
+    @Test
+    public void testHistoricalValidationWithoutRevocationData()
+            throws Exception {
+
+        LOG.debug("historical validation without return revocation data.");
+
+        // setup
+        List<X509Certificate> signCertificateChain = TestUtils
+                .getSignCertificateChain();
+        XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+        Date validationDate = new Date();
+
+        // operate: validate without passing revocation data.
+        try {
+            client.validate(
+                    TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+                    signCertificateChain, validationDate, new LinkedList<OCSPResp>(), new LinkedList<X509CRL>());
+            fail();
+        } catch (RevocationDataNotFoundException e) {
+            // expected
+        }
+        try {
+            client.validate(
+                    TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+                    signCertificateChain, validationDate, null, null);
+            fail();
+        } catch (RevocationDataNotFoundException e) {
+            // expected
+        }
+
+        // operate: validate without passing encoded revocation data.
+        try {
+            client.validateEncoded(
+                    TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+                    signCertificateChain, validationDate, new LinkedList<byte[]>(), new LinkedList<byte[]>());
+            fail();
+        } catch (RevocationDataNotFoundException e) {
+            // expected
+        }
+        try {
+            client.validateEncoded(
+                    TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+                    signCertificateChain, validationDate, null, null);
+            fail();
+        } catch (RevocationDataNotFoundException e) {
+            // expected
+        }
+
+        // operate: validate without passing revocation values.
+        try {
+            client.validate(
+                    TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+                    signCertificateChain, validationDate, null);
+            fail();
+        } catch (RevocationDataNotFoundException e) {
+            // expected
+        }
+
     }
 
     @Test
