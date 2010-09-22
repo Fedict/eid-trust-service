@@ -18,6 +18,7 @@
 
 package be.fedict.trust.client;
 
+import be.fedict.trust.client.exception.RevocationDataCorruptException;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.client.exception.ValidationFailedException;
@@ -48,6 +49,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.*;
@@ -319,11 +321,32 @@ public class XKMS2Client {
                                 Date validationDate,
                                 List<byte[]> ocspResponses, List<byte[]> crls)
             throws CertificateEncodingException, TrustDomainNotFoundException,
-            RevocationDataNotFoundException, ValidationFailedException {
+            RevocationDataNotFoundException, ValidationFailedException,
+            RevocationDataCorruptException {
 
         if ((null == ocspResponses || ocspResponses.isEmpty()) && (null == crls || crls.isEmpty())) {
             LOG.error("No revocation data for historical validation.");
             throw new RevocationDataNotFoundException();
+        }
+
+        try {
+            // check encoded OCSP response are valid
+            for (byte[] encodedOcspResponse : ocspResponses) {
+                new OCSPResp(encodedOcspResponse);
+            }
+            // check encoded CRLs are valid
+            CertificateFactory certificateFactory = CertificateFactory.getInstance(
+                    "X.509");
+            for (byte[] encodedCrl : crls) {
+                ByteArrayInputStream bais = new ByteArrayInputStream(encodedCrl);
+                certificateFactory.generateCRL(bais);
+            }
+        } catch (IOException e) {
+            throw new RevocationDataCorruptException("Invalid OCSP response", e);
+        } catch (CRLException e) {
+            throw new RevocationDataCorruptException("Invalid CRL", e);
+        } catch (CertificateException e) {
+            throw new RevocationDataCorruptException(e);
         }
 
         validate(trustDomain, certificateChain, false, validationDate,

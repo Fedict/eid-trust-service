@@ -20,6 +20,7 @@ package test.integ.be.fedict.trust;
 
 import be.fedict.trust.client.TrustServiceDomains;
 import be.fedict.trust.client.XKMS2Client;
+import be.fedict.trust.client.exception.RevocationDataCorruptException;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.ValidationFailedException;
 import be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType;
@@ -54,9 +55,53 @@ public class XKMSRevocationTest {
 
     private static final Log LOG = LogFactory.getLog(XKMSRevocationTest.class);
 
+    private List<X509Certificate> signCertificateChain;
+
+    private XKMS2Client client;
+
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         Security.addProvider(new BouncyCastleProvider());
+
+        signCertificateChain = TestUtils.getSignCertificateChain();
+        client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+    }
+
+    @Test
+    public void testHistoricalValidationCorruptRevocationData()
+            throws Exception {
+
+        LOG.debug("historical validation with corrupt revocation data.");
+
+        // setup
+        Date validationDate = new Date();
+        byte[] corruptOcspResponse = new byte[]{'f', 'o', 'o'};
+        byte[] corruptCrl = new byte[]{'f', 'o', 'o'};
+
+        // operate: validate with corrupt OCSP response
+        try {
+            client.validateEncoded(
+                    TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+                    signCertificateChain, validationDate,
+                    Collections.singletonList(corruptOcspResponse),
+                    new LinkedList<byte[]>());
+            fail();
+        } catch (RevocationDataCorruptException e) {
+            // expected
+        }
+
+        // operate: validate with corrupt CRL
+        try {
+            client.validateEncoded(
+                    TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+                    signCertificateChain, validationDate,
+                    new LinkedList<byte[]>(),
+                    Collections.singletonList(corruptCrl));
+            fail();
+        } catch (RevocationDataCorruptException e) {
+            // expected
+        }
+
     }
 
     @Test
@@ -66,9 +111,6 @@ public class XKMSRevocationTest {
         LOG.debug("historical validation without return revocation data.");
 
         // setup
-        List<X509Certificate> signCertificateChain = TestUtils
-                .getSignCertificateChain();
-        XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
         Date validationDate = new Date();
 
         // operate: validate without passing revocation data.
@@ -126,9 +168,6 @@ public class XKMSRevocationTest {
                 .debug("validate eID non repudiation certificate and return revocation data.");
 
         // setup
-        List<X509Certificate> signCertificateChain = TestUtils
-                .getSignCertificateChain();
-        XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
         Date validationDate = new Date();
 
         /*
