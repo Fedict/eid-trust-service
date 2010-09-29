@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>FedICT eID Trust Service Project</name>
@@ -19,7 +20,8 @@
     <packaging>pom</packaging>
     <inceptionYear>2009</inceptionYear>
     <scm>
-        <developerConnection>scm:svn:https://eid-trust-service.googlecode.com/svn/trunk
+        <developerConnection>
+            scm:svn:https://eid-trust-service.googlecode.com/svn/trunk
         </developerConnection>
     </scm>
     <modules>
@@ -82,7 +84,8 @@
                 <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect
                 </hibernate.dialect>
                 <hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
-                <eid-applet.SkipSecureConnectionCheck>true</eid-applet.SkipSecureConnectionCheck>
+                <eid-applet.SkipSecureConnectionCheck>true
+                </eid-applet.SkipSecureConnectionCheck>
             </properties>
             <modules>
                 <module>eid-trust-service-oracle-distribution</module>
@@ -98,9 +101,11 @@
                 </property>
             </activation>
             <properties>
-                <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
+                <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect
+                </hibernate.dialect>
                 <hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
-                <hibernate.jdbc.use_streams_for_binary>false</hibernate.jdbc.use_streams_for_binary>
+                <hibernate.jdbc.use_streams_for_binary>false
+                </hibernate.jdbc.use_streams_for_binary>
             </properties>
             <modules>
                 <module>eid-trust-service-postgresql-distribution</module>
@@ -283,8 +288,10 @@
         <trust-service.data.source.pass>trust</trust-service.data.source.pass>
         <hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
         <hibernate.hbm2ddl.auto>create-drop</hibernate.hbm2ddl.auto>
-        <hibernate.jdbc.use_streams_for_binary>true</hibernate.jdbc.use_streams_for_binary>
-        <eid-applet.SkipSecureConnectionCheck>false</eid-applet.SkipSecureConnectionCheck>
+        <hibernate.jdbc.use_streams_for_binary>true
+        </hibernate.jdbc.use_streams_for_binary>
+        <eid-applet.SkipSecureConnectionCheck>false
+        </eid-applet.SkipSecureConnectionCheck>
     </properties>
 
 

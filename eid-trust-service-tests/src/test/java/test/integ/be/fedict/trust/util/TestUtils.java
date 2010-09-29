@@ -428,6 +428,36 @@ public class TestUtils {
         }
     }
 
+    public static X509V2CRLGenerator getCrlGenerator(X509Certificate issuerCertificate,
+                                                     DateTime thisUpdate,
+                                                     DateTime nextUpdate,
+                                                     List<BigInteger> revokedCertificateSerialNumbers)
+            throws CertificateParsingException {
+
+        X509V2CRLGenerator crlGenerator = new X509V2CRLGenerator();
+        crlGenerator.setThisUpdate(thisUpdate.toDate());
+        crlGenerator.setNextUpdate(nextUpdate.toDate());
+        crlGenerator.setSignatureAlgorithm("SHA1withRSA");
+        crlGenerator.setIssuerDN(issuerCertificate.getSubjectX500Principal());
+
+        List<RevokedCertificate> revokedCertificates = new LinkedList<RevokedCertificate>();
+        for (BigInteger revokedCertificateSerialNumber : revokedCertificateSerialNumbers) {
+            revokedCertificates.add(new RevokedCertificate(
+                    revokedCertificateSerialNumber, thisUpdate));
+        }
+        for (RevokedCertificate revokedCertificate : revokedCertificates) {
+            crlGenerator.addCRLEntry(revokedCertificate.serialNumber,
+                    revokedCertificate.revocationDate.toDate(),
+                    CRLReason.privilegeWithdrawn);
+        }
+
+        crlGenerator.addExtension(X509Extensions.AuthorityKeyIdentifier, false,
+                new AuthorityKeyIdentifierStructure(issuerCertificate));
+        crlGenerator.addExtension(X509Extensions.CRLNumber, false,
+                new CRLNumber(BigInteger.ONE));
+        return crlGenerator;
+    }
+
     public static X509CRL generateCrl2(PrivateKey issuerPrivateKey,
                                        X509Certificate issuerCertificate, DateTime thisUpdate,
                                        DateTime nextUpdate,
