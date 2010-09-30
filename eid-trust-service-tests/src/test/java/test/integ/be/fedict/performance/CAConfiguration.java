@@ -21,7 +21,6 @@ package test.integ.be.fedict.performance;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.x509.X509V2CRLGenerator;
 import org.joda.time.DateTime;
 import test.integ.be.fedict.performance.servlet.CrlServlet;
 import test.integ.be.fedict.performance.servlet.OcspServlet;
@@ -43,6 +42,7 @@ public class CAConfiguration implements Serializable {
 
     private final String name;
     private long crlRecords;
+    private int crlRefresh; // in minutes
 
     private CAConfiguration root;
     private List<CAConfiguration> childs;
@@ -50,12 +50,15 @@ public class CAConfiguration implements Serializable {
     private X509Certificate certificate;
     private X509CRL crl;
 
-    private X509V2CRLGenerator crlGenerator;
+    // CRL config data
+    private DateTime crlNextUpdate;
+    private int crlNumber = 1;
 
-    public CAConfiguration(String name, long crlRecords) {
+    public CAConfiguration(String name, long crlRecords, int crlRefresh) {
 
         this.name = name;
         this.crlRecords = crlRecords;
+        this.crlRefresh = crlRefresh;
         this.childs = new LinkedList<CAConfiguration>();
     }
 
@@ -69,6 +72,14 @@ public class CAConfiguration implements Serializable {
 
     public void setCrlRecords(long crlRecords) {
         this.crlRecords = crlRecords;
+    }
+
+    public int getCrlRefresh() {
+        return crlRefresh;
+    }
+
+    public void setCrlRefresh(int crlRefresh) {
+        this.crlRefresh = crlRefresh;
     }
 
     public CAConfiguration getRoot() {
@@ -95,12 +106,22 @@ public class CAConfiguration implements Serializable {
         this.certificate = certificate;
     }
 
-    public X509CRL getCrl() {
-        return crl;
-    }
+    public X509CRL getCrl() throws Exception {
 
-    public X509V2CRLGenerator getCrlGenerator() {
-        return crlGenerator;
+        if (this.crlRefresh > 0) {
+            DateTime now = new DateTime();
+            if (now.isAfter(this.crlNextUpdate)) {
+                // time's up, generate me a new one!
+                this.crlNextUpdate = now.plusMinutes(this.crlRefresh);
+                this.crlNumber++;
+                LOG.debug("generate new CRL for CA=" + this.name + " (nextUpdate="
+                        + this.crlNextUpdate.toString() + " crlNumber=" + this.crlNumber + ")");
+
+                this.crl = generateCrl();
+            }
+        }
+
+        return crl;
     }
 
     public List<CAConfiguration> getChilds() {
@@ -125,8 +146,7 @@ public class CAConfiguration implements Serializable {
         }
 
         // crl
-        this.crlGenerator = createCrlGenerator();
-        this.crl = this.crlGenerator.generate(this.keyPair.getPrivate());
+        this.crl = generateCrl();
 
         // generate childs
         for (CAConfiguration child : childs) {
@@ -156,21 +176,22 @@ public class CAConfiguration implements Serializable {
                 new BigInteger(Long.toString(maxRevokedSn + 1)));
     }
 
-    private X509V2CRLGenerator createCrlGenerator() throws Exception {
+    private X509CRL generateCrl() throws Exception {
 
         DateTime now = new DateTime();
-        DateTime thisUpdate = now.minusHours(3);
-        DateTime nextUpdate = now.plusHours(3);
+        if (this.crlRefresh > 0) {
+            crlNextUpdate = now.plusMinutes(this.crlRefresh);
+        } else {
+            crlNextUpdate = now.plusHours(3);
+        }
+
 
         List<BigInteger> revokedSerialNumbers = new LinkedList<BigInteger>();
         for (long i = 0; i < this.crlRecords; i++) {
             revokedSerialNumbers.add(new BigInteger(Long.toString(i)));
         }
 
-        //        crlGenerator.addExtension(X509Extensions.CRLNumber, false,
-        //                new CRLNumber(BigInteger.ONE));
-
-
-        return TestUtils.getCrlGenerator(certificate, thisUpdate, nextUpdate, revokedSerialNumbers);
+        return TestUtils.generateCrl(crlNumber, this.keyPair.getPrivate(),
+                certificate, now, crlNextUpdate, revokedSerialNumbers);
     }
 }

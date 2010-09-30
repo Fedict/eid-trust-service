@@ -48,14 +48,14 @@ public class TestPKIStartup {
     public void testCA() throws Exception {
 
         // some default PKI setup
-        TestPKI.get().addSaveCa("root1", null, 0);
+        TestPKI.get().addSaveCa("root1", null, 0, 0);
 
-        TestPKI.get().addSaveCa("CA1", "root1", 200000);
-        TestPKI.get().addSaveCa("CA2", "root1", 150000);
-        TestPKI.get().addSaveCa("CA3", "root1", 100000);
-        TestPKI.get().addSaveCa("CA4", "root1", 50000);
-        TestPKI.get().addSaveCa("CA5", "root1", 25000);
-        TestPKI.get().addSaveCa("CA6", "root1", 10000);
+        TestPKI.get().addSaveCa("CA1", "root1", 50000, 10);
+        TestPKI.get().addSaveCa("CA2", "root1", 30000, 10);
+        TestPKI.get().addSaveCa("CA3", "root1", 25000, 10);
+        TestPKI.get().addSaveCa("CA4", "root1", 20000, 10);
+        TestPKI.get().addSaveCa("CA5", "root1", 15000, 10);
+        TestPKI.get().addSaveCa("CA6", "root1", 10000, 10);
 
         while (true) {
             Thread.sleep(1000);

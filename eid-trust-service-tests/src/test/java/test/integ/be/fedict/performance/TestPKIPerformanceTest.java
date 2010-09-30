@@ -135,7 +135,7 @@ public class TestPKIPerformanceTest implements PerformanceTest {
         String caString;
         while (null != (caString = br.readLine())) {
             String[] fields = caString.split(ConfigurationServlet.FIELD_SEPERATOR);
-            testPKI.addSaveCa(fields[0], fields[1], Long.parseLong(fields[2]));
+            testPKI.addSaveCa(fields[0], fields[1], Long.parseLong(fields[2]), Integer.parseInt(fields[3]));
         }
 
         // now get private keys and certificates

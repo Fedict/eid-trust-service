@@ -44,8 +44,7 @@ public class TestPKI {
     private List<String> servletPaths;
 
     // PKI configuration
-    private int crlRefresh; // in minutes
-    private Map<String, CAConfiguration> rootCaConfigurations;
+    private Map<String, CAConfiguration> rootCas;
 
     public static TestPKI get() {
         return testPKI;
@@ -53,7 +52,7 @@ public class TestPKI {
 
     public TestPKI() {
 
-        this.rootCaConfigurations = new HashMap<String, CAConfiguration>();
+        this.rootCas = new HashMap<String, CAConfiguration>();
     }
 
     /**
@@ -146,14 +145,14 @@ public class TestPKI {
     }
 
     public Map<String, CAConfiguration> getRoots() {
-        return this.rootCaConfigurations;
+        return this.rootCas;
     }
 
     public List<CAConfiguration> getLeaves() {
 
         List<CAConfiguration> leaves = new LinkedList<CAConfiguration>();
 
-        for (CAConfiguration rootCa : this.rootCaConfigurations.values()) {
+        for (CAConfiguration rootCa : this.rootCas.values()) {
             leaves.addAll(getLeaves(rootCa));
         }
         return leaves;
@@ -178,38 +177,42 @@ public class TestPKI {
      * @param name       CA name
      * @param root       optional root CA
      * @param crlRecords # of CRL records to generate
+     * @param crlRefresh CRL refresh in minutes
      * @throws Exception root CA not found, CA already existing, ...
      */
-    public void addSaveCa(String name, String root, long crlRecords) throws Exception {
+    public void addSaveCa(String name, String root, long crlRecords, int crlRefresh) throws Exception {
 
-        LOG.debug("Add/Save CA: " + name + " root=" + root + " crlRecords=" + crlRecords);
+        LOG.debug("Add/Save CA: " + name + " root=" + root
+                + " crlRecords=" + crlRecords + " crlRefresh=" + crlRefresh);
 
 
         // find root if needed
-        CAConfiguration rootCaConfiguration = null;
+        CAConfiguration rootCa = null;
         if (null != root && !root.isEmpty()) {
-            rootCaConfiguration = findCa(root);
-            if (null == rootCaConfiguration) {
+            rootCa = findCa(root);
+            if (null == rootCa) {
                 throw new Exception("Root CA " + root + " not found");
             }
         }
 
         // add/save new config
-        CAConfiguration caConfiguration = findCa(name);
-        if (null == caConfiguration) {
-            caConfiguration = new CAConfiguration(name, crlRecords);
+        CAConfiguration ca = findCa(name);
+        if (null == ca) {
+            ca = new CAConfiguration(name, crlRecords, crlRefresh);
         } else {
-            caConfiguration.setCrlRecords(crlRecords);
+            ca.setCrlRecords(crlRecords);
+            ca.setCrlRefresh(crlRefresh);
+
         }
 
         // set root/childs
-        caConfiguration.setRoot(rootCaConfiguration);
-        if (null != rootCaConfiguration) {
-            if (!rootCaConfiguration.getChilds().contains(caConfiguration)) {
-                rootCaConfiguration.getChilds().add(caConfiguration);
+        ca.setRoot(rootCa);
+        if (null != rootCa) {
+            if (!rootCa.getChilds().contains(ca)) {
+                rootCa.getChilds().add(ca);
             }
         } else {
-            rootCaConfigurations.put(name, caConfiguration);
+            rootCas.put(name, ca);
         }
     }
 
@@ -223,13 +226,13 @@ public class TestPKI {
         LOG.debug("remove CA configuration: " + caName);
 
         // check roots
-        if (null != rootCaConfigurations.get(caName)) {
-            rootCaConfigurations.remove(caName);
+        if (null != rootCas.get(caName)) {
+            rootCas.remove(caName);
             return;
         }
 
         // nope, check deeper
-        for (CAConfiguration root : rootCaConfigurations.values()) {
+        for (CAConfiguration root : rootCas.values()) {
             removeCa(caName, root);
         }
     }
@@ -261,13 +264,13 @@ public class TestPKI {
     public CAConfiguration findCa(String caName) {
 
         // check roots
-        CAConfiguration caConfig = rootCaConfigurations.get(caName);
+        CAConfiguration caConfig = rootCas.get(caName);
         if (null != caConfig) {
             return caConfig;
         }
 
         // nope, check deeper
-        for (CAConfiguration root : rootCaConfigurations.values()) {
+        for (CAConfiguration root : rootCas.values()) {
             caConfig = findCa(caName, root);
             if (null != caConfig) {
                 return caConfig;
@@ -301,7 +304,7 @@ public class TestPKI {
 
         LOG.debug("generate");
 
-        for (CAConfiguration caConfig : rootCaConfigurations.values()) {
+        for (CAConfiguration caConfig : rootCas.values()) {
             caConfig.generate();
         }
 

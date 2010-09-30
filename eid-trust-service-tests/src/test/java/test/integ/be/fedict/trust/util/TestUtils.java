@@ -445,7 +445,7 @@ public class TestUtils {
         }
     }
 
-    public static X509V2CRLGenerator getCrlGenerator(X509Certificate issuerCertificate,
+    public static X509V2CRLGenerator getCrlGenerator(int crlNumber, X509Certificate issuerCertificate,
                                                      DateTime thisUpdate,
                                                      DateTime nextUpdate,
                                                      List<BigInteger> revokedCertificateSerialNumbers)
@@ -471,25 +471,21 @@ public class TestUtils {
         crlGenerator.addExtension(X509Extensions.AuthorityKeyIdentifier, false,
                 new AuthorityKeyIdentifierStructure(issuerCertificate));
         crlGenerator.addExtension(X509Extensions.CRLNumber, false,
-                new CRLNumber(BigInteger.ONE));
+                new CRLNumber(new BigInteger(Integer.toString(crlNumber))));
         return crlGenerator;
     }
 
-    public static X509CRL generateCrl2(PrivateKey issuerPrivateKey,
-                                       X509Certificate issuerCertificate, DateTime thisUpdate,
-                                       DateTime nextUpdate,
-                                       List<BigInteger> revokedCertificateSerialNumbers)
+    public static X509CRL generateCrl(int crlNumber, PrivateKey issuerPrivateKey,
+                                      X509Certificate issuerCertificate, DateTime thisUpdate,
+                                      DateTime nextUpdate,
+                                      List<BigInteger> revokedCertificateSerialNumbers)
             throws InvalidKeyException, CRLException, IllegalStateException,
             NoSuchAlgorithmException, SignatureException,
             CertificateParsingException {
 
-        List<RevokedCertificate> revokedCertificates = new LinkedList<RevokedCertificate>();
-        for (BigInteger revokedCertificateSerialNumber : revokedCertificateSerialNumbers) {
-            revokedCertificates.add(new RevokedCertificate(
-                    revokedCertificateSerialNumber, thisUpdate));
-        }
-        return generateCrl(issuerPrivateKey, issuerCertificate, thisUpdate,
-                nextUpdate, null, false, revokedCertificates, "SHA1withRSA");
+        X509V2CRLGenerator crlGenerator = getCrlGenerator(crlNumber,
+                issuerCertificate, thisUpdate, nextUpdate, revokedCertificateSerialNumbers);
+        return crlGenerator.generate(issuerPrivateKey);
     }
 
     public static X509CRL generateCrl(PrivateKey issuerPrivateKey,

@@ -43,10 +43,12 @@ public class ConfigurationServlet extends HttpServlet {
     private static final String CA_NAME_FIELD = "ca_name_";
     private static final String CA_ROOT_FIELD = "ca_root_";
     private static final String CA_CRL_RECORDS_FIELD = "ca_crl_records_";
+    private static final String CA_CRL_REFRESH_FIELD = "ca_crl_refresh";
 
     private static final String CA_NAME_LABEL = "CA Name";
     private static final String CA_ROOT_LABEL = "CA Root";
     private static final String CA_CRL_RECORD_LABEL = "# CRL records";
+    private static final String CA_CRL_REFRESH_LABEL = "CRL refresh (mins)";
 
     public static final String ACTION = "action";
 
@@ -168,9 +170,13 @@ public class ConfigurationServlet extends HttpServlet {
     }
 
     private void outputCa(PrintWriter out, CAConfiguration ca) {
-        out.print(ca.getName() + FIELD_SEPERATOR);
-        out.print((null == ca.getRoot() ? "" : ca.getRoot().getName()) + FIELD_SEPERATOR);
+        out.print(ca.getName());
+        out.print(FIELD_SEPERATOR);
+        out.print((null == ca.getRoot() ? "" : ca.getRoot().getName()));
+        out.print(FIELD_SEPERATOR);
         out.print(ca.getCrlRecords());
+        out.print(FIELD_SEPERATOR);
+        out.print(ca.getCrlRefresh());
         out.println();
     }
 
@@ -181,16 +187,21 @@ public class ConfigurationServlet extends HttpServlet {
         String name = request.getParameter(CA_NAME_FIELD);
         String root = request.getParameter(CA_ROOT_FIELD);
         String crlRecordsString = request.getParameter(CA_CRL_RECORDS_FIELD);
+        String crlRefreshString = request.getParameter(CA_CRL_REFRESH_FIELD);
         long crlRecords = 0;
         if (!crlRecordsString.isEmpty()) {
             crlRecords = Long.parseLong(crlRecordsString);
+        }
+        int crlRefresh = 0;
+        if (!crlRefreshString.isEmpty()) {
+            crlRefresh = Integer.parseInt(crlRefreshString);
         }
 
         if (null != TestPKI.get().findCa(name)) {
             throw new Exception("CA " + name + " already exists");
         }
 
-        TestPKI.get().addSaveCa(name, root, crlRecords);
+        TestPKI.get().addSaveCa(name, root, crlRecords, crlRefresh);
     }
 
     private void onDeleteConfig(HttpServletRequest request) throws Exception {
@@ -206,12 +217,17 @@ public class ConfigurationServlet extends HttpServlet {
         String name = getName(request);
         String root = request.getParameter(CA_ROOT_FIELD + name);
         String crlRecordsString = request.getParameter(CA_CRL_RECORDS_FIELD + name);
+        String crlRefreshString = request.getParameter(CA_CRL_REFRESH_FIELD + name);
         long crlRecords = 0;
         if (!crlRecordsString.isEmpty()) {
             crlRecords = Long.parseLong(crlRecordsString);
         }
+        int crlRefresh = 0;
+        if (!crlRefreshString.isEmpty()) {
+            crlRefresh = Integer.parseInt(crlRefreshString);
+        }
 
-        TestPKI.get().addSaveCa(name, root, crlRecords);
+        TestPKI.get().addSaveCa(name, root, crlRecords, crlRefresh);
     }
 
     private String getName(HttpServletRequest request) throws ServletException {
@@ -249,6 +265,7 @@ public class ConfigurationServlet extends HttpServlet {
         addTextInput(out, CA_ROOT_LABEL, CA_ROOT_FIELD, "");
         addTextInput(out, CA_NAME_LABEL, CA_NAME_FIELD, "");
         addTextInput(out, CA_CRL_RECORD_LABEL, CA_CRL_RECORDS_FIELD, "");
+        addTextInput(out, CA_CRL_REFRESH_LABEL, CA_CRL_REFRESH_FIELD, "");
 
         addSubmit(out, Action.ADD);
 
@@ -272,6 +289,8 @@ public class ConfigurationServlet extends HttpServlet {
         addDisabledTextInput(out, CA_NAME_LABEL, CA_NAME_FIELD + ca.getName(), ca.getName());
         addTextInput(out, CA_CRL_RECORD_LABEL, CA_CRL_RECORDS_FIELD + ca.getName(),
                 Long.toString(ca.getCrlRecords()));
+        addTextInput(out, CA_CRL_REFRESH_LABEL, CA_CRL_REFRESH_FIELD + ca.getName(),
+                Integer.toString(ca.getCrlRefresh()));
 
 
         addSubmit(out, Action.SAVE);

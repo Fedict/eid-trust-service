@@ -116,7 +116,7 @@ public class SchedulingServiceBean implements SchedulingService {
             try {
                 if (!certificateAuthority.getStatus().equals(Status.PROCESSING)) {
                     notifyHarvester(certificateAuthority.getName());
-                    LOG.debug("harvester notified for"
+                    LOG.debug("harvester notified for "
                             + certificateAuthority.getName());
                 }
             } catch (JMSException e) {
