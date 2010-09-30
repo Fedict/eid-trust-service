@@ -205,7 +205,9 @@ public class TestPKI {
         // set root/childs
         caConfiguration.setRoot(rootCaConfiguration);
         if (null != rootCaConfiguration) {
-            rootCaConfiguration.getChilds().add(caConfiguration);
+            if (!rootCaConfiguration.getChilds().contains(caConfiguration)) {
+                rootCaConfiguration.getChilds().add(caConfiguration);
+            }
         } else {
             rootCaConfigurations.put(name, caConfiguration);
         }

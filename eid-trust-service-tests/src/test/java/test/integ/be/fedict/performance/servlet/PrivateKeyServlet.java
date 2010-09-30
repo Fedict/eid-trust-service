@@ -47,7 +47,7 @@ public class PrivateKeyServlet extends HttpServlet {
         if (null == caName) {
             throw new ServletException("No CA name found.");
         }
-        LOG.debug("get certificate for CA=" + caName);
+        LOG.debug("get private key for CA=" + caName);
 
         CAConfiguration ca = TestPKI.get().findCa(caName);
         if (null == ca) {

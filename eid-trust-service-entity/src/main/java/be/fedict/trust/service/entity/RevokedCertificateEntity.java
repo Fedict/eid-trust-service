@@ -35,6 +35,8 @@ import java.util.Date;
                 + "WHERE issuer = :issuer AND serialNumber = :serialNumber ORDER BY crlNumber DESC"),
         @NamedQuery(name = RevokedCertificateEntity.QUERY_COUNT_WHERE_ISSUER_CRL_NUMBER, query = "SELECT COUNT(*) "
                 + "FROM RevokedCertificateEntity WHERE issuer = :issuer AND crlNumber = :crlNumber"),
+        @NamedQuery(name = RevokedCertificateEntity.DELETE_WHERE_ISSUER, query = "DELETE FROM RevokedCertificateEntity "
+                + "WHERE issuer = :issuer"),
         @NamedQuery(name = RevokedCertificateEntity.DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER, query = "DELETE FROM RevokedCertificateEntity "
                 + "WHERE crlNumber < :crlNumber AND issuer = :issuer")})
 public class RevokedCertificateEntity implements Serializable {
@@ -43,6 +45,7 @@ public class RevokedCertificateEntity implements Serializable {
 
     public static final String QUERY_WHERE_ISSUER_SERIAL = "ts_rc.q.i.s";
     public static final String QUERY_COUNT_WHERE_ISSUER_CRL_NUMBER = "ts_rc.q.c.i.c";
+    public static final String DELETE_WHERE_ISSUER = "ts_rc.d.i";
     public static final String DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER = "ts_rc.d.i.old.c";
 
     private long id;

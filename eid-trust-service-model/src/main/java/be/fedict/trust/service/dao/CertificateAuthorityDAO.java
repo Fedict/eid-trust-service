@@ -18,76 +18,79 @@
 
 package be.fedict.trust.service.dao;
 
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.RevokedCertificateEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
+
+import javax.ejb.Local;
+import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Set;
 
-import javax.ejb.Local;
-import javax.security.auth.x500.X500Principal;
-
-import be.fedict.trust.service.entity.CertificateAuthorityEntity;
-import be.fedict.trust.service.entity.RevokedCertificateEntity;
-import be.fedict.trust.service.entity.TrustPointEntity;
-
 /**
  * Certificate Authority DAO.
- * 
+ *
  * @author wvdhaute
- * 
  */
 @Local
 public interface CertificateAuthorityDAO {
 
-	/**
-	 * Return {@link CertificateAuthorityEntity} from specified name. Returns
-	 * <code>null</code> if not found.
-	 */
-	CertificateAuthorityEntity findCertificateAuthority(String name);
+    /**
+     * Return {@link CertificateAuthorityEntity} from specified name. Returns
+     * <code>null</code> if not found.
+     */
+    CertificateAuthorityEntity findCertificateAuthority(String name);
 
-	/**
-	 * Create a new {@link CertificateAuthorityEntity}.
-	 */
-	CertificateAuthorityEntity addCertificateAuthority(
-			X509Certificate certificate, String crlUrl);
+    /**
+     * Create a new {@link CertificateAuthorityEntity}.
+     */
+    CertificateAuthorityEntity addCertificateAuthority(
+            X509Certificate certificate, String crlUrl);
 
-	/**
-	 * Returns {@link CertificateAuthorityEntity} from the specified
-	 * {@link X509Certificate}. Returns <code>null</code> if not found.
-	 */
-	CertificateAuthorityEntity findCertificateAuthority(
-			X509Certificate certificate);
+    /**
+     * Returns {@link CertificateAuthorityEntity} from the specified
+     * {@link X509Certificate}. Returns <code>null</code> if not found.
+     */
+    CertificateAuthorityEntity findCertificateAuthority(
+            X509Certificate certificate);
 
-	/**
-	 * Remove {@link CertificateAuthorityEntity}'s related to the specified
-	 * {@link TrustPointEntity}.
-	 */
-	void removeCertificateAuthorities(TrustPointEntity trustPoint);
+    /**
+     * Remove {@link CertificateAuthorityEntity}'s related to the specified
+     * {@link TrustPointEntity}.
+     */
+    void removeCertificateAuthorities(TrustPointEntity trustPoint);
 
-	/**
-	 * Add a {@link RevokedCertificateEntity} entry.
-	 */
-	RevokedCertificateEntity addRevokedCertificate(String issuerName,
-			BigInteger serialNumber, Date revocationDate, BigInteger crlNumber);
+    /**
+     * Add a {@link RevokedCertificateEntity} entry.
+     */
+    RevokedCertificateEntity addRevokedCertificate(String issuerName,
+                                                   BigInteger serialNumber, Date revocationDate, BigInteger crlNumber);
 
-	/**
-	 * Returns number of {@link RevokedCertificateEntity}'s for the specified
-	 * crl number and issuer.
-	 */
-	long countRevokedCertificates(BigInteger crlNumber, String issuerName);
+    /**
+     * Returns number of {@link RevokedCertificateEntity}'s for the specified
+     * crl number and issuer.
+     */
+    long countRevokedCertificates(BigInteger crlNumber, String issuerName);
 
-	/**
-	 * Remove {@link RevokedCertificateEntity}'s for the specified issuer that
-	 * are older then the specified crl number.
-	 * 
-	 * @return # of {@link RevokedCertificateEntity}'s removed.
-	 */
-	int removeOldRevokedCertificates(BigInteger crlNumber, String issuerName);
+    /**
+     * Remove {@link RevokedCertificateEntity}'s for the specified issuer that
+     * are older then the specified crl number.
+     *
+     * @return # of {@link RevokedCertificateEntity}'s removed.
+     */
+    int removeOldRevokedCertificates(BigInteger crlNumber, String issuerName);
 
-	/**
-	 * Persist batch of {@link X509CRLEntry} to the database.
-	 */
-	void addRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
-			BigInteger crlNumber, X500Principal crlIssuer);
+    /**
+     * Persist batch of {@link X509CRLEntry} to the database.
+     */
+    void addRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
+                                BigInteger crlNumber, X500Principal crlIssuer);
+
+    /**
+     * Remove all {@link RevokedCertificateEntity}'s for specified issuer.
+     */
+    int removeRevokedCertificates(String issuerName);
 }

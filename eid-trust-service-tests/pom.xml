@@ -51,7 +51,7 @@
                             <!--
                                        For running with a runtime without 32-bit mode support.
                                    -->
-                            <argLine>-d64</argLine>
+                            <argLine>-d64 -Xms512m -Xmx1024m</argLine>
                         </configuration>
                     </plugin>
                 </plugins>

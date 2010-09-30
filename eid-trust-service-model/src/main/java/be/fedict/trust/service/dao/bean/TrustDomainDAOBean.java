@@ -90,8 +90,9 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
             throws TrustDomainNotFoundException {
         LOG.debug("get trust domain: " + name);
         TrustDomainEntity trustDomain = findTrustDomain(name);
-        if (null == trustDomain)
+        if (null == trustDomain) {
             throw new TrustDomainNotFoundException();
+        }
         return trustDomain;
     }
 
@@ -111,8 +112,9 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
             throws VirtualTrustDomainNotFoundException {
         LOG.debug("get virtual trust domain: " + name);
         VirtualTrustDomainEntity virtualTrustDomain = findVirtualTrustDomain(name);
-        if (null == virtualTrustDomain)
+        if (null == virtualTrustDomain) {
             throw new VirtualTrustDomainNotFoundException();
+        }
         return virtualTrustDomain;
     }
 
@@ -216,6 +218,19 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
                 .createNamedQuery(CertificateAuthorityEntity.QUERY_WHERE_TRUST_POINT);
         query.setParameter("trustPoint", trustPoint);
         return (List<CertificateAuthorityEntity>) query.getResultList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> listCANames(TrustPointEntity trustPoint) {
+
+        LOG.debug("list CA names for trust point " + trustPoint.getName());
+        Query query = this.entityManager
+                .createNamedQuery(CertificateAuthorityEntity.QUERY_NAME_WHERE_TRUST_POINT);
+        query.setParameter("trustPoint", trustPoint);
+        return (List<String>) query.getResultList();
     }
 
     /**

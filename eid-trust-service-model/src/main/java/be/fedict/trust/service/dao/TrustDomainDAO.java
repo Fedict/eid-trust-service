@@ -141,6 +141,8 @@ public interface TrustDomainDAO {
     List<CertificateAuthorityEntity> listCertificateAuthorities(
             TrustPointEntity trustPoint);
 
+    List<String> listCANames(TrustPointEntity trustPoint);
+
     /**
      * Removes the selected {@link TrustPointEntity}.
      */

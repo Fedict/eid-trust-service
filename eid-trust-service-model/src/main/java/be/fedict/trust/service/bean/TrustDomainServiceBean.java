@@ -214,6 +214,11 @@ public class TrustDomainServiceBean implements TrustDomainService {
         // remove timers
         this.schedulingService.cancelTimers(attachedTrustPoint.getName());
 
+        // remove cache for each CA
+        for (String caName : this.trustDomainDAO.listCANames(trustPoint)) {
+            this.certificateAuthorityDAO.removeRevokedCertificates(caName);
+        }
+
         // remove CA's
         this.certificateAuthorityDAO
                 .removeCertificateAuthorities(attachedTrustPoint);
