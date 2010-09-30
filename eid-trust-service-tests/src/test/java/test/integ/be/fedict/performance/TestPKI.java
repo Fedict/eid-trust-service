@@ -26,10 +26,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.*;
-import test.integ.be.fedict.performance.servlet.CertificateServlet;
-import test.integ.be.fedict.performance.servlet.ConfigurationServlet;
-import test.integ.be.fedict.performance.servlet.CrlServlet;
-import test.integ.be.fedict.performance.servlet.PrivateKeyServlet;
+import test.integ.be.fedict.performance.servlet.*;
 
 import javax.servlet.http.HttpServlet;
 import java.util.*;
@@ -38,35 +35,46 @@ public class TestPKI {
 
     private static final Log LOG = LogFactory.getLog(TestPKI.class);
 
-    public static final String CA_HOST = "sebeco-dev-11";
-
     private static TestPKI testPKI;
 
     // Jetty configuration
+    private String host;
     private Server server;
     private String path;
     private List<String> servletPaths;
 
     // PKI configuration
+    private int crlRefresh; // in minutes
     private Map<String, CAConfiguration> rootCaConfigurations;
 
     public static TestPKI get() {
         return testPKI;
     }
 
-    public void start() throws Exception {
+    public TestPKI() {
 
+        this.rootCaConfigurations = new HashMap<String, CAConfiguration>();
+    }
+
+    /**
+     * Start embedded jetty for this test PKI
+     *
+     * @throws Exception something went wrong :o
+     */
+    public void start(String host) throws Exception {
+
+        this.host = host;
         this.server = new Server();
         Connector connector = new LocalConnector();
         this.server.addConnector(connector);
         this.servletPaths = new LinkedList<String>();
-        this.rootCaConfigurations = new HashMap<String, CAConfiguration>();
 
         /*
          * Add servlets
          */
         addServlet(ConfigurationServlet.class, "/" + ConfigurationServlet.PATH);
         addServlet(CrlServlet.class, "/" + CrlServlet.PATH);
+        addServlet(OcspServlet.class, "/" + OcspServlet.PATH);
         addServlet(CertificateServlet.class, "/" + CertificateServlet.PATH);
         addServlet(PrivateKeyServlet.class, "/" + PrivateKeyServlet.PATH);
 
@@ -79,6 +87,11 @@ public class TestPKI {
         LOG.debug("Test CA started...");
     }
 
+    /**
+     * Stop embedded jetty for this test PKI
+     *
+     * @throws Exception something went wrong :o
+     */
     public void stop() throws Exception {
 
         this.server.stop();
@@ -113,7 +126,7 @@ public class TestPKI {
     private void createSocketConnector() throws Exception {
 
         SocketConnector connector = new SocketConnector();
-        connector.setHost(CA_HOST);
+        connector.setHost(host);
         this.server.addConnector(connector);
         if (this.server.isStarted()) {
             connector.start();
@@ -121,7 +134,7 @@ public class TestPKI {
             connector.open();
         }
 
-        path = "http://" + CA_HOST + ":" + connector.getLocalPort();
+        path = "http://" + host + ":" + connector.getLocalPort();
     }
 
     public String getPath() {
@@ -132,8 +145,31 @@ public class TestPKI {
         return this.servletPaths;
     }
 
-    public Map<String, CAConfiguration> getRootCaConfigurations() {
+    public Map<String, CAConfiguration> getRoots() {
         return this.rootCaConfigurations;
+    }
+
+    public List<CAConfiguration> getLeaves() {
+
+        List<CAConfiguration> leaves = new LinkedList<CAConfiguration>();
+
+        for (CAConfiguration rootCa : this.rootCaConfigurations.values()) {
+            leaves.addAll(getLeaves(rootCa));
+        }
+        return leaves;
+    }
+
+    private List<CAConfiguration> getLeaves(CAConfiguration parent) {
+
+        List<CAConfiguration> leaves = new LinkedList<CAConfiguration>();
+        if (parent.getChilds().isEmpty()) {
+            leaves.add(parent);
+        } else {
+            for (CAConfiguration child : parent.getChilds()) {
+                leaves.addAll(getLeaves(child));
+            }
+        }
+        return leaves;
     }
 
     /**
@@ -222,8 +258,6 @@ public class TestPKI {
      */
     public CAConfiguration findCa(String caName) {
 
-        LOG.debug("find CA configuration: " + caName);
-
         // check roots
         CAConfiguration caConfig = rootCaConfigurations.get(caName);
         if (null != caConfig) {
@@ -268,6 +302,8 @@ public class TestPKI {
         for (CAConfiguration caConfig : rootCaConfigurations.values()) {
             caConfig.generate();
         }
+
+        LOG.debug("generation finished");
     }
 
 }

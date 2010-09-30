@@ -47,14 +47,14 @@ public class CrlServlet extends HttpServlet {
         }
         LOG.debug("get CRL for CA=" + caName);
 
-        CAConfiguration caConfiguration = TestPKI.get().findCa(caName);
-        if (null == caConfiguration) {
+        CAConfiguration ca = TestPKI.get().findCa(caName);
+        if (null == ca) {
             throw new ServletException("CA Config not found for " + caName);
         }
 
         try {
             response.setContentType("text/plain");
-            response.getOutputStream().write(caConfiguration.getCrl().getEncoded());
+            response.getOutputStream().write(ca.getCrl().getEncoded());
         } catch (Exception e) {
             LOG.error("Exception: " + e.getMessage(), e);
             throw new ServletException(e);

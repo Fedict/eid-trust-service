@@ -137,6 +137,24 @@ public class TestUtils {
             IllegalStateException, NoSuchAlgorithmException,
             SignatureException, CertificateException {
 
+        return generateCertificate(subjectPublicKey, subjectDn, issuerPrivateKey,
+                issuerCert, notBefore, notAfter, signatureAlgorithm,
+                includeAuthorityKeyIdentifier, caCert, timeStampingPurpose,
+                ocspUri, crlUri, keyUsage,
+                new BigInteger(128, new SecureRandom()));
+    }
+
+    public static X509Certificate generateCertificate(
+            PublicKey subjectPublicKey, String subjectDn,
+            PrivateKey issuerPrivateKey, X509Certificate issuerCert,
+            DateTime notBefore, DateTime notAfter, String signatureAlgorithm,
+            boolean includeAuthorityKeyIdentifier, boolean caCert,
+            boolean timeStampingPurpose, String ocspUri, String crlUri,
+            KeyUsage keyUsage, BigInteger serialNumber) throws IOException, InvalidKeyException,
+            IllegalStateException, NoSuchAlgorithmException,
+            SignatureException, CertificateException {
+
+
         String finalSignatureAlgorithm = signatureAlgorithm;
         if (null == signatureAlgorithm) {
             finalSignatureAlgorithm = "SHA512WithRSAEncryption";
@@ -156,8 +174,7 @@ public class TestUtils {
         }
         certificateGenerator.setIssuerDN(issuerDN);
         certificateGenerator.setSubjectDN(new X509Principal(subjectDn));
-        certificateGenerator.setSerialNumber(new BigInteger(128,
-                new SecureRandom()));
+        certificateGenerator.setSerialNumber(serialNumber);
 
         certificateGenerator.addExtension(X509Extensions.SubjectKeyIdentifier,
                 false, createSubjectKeyId(subjectPublicKey));

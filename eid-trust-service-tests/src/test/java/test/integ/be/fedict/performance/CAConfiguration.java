@@ -24,6 +24,7 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.x509.X509V2CRLGenerator;
 import org.joda.time.DateTime;
 import test.integ.be.fedict.performance.servlet.CrlServlet;
+import test.integ.be.fedict.performance.servlet.OcspServlet;
 import test.integ.be.fedict.trust.util.TestUtils;
 
 import java.io.Serializable;
@@ -82,8 +83,16 @@ public class CAConfiguration implements Serializable {
         return keyPair;
     }
 
+    public void setKeyPair(KeyPair keyPair) {
+        this.keyPair = keyPair;
+    }
+
     public X509Certificate getCertificate() {
         return certificate;
+    }
+
+    public void setCertificate(X509Certificate certificate) {
+        this.certificate = certificate;
     }
 
     public X509CRL getCrl() {
@@ -100,14 +109,19 @@ public class CAConfiguration implements Serializable {
 
     public void generate() throws Exception {
 
-        LOG.debug("generate CA " + this.name);
-
         keyPair = TestUtils.generateKeyPair();
 
         if (null == this.root) {
-            this.certificate = generateCertificate(this.keyPair.getPublic(), this.keyPair.getPrivate());
+            LOG.debug("generate CA " + this.name + " (root)");
+            this.certificate = generateCertificate(this.keyPair.getPublic(),
+                    name, this.keyPair.getPrivate(), null, crlRecords);
         } else {
-            this.certificate = generateCertificate(this.keyPair.getPublic(), this.root.getKeyPair().getPrivate());
+            LOG.debug("generate CA " + this.name + " (intermediate)");
+            this.certificate = generateCertificate(this.keyPair.getPublic(),
+                    this.root.getName(),
+                    this.root.getKeyPair().getPrivate(),
+                    this.root.getCertificate(),
+                    this.root.getCrlRecords());
         }
 
         // crl
@@ -120,18 +134,26 @@ public class CAConfiguration implements Serializable {
         }
     }
 
-    private X509Certificate generateCertificate(PublicKey publicKey, PrivateKey privateKey)
+    private X509Certificate generateCertificate(PublicKey publicKey,
+                                                String issuerName,
+                                                PrivateKey issuerPrivateKey,
+                                                X509Certificate issuerCertificate,
+                                                long maxRevokedSn)
             throws Exception {
 
         DateTime now = new DateTime();
         DateTime notBefore = now.minusYears(10);
         DateTime notAfter = now.plusYears(10);
 
-        return TestUtils.generateCertificate(publicKey,
-                "CN=" + name, privateKey, null, notBefore,
-                notAfter, "SHA512WithRSAEncryption", true, true, false, null,
-                CrlServlet.getPath(name), new KeyUsage(
-                        KeyUsage.cRLSign));
+        return TestUtils.generateCertificate(
+                publicKey, "CN=" + name,
+                issuerPrivateKey, issuerCertificate,
+                notBefore, notAfter, "SHA512WithRSAEncryption",
+                true, true, false,
+                OcspServlet.getPath(issuerName),
+                CrlServlet.getPath(issuerName),
+                new KeyUsage(KeyUsage.cRLSign),
+                new BigInteger(Long.toString(maxRevokedSn + 1)));
     }
 
     private X509V2CRLGenerator createCrlGenerator() throws Exception {

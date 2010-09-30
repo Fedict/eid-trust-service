@@ -49,12 +49,12 @@ public class PrivateKeyServlet extends HttpServlet {
         }
         LOG.debug("get certificate for CA=" + caName);
 
-        CAConfiguration caConfiguration = TestPKI.get().findCa(caName);
-        if (null == caConfiguration) {
+        CAConfiguration ca = TestPKI.get().findCa(caName);
+        if (null == ca) {
             throw new ServletException("CA Config not found for " + caName);
         }
 
-        String pemCertificate = TestUtils.toPem(caConfiguration.getKeyPair().getPrivate());
+        String pemCertificate = TestUtils.toPem(ca.getKeyPair().getPrivate());
 
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();

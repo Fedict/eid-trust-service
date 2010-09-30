@@ -31,7 +31,7 @@ public class TestPKIStartup {
     @BeforeClass
     public static void oneTimeSetUp() throws Exception {
 
-        new TestPKI().start();
+        new TestPKI().start("sebeco-dev-11");
 
         for (String servletPath : TestPKI.get().getServletPaths()) {
             LOG.debug("Servlet: " + TestPKI.get().getPath() + servletPath);

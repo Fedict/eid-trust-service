@@ -18,6 +18,7 @@
 
 package test.integ.be.fedict.trust;
 
+import be.fedict.trust.TrustLinkerResultReason;
 import be.fedict.trust.client.TrustServiceDomains;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.client.exception.RevocationDataCorruptException;
@@ -25,7 +26,6 @@ import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.ValidationFailedException;
 import be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType;
 import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
-import be.fedict.trust.xkms2.XKMSConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ocsp.OCSPResponseStatus;
@@ -248,7 +248,7 @@ public class XKMSRevocationTest {
             fail();
         } catch (ValidationFailedException e) {
             // expected
-            assertEquals(XKMSConstants.KEY_BINDING_REASON_VALIDITY_INTERVAL_URI, e
+            assertEquals(TrustLinkerResultReason.INVALID_VALIDITY_INTERVAL, e
                     .getReasons().get(0));
         }
     }

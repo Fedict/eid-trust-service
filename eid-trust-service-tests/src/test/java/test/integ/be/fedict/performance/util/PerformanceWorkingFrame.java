@@ -30,6 +30,7 @@ public class PerformanceWorkingFrame extends JFrame implements ActionListener,
     private final PerformanceTest performanceTest;
 
     private final JLabel countLabel;
+    private final JLabel revokedLabel;
     private final JLabel performanceCountLabel;
 
     private final Thread updateThread;
@@ -39,7 +40,7 @@ public class PerformanceWorkingFrame extends JFrame implements ActionListener,
 
         this.performanceTest = performanceTest;
 
-        setSize(400, 100);
+        setSize(400, 150);
 
         Container container = getContentPane();
 
@@ -54,6 +55,14 @@ public class PerformanceWorkingFrame extends JFrame implements ActionListener,
         c.gridx++;
         this.countLabel = new JLabel("0");
         infoPanel.add(this.countLabel, c);
+
+        c.gridx = 0;
+        c.gridy++;
+        infoPanel.add(new JLabel("Revoked count:"), c);
+
+        c.gridx++;
+        this.revokedLabel = new JLabel("0");
+        infoPanel.add(this.revokedLabel, c);
 
         c.gridx = 0;
         c.gridy++;
@@ -98,6 +107,8 @@ public class PerformanceWorkingFrame extends JFrame implements ActionListener,
                 public void run() {
                     PerformanceWorkingFrame.this.countLabel.setText(Integer
                             .toString(performanceTest.getCount()));
+                    PerformanceWorkingFrame.this.revokedLabel.setText(Integer
+                            .toString(performanceTest.getRevokedCount()));
                     PerformanceWorkingFrame.this.performanceCountLabel.setText(Integer
                             .toString(performanceTest.getIntervalCount()));
                 }

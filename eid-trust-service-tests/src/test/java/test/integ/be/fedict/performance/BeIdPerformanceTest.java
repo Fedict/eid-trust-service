@@ -55,10 +55,43 @@ public class BeIdPerformanceTest implements PerformanceTest {
     }
 
     private boolean run = true;
-
     private int count = 0;
-
     private int intervalCount = 0;
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getIntervalCount() {
+        return this.intervalCount;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getCount() {
+        return this.count;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getRevokedCount() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isRunning() {
+        return this.run;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void stop() {
+        this.run = false;
+    }
 
     @Test
     public void testValidateEIDCertificate() throws Exception {
@@ -98,25 +131,10 @@ public class BeIdPerformanceTest implements PerformanceTest {
         }
 
         PerformanceResultDialog dialog = new PerformanceResultDialog(
-                INTERVAL_SIZE, performance);
+                INTERVAL_SIZE, performance, 0);
         while (dialog.isVisible()) {
             Thread.sleep(1000);
         }
     }
 
-    public int getIntervalCount() {
-        return this.intervalCount;
-    }
-
-    public int getCount() {
-        return this.count;
-    }
-
-    public boolean isRunning() {
-        return this.run;
-    }
-
-    public void stop() {
-        this.run = false;
-    }
 }

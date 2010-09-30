@@ -24,16 +24,22 @@ public class PerformanceData {
 
     private final Date date;
     private int count;
+    private int revoked;
     private int failures;
 
     public PerformanceData() {
         this.date = new Date();
         this.count = 0;
+        this.revoked = 0;
         this.failures = 0;
     }
 
     public void inc() {
         this.count++;
+    }
+
+    public void incRevoked() {
+        this.revoked++;
     }
 
     public void incFailures() {
@@ -46,6 +52,10 @@ public class PerformanceData {
 
     public int getCount() {
         return this.count;
+    }
+
+    public int getRevoked() {
+        return this.revoked;
     }
 
     public int getFailures() {

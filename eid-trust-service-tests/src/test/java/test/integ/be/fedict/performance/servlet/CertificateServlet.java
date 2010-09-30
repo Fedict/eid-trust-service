@@ -49,12 +49,12 @@ public class CertificateServlet extends HttpServlet {
         }
         LOG.debug("get certificate for CA=" + caName);
 
-        CAConfiguration caConfiguration = TestPKI.get().findCa(caName);
-        if (null == caConfiguration) {
+        CAConfiguration ca = TestPKI.get().findCa(caName);
+        if (null == ca) {
             throw new ServletException("CA Config not found for " + caName);
         }
 
-        String pemCertificate = TestUtils.toPem(caConfiguration.getCertificate());
+        String pemCertificate = TestUtils.toPem(ca.getCertificate());
 
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
@@ -62,4 +62,7 @@ public class CertificateServlet extends HttpServlet {
         out.close();
     }
 
+    public static String getPath(String caName) {
+        return TestPKI.get().getPath() + "/" + PATH + "?" + CA_QUERY_PARAM + "=" + caName;
+    }
 }

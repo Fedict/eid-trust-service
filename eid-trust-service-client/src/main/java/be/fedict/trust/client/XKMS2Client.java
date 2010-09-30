@@ -85,8 +85,19 @@ public class XKMS2Client {
         this.port = xkmsService.getXKMSPort();
 
         registeredWSSecurityHandler(this.port);
-        registerLoggerHandler(this.port);
         setEndpointAddress(location);
+    }
+
+    /**
+     * Enables/disables logging of all SOAP requests/responses.
+     */
+    public void setLogging(boolean logging) {
+
+        if (logging) {
+            registerLoggerHandler(this.port);
+        } else {
+            removeLoggerHandler(this.port);
+        }
     }
 
     /**
@@ -221,6 +232,26 @@ public class XKMS2Client {
         List<Handler> handlerChain = binding.getHandlerChain();
         handlerChain.add(new LoggingSoapHandler());
         binding.setHandlerChain(handlerChain);
+    }
+
+    /**
+     * Unregister possible logging SOAP handlers on the given JAX-WS port component.
+     */
+    protected void removeLoggerHandler(Object port) {
+
+        BindingProvider bindingProvider = (BindingProvider) port;
+
+        Binding binding = bindingProvider.getBinding();
+        @SuppressWarnings("unchecked")
+        List<Handler> handlerChain = binding.getHandlerChain();
+        Iterator<Handler> iter = handlerChain.iterator();
+        while (iter.hasNext()) {
+            Handler handler = iter.next();
+            if (handler instanceof LoggingSoapHandler) {
+                iter.remove();
+            }
+
+        }
     }
 
     protected void registeredWSSecurityHandler(Object port) {

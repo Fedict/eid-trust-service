@@ -24,6 +24,8 @@ public interface PerformanceTest {
 
     int getCount();
 
+    int getRevokedCount();
+    
     boolean isRunning();
 
     void stop();

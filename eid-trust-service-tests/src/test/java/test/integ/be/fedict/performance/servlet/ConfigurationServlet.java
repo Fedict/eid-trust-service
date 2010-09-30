@@ -38,15 +38,25 @@ public class ConfigurationServlet extends HttpServlet {
 
     public static final String PATH = "configuration";
 
+    public static final String FIELD_SEPERATOR = ";";
+
+    private static final String CA_NAME_FIELD = "ca_name_";
+    private static final String CA_ROOT_FIELD = "ca_root_";
+    private static final String CA_CRL_RECORDS_FIELD = "ca_crl_records_";
+
+    private static final String CA_NAME_LABEL = "CA Name";
+    private static final String CA_ROOT_LABEL = "CA Root";
+    private static final String CA_CRL_RECORD_LABEL = "# CRL records";
+
     public static final String ACTION = "action";
 
-    public static final String CA_NAME_FIELD = "ca_name_";
-    public static final String CA_ROOT_FIELD = "ca_root_";
-    public static final String CA_CRL_RECORDS_FIELD = "ca_crl_records_";
-
-    public static final String CA_NAME_LABEL = "CA Name";
-    public static final String CA_ROOT_LABEL = "CA Root";
-    public static final String CA_CRL_RECORD_LABEL = "# CRL records";
+    public enum Action {
+        SAVE,
+        DELETE,
+        ADD,
+        GET,
+        GENERATE
+    }
 
     @Override
     protected void doPost(HttpServletRequest request,
@@ -54,15 +64,17 @@ public class ConfigurationServlet extends HttpServlet {
 
         LOG.debug("doPost");
 
-        String actionString = request.getParameter(ACTION);
-        if (null == actionString) {
-            throw new ServletException("No " + ACTION + "?!");
+        Action action = getAction(request);
+        if (null == action) {
+            throw new ServletException("No action :(");
         }
-        Action action = Action.valueOf(actionString);
 
         try {
             switch (action) {
 
+                case GET:
+                    outputConfig(response);
+                    return;
                 case SAVE:
                     onSaveConfig(request);
                     break;
@@ -87,6 +99,13 @@ public class ConfigurationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
 
+        Action action = getAction(request);
+        if (null != action && action.equals(Action.GET)) {
+            outputConfig(response);
+            return;
+        }
+
+
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
 
@@ -95,16 +114,20 @@ public class ConfigurationServlet extends HttpServlet {
 
         out.println("<h1>Configuration</h1>");
 
+        out.println("<hr/>");
+
         // add existing CA's
         for (Map.Entry<String, CAConfiguration> caConfig :
-                TestPKI.get().getRootCaConfigurations().entrySet()) {
-            addEditRootCAConfig(out, caConfig.getValue());
+                TestPKI.get().getRoots().entrySet()) {
+            addEditRootCAMarkup(out, caConfig.getValue());
         }
 
         out.println("<hr/>");
 
         // to add new one
-        addNewCAConfig(out);
+        addNewCAMarkup(out);
+
+        out.println("<hr/>");
 
         // generate form
         addGenerate(out);
@@ -112,9 +135,45 @@ public class ConfigurationServlet extends HttpServlet {
         out.println("</body>");
     }
 
+    private Action getAction(HttpServletRequest request) {
+
+        String actionString = request.getParameter(ACTION);
+        if (null == actionString) {
+            return null;
+        }
+        return Action.valueOf(actionString);
+
+    }
+
     /*
     * Some action helper methods
     */
+    private void outputConfig(HttpServletResponse response) throws IOException {
+
+        LOG.debug("output config");
+        response.setContentType("text/plain");
+        PrintWriter out = response.getWriter();
+
+        for (CAConfiguration rootCa : TestPKI.get().getRoots().values()) {
+            outputParentCa(out, rootCa);
+        }
+    }
+
+    private void outputParentCa(PrintWriter out, CAConfiguration parentCa) {
+
+        outputCa(out, parentCa);
+        for (CAConfiguration child : parentCa.getChilds()) {
+            outputParentCa(out, child);
+        }
+    }
+
+    private void outputCa(PrintWriter out, CAConfiguration ca) {
+        out.print(ca.getName() + FIELD_SEPERATOR);
+        out.print((null == ca.getRoot() ? "" : ca.getRoot().getName()) + FIELD_SEPERATOR);
+        out.print(ca.getCrlRecords());
+        out.println();
+    }
+
     private void onAddConfig(HttpServletRequest request) throws Exception {
 
         LOG.debug("add config");
@@ -176,7 +235,6 @@ public class ConfigurationServlet extends HttpServlet {
 
     private void addGenerate(PrintWriter out) {
 
-        out.println("<h2>Generate</h2>");
         out.println("<form action=\"" + PATH + "\" method=\"POST\">");
 
         addSubmit(out, Action.GENERATE);
@@ -184,7 +242,7 @@ public class ConfigurationServlet extends HttpServlet {
         out.println("</form>");
     }
 
-    private void addNewCAConfig(PrintWriter out) {
+    private void addNewCAMarkup(PrintWriter out) {
 
         out.println("<form action=\"" + PATH + "\" method=\"POST\">");
 
@@ -197,27 +255,31 @@ public class ConfigurationServlet extends HttpServlet {
         out.println("</form>");
     }
 
-    private void addEditRootCAConfig(PrintWriter out, CAConfiguration rootCaConfiguration) {
+    private void addEditRootCAMarkup(PrintWriter out, CAConfiguration rootCa) {
 
-        addEditCAConfig(out, rootCaConfiguration);
-        for (CAConfiguration child : rootCaConfiguration.getChilds()) {
-            addEditRootCAConfig(out, child);
+        addEditCAMarkup(out, rootCa);
+        for (CAConfiguration child : rootCa.getChilds()) {
+            addEditRootCAMarkup(out, child);
         }
     }
 
-    private void addEditCAConfig(PrintWriter out, CAConfiguration caConfiguration) {
+    private void addEditCAMarkup(PrintWriter out, CAConfiguration ca) {
 
         out.println("<form action=\"" + PATH + "\" method=\"POST\">");
 
-        addTextInput(out, CA_ROOT_LABEL, CA_ROOT_FIELD + caConfiguration.getName(),
-                null != caConfiguration.getRoot() ? caConfiguration.getRoot().getName() : "");
-        addDisabledTextInput(out, CA_NAME_LABEL, CA_NAME_FIELD + caConfiguration.getName(), caConfiguration.getName());
-        addTextInput(out, CA_CRL_RECORD_LABEL, CA_CRL_RECORDS_FIELD + caConfiguration.getName(),
-                Long.toString(caConfiguration.getCrlRecords()));
+        addTextInput(out, CA_ROOT_LABEL, CA_ROOT_FIELD + ca.getName(),
+                null != ca.getRoot() ? ca.getRoot().getName() : "");
+        addDisabledTextInput(out, CA_NAME_LABEL, CA_NAME_FIELD + ca.getName(), ca.getName());
+        addTextInput(out, CA_CRL_RECORD_LABEL, CA_CRL_RECORDS_FIELD + ca.getName(),
+                Long.toString(ca.getCrlRecords()));
 
 
         addSubmit(out, Action.SAVE);
         addSubmit(out, Action.DELETE);
+
+        if (null != ca.getCertificate()) {
+            addLink(out, CertificateServlet.getPath(ca.getName()), "Certificate");
+        }
 
         out.println("</form>");
     }
@@ -238,10 +300,7 @@ public class ConfigurationServlet extends HttpServlet {
         out.println("<input name=\"" + ACTION + "\" type=\"submit\" value=\"" + action + "\"/>");
     }
 
-    enum Action {
-        SAVE,
-        DELETE,
-        ADD,
-        GENERATE
+    private void addLink(PrintWriter out, String path, String value) {
+        out.println("<a href=\"" + path + "\">" + value + "</a>");
     }
 }

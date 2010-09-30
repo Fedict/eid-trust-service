@@ -48,9 +48,12 @@ public class PerformanceResultDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
     private JFreeChart chart;
 
-    public PerformanceResultDialog(int intervalSize, List<PerformanceData> performance) {
+    public PerformanceResultDialog(int intervalSize,
+                                   List<PerformanceData> performance,
+                                   int expectedRevoked) {
+
         super((Frame) null, "Performance test results");
-        setSize(400, 300);
+        setSize(500, 400);
 
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
@@ -61,6 +64,7 @@ public class PerformanceResultDialog extends JDialog implements ActionListener {
         saveMenuItem.addActionListener(this);
 
         TimeSeries series = new TimeSeries("Success");
+        TimeSeries revokedSeries = new TimeSeries("Revoked");
         TimeSeries failureSeries = new TimeSeries("Failures");
 
         performance.remove(performance.size() - 1);
@@ -71,12 +75,17 @@ public class PerformanceResultDialog extends JDialog implements ActionListener {
         }
 
         int totalCount = 0;
+        int totalRevoked = 0;
         int totalFailures = 0;
 
         for (PerformanceData performanceEntry : performance) {
             series.add(new Second(performanceEntry.getDate()),
                     performanceEntry.getCount());
             totalCount += performanceEntry.getCount();
+
+            revokedSeries.add(new Second(performanceEntry.getDate()),
+                    performanceEntry.getRevoked());
+            totalRevoked += performanceEntry.getRevoked();
 
             failureSeries.add(new Second(performanceEntry.getDate()),
                     performanceEntry.getFailures());
@@ -85,6 +94,7 @@ public class PerformanceResultDialog extends JDialog implements ActionListener {
 
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.addSeries(series);
+        dataset.addSeries(revokedSeries);
         dataset.addSeries(failureSeries);
         this.chart = ChartFactory.createTimeSeriesChart(
                 "eID Trust Service Performance History",
@@ -102,11 +112,19 @@ public class PerformanceResultDialog extends JDialog implements ActionListener {
         info.setTextAlignment(HorizontalAlignment.LEFT);
         info.setPosition(RectangleEdge.BOTTOM);
         this.chart.addSubtitle(info);
-        TextTitle info2 = new TextTitle("Total number of failures: "
-                + totalFailures);
+
+        TextTitle info2 = new TextTitle("Total number of revoked: "
+                + totalRevoked + " expected=" + expectedRevoked);
         info2.setPosition(RectangleEdge.BOTTOM);
         info2.setTextAlignment(HorizontalAlignment.LEFT);
         this.chart.addSubtitle(info2);
+
+        TextTitle info3 = new TextTitle("Total number of failures: "
+                + totalFailures);
+        info3.setPosition(RectangleEdge.BOTTOM);
+        info3.setTextAlignment(HorizontalAlignment.LEFT);
+        this.chart.addSubtitle(info3);
+
         this.chart.setBackgroundPaint(Color.WHITE);
         XYPlot plot = this.chart.getXYPlot();
         plot.setBackgroundPaint(Color.WHITE);
