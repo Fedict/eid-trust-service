@@ -26,6 +26,8 @@ import test.integ.be.fedict.performance.servlet.CrlServlet;
 import test.integ.be.fedict.performance.servlet.OcspServlet;
 import test.integ.be.fedict.trust.util.TestUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -48,7 +50,7 @@ public class CAConfiguration implements Serializable {
     private List<CAConfiguration> childs;
     private KeyPair keyPair;
     private X509Certificate certificate;
-    private X509CRL crl;
+    private File crlFile;
 
     // CRL config data
     private DateTime crlNextUpdate;
@@ -106,7 +108,7 @@ public class CAConfiguration implements Serializable {
         this.certificate = certificate;
     }
 
-    public X509CRL getCrl() throws Exception {
+    public File getCrl() throws Exception {
 
         if (this.crlRefresh > 0) {
             DateTime now = new DateTime();
@@ -116,12 +118,11 @@ public class CAConfiguration implements Serializable {
                 this.crlNumber++;
                 LOG.debug("generate new CRL for CA=" + this.name + " (nextUpdate="
                         + this.crlNextUpdate.toString() + " crlNumber=" + this.crlNumber + ")");
-
-                this.crl = generateCrl();
+                generateCrl();
             }
         }
 
-        return crl;
+        return crlFile;
     }
 
     public List<CAConfiguration> getChilds() {
@@ -139,14 +140,14 @@ public class CAConfiguration implements Serializable {
         } else {
             LOG.debug("generate CA " + this.name + " (intermediate)");
             this.certificate = generateCertificate(this.keyPair.getPublic(),
-                    this.root.getName(),
+                    this.root.getCertificate().getSubjectDN().getName(),
                     this.root.getKeyPair().getPrivate(),
                     this.root.getCertificate(),
                     this.root.getCrlRecords());
         }
 
         // crl
-        this.crl = generateCrl();
+        generateCrl();
 
         // generate childs
         for (CAConfiguration child : childs) {
@@ -166,7 +167,7 @@ public class CAConfiguration implements Serializable {
         DateTime notAfter = now.plusYears(10);
 
         return TestUtils.generateCertificate(
-                publicKey, "CN=" + name,
+                publicKey, name,
                 issuerPrivateKey, issuerCertificate,
                 notBefore, notAfter, "SHA512WithRSAEncryption",
                 true, true, false,
@@ -176,7 +177,7 @@ public class CAConfiguration implements Serializable {
                 new BigInteger(Long.toString(maxRevokedSn + 1)));
     }
 
-    private X509CRL generateCrl() throws Exception {
+    private void generateCrl() throws Exception {
 
         DateTime now = new DateTime();
         if (this.crlRefresh > 0) {
@@ -191,7 +192,14 @@ public class CAConfiguration implements Serializable {
             revokedSerialNumbers.add(new BigInteger(Long.toString(i)));
         }
 
-        return TestUtils.generateCrl(crlNumber, this.keyPair.getPrivate(),
+        X509CRL crl = TestUtils.generateCrl(crlNumber, this.keyPair.getPrivate(),
                 certificate, now, crlNextUpdate, revokedSerialNumbers);
+
+        this.crlFile = File.createTempFile("crl_" + name + "_", ".crl");
+        this.crlFile.deleteOnExit();
+
+        FileOutputStream fos = new FileOutputStream(this.crlFile);
+        fos.write(crl.getEncoded());
+        fos.close();
     }
 }

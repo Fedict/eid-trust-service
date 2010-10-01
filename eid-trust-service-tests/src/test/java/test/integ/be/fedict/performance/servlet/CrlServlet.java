@@ -18,8 +18,10 @@
 
 package test.integ.be.fedict.performance.servlet;
 
+import org.apache.commons.httpclient.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.lf5.util.StreamUtils;
 import test.integ.be.fedict.performance.CAConfiguration;
 import test.integ.be.fedict.performance.TestPKI;
 
@@ -27,7 +29,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class CrlServlet extends HttpServlet {
 
@@ -54,14 +58,16 @@ public class CrlServlet extends HttpServlet {
 
         try {
             response.setContentType("text/plain");
-            response.getOutputStream().write(ca.getCrl().getEncoded());
+
+            InputStream inputStream = new FileInputStream(ca.getCrl());
+            StreamUtils.copy(inputStream, response.getOutputStream());
         } catch (Exception e) {
             LOG.error("Exception: " + e.getMessage(), e);
             throw new ServletException(e);
         }
     }
 
-    public static String getPath(String caName) {
-        return TestPKI.get().getPath() + "/" + PATH + "?" + CA_QUERY_PARAM + "=" + caName;
+    public static String getPath(String caName) throws Exception {
+        return new URI(TestPKI.get().getPath() + "/" + PATH + "?" + CA_QUERY_PARAM + "=" + caName, false).toString();
     }
 }

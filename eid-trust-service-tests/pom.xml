@@ -149,5 +149,23 @@
             <artifactId>commons-net</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.naming</groupId>
+            <artifactId>jnp-client</artifactId>
+            <version>5.0.5.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-system</artifactId>
+            <version>6.0.0.20100721-M4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-system-jmx</artifactId>
+            <version>6.0.0.20100721-M4</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

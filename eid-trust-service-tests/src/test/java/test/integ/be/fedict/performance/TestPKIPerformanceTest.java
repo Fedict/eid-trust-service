@@ -22,6 +22,7 @@ import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.client.exception.ValidationFailedException;
 import be.fedict.trust.xkms2.XKMSConstants;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,12 +32,13 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import test.integ.be.fedict.performance.servlet.*;
-import test.integ.be.fedict.performance.util.PerformanceData;
-import test.integ.be.fedict.performance.util.PerformanceResultDialog;
-import test.integ.be.fedict.performance.util.PerformanceTest;
-import test.integ.be.fedict.performance.util.PerformanceWorkingFrame;
+import test.integ.be.fedict.performance.util.*;
 import test.integ.be.fedict.trust.util.TestUtils;
 
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -46,6 +48,7 @@ import java.security.KeyPair;
 import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -54,12 +57,8 @@ public class TestPKIPerformanceTest implements PerformanceTest {
 
     private static final Log LOG = LogFactory.getLog(TestPKIPerformanceTest.class);
 
-    // private static final String XKMS_LOCATION =
-    // "http://www.e-contract.be/eid-trust-service-ws/xkms2";
-
-    //private static final String XKMS_LOCATION = "http://192.168.1.101/eid-trust-service-ws/xkms2";
-    //private static final String XKMS_LOCATION = "http://localhost/eid-trust-service-ws/xkms2";
-    private static final String XKMS_LOCATION = "http://sebeco-dev-11:8080/eid-trust-service-ws/xkms2";
+    private static final String HOST = "sebeco-dev-11";
+    private static final String XKMS_LOCATION = "http://" + HOST + ":8080/eid-trust-service-ws/xkms2";
 
     private static final int INTERVAL_SIZE = 1000 * 10;
 
@@ -79,6 +78,8 @@ public class TestPKIPerformanceTest implements PerformanceTest {
 
     private TestPKI testPKI;
     private String testPkiPath;
+
+    private MBeanServerConnection rmi;
 
     /**
      * {@inheritDoc}
@@ -148,9 +149,20 @@ public class TestPKIPerformanceTest implements PerformanceTest {
 
         // initialize test framework
         List<PerformanceData> performance = new LinkedList<PerformanceData>();
+        List<MemoryData> memory = new LinkedList<MemoryData>();
         PerformanceData currentPerformance = new PerformanceData();
         performance.add(currentPerformance);
         long nextIntervalT = System.currentTimeMillis() + INTERVAL_SIZE;
+
+        // initialize JBoss monitoring
+        String jnpLocation = "jnp://" + HOST + ":1099";
+        Hashtable<String, String> environment = new Hashtable<String, String>();
+        environment.put(Context.INITIAL_CONTEXT_FACTORY, "org.jnp.interfaces.NamingContextFactory");
+        environment.put(Context.PROVIDER_URL, jnpLocation);
+        rmi = (MBeanServerConnection) new InitialContext(environment)
+                .lookup("jmx/invoker/RMIAdaptor");
+//        rmi = (MBeanServerConnection) new InitialContext(environment)
+//                .lookup("jmx/rmi/RMIAdaptor");
 
         new PerformanceWorkingFrame(this);
 
@@ -171,6 +183,9 @@ public class TestPKIPerformanceTest implements PerformanceTest {
                 currentPerformance.inc();
                 this.count++;
                 if (System.currentTimeMillis() > nextIntervalT) {
+
+                    memory.add(new MemoryData(getFreeMemory(), getMaxMemory(), getTotalMemory()));
+
                     currentPerformance = new PerformanceData();
                     nextIntervalT = System.currentTimeMillis() + INTERVAL_SIZE;
                     performance.add(currentPerformance);
@@ -198,11 +213,48 @@ public class TestPKIPerformanceTest implements PerformanceTest {
 
         // show result
         PerformanceResultDialog dialog = new PerformanceResultDialog(
-                INTERVAL_SIZE, performance, this.expectedRevokedCount);
+                INTERVAL_SIZE, performance, this.expectedRevokedCount, memory);
         while (dialog.isVisible()) {
             Thread.sleep(1000);
         }
     }
+
+    private long getFreeMemory() {
+
+        try {
+            return (Long) rmi.getAttribute(new ObjectName("jboss.system:type=ServerInfo"), "FreeMemory");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    private long getMaxMemory() {
+
+        try {
+            return (Long) rmi.getAttribute(new ObjectName("jboss.system:type=ServerInfo"), "MaxMemory");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    private long getTotalMemory() {
+
+        try {
+            return (Long) rmi.getAttribute(new ObjectName("jboss.system:type=ServerInfo"), "TotalMemory");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
 
     private List<X509Certificate> getCertificateChain(KeyPair testKeyPair,
                                                       List<CAConfiguration> leaves,
@@ -214,7 +266,10 @@ public class TestPKIPerformanceTest implements PerformanceTest {
         int leafIndex = random.nextInt(leaves.size());
         CAConfiguration ca = leaves.get(leafIndex);
         boolean revoked = random.nextInt(100) < revokedPercentage;
-        long t = Math.abs(random.nextLong()) % ca.getCrlRecords();
+        long t = Math.abs(random.nextLong()) % (0 != ca.getCrlRecords() ? ca.getCrlRecords() : 2);
+        if (0 == t) {
+            t = 1;
+        }
         BigInteger serialNumber;
         if (revoked) {
             serialNumber = new BigInteger(Long.toString(t));
@@ -223,11 +278,11 @@ public class TestPKIPerformanceTest implements PerformanceTest {
             serialNumber = new BigInteger(Long.toString(t + ca.getCrlRecords()));
         }
 
-        String crlPath = testPkiPath
+        String crlPath = new URI(testPkiPath
                 + "/" + CrlServlet.PATH + "?"
-                + CrlServlet.CA_QUERY_PARAM + "=" + ca.getName();
-        String ocspPath = testPkiPath
-                + "/" + OcspServlet.PATH + "?" + OcspServlet.CA_QUERY_PARAM + "=" + ca.getName();
+                + CrlServlet.CA_QUERY_PARAM + "=" + ca.getName(), false).toString();
+        String ocspPath = new URI(testPkiPath
+                + "/" + OcspServlet.PATH + "?" + OcspServlet.CA_QUERY_PARAM + "=" + ca.getName(), false).toString();
 
         LOG.debug("generate for CA=" + ca.getName() + " revoked=" + revoked
                 + " sn=" + serialNumber);
@@ -271,9 +326,12 @@ public class TestPKIPerformanceTest implements PerformanceTest {
                 .getInstance("X.509");
 
         // load certificate
-        GetMethod getMethod = new GetMethod(testPkiPath + "/"
+        URI certificateURI = new URI(testPkiPath + "/"
                 + CertificateServlet.PATH + "?"
-                + CertificateServlet.CA_QUERY_PARAM + "=" + ca.getName());
+                + CertificateServlet.CA_QUERY_PARAM + "=" + ca.getName(), false);
+        LOG.debug("URI: " + certificateURI.toString());
+
+        GetMethod getMethod = new GetMethod(certificateURI.toString());
         httpClient.executeMethod(getMethod);
 
         X509Certificate certificate = (X509Certificate) certificateFactory
@@ -281,9 +339,10 @@ public class TestPKIPerformanceTest implements PerformanceTest {
         ca.setCertificate(certificate);
 
         // load private key
-        getMethod = new GetMethod(testPkiPath + "/"
+        URI keyURI = new URI(testPkiPath + "/"
                 + PrivateKeyServlet.PATH + "?"
-                + PrivateKeyServlet.CA_QUERY_PARAM + "=" + ca.getName());
+                + PrivateKeyServlet.CA_QUERY_PARAM + "=" + ca.getName(), false);
+        getMethod = new GetMethod(keyURI.toString());
         httpClient.executeMethod(getMethod);
 
         PEMReader pemReader = new PEMReader(new InputStreamReader(getMethod

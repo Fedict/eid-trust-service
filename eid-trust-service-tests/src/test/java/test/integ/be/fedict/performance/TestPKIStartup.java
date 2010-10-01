@@ -31,7 +31,7 @@ public class TestPKIStartup {
     @BeforeClass
     public static void oneTimeSetUp() throws Exception {
 
-        new TestPKI().start("sebeco-dev-11");
+        new TestPKI().start("sebeco-dev-10");
 
         for (String servletPath : TestPKI.get().getServletPaths()) {
             LOG.debug("Servlet: " + TestPKI.get().getPath() + servletPath);
@@ -48,14 +48,14 @@ public class TestPKIStartup {
     public void testCA() throws Exception {
 
         // some default PKI setup
-        TestPKI.get().addSaveCa("root1", null, 0, 0);
+        TestPKI.get().addSaveCa("CN=root1", null, 0, 0);
 
-        TestPKI.get().addSaveCa("CA1", "root1", 50000, 10);
-        TestPKI.get().addSaveCa("CA2", "root1", 30000, 10);
-        TestPKI.get().addSaveCa("CA3", "root1", 25000, 10);
-        TestPKI.get().addSaveCa("CA4", "root1", 20000, 10);
-        TestPKI.get().addSaveCa("CA5", "root1", 15000, 10);
-        TestPKI.get().addSaveCa("CA6", "root1", 10000, 10);
+        TestPKI.get().addSaveCa("CN=CA1", "CN=root1", 50000, 10);
+        TestPKI.get().addSaveCa("CN=CA2", "CN=root1", 30000, 10);
+        TestPKI.get().addSaveCa("CN=CA3", "CN=root1", 25000, 10);
+        TestPKI.get().addSaveCa("CN=CA4", "CN=root1", 20000, 10);
+        TestPKI.get().addSaveCa("CN=CA5", "CN=root1", 15000, 10);
+        TestPKI.get().addSaveCa("CN=CA6", "CN=root1", 10000, 10);
 
         while (true) {
             Thread.sleep(1000);

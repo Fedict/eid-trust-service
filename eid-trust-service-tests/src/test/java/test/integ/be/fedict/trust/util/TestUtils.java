@@ -167,8 +167,7 @@ public class TestUtils {
         certificateGenerator.setNotAfter(notAfter.toDate());
         X509Principal issuerDN;
         if (null != issuerCert) {
-            issuerDN = new X509Principal(issuerCert.getSubjectX500Principal()
-                    .toString());
+            issuerDN = new X509Principal(issuerCert.getSubjectX500Principal().getName());
         } else {
             issuerDN = new X509Principal(subjectDn);
         }

@@ -131,7 +131,7 @@ public class BeIdPerformanceTest implements PerformanceTest {
         }
 
         PerformanceResultDialog dialog = new PerformanceResultDialog(
-                INTERVAL_SIZE, performance, 0);
+                INTERVAL_SIZE, performance, 0, null);
         while (dialog.isVisible()) {
             Thread.sleep(1000);
         }

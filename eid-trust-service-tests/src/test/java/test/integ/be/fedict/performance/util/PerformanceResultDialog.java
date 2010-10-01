@@ -43,26 +43,145 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class PerformanceResultDialog extends JDialog implements ActionListener {
+public class PerformanceResultDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
-    private JFreeChart chart;
+    private JFreeChart performanceChart;
+    private JFreeChart memoryChart;
 
     public PerformanceResultDialog(int intervalSize,
                                    List<PerformanceData> performance,
-                                   int expectedRevoked) {
+                                   int expectedRevoked,
+                                   List<MemoryData> memory) {
 
         super((Frame) null, "Performance test results");
-        setSize(500, 400);
+        setSize(1000, 800);
 
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
         JMenu fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
-        JMenuItem saveMenuItem = new JMenuItem("Save");
-        fileMenu.add(saveMenuItem);
-        saveMenuItem.addActionListener(this);
+        JMenuItem savePerformanceMenuItem = new JMenuItem("Save Performance");
+        fileMenu.add(savePerformanceMenuItem);
+        savePerformanceMenuItem.addActionListener(new ActionListener() {
 
+            public void actionPerformed(ActionEvent event) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Save as PNG...");
+                int result = fileChooser.showSaveDialog(PerformanceResultDialog.this);
+                if (JFileChooser.APPROVE_OPTION == result) {
+                    File file = fileChooser.getSelectedFile();
+                    try {
+                        ChartUtilities.saveChartAsPNG(file, performanceChart, 1024, 768);
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(null,
+                                "error saving to file: " + e.getMessage());
+                    }
+                }
+            }
+
+        });
+        JMenuItem saveMemoryMenuItem = new JMenuItem("Save Memory");
+        fileMenu.add(saveMemoryMenuItem);
+        saveMemoryMenuItem.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent event) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Save as PNG...");
+                int result = fileChooser.showSaveDialog(PerformanceResultDialog.this);
+                if (JFileChooser.APPROVE_OPTION == result) {
+                    File file = fileChooser.getSelectedFile();
+                    try {
+                        ChartUtilities.saveChartAsPNG(file, memoryChart, 1024, 768);
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(null,
+                                "error saving to file: " + e.getMessage());
+                    }
+                }
+            }
+
+        });
+
+        // memory chart
+        memoryChart = getMemoryChart(intervalSize, memory);
+
+        // performance chart
+        performanceChart = getPerformanceChart(intervalSize,
+                performance, expectedRevoked);
+
+        Container container = getContentPane();
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        if (null != performanceChart) {
+            splitPane.setTopComponent(new ChartPanel(performanceChart));
+        }
+        if (null != memoryChart) {
+            splitPane.setBottomComponent(new ChartPanel(memoryChart));
+        }
+        splitPane.setDividerLocation(getHeight() / 2);
+        splitPane.setDividerSize(1);
+        container.add(splitPane);
+
+        setVisible(true);
+    }
+
+    private JFreeChart getMemoryChart(int intervalSize, List<MemoryData> memory) {
+
+        if (null == memory || memory.isEmpty()) {
+            return null;
+        }
+
+        JFreeChart chart;
+
+        TimeSeries freeSeries = new TimeSeries("Free");
+        TimeSeries maxSeries = new TimeSeries("Max");
+        TimeSeries totalSeries = new TimeSeries("Total");
+
+        memory.remove(memory.size() - 1);
+
+        for (MemoryData memoryEntry : memory) {
+            freeSeries.add(new Second(memoryEntry.getDate()),
+                    memoryEntry.getFreeMemory());
+
+            maxSeries.add(new Second(memoryEntry.getDate()),
+                    memoryEntry.getMaxMemory());
+
+            totalSeries.add(new Second(memoryEntry.getDate()),
+                    memoryEntry.getTotalMemory());
+        }
+
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+        dataset.addSeries(freeSeries);
+        dataset.addSeries(maxSeries);
+        dataset.addSeries(totalSeries);
+        chart = ChartFactory.createTimeSeriesChart(
+                "eID Trust Service Memory Usage History",
+                "Time (interval size " + intervalSize + " msec)",
+                "Memory", dataset, true, false, false);
+
+        chart.addSubtitle(new TextTitle(memory.get(0).getDate()
+                .toString()
+                + " - "
+                + memory.get(memory.size() - 1).getDate()
+                .toString()));
+
+        chart.setBackgroundPaint(Color.WHITE);
+        XYPlot plot = chart.getXYPlot();
+        plot.setBackgroundPaint(Color.WHITE);
+        DateAxis axis = (DateAxis) plot.getDomainAxis();
+        axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:ss"));
+        ValueAxis valueAxis = plot.getRangeAxis();
+        valueAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        plot.setRangeGridlinePaint(Color.black);
+        plot.setDomainGridlinePaint(Color.black);
+        plot.setRenderer(renderer);
+
+        return chart;
+    }
+
+    private JFreeChart getPerformanceChart(int intervalSize,
+                                           List<PerformanceData> performance,
+                                           int expectedRevoked) {
         TimeSeries series = new TimeSeries("Success");
         TimeSeries revokedSeries = new TimeSeries("Revoked");
         TimeSeries failureSeries = new TimeSeries("Failures");
@@ -71,8 +190,10 @@ public class PerformanceResultDialog extends JDialog implements ActionListener {
         if (performance.isEmpty()) {
             JOptionPane.showMessageDialog(null,
                     "test did not run long enough");
-            return;
+            return null;
         }
+
+        JFreeChart chart;
 
         int totalCount = 0;
         int totalRevoked = 0;
@@ -96,12 +217,12 @@ public class PerformanceResultDialog extends JDialog implements ActionListener {
         dataset.addSeries(series);
         dataset.addSeries(revokedSeries);
         dataset.addSeries(failureSeries);
-        this.chart = ChartFactory.createTimeSeriesChart(
+        chart = ChartFactory.createTimeSeriesChart(
                 "eID Trust Service Performance History",
                 "Time (interval size " + intervalSize + " msec)",
                 "Number of XKMS requests", dataset, true, false, false);
 
-        this.chart.addSubtitle(new TextTitle(performance.get(0).getDate()
+        chart.addSubtitle(new TextTitle(performance.get(0).getDate()
                 .toString()
                 + " - "
                 + performance.get(performance.size() - 1).getDate()
@@ -111,22 +232,22 @@ public class PerformanceResultDialog extends JDialog implements ActionListener {
                 "Total number of successful requests: " + totalCount);
         info.setTextAlignment(HorizontalAlignment.LEFT);
         info.setPosition(RectangleEdge.BOTTOM);
-        this.chart.addSubtitle(info);
+        chart.addSubtitle(info);
 
         TextTitle info2 = new TextTitle("Total number of revoked: "
                 + totalRevoked + " expected=" + expectedRevoked);
         info2.setPosition(RectangleEdge.BOTTOM);
         info2.setTextAlignment(HorizontalAlignment.LEFT);
-        this.chart.addSubtitle(info2);
+        chart.addSubtitle(info2);
 
         TextTitle info3 = new TextTitle("Total number of failures: "
                 + totalFailures);
         info3.setPosition(RectangleEdge.BOTTOM);
         info3.setTextAlignment(HorizontalAlignment.LEFT);
-        this.chart.addSubtitle(info3);
+        chart.addSubtitle(info3);
 
-        this.chart.setBackgroundPaint(Color.WHITE);
-        XYPlot plot = this.chart.getXYPlot();
+        chart.setBackgroundPaint(Color.WHITE);
+        XYPlot plot = chart.getXYPlot();
         plot.setBackgroundPaint(Color.WHITE);
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:ss"));
@@ -137,25 +258,6 @@ public class PerformanceResultDialog extends JDialog implements ActionListener {
         plot.setDomainGridlinePaint(Color.black);
         plot.setRenderer(renderer);
 
-        ChartPanel chartPanel = new ChartPanel(this.chart);
-        Container container = getContentPane();
-        container.add(chartPanel);
-
-        setVisible(true);
-    }
-
-    public void actionPerformed(ActionEvent event) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Save as PNG...");
-        int result = fileChooser.showSaveDialog(this);
-        if (JFileChooser.APPROVE_OPTION == result) {
-            File file = fileChooser.getSelectedFile();
-            try {
-                ChartUtilities.saveChartAsPNG(file, this.chart, 1024, 768);
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null,
-                        "error saving to file: " + e.getMessage());
-            }
-        }
+        return chart;
     }
 }
