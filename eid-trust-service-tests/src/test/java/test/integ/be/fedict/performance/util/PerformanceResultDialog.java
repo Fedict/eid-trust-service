@@ -33,13 +33,15 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.HorizontalAlignment;
 import org.jfree.ui.RectangleEdge;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -49,10 +51,7 @@ public class PerformanceResultDialog extends JDialog {
     private JFreeChart performanceChart;
     private JFreeChart memoryChart;
 
-    public PerformanceResultDialog(int intervalSize,
-                                   List<PerformanceData> performance,
-                                   int expectedRevoked,
-                                   List<MemoryData> memory) {
+    public PerformanceResultDialog(PerformanceResultsData data) {
 
         super((Frame) null, "Performance test results");
         setSize(1000, 800);
@@ -103,11 +102,11 @@ public class PerformanceResultDialog extends JDialog {
         });
 
         // memory chart
-        memoryChart = getMemoryChart(intervalSize, memory);
+        memoryChart = getMemoryChart(data.getIntervalSize(), data.getMemory());
 
         // performance chart
-        performanceChart = getPerformanceChart(intervalSize,
-                performance, expectedRevoked);
+        performanceChart = getPerformanceChart(data.getIntervalSize(),
+                data.getPerformance(), data.getExpectedRevokedCount());
 
         Container container = getContentPane();
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -259,5 +258,24 @@ public class PerformanceResultDialog extends JDialog {
         plot.setRenderer(renderer);
 
         return chart;
+    }
+
+    public static void writeResults(PerformanceResultsData data) throws Exception {
+
+        DateTime dt = new DateTime();
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd_MM_yyyy_HHmmss");
+        File resultsFile = new File("performance_results_" + fmt.print(dt) + ".data");
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(resultsFile));
+        out.writeObject(data);
+    }
+
+    public static PerformanceResultsData readResults(File resultsFile) throws Exception {
+
+        if (!resultsFile.exists()) {
+            throw new Exception("Results file: " + resultsFile.getPath() + " does not exist.");
+        }
+
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(resultsFile));
+        return (PerformanceResultsData) in.readObject();
     }
 }

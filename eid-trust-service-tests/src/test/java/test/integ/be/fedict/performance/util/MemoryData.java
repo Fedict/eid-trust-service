@@ -18,9 +18,10 @@
 
 package test.integ.be.fedict.performance.util;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MemoryData {
+public class MemoryData implements Serializable{
 
     private final Date date;
     private final long freeMemory;

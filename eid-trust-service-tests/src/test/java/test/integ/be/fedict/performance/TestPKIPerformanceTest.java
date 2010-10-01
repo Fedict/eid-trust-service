@@ -62,6 +62,10 @@ public class TestPKIPerformanceTest implements PerformanceTest {
 
     private static final int INTERVAL_SIZE = 1000 * 10;
 
+    private static boolean interactive = false;
+    private static String PKI_PATH = "http://sebeco-dev-10:52762";
+    private static int minutes = 2;
+
     @Before
     public void setUp() {
         Security.addProvider(new BouncyCastleProvider());
@@ -70,6 +74,8 @@ public class TestPKIPerformanceTest implements PerformanceTest {
     private boolean run = true;
     private int count = 0;
     private int intervalCount = 0;
+
+    private DateTime startTime;
 
     // test configuration
     private int revokedPercentage = 10;
@@ -123,7 +129,11 @@ public class TestPKIPerformanceTest implements PerformanceTest {
 
         // get test PKI information
         testPKI = new TestPKI();
-        testPkiPath = JOptionPane.showInputDialog("Please give the test PKI base URL");
+        if (interactive) {
+            testPkiPath = JOptionPane.showInputDialog("Please give the test PKI base URL");
+        } else {
+            testPkiPath = PKI_PATH;
+        }
 
         HttpClient httpClient = new HttpClient();
         GetMethod getMethod = new GetMethod(testPkiPath + "/"
@@ -154,27 +164,27 @@ public class TestPKIPerformanceTest implements PerformanceTest {
         performance.add(currentPerformance);
         long nextIntervalT = System.currentTimeMillis() + INTERVAL_SIZE;
 
-        // initialize JBoss monitoring
+        // initialize JBoss monitoring for memory usage
         String jnpLocation = "jnp://" + HOST + ":1099";
         Hashtable<String, String> environment = new Hashtable<String, String>();
         environment.put(Context.INITIAL_CONTEXT_FACTORY, "org.jnp.interfaces.NamingContextFactory");
         environment.put(Context.PROVIDER_URL, jnpLocation);
         rmi = (MBeanServerConnection) new InitialContext(environment)
                 .lookup("jmx/invoker/RMIAdaptor");
-//        rmi = (MBeanServerConnection) new InitialContext(environment)
-//                .lookup("jmx/rmi/RMIAdaptor");
 
-        new PerformanceWorkingFrame(this);
+        if (interactive) {
+            new PerformanceWorkingFrame(this);
+        }
 
         // used to generate our certificates
-        DateTime now = new DateTime();
-        DateTime notBefore = now.minusHours(10);
-        DateTime notAfter = now.plusHours(10);
+        DateTime notBefore = new DateTime().minusHours(10);
+        DateTime notAfter = new DateTime().plusHours(10);
         KeyPair testKeyPair = TestUtils.generateKeyPair();
         List<CAConfiguration> leaves = testPKI.getLeaves();
         Random random = new Random();
 
         // operate
+        this.startTime = new DateTime();
         while (this.run) {
             try {
                 List<X509Certificate> certificateChain = getCertificateChain(testKeyPair,
@@ -190,6 +200,14 @@ public class TestPKIPerformanceTest implements PerformanceTest {
                     nextIntervalT = System.currentTimeMillis() + INTERVAL_SIZE;
                     performance.add(currentPerformance);
                     this.intervalCount++;
+
+                    if (!interactive) {
+                        DateTime now = new DateTime();
+                        if (now.isAfter(startTime.plusMinutes(minutes))) {
+                            this.run = false;
+                        }
+                    }
+
                 }
             } catch (ValidationFailedException e) {
 
@@ -211,11 +229,17 @@ public class TestPKIPerformanceTest implements PerformanceTest {
         // add last performance
         performance.add(currentPerformance);
 
-        // show result
-        PerformanceResultDialog dialog = new PerformanceResultDialog(
-                INTERVAL_SIZE, performance, this.expectedRevokedCount, memory);
-        while (dialog.isVisible()) {
-            Thread.sleep(1000);
+        if (interactive) {
+            // show result
+            PerformanceResultDialog dialog = new PerformanceResultDialog(
+                    new PerformanceResultsData(INTERVAL_SIZE, performance, this.expectedRevokedCount, memory));
+            while (dialog.isVisible()) {
+                Thread.sleep(1000);
+            }
+        } else {
+            // write results to file for later
+            PerformanceResultDialog.writeResults(new PerformanceResultsData(intervalCount,
+                    performance, expectedRevokedCount, memory));
         }
     }
 

@@ -24,10 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;
-import test.integ.be.fedict.performance.util.PerformanceData;
-import test.integ.be.fedict.performance.util.PerformanceResultDialog;
-import test.integ.be.fedict.performance.util.PerformanceTest;
-import test.integ.be.fedict.performance.util.PerformanceWorkingFrame;
+import test.integ.be.fedict.performance.util.*;
 import test.integ.be.fedict.trust.util.TestUtils;
 
 import javax.swing.*;
@@ -131,7 +128,7 @@ public class BeIdPerformanceTest implements PerformanceTest {
         }
 
         PerformanceResultDialog dialog = new PerformanceResultDialog(
-                INTERVAL_SIZE, performance, 0, null);
+                new PerformanceResultsData(INTERVAL_SIZE, performance, 0, null));
         while (dialog.isVisible()) {
             Thread.sleep(1000);
         }

@@ -18,9 +18,10 @@
 
 package test.integ.be.fedict.performance.util;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class PerformanceData {
+public class PerformanceData implements Serializable {
 
     private final Date date;
     private int count;
