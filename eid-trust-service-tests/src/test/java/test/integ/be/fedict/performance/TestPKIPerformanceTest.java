@@ -186,12 +186,30 @@ public class TestPKIPerformanceTest implements PerformanceTest {
         // operate
         this.startTime = new DateTime();
         while (this.run) {
+
             try {
                 List<X509Certificate> certificateChain = getCertificateChain(testKeyPair,
                         leaves, random, notBefore, notAfter);
                 client.validate("performance", certificateChain);
                 currentPerformance.inc();
                 this.count++;
+
+            } catch (ValidationFailedException e) {
+
+                if (e.getReasons().get(0).equals(XKMSConstants.KEY_BINDING_REASON_REVOCATION_STATUS_URI)) {
+                    LOG.debug("revoked");
+                    currentPerformance.incRevoked();
+                    this.revokedCount++;
+                } else {
+                    LOG.error("Validation failed: " + e.getReasons().get(0));
+                    currentPerformance.incFailures();
+                }
+
+            } catch (Exception e) {
+                LOG.error("error: " + e.getMessage(), e);
+                currentPerformance.incFailures();
+            } finally {
+
                 if (System.currentTimeMillis() > nextIntervalT) {
 
                     memory.add(new MemoryData(getFreeMemory(), getMaxMemory(), getTotalMemory()));
@@ -209,20 +227,6 @@ public class TestPKIPerformanceTest implements PerformanceTest {
                     }
 
                 }
-            } catch (ValidationFailedException e) {
-
-                if (e.getReasons().get(0).equals(XKMSConstants.KEY_BINDING_REASON_REVOCATION_STATUS_URI)) {
-                    LOG.debug("revoked");
-                    currentPerformance.incRevoked();
-                    this.revokedCount++;
-                } else {
-                    LOG.error("Validation failed: " + e.getReasons().get(0));
-                    currentPerformance.incFailures();
-                }
-
-            } catch (Exception e) {
-                LOG.error("error: " + e.getMessage(), e);
-                currentPerformance.incFailures();
             }
         }
 
