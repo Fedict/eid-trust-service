@@ -182,8 +182,8 @@ public class TestPKI {
      */
     public void addSaveCa(String name, String root, long crlRecords, int crlRefresh) throws Exception {
 
-        LOG.debug("Add/Save CA: " + name + " root=" + root
-                + " crlRecords=" + crlRecords + " crlRefresh=" + crlRefresh);
+//        LOG.debug("Add/Save CA: " + name + " root=" + root
+//                + " crlRecords=" + crlRecords + " crlRefresh=" + crlRefresh);
 
 
         // find root if needed

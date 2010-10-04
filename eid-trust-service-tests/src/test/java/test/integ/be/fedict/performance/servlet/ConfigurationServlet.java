@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
-import java.util.Map;
 
 public class ConfigurationServlet extends HttpServlet {
 
@@ -119,9 +118,13 @@ public class ConfigurationServlet extends HttpServlet {
         out.println("<hr/>");
 
         // add existing CA's
-        for (Map.Entry<String, CAConfiguration> caConfig :
-                TestPKI.get().getRoots().entrySet()) {
-            addEditRootCAMarkup(out, caConfig.getValue());
+        for (CAConfiguration root : TestPKI.get().getRoots().values()) {
+            addEditCAMarkup(out, root);
+        }
+        for (CAConfiguration root : TestPKI.get().getRoots().values()) {
+            for (CAConfiguration child : root.getChilds()) {
+                addEditRootCAMarkup(out, child);
+            }
         }
 
         out.println("<hr/>");
@@ -289,14 +292,16 @@ public class ConfigurationServlet extends HttpServlet {
         addDisabledTextInput(out, CA_NAME_LABEL, CA_NAME_FIELD + ca.getName(), ca.getName());
         addTextInput(out, CA_CRL_RECORD_LABEL, CA_CRL_RECORDS_FIELD + ca.getName(),
                 Long.toString(ca.getCrlRecords()));
-        addTextInput(out, CA_CRL_REFRESH_LABEL, CA_CRL_REFRESH_FIELD + ca.getName(),
-                Integer.toString(ca.getCrlRefresh()));
+        if (null == ca.getRoot()) {
+            addTextInput(out, CA_CRL_REFRESH_LABEL, CA_CRL_REFRESH_FIELD + ca.getName(),
+                    Integer.toString(ca.getCrlRefresh()));
+        }
 
 
         addSubmit(out, Action.SAVE);
         addSubmit(out, Action.DELETE);
 
-        if (null != ca.getCertificate()) {
+        if (null == ca.getRoot() && null != ca.getCertificate()) {
             addLink(out, CertificateServlet.getPath(ca.getName()), "Certificate");
         }
 

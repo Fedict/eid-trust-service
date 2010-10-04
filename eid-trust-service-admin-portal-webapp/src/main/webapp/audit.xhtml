@@ -13,9 +13,9 @@
 					<rich:dataTable id="data" var="item" value="#{ts_auditList}"
 						rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
 
-						<rich:column sortBy="#{item.date}">
+						<rich:column sortBy="#{item.auditDate}">
 							<f:facet name="header">#{messages.date}</f:facet>
-							<h:outputText value="#{item.date}">
+							<h:outputText value="#{item.auditDate}">
 								<f:convertDateTime type="both" timeStyle="full" />
 							</h:outputText>
 						</rich:column>

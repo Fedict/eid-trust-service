@@ -60,11 +60,11 @@ public class TestPKIPerformanceTest implements PerformanceTest {
     private static final String HOST = "sebeco-dev-11";
     private static final String XKMS_LOCATION = "http://" + HOST + ":8080/eid-trust-service-ws/xkms2";
 
-    private static final int INTERVAL_SIZE = 1000 * 10;
+    private static final int INTERVAL_SIZE = 1000 * 60 * 5; // ms
 
     private static boolean interactive = false;
-    private static String PKI_PATH = "http://sebeco-dev-10:52762";
-    private static int minutes = 2;
+    private static String PKI_PATH = "http://sebeco-dev-10:51104";
+    private static int minutes = 600;
 
     @Before
     public void setUp() {
@@ -177,8 +177,8 @@ public class TestPKIPerformanceTest implements PerformanceTest {
         }
 
         // used to generate our certificates
-        DateTime notBefore = new DateTime().minusHours(10);
-        DateTime notAfter = new DateTime().plusHours(10);
+        DateTime notBefore = new DateTime().minusYears(10);
+        DateTime notAfter = new DateTime().plusYears(10);
         KeyPair testKeyPair = TestUtils.generateKeyPair();
         List<CAConfiguration> leaves = testPKI.getLeaves();
         Random random = new Random();
@@ -238,7 +238,7 @@ public class TestPKIPerformanceTest implements PerformanceTest {
             }
         } else {
             // write results to file for later
-            PerformanceResultDialog.writeResults(new PerformanceResultsData(intervalCount,
+            PerformanceResultDialog.writeResults(new PerformanceResultsData(INTERVAL_SIZE,
                     performance, expectedRevokedCount, memory));
         }
     }
