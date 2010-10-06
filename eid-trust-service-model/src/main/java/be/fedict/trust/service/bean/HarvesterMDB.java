@@ -31,8 +31,14 @@ import be.fedict.trust.service.snmp.SNMPInterceptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
+import org.bouncycastle.asn1.x509.TBSCertList;
+import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.jce.provider.X509CRLEntryObject;
+import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.*;
@@ -40,15 +46,18 @@ import javax.interceptor.Interceptors;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -153,11 +162,18 @@ public class HarvesterMDB implements MessageListener {
         BigInteger crlNumber = getCrlNumber(crl);
         LOG.debug("CRL number: " + crlNumber);
 
-        Set<? extends X509CRLEntry> revokedCertificates = crl
-                .getRevokedCertificates();
-        if (null != revokedCertificates) {
-            LOG.debug("found " + revokedCertificates.size() + " crl entries");
+        boolean isIndirect;
+        Enumeration revokedCertificatesEnum;
+        try {
+            isIndirect = isIndirectCRL(crl);
+            revokedCertificatesEnum = getRevokedCertificatesEnum(crl);
+        } catch (Exception e) {
+            this.auditDAO.logAudit("Failed to parse CRL for CA=" + caName);
+            this.failures++;
+            throw new RuntimeException(e);
+        }
 
+        if (revokedCertificatesEnum.hasMoreElements()) {
             long entriesFound = 0;
             if (null != crlNumber) {
                 entriesFound = this.certificateAuthorityDAO
@@ -175,15 +191,22 @@ public class HarvesterMDB implements MessageListener {
                 /*
                  * Split up persisting the crl entries to avoid memory issues.
                  */
-                Set<X509CRLEntry> revokedCertsBatch = new HashSet<X509CRLEntry>();
                 int added = 0;
-                for (X509CRLEntry revokedCertificate : revokedCertificates) {
+                Set<X509CRLEntry> revokedCertsBatch = new HashSet<X509CRLEntry>();
+                X500Principal previousCertificateIssuer = crl.getIssuerX500Principal();
+                while (revokedCertificatesEnum.hasMoreElements()) {
+
+                    TBSCertList.CRLEntry entry =
+                            (TBSCertList.CRLEntry) revokedCertificatesEnum.nextElement();
+                    X509CRLEntryObject revokedCertificate = new X509CRLEntryObject(entry, isIndirect, previousCertificateIssuer);
+                    previousCertificateIssuer = revokedCertificate.getCertificateIssuer();
+
                     revokedCertsBatch.add(revokedCertificate);
                     added++;
                     if (added == BATCH_SIZE) {
                         /*
-                         * Persist batch
-                         */
+                        * Persist batch
+                        */
                         this.certificateAuthorityDAO.addRevokedCertificates(
                                 revokedCertsBatch, crlNumber, crl
                                         .getIssuerX500Principal());
@@ -192,15 +215,15 @@ public class HarvesterMDB implements MessageListener {
                     }
                 }
                 /*
-                 * Persist final batch
-                 */
+                * Persist final batch
+                */
                 this.certificateAuthorityDAO.addRevokedCertificates(
                         revokedCertsBatch, crlNumber, crl
                                 .getIssuerX500Principal());
 
                 /*
-                 * Cleanup redundant CRL entries
-                 */
+                * Cleanup redundant CRL entries
+                */
                 if (null != crlNumber) {
                     this.certificateAuthorityDAO.removeOldRevokedCertificates(
                             crlNumber, crl.getIssuerX500Principal().toString());
@@ -233,5 +256,53 @@ public class HarvesterMDB implements MessageListener {
         } catch (IOException e) {
             throw new RuntimeException("IO error: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Added for as {@link X509CRL#getRevokedCertificates()}
+     * is memory intensive because it is returning a complete set, for huge CRL's
+     * this can get kinda out of hand.
+     * So we return an enumeration of the DER {@link TBSCertList.CRLEntry} objects.
+     *
+     * @param crl the CRL
+     * @return {@link Enumeration} of {@link TBSCertList.CRLEntry}'s.
+     * @throws IOException  something went wrong parsing.
+     * @throws CRLException something went wrong parsing.
+     */
+    @SuppressWarnings("unchecked")
+    private Enumeration<TBSCertList.CRLEntry> getRevokedCertificatesEnum(X509CRL crl) throws IOException, CRLException {
+
+        byte[] certList = crl.getTBSCertList();
+        ByteArrayInputStream bais = new ByteArrayInputStream(certList);
+        ASN1InputStream aIn = new ASN1InputStream(bais, Integer.MAX_VALUE, true);
+        ASN1Sequence seq = (ASN1Sequence) aIn.readObject();
+        TBSCertList cl = TBSCertList.getInstance(seq);
+        return cl.getRevokedCertificateEnumeration();
+    }
+
+    /**
+     * Returns if the specified CRL is indirect.
+     *
+     * @param crl the CRL
+     * @return true or false
+     * @throws CRLException something went wrong reading the
+     *                      {@link org.bouncycastle.asn1.x509.IssuingDistributionPoint}.
+     */
+    private boolean isIndirectCRL(X509CRL crl)
+            throws CRLException {
+        byte[] idp = crl.getExtensionValue(X509Extensions.IssuingDistributionPoint.getId());
+        boolean isIndirect = false;
+        try {
+            if (idp != null) {
+                isIndirect = IssuingDistributionPoint.getInstance(
+                        X509ExtensionUtil.fromExtensionValue(idp))
+                        .isIndirectCRL();
+            }
+        }
+        catch (Exception e) {
+            throw new CRLException("Exception reading IssuingDistributionPoint", e);
+        }
+
+        return isIndirect;
     }
 }
