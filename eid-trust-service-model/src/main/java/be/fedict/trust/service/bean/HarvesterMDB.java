@@ -173,18 +173,17 @@ public class HarvesterMDB implements MessageListener {
                         + BATCH_SIZE + ")");
 
                 /*
-                     * Split up persisting the crl entries to avoid memory issues.
-                     */
+                 * Split up persisting the crl entries to avoid memory issues.
+                 */
                 Set<X509CRLEntry> revokedCertsBatch = new HashSet<X509CRLEntry>();
                 int added = 0;
-                for (X509CRLEntry revokedCertificate : crl
-                        .getRevokedCertificates()) {
+                for (X509CRLEntry revokedCertificate : revokedCertificates) {
                     revokedCertsBatch.add(revokedCertificate);
                     added++;
                     if (added == BATCH_SIZE) {
                         /*
-                               * Persist batch
-                               */
+                         * Persist batch
+                         */
                         this.certificateAuthorityDAO.addRevokedCertificates(
                                 revokedCertsBatch, crlNumber, crl
                                         .getIssuerX500Principal());
@@ -193,15 +192,15 @@ public class HarvesterMDB implements MessageListener {
                     }
                 }
                 /*
-                     * Persist final batch
-                     */
+                 * Persist final batch
+                 */
                 this.certificateAuthorityDAO.addRevokedCertificates(
                         revokedCertsBatch, crlNumber, crl
                                 .getIssuerX500Principal());
 
                 /*
-                     * Cleanup redundant CRL entries
-                     */
+                 * Cleanup redundant CRL entries
+                 */
                 if (null != crlNumber) {
                     this.certificateAuthorityDAO.removeOldRevokedCertificates(
                             crlNumber, crl.getIssuerX500Principal().toString());
