@@ -27,6 +27,9 @@ import test.integ.be.fedict.performance.util.PerformanceResultsData;
 import javax.swing.*;
 import java.io.File;
 
+/**
+ * Used for loading in performance test result data generated in non-interactive mode.
+ */
 public class TestLoadResults {
 
     private static final Log LOG = LogFactory.getLog(TestLoadResults.class);

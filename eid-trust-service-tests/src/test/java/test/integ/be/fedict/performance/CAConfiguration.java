@@ -54,6 +54,7 @@ public class CAConfiguration implements Serializable {
 
     // CRL config data
     private DateTime crlNextUpdate;
+    private DateTime crllGenerateNext;
     private int crlNumber = 1;
 
     public CAConfiguration(String name, long crlRecords, int crlRefresh) {
@@ -112,9 +113,8 @@ public class CAConfiguration implements Serializable {
 
         if (this.crlRefresh > 0) {
             DateTime now = new DateTime();
-            if (now.isAfter(this.crlNextUpdate)) {
+            if (now.isAfter(this.crllGenerateNext)) {
                 // time's up, generate me a new one!
-                this.crlNextUpdate = now.plusMinutes(this.crlRefresh);
                 this.crlNumber++;
                 LOG.debug("generate new CRL for CA=" + this.name + " (nextUpdate="
                         + this.crlNextUpdate.toString() + " crlNumber=" + this.crlNumber + ")");
@@ -181,11 +181,11 @@ public class CAConfiguration implements Serializable {
 
         DateTime now = new DateTime();
         if (this.crlRefresh > 0) {
-            crlNextUpdate = now.plusMinutes(this.crlRefresh);
+            crllGenerateNext = now.plusHours(this.crlRefresh);
         } else {
-            crlNextUpdate = now.plusHours(3);
+            crllGenerateNext = now.plusHours(3);
         }
-
+        crlNextUpdate = now.plusDays(7);
 
         List<BigInteger> revokedSerialNumbers = new LinkedList<BigInteger>();
         for (long i = 0; i < this.crlRecords; i++) {

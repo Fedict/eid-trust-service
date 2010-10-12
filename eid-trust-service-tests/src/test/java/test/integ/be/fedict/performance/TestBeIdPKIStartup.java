@@ -24,6 +24,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * An example {@link TestPKI} simulating the Belgian eID PKI.
+ * The CA's and # of CRL entries where found using {@link TestHarvestEid}.
+ */
 public class TestBeIdPKIStartup {
 
     private static final Log LOG = LogFactory.getLog(TestBeIdPKIStartup.class);
@@ -47,22 +51,11 @@ public class TestBeIdPKIStartup {
     @Test
     public void testCA() throws Exception {
 
-        // some default PKI setup
-//        TestPKI.get().addSaveCa("root1", null, 0, 0);
-//
-//        TestPKI.get().addSaveCa("CA1", "root1", 50000, 10);
-//        TestPKI.get().addSaveCa("CA2", "root1", 30000, 10);
-//        TestPKI.get().addSaveCa("CA3", "root1", 25000, 10);
-//        TestPKI.get().addSaveCa("CA4", "root1", 20000, 10);
-//        TestPKI.get().addSaveCa("CA5", "root1", 15000, 10);
-//        TestPKI.get().addSaveCa("CA6", "root1", 10000, 10);
-
         // Belgian eid test PKI
-        TestPKI.get().addSaveCa("CN=root1", null, 0, 180);
-        TestPKI.get().addSaveCa("CN=root2", null, 0, 180);
-        // a wee bit to big this one :/
-        //TestPKI.get().addSaveCa("CN=Citizen CA", "CN=root1", 718521, 180);
-        //TestPKI.get().addSaveCa("CN=200501", "CN=root1", 709866, 180);
+        TestPKI.get().addSaveCa("CN=root1", null, 1, 180);
+        TestPKI.get().addSaveCa("CN=root2", null, 1, 180);
+        TestPKI.get().addSaveCa("CN=Citizen CA", "CN=root1", 718521, 180);
+        TestPKI.get().addSaveCa("CN=200501", "CN=root1", 709866, 180);
         TestPKI.get().addSaveCa("CN=200502", "CN=root1", 58135, 180);
         TestPKI.get().addSaveCa("CN=200503", "CN=root1", 191524, 180);
         TestPKI.get().addSaveCa("CN=200504", "CN=root1", 188841, 180);

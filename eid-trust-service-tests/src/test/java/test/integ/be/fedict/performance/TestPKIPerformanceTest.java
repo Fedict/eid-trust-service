@@ -53,6 +53,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Performance test using a configurable {@link TestPKI}.
+ * <p/>
+ * The performance test can run in interactive or non-interactive mode.
+ * <p/>
+ * In interactive mode, the base URL of the {@link TestPKI} will be asked first
+ * and you have the ability to manually end the test and start generating the graphs.
+ * <p/>
+ * In non-interactive mode you will have to specify the {@link TestPKI} in the code and also specify the # minutes to run.
+ * When the test has finished, it will dump the performanc result data in a file name <code>performance_results_xxx.data</code>.
+ * Use the {@link TestLoadResults} unit test to load this file in to get the graphs.
+ * <p/>
+ * <u>How to start the {@link TestPKI} ?</u>
+ * Have a look at {@link TestPKIStartup} and {@link TestBeIdPKIStartup} for examples.
+ * <p>/>
+ * <u>How to configure the {@link TestPKI} ?</u>
+ * You can view its configuration @ e.g. localhost:13456/configuration.
+ * There you will be able to generate the {@link TestPKI} infrastructure.
+ * After this is done, all certificates and initial CRLs will be generated and you are set to start your performance test.
+ */
 public class TestPKIPerformanceTest implements PerformanceTest {
 
     private static final Log LOG = LogFactory.getLog(TestPKIPerformanceTest.class);
@@ -63,8 +83,8 @@ public class TestPKIPerformanceTest implements PerformanceTest {
     private static final int INTERVAL_SIZE = 1000 * 60 * 5; // ms
 
     private static boolean interactive = false;
-    private static String PKI_PATH = "http://sebeco-dev-11:38010";
-    private static int minutes = 600;
+    private static String PKI_PATH = "http://sebeco-dev-10:49065";
+    private static int minutes = 60 * 48;
 
     @Before
     public void setUp() {
