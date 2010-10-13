@@ -12,7 +12,7 @@
           -->
         <groupId>be.fedict</groupId>
         <artifactId>eid-applet</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2.Beta1</version>
     </parent>
     <groupId>be.fedict</groupId>
     <artifactId>eid-trust-service</artifactId>
@@ -149,7 +149,7 @@
             <dependency>
                 <groupId>be.fedict</groupId>
                 <artifactId>jtrust</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>1.1.1</version>
             </dependency>
             <dependency>
                 <groupId>be.fedict.eid-applet</groupId>
@@ -283,7 +283,7 @@
 
     <!-- Default properties -->
     <properties>
-        <eid-applet.version>1.0.2-SNAPSHOT</eid-applet.version>
+        <eid-applet.version>1.0.2.Beta1</eid-applet.version>
         <trust-service.data.source.user>trust</trust-service.data.source.user>
         <trust-service.data.source.pass>trust</trust-service.data.source.pass>
         <hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
