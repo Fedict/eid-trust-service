@@ -3,12 +3,12 @@
     <parent>
         <groupId>be.fedict</groupId>
         <artifactId>eid-trust-service</artifactId>
-        <version>1.0.0.RC2</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
     <name>eID Trust Service Integration Tests</name>
     <groupId>be.fedict.eid-trust-service</groupId>
     <artifactId>eid-trust-service-tests</artifactId>
-    <version>1.0.0.RC2</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <build>
@@ -60,19 +60,19 @@
         <dependency>
             <groupId>be.fedict.eid-trust-service</groupId>
             <artifactId>eid-trust-service-client</artifactId>
-            <version>1.0.0.RC2</version>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>be.fedict.eid-trust-service</groupId>
             <artifactId>eid-trust-service-xkms2-ws-impl</artifactId>
-            <version>1.0.0.RC2</version>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>be.fedict.eid-trust-service</groupId>
             <artifactId>eid-trust-service-model</artifactId>
-            <version>1.0.0.RC2</version>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
