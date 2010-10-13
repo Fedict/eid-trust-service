@@ -35,14 +35,14 @@
 			<orderedlist>
 				<listitem>
 					<para>
-					eID Trust Service portal
+						eID Trust Service portal
 					</para>
 					<para>Via this web portal citizens can check the validity of their
 						eID certificates.</para>
 				</listitem>
 				<listitem>
 					<para>
-					eID Trust Service validation web service
+						eID Trust Service validation web service
 					</para>
 					<para>Via this SOAP web service Relying Parties (aka Service
 						Providers) can check the validity of certificate paths. This web
@@ -256,7 +256,8 @@
 	<section>
 		<title>Installation</title>
 		<para>
-			This chapter explains how to install the Fedict eID Trust Service
+			This chapter explains how to install the Fedict eID Trust
+			Service
 			application.
 		</para>
 		<para>
@@ -406,7 +407,8 @@ QUIT;]]></programlisting>
 				]]></programlisting>
 			</para>
 			<para>
-				Check whether the PostgreSQL service will be started at boot time via:
+				Check whether the PostgreSQL service will be started at boot time
+				via:
 				<programlisting><![CDATA[
 					chkconfig --list postgresql
 				]]></programlisting>
@@ -613,29 +615,39 @@ CreateBalancers 1
 				After you have correctly setup your database, you can start the
 				application by executing following command:
 				<programlisting><![CDATA[
-					./jboss/bin/run.sh -b 0.0.0.0 -c all
+					./jboss/bin/run.sh -b 0.0.0.0 -c all &
 				]]></programlisting>
 				. The option
 				<code>-b 0.0.0.0</code>
 				is to change the bind address of the server so its available to all
 				interfaces.
 			</para>
+			<warning>
+				<title>eID Trust Service Administrator registration</title>
+				<para>
+					The first time you start the eID Trust Service you should
+					register a trust service administrator via the admin portal.
+				</para>
+			</warning>
 			<para>
 				After the application has started, it will have initialized itself
 				with 4 trust domains.
 				<orderedlist>
 					<listitem>
-						<para>eID Authentication Trust Domain ( machine domain name BE-AUTH )</para>
+						<para>eID Authentication Trust Domain ( machine domain name
+							BE-AUTH )</para>
 					</listitem>
 					<listitem>
-						<para>eID Non Repudiation Trust Domain ( machine domain name BE )</para>
+						<para>eID Non Repudiation Trust Domain ( machine domain name BE )
+						</para>
 					</listitem>
 					<listitem>
 						<para>eID National Registry Trust Domain ( machine domain name
-						BE-NAT-REG )</para>
+							BE-NAT-REG )</para>
 					</listitem>
 					<listitem>
-						<para>Belgian TSA Trust Domain ( machine domain name BE-TSA )</para>
+						<para>Belgian TSA Trust Domain ( machine domain name BE-TSA )
+						</para>
 					</listitem>
 				</orderedlist>
 			</para>
@@ -1043,39 +1055,39 @@ JBOSS_CONF="all"]]></programlisting>
 			<itemizedlist>
 				<listitem>
 					<para>
-					<ulink
-						url="http://java.sun.com/javase/technologies/hotspot/gc/gc_tuning_6.html">JVM GC Tuning</ulink>
+						<ulink
+							url="http://java.sun.com/javase/technologies/hotspot/gc/gc_tuning_6.html">JVM GC Tuning</ulink>
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-					<ulink url="http://en.wikipedia.org/wiki/Revocation_list">Certificate Revocation Lists</ulink>
+						<ulink url="http://en.wikipedia.org/wiki/Revocation_list">Certificate Revocation Lists</ulink>
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-					<ulink url="http://en.wikipedia.org/wiki/OCSP">Online Certificate Status Protocol</ulink>
+						<ulink url="http://en.wikipedia.org/wiki/OCSP">Online Certificate Status Protocol</ulink>
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-					<ulink url="http://en.wikipedia.org/wiki/Time_Stamp_Protocol">Timestamp Protocol</ulink>
+						<ulink url="http://en.wikipedia.org/wiki/Time_Stamp_Protocol">Timestamp Protocol</ulink>
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-					<ulink url="http://en.wikipedia.org/wiki/Network_Time_Protocol">Network Time Protocol</ulink>
+						<ulink url="http://en.wikipedia.org/wiki/Network_Time_Protocol">Network Time Protocol</ulink>
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-					<ulink
-						url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Server_Configuration_Guide/beta500/html-single/index.html#cluster.chapt">JBoss Clustering</ulink>
+						<ulink
+							url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Server_Configuration_Guide/beta500/html-single/index.html#cluster.chapt">JBoss Clustering</ulink>
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-					<ulink url="http://www.jboss.org/mod_cluster.html">JBoss mod_cluster</ulink>
+						<ulink url="http://www.jboss.org/mod_cluster.html">JBoss mod_cluster</ulink>
 					</para>
 				</listitem>
 			</itemizedlist>
