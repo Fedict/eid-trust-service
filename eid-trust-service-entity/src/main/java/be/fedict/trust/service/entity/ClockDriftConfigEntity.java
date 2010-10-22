@@ -18,13 +18,16 @@
 
 package be.fedict.trust.service.entity;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.annotations.Type;
-
-import javax.ejb.TimerHandle;
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Entity
 @Table(name = "ts_clock_drift")

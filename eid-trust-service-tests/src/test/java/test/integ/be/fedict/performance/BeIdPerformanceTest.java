@@ -44,7 +44,7 @@ public class BeIdPerformanceTest implements PerformanceTest {
     //private static final String XKMS_LOCATION = "http://localhost/eid-trust-service-ws/xkms2";
     //private static final String XKMS_LOCATION = "http://sebeco-dev-11:8080/eid-trust-service-ws/xkms2";
 
-    private static final int INTERVAL_SIZE = 1000 * 10;
+    private static final int INTERVAL_SIZE = 1000 * 60;
 
     @Before
     public void setUp() {
