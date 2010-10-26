@@ -37,6 +37,7 @@ import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.*;
 import be.fedict.trust.service.entity.constraints.*;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.service.snmp.SNMP;
 import be.fedict.trust.service.snmp.SNMPCounter;
@@ -373,7 +374,6 @@ public class TrustServiceBean implements TrustService {
         OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
                 networkConfig);
 
-        // TODO: use singleton here
         CachedCrlRepository cachedCrlRepository = crlRepositoryService.getCachedCrlRepository();
         if (null == cachedCrlRepository) {
             OnlineCrlRepository crlRepository = new OnlineCrlRepository(
@@ -608,7 +608,11 @@ public class TrustServiceBean implements TrustService {
                             }
                         } catch (JMSException e) {
                             logAudit("Failed to notify harvester: " + e.getMessage());
-                            LOG.error("could not notify harvester: " + e.getMessage(), e);
+                            LOG.error(e.getMessage(), e);
+                        } catch (InvalidCronExpressionException e) {
+                            logAudit("Failed to start timer for trust point: " +
+                                    certificateAuthority.getTrustPoint().getName());
+                            LOG.error(e.getMessage(), e);
                         }
                     } else {
                         certificateAuthority.setStatus(Status.NONE);

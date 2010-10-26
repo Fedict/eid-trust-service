@@ -19,6 +19,7 @@
 package be.fedict.trust.service;
 
 import be.fedict.trust.service.entity.*;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
 import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
@@ -54,9 +55,9 @@ public interface ConfigurationService {
      * Save the {@link ClockDriftConfigEntity}.
      */
     void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
-                              int timeout, int maxClockOffset, long interval, boolean enabled)
+                              int timeout, int maxClockOffset, String cronSchedule, boolean enabled)
             throws InvalidTimeoutException,
-            InvalidMaxClockOffsetException;
+            InvalidMaxClockOffsetException, InvalidCronExpressionException;
 
     /**
      * Returns the {@link WSSecurityConfigEntity}.

@@ -90,12 +90,12 @@ public interface ConfigurationDAO {
 	 *            used by the NTP client as timeout to the NTP server, in ms
 	 * @param maxClockOffset
 	 *            maximum clock offset accepted, in ms
-     * @param interval
-     *            interval in minutes.
+     * @param cronSchedule
+     *            cron schedule.
 	 * @return
 	 */
 	ClockDriftConfigEntity setClockDriftConfig(TimeProtocol timeProtocol,
-			String server, int timeout, int maxClockOffset, long interval);
+			String server, int timeout, int maxClockOffset, String cronSchedule);
 
 	/**
 	 * Enable/disable the {@link ClockDriftConfigEntity}.

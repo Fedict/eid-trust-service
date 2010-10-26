@@ -18,55 +18,54 @@
 
 package be.fedict.trust.admin.portal;
 
-import java.io.IOException;
+import org.richfaces.event.UploadEvent;
 
 import javax.ejb.Local;
-
-import org.richfaces.event.UploadEvent;
+import java.io.IOException;
 
 @Local
 public interface TrustPoint {
 
-	/*
-	 * Factories
-	 */
-	void trustPointListFactory();
+    /*
+      * Factories
+      */
+    void trustPointListFactory();
 
-	void trustPointCAListFactory();
+    void trustPointCAListFactory();
 
-	/*
-	 * Lifecycle.
-	 */
-	void destroyCallback();
+    /*
+      * Lifecycle.
+      */
+    void destroyCallback();
 
-	/*
-	 * Accessors
-	 */
-	long getCrlRefreshInterval();
+    /*
+      * Accessors
+      */
+    String getCrlRefreshCronSchedule();
 
-	void setCrlRefreshInterval(long crlRefreshInterval);
+    void setCrlRefreshCronSchedule(String crlRefreshCronSchedule);
 
-	/*
-	 * Actions
-	 */
-	String modify();
+    /*
+      * Actions
+      */
+    String modify();
 
-	String save();
+    String save();
 
-	void select();
+    void select();
 
-	String remove();
+    String remove();
 
-	String add();
+    String add();
 
-	String back();
+    String back();
 
-	String refresh();
+    String refresh();
 
-	String refreshCA();
+    String refreshCA();
 
-	/*
-	 * Richfaces component callbacks
-	 */
-	void uploadListener(UploadEvent event) throws IOException;
+    /*
+      * Richfaces component callbacks
+      */
+    void uploadListener(UploadEvent event) throws IOException;
 }

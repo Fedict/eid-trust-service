@@ -170,12 +170,12 @@ public class TrustDomainServiceBean implements TrustDomainService {
      * {@inheritDoc}
      */
     @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-    public void save(TrustPointEntity trustPoint) {
+    public void save(TrustPointEntity trustPoint) throws InvalidCronExpressionException {
 
         LOG.debug("save trust point: " + trustPoint.getName());
         TrustPointEntity attachedTrustPoint = this.trustDomainDAO
                 .attachTrustPoint(trustPoint);
-        attachedTrustPoint.setCrlRefreshInterval(trustPoint.getCrlRefreshInterval());
+        attachedTrustPoint.setCrlRefreshCronSchedule(trustPoint.getCrlRefreshCronSchedule());
         this.schedulingService.startTimer(attachedTrustPoint);
     }
 
@@ -240,9 +240,9 @@ public class TrustDomainServiceBean implements TrustDomainService {
      * {@inheritDoc}
      */
     @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-    public TrustPointEntity addTrustPoint(long crlRefreshInterval,
+    public TrustPointEntity addTrustPoint(String crlRefreshCronSchedule,
                                           byte[] certificateBytes) throws TrustPointAlreadyExistsException,
-            CertificateException {
+            CertificateException, InvalidCronExpressionException {
 
         LOG.debug("add trust point");
 
@@ -260,7 +260,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 
         // add trust point
         TrustPointEntity trustPoint = this.trustDomainDAO.addTrustPoint(
-                crlRefreshInterval, certificateAuthority);
+                crlRefreshCronSchedule, certificateAuthority);
 
         // manage relationship
         certificateAuthority.setTrustPoint(trustPoint);

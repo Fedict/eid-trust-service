@@ -113,7 +113,7 @@ public interface TrustDomainDAO {
     /**
      * Create a new {@link TrustPointEntity}.
      */
-    TrustPointEntity addTrustPoint(long crlRefreshInterval,
+    TrustPointEntity addTrustPoint(String crlRefreshCronSchedule,
                                    CertificateAuthorityEntity ca);
 
     /**

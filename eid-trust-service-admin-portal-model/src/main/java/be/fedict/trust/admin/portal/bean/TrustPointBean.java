@@ -24,6 +24,7 @@ import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 import org.apache.commons.io.FileUtils;
 import org.jboss.ejb3.annotation.LocalBinding;
@@ -90,7 +91,7 @@ public class TrustPointBean implements TrustPoint {
     @In(value = TrustDomainBean.SELECTED_TRUST_DOMAIN, required = false)
     private TrustDomainEntity selectedTrustDomain;
 
-    private long crlRefreshInterval;
+    private String crlRefreshCronSchedule;
 
     /**
      * {@inheritDoc}
@@ -130,7 +131,7 @@ public class TrustPointBean implements TrustPoint {
     public String modify() {
 
         this.log.debug("modify: #0", this.selectedTrustPoint.getName());
-        this.crlRefreshInterval = this.selectedTrustPoint.getCrlRefreshInterval();
+        this.crlRefreshCronSchedule = this.selectedTrustPoint.getCrlRefreshCronSchedule();
         return "modify";
     }
 
@@ -167,11 +168,17 @@ public class TrustPointBean implements TrustPoint {
     public String save() {
 
         if (null != this.selectedTrustPoint) {
-            this.selectedTrustPoint.setCrlRefreshInterval(this.crlRefreshInterval);
+            this.selectedTrustPoint.setCrlRefreshCronSchedule(this.crlRefreshCronSchedule);
             this.log.debug("save trust point: #0", this.selectedTrustPoint
                     .getName());
-            this.trustDomainService.save(this.selectedTrustPoint);
-            this.crlRefreshInterval = 0;
+            try {
+                this.trustDomainService.save(this.selectedTrustPoint);
+            } catch (InvalidCronExpressionException e) {
+                this.facesMessages.addToControlFromResourceBundle("cronSchedule",
+                        StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
+                return null;
+            }
+            this.crlRefreshCronSchedule = null;
         }
         if (null != this.selectedTrustDomain) {
             return "success_trustdomain";
@@ -198,8 +205,8 @@ public class TrustPointBean implements TrustPoint {
     @End
     public String add() {
 
-        this.log.debug("add trust point: crlRefreshInterval=#0",
-                this.crlRefreshInterval);
+        this.log.debug("add trust point: crlRefreshCronSchedule=#0",
+                this.crlRefreshCronSchedule);
 
         if (null == this.certificateBytes) {
             this.facesMessages.addFromResourceBundle(
@@ -208,9 +215,9 @@ public class TrustPointBean implements TrustPoint {
         }
 
         try {
-            this.trustDomainService.addTrustPoint(this.crlRefreshInterval,
+            this.trustDomainService.addTrustPoint(this.crlRefreshCronSchedule,
                     this.certificateBytes);
-            this.crlRefreshInterval = 0;
+            this.crlRefreshCronSchedule = null;
             this.certificateBytes = null;
             trustPointListFactory();
         } catch (CertificateException e) {
@@ -221,6 +228,10 @@ public class TrustPointBean implements TrustPoint {
             this.facesMessages.addFromResourceBundle(
                     StatusMessage.Severity.ERROR,
                     "errorTrustPointAlreadyExists");
+            return null;
+        } catch (InvalidCronExpressionException e) {
+            this.facesMessages.addToControlFromResourceBundle("cronSchedule",
+                    StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
             return null;
         }
 
@@ -261,17 +272,17 @@ public class TrustPointBean implements TrustPoint {
     /**
      * {@inheritDoc}
      */
-    public long getCrlRefreshInterval() {
+    public String getCrlRefreshCronSchedule() {
 
-        return this.crlRefreshInterval;
+        return this.crlRefreshCronSchedule;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void setCrlRefreshInterval(long crlRefreshInterval) {
+    public void setCrlRefreshCronSchedule(String crlRefreshCronSchedule) {
 
-        this.crlRefreshInterval = crlRefreshInterval;
+        this.crlRefreshCronSchedule = crlRefreshCronSchedule;
     }
 
     /**

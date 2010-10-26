@@ -126,7 +126,7 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
                     TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER,
                     TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
                     TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET,
-                    TrustServiceConstants.DEFAULT_CRON_INTERVAL);
+                    TrustServiceConstants.DEFAULT_CRON_EXPRESSION);
             this.entityManager.persist(clockDriftConfig);
         }
         return clockDriftConfig;
@@ -137,7 +137,7 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
      */
     public ClockDriftConfigEntity setClockDriftConfig(
             TimeProtocol timeProtocol, String server, int timeout,
-            int maxClockOffset, long interval) {
+            int maxClockOffset, String cronSchedule) {
 
         LOG.debug("set clock drift detection config: protocol="
                 + timeProtocol.name() + " server=" + server + " timeout="
@@ -147,7 +147,7 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
         clockDriftConfig.setServer(server);
         clockDriftConfig.setTimeout(timeout);
         clockDriftConfig.setMaxClockOffset(maxClockOffset);
-        clockDriftConfig.setClockDriftInterval(interval);
+        clockDriftConfig.setCronSchedule(cronSchedule);
         return clockDriftConfig;
     }
 

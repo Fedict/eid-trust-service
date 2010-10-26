@@ -196,12 +196,12 @@ public class TrustDomainDAOBean implements TrustDomainDAO {
     /**
      * {@inheritDoc}
      */
-    public TrustPointEntity addTrustPoint(long crlRefreshInterval,
+    public TrustPointEntity addTrustPoint(String crlRefreshCronSchedule,
                                           CertificateAuthorityEntity ca) {
 
-        LOG.debug("add trust point " + ca.getName() + " crlRefreshInterval="
-                + crlRefreshInterval);
-        TrustPointEntity trustPoint = new TrustPointEntity(crlRefreshInterval, ca);
+        LOG.debug("add trust point " + ca.getName() + " crlRefreshCronSchedule="
+                + crlRefreshCronSchedule);
+        TrustPointEntity trustPoint = new TrustPointEntity(crlRefreshCronSchedule, ca);
         this.entityManager.persist(trustPoint);
         return trustPoint;
     }

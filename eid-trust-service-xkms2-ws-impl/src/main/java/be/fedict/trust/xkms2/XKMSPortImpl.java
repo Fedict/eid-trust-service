@@ -168,6 +168,7 @@ public class XKMSPortImpl implements XKMSPortType {
            */
         for (MessageExtensionAbstractType messageExtension : body
                 .getMessageExtension()) {
+
             if (messageExtension instanceof RevocationDataMessageExtensionType) {
 
                 RevocationDataMessageExtensionType revocationDataMessageExtension = (RevocationDataMessageExtensionType) messageExtension;

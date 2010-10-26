@@ -23,6 +23,7 @@ import be.fedict.trust.admin.portal.Configuration;
 import be.fedict.trust.service.ConfigurationService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.entity.*;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
 import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
@@ -69,7 +70,7 @@ public class ConfigurationBean implements Configuration {
     private String clockDriftServer;
     private int clockDriftTimeout;
     private int clockDriftMaxClockOffset;
-    private long clockDriftInterval;
+    private String clockDriftCronSchedule;
     private boolean clockDriftEnabled;
 
     private boolean wsSecuritySigning;
@@ -119,7 +120,7 @@ public class ConfigurationBean implements Configuration {
         this.clockDriftServer = clockDriftConfig.getServer();
         this.clockDriftTimeout = clockDriftConfig.getTimeout();
         this.clockDriftMaxClockOffset = clockDriftConfig.getMaxClockOffset();
-        this.clockDriftInterval = clockDriftConfig.getClockDriftInterval();
+        this.clockDriftCronSchedule = clockDriftConfig.getCronSchedule();
         this.clockDriftEnabled = clockDriftConfig.isEnabled();
 
         WSSecurityConfigEntity wsSecurityConfig = this.configurationService
@@ -188,16 +189,16 @@ public class ConfigurationBean implements Configuration {
 
         this.log
                 .debug(
-                        "save clock drift config: protocol=#0 server=#1 timeout=#2 maxClockOffset=#3 clockDriftInterval=#4 enabled=#5",
+                        "save clock drift config: protocol=#0 server=#1 timeout=#2 maxClockOffset=#3 clockDriftCronSchedule=#4 enabled=#5",
                         this.clockDriftProtocol, this.clockDriftServer,
                         this.clockDriftTimeout, this.clockDriftMaxClockOffset,
-                        this.clockDriftInterval, this.clockDriftEnabled);
+                        this.clockDriftCronSchedule, this.clockDriftEnabled);
 
         try {
             this.configurationService.saveClockDriftConfig(TimeProtocol
                     .valueOf(this.clockDriftProtocol), this.clockDriftServer,
                     this.clockDriftTimeout, this.clockDriftMaxClockOffset,
-                    this.clockDriftInterval, this.clockDriftEnabled);
+                    this.clockDriftCronSchedule, this.clockDriftEnabled);
         } catch (InvalidTimeoutException e) {
             this.facesMessages.addToControlFromResourceBundle("timeout",
                     StatusMessage.Severity.ERROR, "errorTimeoutInvalid");
@@ -205,6 +206,10 @@ public class ConfigurationBean implements Configuration {
         } catch (InvalidMaxClockOffsetException e) {
             this.facesMessages.addToControlFromResourceBundle("maxClockOffset",
                     StatusMessage.Severity.ERROR, "errorMaxClockOffsetInvalid");
+            return null;
+        } catch (InvalidCronExpressionException e) {
+            this.facesMessages.addToControlFromResourceBundle("cronSchedule",
+                    StatusMessage.Severity.ERROR, "errorCronExpressionInvalid");
             return null;
         }
         this.selectedTab = ConfigurationTab.tab_clock.name();
@@ -336,9 +341,9 @@ public class ConfigurationBean implements Configuration {
     /**
      * {@inheritDoc}
      */
-    public long getClockDriftInterval() {
+    public String getClockDriftCronSchedule() {
 
-        return this.clockDriftInterval;
+        return this.clockDriftCronSchedule;
     }
 
     /**
@@ -376,9 +381,9 @@ public class ConfigurationBean implements Configuration {
     /**
      * {@inheritDoc}
      */
-    public void setClockDriftInterval(long clockDriftInterval) {
+    public void setClockDriftCronSchedule(String clockDriftCronSchedule) {
 
-        this.clockDriftInterval = clockDriftInterval;
+        this.clockDriftCronSchedule = clockDriftCronSchedule;
     }
 
     /**

@@ -195,11 +195,11 @@
 									<h:message for="maxClockOffset" styleClass="error" />
 								</s:decorate>
 
-								<h:outputLabel for="interval" value="#{messages.interval}" />
+								<h:outputLabel for="cronSchedule" value="#{messages.cronSchedule}" />
 								<s:decorate>
-									<h:inputText id="interval" value="#{ts_config.clockDriftInterval}"
+									<h:inputText id="cronSchedule" value="#{ts_config.clockDriftCronSchedule}"
 										required="true" />
-									<h:message for="interval" styleClass="error" />
+									<h:message for="cronSchedule" styleClass="error" />
 								</s:decorate>
 
 								<h:outputLabel for="enabled" value="#{messages.enabled}" />

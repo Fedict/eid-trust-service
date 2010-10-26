@@ -73,9 +73,9 @@ public interface Configuration {
 
     void setClockDriftMaxClockOffset(int clockDriftMaxClockOffset);
 
-    long getClockDriftInterval();
+    String getClockDriftCronSchedule();
 
-    void setClockDriftInterval(long clockDriftInterval);
+    void setClockDriftCronSchedule(String clockDriftCronSchedule);
 
     boolean isClockDriftEnabled();
 

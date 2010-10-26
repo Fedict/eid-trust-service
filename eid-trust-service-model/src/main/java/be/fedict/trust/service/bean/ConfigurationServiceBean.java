@@ -25,6 +25,7 @@ import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.LocalizationDAO;
 import be.fedict.trust.service.entity.*;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
 import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
@@ -101,8 +102,10 @@ public class ConfigurationServiceBean implements ConfigurationService {
      */
     @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
-                                     int timeout, int maxClockOffset, long interval, boolean enabled)
-            throws InvalidTimeoutException, InvalidMaxClockOffsetException {
+                                     int timeout, int maxClockOffset,
+                                     String cronSchedule, boolean enabled)
+            throws InvalidTimeoutException, InvalidMaxClockOffsetException,
+            InvalidCronExpressionException {
 
         LOG.debug("save clock drift detection config");
 
@@ -117,7 +120,7 @@ public class ConfigurationServiceBean implements ConfigurationService {
         // save
         ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
                 .setClockDriftConfig(timeProtocol, server, timeout,
-                        maxClockOffset, interval);
+                        maxClockOffset, cronSchedule);
         this.configurationDAO.setClockDriftConfigEnabled(enabled);
         if (enabled) {
             this.schedulingService.startTimer(clockDriftConfig);
@@ -155,8 +158,9 @@ public class ConfigurationServiceBean implements ConfigurationService {
         LocalizationKeyEntity localizationKey = this.localizationDAO
                 .findLocalization(key);
         for (LocalizationTextEntity text : localizationKey.getTexts()) {
-            if (text.getLanguage().equals(locale.getLanguage()))
+            if (text.getLanguage().equals(locale.getLanguage())) {
                 return text.getText();
+            }
         }
         return null;
     }
@@ -173,8 +177,9 @@ public class ConfigurationServiceBean implements ConfigurationService {
                 .findLocalization(key);
         for (LocalizationTextEntity localizationText : localizationKey
                 .getTexts()) {
-            if (localizationText.getLanguage().equals(locale.getLanguage()))
+            if (localizationText.getLanguage().equals(locale.getLanguage())) {
                 localizationText.setText(text);
+            }
         }
     }
 

@@ -18,20 +18,13 @@
 
 package be.fedict.trust.service.entity;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "ts_trust_point")
@@ -44,7 +37,7 @@ public class TrustPointEntity implements Serializable {
 
     private String name;
 
-    private long crlRefreshInterval;
+    private String crlRefreshCronSchedule;
     private Date fireDate;
 
     private CertificateAuthorityEntity certificateAuthority;
@@ -59,14 +52,14 @@ public class TrustPointEntity implements Serializable {
     /**
      * Main constructor.
      *
-     * @param crlRefreshInterval
+     * @param crlRefreshCronSchedule
      * @param certificateAuthority
      */
-    public TrustPointEntity(long crlRefreshInterval,
+    public TrustPointEntity(String crlRefreshCronSchedule,
                             CertificateAuthorityEntity certificateAuthority) {
         this.name = certificateAuthority.getName();
         this.certificateAuthority = certificateAuthority;
-        this.crlRefreshInterval = crlRefreshInterval;
+        this.crlRefreshCronSchedule = crlRefreshCronSchedule;
     }
 
     @Id
@@ -90,14 +83,14 @@ public class TrustPointEntity implements Serializable {
         this.certificateAuthority = certificateAuthority;
     }
 
-    public long getCrlRefreshInterval() {
+    public String getCrlRefreshCronSchedule() {
 
-        return this.crlRefreshInterval;
+        return this.crlRefreshCronSchedule;
     }
 
-    public void setCrlRefreshInterval(long crlRefreshInterval) {
+    public void setCrlRefreshCronSchedule(String crlRefreshCronSchedule) {
 
-        this.crlRefreshInterval = crlRefreshInterval;
+        this.crlRefreshCronSchedule = crlRefreshCronSchedule;
     }
 
     public Date getFireDate() {
@@ -137,7 +130,7 @@ public class TrustPointEntity implements Serializable {
     public String toString() {
 
         return new ToStringBuilder(this).append("name", this.name).append(
-                "crlRefresh", this.crlRefreshInterval).toString();
-	}
+                "crlRefreshCronSchedule", this.crlRefreshCronSchedule).toString();
+    }
 
 }

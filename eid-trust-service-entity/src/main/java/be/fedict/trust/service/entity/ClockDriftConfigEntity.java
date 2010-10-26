@@ -18,16 +18,11 @@
 
 package be.fedict.trust.service.entity;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Entity
 @Table(name = "ts_clock_drift")
@@ -44,7 +39,7 @@ public class ClockDriftConfigEntity implements Serializable {
 
     private boolean enabled = false;
 
-    private long clockDriftInterval;
+    private String cronSchedule;
     private Date fireDate;
 
     /**
@@ -59,14 +54,14 @@ public class ClockDriftConfigEntity implements Serializable {
      * Main constructor.
      */
     public ClockDriftConfigEntity(String name, TimeProtocol timeProtocol,
-                                  String server, int timeout, int maxClockOffset, long clockDriftInterval) {
+                                  String server, int timeout, int maxClockOffset, String cronSchedule) {
 
         this.name = name;
         this.timeProtocol = timeProtocol;
         this.server = server;
         this.timeout = timeout;
         this.maxClockOffset = maxClockOffset;
-        this.clockDriftInterval = clockDriftInterval;
+        this.cronSchedule = cronSchedule;
     }
 
     @Id
@@ -121,14 +116,14 @@ public class ClockDriftConfigEntity implements Serializable {
         this.maxClockOffset = maxClockOffset;
     }
 
-    public long getClockDriftInterval() {
+    public String getCronSchedule() {
 
-        return this.clockDriftInterval;
+        return this.cronSchedule;
     }
 
-    public void setClockDriftInterval(long clockDriftInterval) {
+    public void setCronSchedule(String cronSchedule) {
 
-        this.clockDriftInterval = clockDriftInterval;
+        this.cronSchedule = cronSchedule;
     }
 
     public boolean isEnabled() {
@@ -155,7 +150,7 @@ public class ClockDriftConfigEntity implements Serializable {
         return new ToStringBuilder(this).append("protocol",
                 this.timeProtocol.name()).append("server", this.server).append(
                 "timeout", this.timeout).append("maxClockOffset",
-                this.maxClockOffset).toString();
+                this.maxClockOffset).append("cronSchedule", this.cronSchedule).toString();
     }
 
 }

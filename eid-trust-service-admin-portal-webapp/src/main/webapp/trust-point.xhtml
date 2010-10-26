@@ -24,7 +24,7 @@
 								</h:column>
 								<h:column>
 									<f:facet name="header">#{messages.crlRefresh}</f:facet>
-									<h:outputText value="#{item.crlRefreshInterval}" />
+									<h:outputText value="#{item.crlRefreshCronSchedule}" />
 								</h:column>
 								<h:column>
 									<h:commandLink id="modify" value="#{messages.modify}"
@@ -74,13 +74,13 @@
 
 							<h:panelGrid id="panel" columns="2" border="0">
 
-								<h:outputLabel for="interval" value="#{messages.crlRefresh}" />
+								<h:outputLabel for="cronSchedule" value="#{messages.crlRefresh}" />
 								<s:decorate>
-									<h:inputText id="interval" value="#{ts_trustPoint.crlRefreshInterval}" />
-									<h:message for="interval" styleClass="error" />
+									<h:inputText id="cronSchedule" value="#{ts_trustPoint.crlRefreshCronSchedule}" />
+									<h:message for="cronSchedule" styleClass="error" />
 								</s:decorate>
 
-								<h:outputLabel for="certificate" value="#{messages.certificate}" />
+								<h:outputLabel for="upload" value="#{messages.certificate}" />
 
 								<rich:fileUpload fileUploadListener="#{ts_trustPoint.uploadListener}"
 									maxFilesQuantity="1" id="upload" immediateUpload="true">

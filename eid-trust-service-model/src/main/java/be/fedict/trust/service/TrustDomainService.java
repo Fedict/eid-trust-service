@@ -83,20 +83,20 @@ public interface TrustDomainService {
      *
      * @param trustPoint
      */
-    void save(TrustPointEntity trustPoint);
+    void save(TrustPointEntity trustPoint) throws InvalidCronExpressionException;
 
     /**
      * Add a new {@link TrustPointEntity}.
      *
-     * @param crlRefreshInterval
+     * @param crlRefreshCronSchedule
      * @param certificateBytes
      * @throws TrustPointAlreadyExistsException
      *
      * @throws CertificateException
      */
-    TrustPointEntity addTrustPoint(long crlRefreshInterval,
+    TrustPointEntity addTrustPoint(String crlRefreshCronSchedule,
                                    byte[] certificateBytes) throws TrustPointAlreadyExistsException,
-            CertificateException;
+            CertificateException, InvalidCronExpressionException;
 
     /**
      * Sets the specified {@link TrustDomainEntity} as default.

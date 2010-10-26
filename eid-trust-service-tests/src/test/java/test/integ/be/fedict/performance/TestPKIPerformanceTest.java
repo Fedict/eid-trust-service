@@ -83,8 +83,8 @@ public class TestPKIPerformanceTest implements PerformanceTest {
     private static final int INTERVAL_SIZE = 1000 * 60 * 5; // ms
 
     private static boolean interactive = false;
-    private static String PKI_PATH = "http://sebeco-dev-10:49065";
-    private static int minutes = 60 * 48;
+    private static String PKI_PATH = "http://sebeco-dev-10:46238";
+    private static int minutes = 60 * 10;
 
     @Before
     public void setUp() {

@@ -126,7 +126,7 @@ public class InitializationServiceBean implements InitializationService {
                     TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER,
                     TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
                     TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET,
-                    TrustServiceConstants.DEFAULT_CRON_INTERVAL);
+                    TrustServiceConstants.DEFAULT_CRON_EXPRESSION);
         }
     }
 
@@ -149,7 +149,7 @@ public class InitializationServiceBean implements InitializationService {
 
         if (null == rootCa.getTrustPoint()) {
             TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
-                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON_INTERVAL, rootCa);
+                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON_EXPRESSION, rootCa);
             rootCa.setTrustPoint(rootCaTrustPoint);
         }
         trustPoints.add(rootCa.getTrustPoint());
@@ -165,7 +165,7 @@ public class InitializationServiceBean implements InitializationService {
 
         if (null == rootCa2.getTrustPoint()) {
             TrustPointEntity rootCa2TrustPoint = this.trustDomainDAO
-                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON_INTERVAL, rootCa2);
+                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON_EXPRESSION, rootCa2);
             rootCa2.setTrustPoint(rootCa2TrustPoint);
         }
         trustPoints.add(rootCa2.getTrustPoint());
@@ -287,7 +287,7 @@ public class InitializationServiceBean implements InitializationService {
 
         if (null == rootCa.getTrustPoint()) {
             TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
-                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON_INTERVAL, rootCa);
+                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON_EXPRESSION, rootCa);
             rootCa.setTrustPoint(rootCaTrustPoint);
         }
         trustPoints.add(rootCa.getTrustPoint());

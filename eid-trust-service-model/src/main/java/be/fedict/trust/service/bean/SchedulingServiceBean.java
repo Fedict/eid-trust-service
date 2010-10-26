@@ -28,6 +28,7 @@ import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.entity.Status;
 import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,7 +38,6 @@ import javax.jms.*;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Collection;
-import java.util.Date;
 
 /**
  * Scheduler Service Bean implementation.
@@ -130,10 +130,11 @@ public class SchedulingServiceBean implements SchedulingService {
      * {@inheritDoc}
      */
     public void startTimer(ClockDriftConfigEntity clockDriftConfig
-    ) {
+    ) throws InvalidCronExpressionException {
         LOG.debug("start timer for clock drift detection");
 
-        if (0 == clockDriftConfig.getClockDriftInterval()) {
+        if (null == clockDriftConfig.getCronSchedule() ||
+                clockDriftConfig.getCronSchedule().isEmpty()) {
             LOG.debug("no interval set for clock drift, ignoring...");
             return;
         }
@@ -145,10 +146,15 @@ public class SchedulingServiceBean implements SchedulingService {
         timerConfig.setInfo(TrustServiceConstants.CLOCK_DRIFT_TIMER);
         timerConfig.setPersistent(true);
 
-        long interval = 1000 * 60 * clockDriftConfig.getClockDriftInterval();
+        ScheduleExpression schedule = getScheduleExpression(clockDriftConfig.getCronSchedule());
 
-        Timer timer = this.timerService.createIntervalTimer(new Date().getTime() + interval,
-                interval, timerConfig);
+        Timer timer;
+        try {
+            timer = this.timerService.createCalendarTimer(schedule, timerConfig);
+        } catch (Exception e) {
+            LOG.error("Exception while creating timer for clock drift: " + e.getMessage(), e);
+            throw new InvalidCronExpressionException(e);
+        }
 
         LOG.debug("created timer for clock drift at " + timer.getNextTimeout().toString());
         clockDriftConfig.setFireDate(timer.getNextTimeout());
@@ -157,11 +163,12 @@ public class SchedulingServiceBean implements SchedulingService {
     /**
      * {@inheritDoc}
      */
-    public void startTimer(TrustPointEntity trustPoint) {
+    public void startTimer(TrustPointEntity trustPoint) throws InvalidCronExpressionException {
 
         LOG.debug("start timer for " + trustPoint.getName());
 
-        if (0 == trustPoint.getCrlRefreshInterval()) {
+        if (null == trustPoint.getCrlRefreshCronSchedule() ||
+                trustPoint.getCrlRefreshCronSchedule().isEmpty()) {
             LOG.debug("no CRL refresh set for trust point "
                     + trustPoint.getName() + " ignoring...");
             return;
@@ -174,14 +181,51 @@ public class SchedulingServiceBean implements SchedulingService {
         timerConfig.setInfo(trustPoint.getName());
         timerConfig.setPersistent(true);
 
-        long interval = 1000 * 60 * trustPoint.getCrlRefreshInterval();
+        ScheduleExpression schedule = getScheduleExpression(trustPoint.getCrlRefreshCronSchedule());
 
-        Timer timer = this.timerService.createIntervalTimer(new Date().getTime() +
-                interval, interval, timerConfig);
+        Timer timer;
+        try {
+            timer = this.timerService.createCalendarTimer(schedule, timerConfig);
+        } catch (Exception e) {
+            LOG.error("Exception while creating timer for clock drift: " + e.getMessage(), e);
+            throw new InvalidCronExpressionException(e);
+        }
 
         LOG.debug("created timer for trustpoint " + trustPoint.getName()
                 + " at " + timer.getNextTimeout().toString());
         trustPoint.setFireDate(timer.getNextTimeout());
+    }
+
+    private ScheduleExpression getScheduleExpression(String cronSchedule) {
+
+        ScheduleExpression schedule = new ScheduleExpression();
+        String[] fields = cronSchedule.split(" ");
+        if (fields.length > 8) {
+            throw new IllegalArgumentException("Too many fields in cronexpression: " + cronSchedule);
+        }
+        if (fields.length > 1) {
+            schedule.second(fields[0]);
+        }
+        if (fields.length > 2) {
+            schedule.minute(fields[1]);
+        }
+        if (fields.length > 3) {
+            schedule.hour(fields[2]);
+        }
+        if (fields.length > 4) {
+            schedule.dayOfMonth(fields[3]);
+        }
+        if (fields.length > 5) {
+            schedule.month(fields[4]);
+        }
+        if (fields.length > 6) {
+            schedule.dayOfWeek(fields[5]);
+        }
+        if (fields.length > 7) {
+            schedule.year(fields[6]);
+        }
+
+        return schedule;
     }
 
     /**
