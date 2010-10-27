@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE article PUBLIC 
+<!DOCTYPE article PUBLIC
 	"-//OASIS//DTD DocBook XML V4.5//EN"
 	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <article lang="en">
@@ -299,7 +299,7 @@
 			Please note that it is not recommended to use this setup in a
 			production environment. As the HSQL database is in-memory and parsing
 			of large CRL's also is memory intensive, you will run quickly into
-			memory problems. 
+			memory problems.
 		</para>
 		<section>
 			<title>Database setup</title>
@@ -480,7 +480,7 @@ DROP DATABASE trust;
 			</para>
 			<para>
 				As to the amount of network traffic, this is highly related as
-				to how CRL caching is configured. 
+				to how CRL caching is configured.
 			</para>
 		</section>
 		<section>
@@ -653,7 +653,7 @@ CreateBalancers 1
 			</para>
 			<para>
 				The default trust domain will be set to the eID Authentication
-				Trust Domain. 
+				Trust Domain.
 			</para>
 			<para>
 				In order to function properly, the application needs to be able
@@ -934,7 +934,7 @@ JBOSS_CONF="all"]]></programlisting>
 						WS-Security. The keystore to be used for this can be configured
 						here. There is support for JKS, PKCS#11 and PKCS#12 keystores. The
 						keystore path in case of PKCS#11 is the path to the configuration
-						file which will be used by the Sun PKCS#11 provider. 
+						file which will be used by the Sun PKCS#11 provider.
 				</para>
 				</section>
 				<section>
@@ -951,10 +951,13 @@ JBOSS_CONF="all"]]></programlisting>
 						certifying timestamps. A timestamp request will be sent to the
 						configured TSA server, returning a timestamp response containing a
 						timestamp token. The received timestamp token will be used
-						for
-						clock
-						drift detection.
-				</para>
+						for clock drift detection.
+				    </para>
+                    <para>
+                        You can configure the times when to perform the clock drift detection check
+                        using a cron-like expression string.
+                        See <link linkend="cron">Cron schedules</link> for more info.
+                    </para>
 				</section>
 				<section>
 					<title>Information Message</title>
@@ -991,8 +994,8 @@ JBOSS_CONF="all"]]></programlisting>
 					which trust points lie under this trust domain and which
 					certificate
 					contraints are too be enforced when validating against
-					this trust
-					domain.
+					this trust domain.
+                    See <link linkend="cron">Cron schedules</link> for more info.
 			</para>
 			</section>
 			<section>
@@ -1000,13 +1003,14 @@ JBOSS_CONF="all"]]></programlisting>
 				<para>
 					For each trust point, you can specify a cron expression for
 					specifying
-					the CRL cache refresh interval. Such a refresh includes
+					the CRL cache cron schedule interval. This includes
 					refreshing all
 					underlying CA's that have been cached. You can also
 					refresh the CRL cache immediately here for debugging purposes. For
 					each trust point you can see the list of CA's associated with
 					this
 					trust point and for each CA refresh the cache individually.
+
 			</para>
 			</section>
 			<section>
@@ -1047,6 +1051,68 @@ JBOSS_CONF="all"]]></programlisting>
 					</itemizedlist>
 				</para>
 			</section>
+            <section id="cron">
+                <title>CRON expression</title>
+                <para>
+                    You can specify a cron-like expression for the clock drift detection task and for each
+                    trust point.
+                    So for example: <code>0 0 0/3 * * *</code> is valid and represents, every 3 hours.
+                    The cron schedule string consist of following fields.
+                    <table>
+                        <title>All cron fields and default values.</title>
+                        <tgroup cols="3">
+                            <colspec colwidth="2*" />
+                            <colspec colwidth="2*" />
+                            <colspec colwidth="2*" />
+                            <thead>
+                                <row>
+                                    <entry>Attribute</entry>
+                                    <entry>Allowable Values</entry>
+                                    <entry>Default</entry>
+                                </row>
+                            </thead>
+                            <tbody>
+                                <row>
+                                    <entry>Second</entry>
+                                    <entry>[0,59]</entry>
+                                    <entry>0</entry>
+                                </row>
+                                <row>
+                                    <entry>Minute</entry>
+                                    <entry>[0,59]</entry>
+                                    <entry>0</entry>
+                                </row>
+                                <row>
+                                    <entry>Hour</entry>
+                                    <entry>[0,23]</entry>
+                                    <entry>0</entry>
+                                </row>
+                                <row>
+                                    <entry>dayOfMonth</entry>
+                                    <entry>[1,31]</entry>
+                                    <entry>*</entry>
+                                </row>
+                                <row>
+                                    <entry>Month</entry>
+                                    <entry>[1,12]</entry>
+                                    <entry>*</entry>
+                                </row>
+                                <row>
+                                    <entry>dayOfWeek</entry>
+                                    <entry>[0,7]</entry>
+                                    <entry>*</entry>
+                                </row>
+                                <row>
+                                    <entry>Year</entry>
+                                    <entry>A four-digit calendar year</entry>
+                                    <entry>*</entry>
+                                </row>
+                            </tbody>
+                        </tgroup>
+                    </table>
+                    For a more complete view of what is allowed, check the EJB 3.1 specification's TimerService/ScheduleExpression section.
+                </para>
+            </section>
 		</section>
 	</section>
 	<appendix id="links">
@@ -1090,6 +1156,11 @@ JBOSS_CONF="all"]]></programlisting>
 						<ulink url="http://www.jboss.org/mod_cluster.html">JBoss mod_cluster</ulink>
 					</para>
 				</listitem>
+                <listitem>
+                    <para>
+                        <ulink url="http://jcp.org/en/jsr/detail?id=318">EJB 3.1 specification</ulink>
+                    </para>
+                </listitem>
 			</itemizedlist>
 		</para>
 	</appendix>
@@ -1198,6 +1269,11 @@ JBOSS_CONF="all"]]></programlisting>
 						<entry>Frank Cornelis</entry>
 						<entry>JVM, logging, init scripts.</entry>
 					</row>
+                    <row>
+                        <entry>27 Oct 2010</entry>
+                        <entry>Wim Vandenhaute</entry>
+                        <entry>RFC.3: Cron schedule.</entry>
+                    </row>
 				</tbody>
 			</tgroup>
 		</table>
