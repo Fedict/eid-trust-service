@@ -33,6 +33,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+/**
+ * Unit test that harvests all BeId published CRLs and dumps the # entries they contain
+ * Used to simulate the BeId PKI with an exact copy of CA's and size of CRLs
+ */
 public class TestHarvestEid {
 
     private static final Log LOG = LogFactory.getLog(TestHarvestEid.class);

@@ -32,11 +32,9 @@ import java.util.Date;
 @Table(name = "ts_revoked_certs")
 @NamedQueries({
         @NamedQuery(name = RevokedCertificateEntity.QUERY_WHERE_ISSUER_SERIAL, query = "FROM RevokedCertificateEntity "
-                + "WHERE issuer = :issuer AND serialNumber = :serialNumber ORDER BY crlNumber DESC"),
-        @NamedQuery(name = RevokedCertificateEntity.QUERY_COUNT_WHERE_ISSUER_CRL_NUMBER, query = "SELECT COUNT(*) "
-                + "FROM RevokedCertificateEntity WHERE issuer = :issuer AND crlNumber = :crlNumber"),
+                + "WHERE pk.issuer = :issuer AND pk.serialNumber = :serialNumber"),
         @NamedQuery(name = RevokedCertificateEntity.DELETE_WHERE_ISSUER, query = "DELETE FROM RevokedCertificateEntity "
-                + "WHERE issuer = :issuer"),
+                + "WHERE pk.issuer = :issuer"),
         @NamedQuery(name = RevokedCertificateEntity.DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER, query = "DELETE FROM RevokedCertificateEntity "
                 + "WHERE crlNumber < :crlNumber AND issuer = :issuer")})
 public class RevokedCertificateEntity implements Serializable {
@@ -44,14 +42,10 @@ public class RevokedCertificateEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static final String QUERY_WHERE_ISSUER_SERIAL = "ts_rc.q.i.s";
-    public static final String QUERY_COUNT_WHERE_ISSUER_CRL_NUMBER = "ts_rc.q.c.i.c";
     public static final String DELETE_WHERE_ISSUER = "ts_rc.d.i";
     public static final String DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER = "ts_rc.d.i.old.c";
 
-    private long id;
-
-    private String issuer;
-    private BigInteger serialNumber;
+    private RevokedCertificatePK pk;
     private Date revocationDate;
     private BigInteger crlNumber;
 
@@ -63,43 +57,18 @@ public class RevokedCertificateEntity implements Serializable {
     public RevokedCertificateEntity(String issuer, BigInteger serialNumber,
                                     Date revocationDate, BigInteger crlNumber) {
 
-        this.issuer = issuer;
-        this.serialNumber = serialNumber;
+        this.pk = new RevokedCertificatePK(issuer, serialNumber.toString());
         this.revocationDate = revocationDate;
         this.crlNumber = crlNumber;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() {
-
-        return this.id;
+    @EmbeddedId
+    public RevokedCertificatePK getPk() {
+        return this.pk;
     }
 
-    public void setId(long id) {
-
-        this.id = id;
-    }
-
-    public String getIssuer() {
-
-        return this.issuer;
-    }
-
-    public void setIssuer(String issuer) {
-
-        this.issuer = issuer;
-    }
-
-    @Column(precision = 38)
-    public BigInteger getSerialNumber() {
-
-        return this.serialNumber;
-    }
-
-    public void setSerialNumber(BigInteger serialNumber) {
-
-        this.serialNumber = serialNumber;
+    public void setPk(RevokedCertificatePK pk) {
+        this.pk = pk;
     }
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -133,23 +102,21 @@ public class RevokedCertificateEntity implements Serializable {
             return false;
         }
         RevokedCertificateEntity rhs = (RevokedCertificateEntity) obj;
-        return new EqualsBuilder().append(this.id, rhs.id).isEquals();
+        return new EqualsBuilder().append(this.pk, rhs.pk).isEquals();
     }
 
     @Override
     public int hashCode() {
 
-        return new HashCodeBuilder().append(this.id).toHashCode();
+        return new HashCodeBuilder().append(this.pk).toHashCode();
     }
 
     @Override
     public String toString() {
 
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("id", this.id).append("issuer", this.issuer).append(
-                        "serialNumber", this.serialNumber).append("crlNumber",
+                .append("pk", this.pk).append("crlNumber",
                         this.crlNumber).append("revocationDate",
-                        this.revocationDate)
-                .append("crlNumber", this.crlNumber).toString();
+                        this.revocationDate).toString();
     }
 }

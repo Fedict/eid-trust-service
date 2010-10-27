@@ -21,6 +21,7 @@ package be.fedict.trust.service.dao.bean;
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
+import be.fedict.trust.service.entity.RevokedCertificatePK;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -124,10 +125,10 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
      * {@inheritDoc}
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void addRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
+    public void updateRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
                                        BigInteger crlNumber, X500Principal crlIssuer) {
 
-        LOG.debug("Add " + revokedCertificates.size()
+        LOG.debug("Update " + revokedCertificates.size()
                 + " revoked certificates (crlNumber=" + crlNumber + ")");
         for (X509CRLEntry revokedCertificate : revokedCertificates) {
             X500Principal certificateIssuer = revokedCertificate
@@ -141,24 +142,21 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
             BigInteger serialNumber = revokedCertificate.getSerialNumber();
             Date revocationDate = revokedCertificate.getRevocationDate();
 
-            this.entityManager.persist(new RevokedCertificateEntity(issuerName,
-                    serialNumber, revocationDate, crlNumber));
+            // lookup
+            RevokedCertificateEntity revokedCertificateEntity =
+                    this.entityManager.find(RevokedCertificateEntity.class,
+                            new RevokedCertificatePK(issuerName, serialNumber.toString()));
+
+            if (null != revokedCertificateEntity) {
+                // already exists, update revocationDate and crl number
+                revokedCertificateEntity.setRevocationDate(revocationDate);
+                revokedCertificateEntity.setCrlNumber(crlNumber);
+            } else {
+                // don't exist yet, add
+                this.entityManager.persist(new RevokedCertificateEntity(issuerName,
+                        serialNumber, revocationDate, crlNumber));
+            }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public long countRevokedCertificates(BigInteger crlNumber, String issuerName) {
-
-        LOG.debug("count revoked certificates for crl number " + crlNumber
-                + " issuer " + issuerName);
-        Query query = this.entityManager
-                .createNamedQuery(RevokedCertificateEntity.QUERY_COUNT_WHERE_ISSUER_CRL_NUMBER);
-        query.setParameter("issuer", issuerName);
-        query.setParameter("crlNumber", crlNumber);
-        return (Long) query.getSingleResult();
     }
 
     /**

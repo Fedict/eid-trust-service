@@ -421,7 +421,6 @@ public class TestUtils {
         StringWriter buffer = new StringWriter();
         try {
             PEMWriter writer = new PEMWriter(buffer);
-            LOG.debug("toPem: " + object.getClass().getName());
             writer.writeObject(object);
             writer.close();
             return buffer.toString();

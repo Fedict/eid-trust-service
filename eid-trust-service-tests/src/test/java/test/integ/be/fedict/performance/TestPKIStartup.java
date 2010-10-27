@@ -48,10 +48,10 @@ public class TestPKIStartup {
     public void testCA() throws Exception {
 
         // some default PKI setup
-        TestPKI.get().addSaveCa("CN=root1", null, 0, 0);
-        TestPKI.get().addSaveCa("CN=root2", null, 0, 0);
+        TestPKI.get().addSaveCa("CN=root1", null, 0, 5);
+//        TestPKI.get().addSaveCa("CN=root2", null, 0, 0);
 
-        TestPKI.get().addSaveCa("CN=Citizen CA", "CN=root1", 718521, 180);
+        TestPKI.get().addSaveCa("CN=Citizen CA", "CN=root1", 50000, 5);
 
 //        TestPKI.get().addSaveCa("CN=CA1", "CN=root1", 50000, 10);
 //        TestPKI.get().addSaveCa("CN=CA2", "CN=root1", 30000, 10);

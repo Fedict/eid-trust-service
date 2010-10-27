@@ -181,7 +181,7 @@ public class CAConfiguration implements Serializable {
 
         DateTime now = new DateTime();
         if (this.crlRefresh > 0) {
-            crllGenerateNext = now.plusHours(this.crlRefresh);
+            crllGenerateNext = now.plusMinutes(this.crlRefresh);
         } else {
             crllGenerateNext = now.plusHours(3);
         }

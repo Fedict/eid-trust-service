@@ -41,7 +41,9 @@ import org.bouncycastle.jce.provider.X509CRLEntryObject;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.*;
+import javax.ejb.ActivationConfigProperty;
+import javax.ejb.EJB;
+import javax.ejb.MessageDriven;
 import javax.interceptor.Interceptors;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -65,8 +67,6 @@ import java.util.Set;
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
         @ActivationConfigProperty(propertyName = "maxSession", propertyValue = "1"),
         @ActivationConfigProperty(propertyName = "destination", propertyValue = HarvesterMDB.HARVESTER_QUEUE_NAME)})
-@TransactionManagement(value = TransactionManagementType.CONTAINER)
-@TransactionAttribute(value = TransactionAttributeType.REQUIRED)
 @Interceptors(SNMPInterceptor.class)
 public class HarvesterMDB implements MessageListener {
 
@@ -173,63 +173,51 @@ public class HarvesterMDB implements MessageListener {
             throw new RuntimeException(e);
         }
 
+        int entries = 0;
         if (revokedCertificatesEnum.hasMoreElements()) {
-            long entriesFound = 0;
+            /*
+            * Split up persisting the crl entries to avoid memory issues.
+            */
+            Set<X509CRLEntry> revokedCertsBatch = new HashSet<X509CRLEntry>();
+            X500Principal previousCertificateIssuer = crl.getIssuerX500Principal();
+            int added = 0;
+            while (revokedCertificatesEnum.hasMoreElements()) {
+
+                TBSCertList.CRLEntry entry =
+                        (TBSCertList.CRLEntry) revokedCertificatesEnum.nextElement();
+                X509CRLEntryObject revokedCertificate = new X509CRLEntryObject(entry, isIndirect, previousCertificateIssuer);
+                previousCertificateIssuer = revokedCertificate.getCertificateIssuer();
+
+                revokedCertsBatch.add(revokedCertificate);
+                added++;
+                if (added == BATCH_SIZE) {
+                    /*
+                    * Persist batch
+                    */
+                    this.certificateAuthorityDAO.updateRevokedCertificates(
+                            revokedCertsBatch, crlNumber, crl
+                                    .getIssuerX500Principal());
+                    entries += revokedCertsBatch.size();
+                    revokedCertsBatch.clear();
+                    added = 0;
+                }
+            }
+            /*
+            * Persist final batch
+            */
+            this.certificateAuthorityDAO.updateRevokedCertificates(
+                    revokedCertsBatch, crlNumber, crl
+                            .getIssuerX500Principal());
+            entries += revokedCertsBatch.size();
+
+            /*
+            * Cleanup redundant CRL entries
+            */
             if (null != crlNumber) {
-                entriesFound = this.certificateAuthorityDAO
-                        .countRevokedCertificates(crlNumber, crl
-                                .getIssuerX500Principal().toString());
+                this.certificateAuthorityDAO.removeOldRevokedCertificates(
+                        crlNumber, crl.getIssuerX500Principal().toString());
             }
-
-            if (entriesFound > 0) {
-                LOG.debug("entries already added, skipping... (#="
-                        + entriesFound + ")");
-            } else {
-                LOG.debug("no entries found, adding... ( batchSize="
-                        + BATCH_SIZE + ")");
-
-                /*
-                 * Split up persisting the crl entries to avoid memory issues.
-                 */
-                int added = 0;
-                Set<X509CRLEntry> revokedCertsBatch = new HashSet<X509CRLEntry>();
-                X500Principal previousCertificateIssuer = crl.getIssuerX500Principal();
-                while (revokedCertificatesEnum.hasMoreElements()) {
-
-                    TBSCertList.CRLEntry entry =
-                            (TBSCertList.CRLEntry) revokedCertificatesEnum.nextElement();
-                    X509CRLEntryObject revokedCertificate = new X509CRLEntryObject(entry, isIndirect, previousCertificateIssuer);
-                    previousCertificateIssuer = revokedCertificate.getCertificateIssuer();
-
-                    revokedCertsBatch.add(revokedCertificate);
-                    added++;
-                    if (added == BATCH_SIZE) {
-                        /*
-                        * Persist batch
-                        */
-                        this.certificateAuthorityDAO.addRevokedCertificates(
-                                revokedCertsBatch, crlNumber, crl
-                                        .getIssuerX500Principal());
-                        revokedCertsBatch.clear();
-                        added = 0;
-                    }
-                }
-                /*
-                * Persist final batch
-                */
-                this.certificateAuthorityDAO.addRevokedCertificates(
-                        revokedCertsBatch, crlNumber, crl
-                                .getIssuerX500Principal());
-
-                /*
-                * Cleanup redundant CRL entries
-                */
-                if (null != crlNumber) {
-                    this.certificateAuthorityDAO.removeOldRevokedCertificates(
-                            crlNumber, crl.getIssuerX500Principal().toString());
-                }
-
-            }
+            //}
         }
 
         LOG.debug("CRL this update: " + crl.getThisUpdate());
@@ -237,7 +225,7 @@ public class HarvesterMDB implements MessageListener {
         certificateAuthority.setStatus(Status.ACTIVE);
         certificateAuthority.setThisUpdate(crl.getThisUpdate());
         certificateAuthority.setNextUpdate(crl.getNextUpdate());
-        LOG.debug("cache activated for CA: " + crl.getIssuerX500Principal());
+        LOG.debug("cache activated for CA: " + crl.getIssuerX500Principal() + " (entries=" + entries + ")");
     }
 
     private BigInteger getCrlNumber(X509CRL crl) {

@@ -148,31 +148,12 @@ public class TestPKIPerformanceTest implements PerformanceTest {
         LOG.debug("performance test using test PKI");
 
         // get test PKI information
-        testPKI = new TestPKI();
         if (interactive) {
             testPkiPath = JOptionPane.showInputDialog("Please give the test PKI base URL");
         } else {
             testPkiPath = PKI_PATH;
         }
-
-        HttpClient httpClient = new HttpClient();
-        GetMethod getMethod = new GetMethod(testPkiPath + "/"
-                + ConfigurationServlet.PATH + "?"
-                + ConfigurationServlet.ACTION + "=" + ConfigurationServlet.Action.GET);
-        httpClient.executeMethod(getMethod);
-
-        InputStream inputStream = getMethod.getResponseBodyAsStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-        String caString;
-        while (null != (caString = br.readLine())) {
-            String[] fields = caString.split(ConfigurationServlet.FIELD_SEPERATOR);
-            testPKI.addSaveCa(fields[0], fields[1], Long.parseLong(fields[2]), Integer.parseInt(fields[3]));
-        }
-
-        // now get private keys and certificates
-        for (CAConfiguration rootCa : testPKI.getRoots().values()) {
-            loadParentCa(httpClient, rootCa);
-        }
+        testPKI = TestPKI.load(testPkiPath);
 
         // initialize XKMS2 client
         XKMS2Client client = new XKMS2Client(XKMS_LOCATION);
@@ -356,46 +337,5 @@ public class TestPKIPerformanceTest implements PerformanceTest {
             certificateChain.add(parent.getCertificate());
         }
         return certificateChain;
-    }
-
-    private void loadParentCa(HttpClient httpClient, CAConfiguration parentCa) throws Exception {
-
-        loadCa(httpClient, parentCa);
-        for (CAConfiguration child : parentCa.getChilds()) {
-            loadParentCa(httpClient, child);
-        }
-    }
-
-    private void loadCa(HttpClient httpClient, CAConfiguration ca) throws Exception {
-
-        LOG.debug("load CA: " + ca.getName());
-
-        CertificateFactory certificateFactory = CertificateFactory
-                .getInstance("X.509");
-
-        // load certificate
-        URI certificateURI = new URI(testPkiPath + "/"
-                + CertificateServlet.PATH + "?"
-                + CertificateServlet.CA_QUERY_PARAM + "=" + ca.getName(), false);
-        LOG.debug("URI: " + certificateURI.toString());
-
-        GetMethod getMethod = new GetMethod(certificateURI.toString());
-        httpClient.executeMethod(getMethod);
-
-        X509Certificate certificate = (X509Certificate) certificateFactory
-                .generateCertificate(getMethod.getResponseBodyAsStream());
-        ca.setCertificate(certificate);
-
-        // load private key
-        URI keyURI = new URI(testPkiPath + "/"
-                + PrivateKeyServlet.PATH + "?"
-                + PrivateKeyServlet.CA_QUERY_PARAM + "=" + ca.getName(), false);
-        getMethod = new GetMethod(keyURI.toString());
-        httpClient.executeMethod(getMethod);
-
-        PEMReader pemReader = new PEMReader(new InputStreamReader(getMethod
-                .getResponseBodyAsStream()));
-        KeyPair keyPair = (KeyPair) pemReader.readObject();
-        ca.setKeyPair(keyPair);
     }
 }

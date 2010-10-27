@@ -70,12 +70,6 @@ public interface CertificateAuthorityDAO {
                                                    BigInteger serialNumber, Date revocationDate, BigInteger crlNumber);
 
     /**
-     * Returns number of {@link RevokedCertificateEntity}'s for the specified
-     * crl number and issuer.
-     */
-    long countRevokedCertificates(BigInteger crlNumber, String issuerName);
-
-    /**
      * Remove {@link RevokedCertificateEntity}'s for the specified issuer that
      * are older then the specified crl number.
      *
@@ -86,8 +80,8 @@ public interface CertificateAuthorityDAO {
     /**
      * Persist batch of {@link X509CRLEntry} to the database.
      */
-    void addRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
-                                BigInteger crlNumber, X500Principal crlIssuer);
+    void updateRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
+                                   BigInteger crlNumber, X500Principal crlIssuer);
 
     /**
      * Remove all {@link RevokedCertificateEntity}'s for specified issuer.

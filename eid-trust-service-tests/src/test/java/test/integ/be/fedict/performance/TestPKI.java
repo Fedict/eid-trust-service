@@ -18,8 +18,12 @@
 
 package test.integ.be.fedict.performance;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.openssl.PEMReader;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.LocalConnector;
 import org.mortbay.jetty.Server;
@@ -29,8 +33,26 @@ import org.mortbay.jetty.servlet.*;
 import test.integ.be.fedict.performance.servlet.*;
 
 import javax.servlet.http.HttpServlet;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.KeyPair;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
+/**
+ * Test PKI which can be used by the trust service.
+ * <p/>
+ * {@link #start(String)} will start a jetty servlet server which publishes:
+ * <ul>
+ * <li>{@link ConfigurationServlet} to view/edit the PKI setup
+ * <li>{@link CrlServlet} to download the CRL for specified CA
+ * <li>{@link OcspServlet} for OCSP request for specified CA
+ * <li>{@link CertificateServlet} to download the specified CA's certificate
+ * <li>{@link PrivateKeyServlet} to download the specified CA's private key in PEM format.
+ * </ul>
+ */
 public class TestPKI {
 
     private static final Log LOG = LogFactory.getLog(TestPKI.class);
@@ -47,6 +69,32 @@ public class TestPKI {
     private Map<String, CAConfiguration> rootCas;
 
     public static TestPKI get() {
+        return testPKI;
+    }
+
+    public static TestPKI load(String testPkiPath) throws Exception {
+        testPKI = new TestPKI();
+
+        // load CA config
+        HttpClient httpClient = new HttpClient();
+        GetMethod getMethod = new GetMethod(testPkiPath + "/"
+                + ConfigurationServlet.PATH + "?"
+                + ConfigurationServlet.ACTION + "=" + ConfigurationServlet.Action.GET);
+        httpClient.executeMethod(getMethod);
+
+        InputStream inputStream = getMethod.getResponseBodyAsStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        String caString;
+        while (null != (caString = br.readLine())) {
+            String[] fields = caString.split(ConfigurationServlet.FIELD_SEPERATOR);
+            testPKI.addSaveCa(fields[0], fields[1], Long.parseLong(fields[2]), Integer.parseInt(fields[3]));
+        }
+
+        // now get private keys and certificates
+        for (CAConfiguration rootCa : testPKI.getRoots().values()) {
+            loadParentCa(httpClient, testPkiPath, rootCa);
+        }
+
         return testPKI;
     }
 
@@ -309,6 +357,47 @@ public class TestPKI {
         }
 
         LOG.debug("generation finished");
+    }
+
+    private static void loadParentCa(HttpClient httpClient, String testPkiPath, CAConfiguration parentCa) throws Exception {
+
+        loadCa(httpClient, testPkiPath, parentCa);
+        for (CAConfiguration child : parentCa.getChilds()) {
+            loadParentCa(httpClient, testPkiPath, child);
+        }
+    }
+
+    private static void loadCa(HttpClient httpClient, String testPkiPath, CAConfiguration ca) throws Exception {
+
+        LOG.debug("load CA: " + ca.getName());
+
+        CertificateFactory certificateFactory = CertificateFactory
+                .getInstance("X.509");
+
+        // load certificate
+        URI certificateURI = new URI(testPkiPath + "/"
+                + CertificateServlet.PATH + "?"
+                + CertificateServlet.CA_QUERY_PARAM + "=" + ca.getName(), false);
+        LOG.debug("URI: " + certificateURI.toString());
+
+        GetMethod getMethod = new GetMethod(certificateURI.toString());
+        httpClient.executeMethod(getMethod);
+
+        X509Certificate certificate = (X509Certificate) certificateFactory
+                .generateCertificate(getMethod.getResponseBodyAsStream());
+        ca.setCertificate(certificate);
+
+        // load private key
+        URI keyURI = new URI(testPkiPath + "/"
+                + PrivateKeyServlet.PATH + "?"
+                + PrivateKeyServlet.CA_QUERY_PARAM + "=" + ca.getName(), false);
+        getMethod = new GetMethod(keyURI.toString());
+        httpClient.executeMethod(getMethod);
+
+        PEMReader pemReader = new PEMReader(new InputStreamReader(getMethod
+                .getResponseBodyAsStream()));
+        KeyPair keyPair = (KeyPair) pemReader.readObject();
+        ca.setKeyPair(keyPair);
     }
 
 }
