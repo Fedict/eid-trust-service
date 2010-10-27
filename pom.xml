@@ -119,6 +119,7 @@
             </activation>
             <modules>
                 <module>eid-trust-service-devel-guide</module>
+		<module>eid-trust-service-architecture-guide</module>
                 <module>eid-trust-service-sdk</module>
                 <module>eid-trust-service-sdk-dotnet</module>
             </modules>
@@ -135,6 +136,7 @@
                 <module>eid-trust-service-tests</module>
                 <module>eid-trust-service-mysql-distribution</module>
                 <module>eid-trust-service-admin-manual</module>
+		<module>eid-trust-service-architecture-guide</module>
                 <module>eid-trust-service-devel-guide</module>
                 <module>eid-trust-service-sdk</module>
                 <module>eid-trust-service-sdk-dotnet</module>

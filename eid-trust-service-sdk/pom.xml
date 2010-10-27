@@ -18,7 +18,7 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>unpack-manual</id>
+						<id>unpack-devel-manual</id>
 						<phase>package</phase>
 						<goals>
 							<goal>unpack</goal>
@@ -36,6 +36,25 @@
 							</outputDirectory>
 						</configuration>
 					</execution>
+                    <execution>
+                        <id>unpack-arch-manual</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>be.fedict.eid-trust-service</groupId>
+                                    <artifactId>eid-trust-service-architecture-guide</artifactId>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>
+                                ${project.build.directory}/files
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
 					<execution>
 						<id>unpack-javadoc</id>
 						<phase>package</phase>
@@ -102,5 +121,11 @@
 			<version>1.0.0-SNAPSHOT</version>
 			<type>zip</type>
 		</dependency>
+        <dependency>
+            <groupId>be.fedict.eid-trust-service</groupId>
+            <artifactId>eid-trust-service-architecture-guide</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <type>zip</type>
+        </dependency>
 	</dependencies>
 </project>

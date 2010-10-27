@@ -49,6 +49,10 @@
 			<source>target/files/eid-trust-service-devel-guide.pdf</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
+        <file>
+            <source>target/files/eid-trust-service-architecture-guide.pdf</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
 		<file>
 			<source>src/main/files/README.txt</source>
 			<outputDirectory>/</outputDirectory>
