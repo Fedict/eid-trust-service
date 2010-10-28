@@ -450,10 +450,12 @@ public class XKMSPortImpl implements XKMSPortType {
     private void addRevocationData(ValidateResultType validateResult,
                                    RevocationData revocationData) {
 
-        be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
+        be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory =
+                new be.fedict.trust.xkms.extensions.ObjectFactory();
         RevocationDataMessageExtensionType revocationDataMessageExtension = extensionsObjectFactory
                 .createRevocationDataMessageExtensionType();
-        be.fedict.trust.client.jaxb.xades132.ObjectFactory xadesObjectFactory = new be.fedict.trust.client.jaxb.xades132.ObjectFactory();
+        be.fedict.trust.client.jaxb.xades132.ObjectFactory xadesObjectFactory =
+                new be.fedict.trust.client.jaxb.xades132.ObjectFactory();
         RevocationValuesType revocationValues = xadesObjectFactory
                 .createRevocationValuesType();
 

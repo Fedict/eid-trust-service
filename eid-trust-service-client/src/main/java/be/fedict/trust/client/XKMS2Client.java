@@ -70,7 +70,7 @@ public class XKMS2Client {
 
     private WSSecurityClientHandler wsSecurityClientHandler;
 
-    private List<String> invalidReasonURIs;
+    protected List<String> invalidReasonURIs;
 
     /**
      * Main constructor
@@ -125,7 +125,7 @@ public class XKMS2Client {
     }
 
     /**
-     * Set the maximum offset of the WS-Security timestamp ( in ms ). If not
+     * Set the maximum offset of the WS-Security timestamp ( in seconds ). If not
      * specified this will be defaulted to 5 minutes.
      *
      * @param maxWSSecurityTimestampOffset maximum WS Security Timestamp offset
@@ -134,7 +134,7 @@ public class XKMS2Client {
             long maxWSSecurityTimestampOffset) {
 
         this.wsSecurityClientHandler
-                .setMaxWSSecurityTimestampOffset(maxWSSecurityTimestampOffset);
+                .setMaxWSSecurityTimestampOffset(maxWSSecurityTimestampOffset * 1000);
     }
 
     /**
@@ -309,6 +309,24 @@ public class XKMS2Client {
 
     /**
      * Validate the specified certificate chain against the specified trust
+     * domain.
+     * <p/>
+     * The used revocation data can be retrieved using
+     * {@link #getRevocationValues()}.
+     *
+     * @param returnRevocationData whether or not the used revocation data should be returned.
+     */
+    public void validate(String trustDomain,
+                         List<X509Certificate> certificateChain, boolean returnRevocationData)
+            throws CertificateEncodingException, TrustDomainNotFoundException,
+            RevocationDataNotFoundException, ValidationFailedException {
+
+        validate(trustDomain, certificateChain, returnRevocationData, null,
+                null, null, null, null, null);
+    }
+    
+    /**
+     * Validate the specified certificate chain against the specified trust
      * domain using historical validation using the specified revocation data.
      */
     public void validate(String trustDomain,
@@ -401,24 +419,6 @@ public class XKMS2Client {
 
         validate(trustDomain, certificateChain, false, validationDate, null,
                 null, revocationValues, null, null);
-    }
-
-    /**
-     * Validate the specified certificate chain against the specified trust
-     * domain.
-     * <p/>
-     * The used revocation data can be retrieved using
-     * {@link #getRevocationValues()}.
-     *
-     * @param returnRevocationData whether or not the used revocation data should be returned.
-     */
-    public void validate(String trustDomain,
-                         List<X509Certificate> certificateChain, boolean returnRevocationData)
-            throws CertificateEncodingException, TrustDomainNotFoundException,
-            RevocationDataNotFoundException, ValidationFailedException {
-
-        validate(trustDomain, certificateChain, returnRevocationData, null,
-                null, null, null, null, null);
     }
 
     /**
