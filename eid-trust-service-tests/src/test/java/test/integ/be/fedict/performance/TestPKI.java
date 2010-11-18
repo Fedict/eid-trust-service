@@ -110,6 +110,7 @@ public class TestPKI {
      */
     public void start(String host) throws Exception {
 
+        LOG.debug("host=" + host);
         this.host = host;
         this.server = new Server();
         Connector connector = new LocalConnector();

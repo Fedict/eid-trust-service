@@ -31,7 +31,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "ts_virt_trust_domain")
+@Table(name = "ts_v_trustdom")
 @NamedQueries( {
 		@NamedQuery(name = VirtualTrustDomainEntity.QUERY_LIST_ALL, query = "FROM VirtualTrustDomainEntity"),
 		@NamedQuery(name = VirtualTrustDomainEntity.QUERY_LIST_TRUST_DOMAINS, query = "SELECT vtd.trustDomains "

@@ -80,11 +80,11 @@ public class TestPKIPerformanceTest implements PerformanceTest {
     private static final String HOST = "sebeco-dev-11";
     private static final String XKMS_LOCATION = "http://" + HOST + ":8080/eid-trust-service-ws/xkms2";
 
-    private static final int INTERVAL_SIZE = 1000 * 60 * 5; // ms
+    private static final int INTERVAL_SIZE = 1000 * 60 * 15; // ms
 
     private static boolean interactive = false;
-    private static String PKI_PATH = "http://sebeco-dev-10:46238";
-    private static int minutes = 60 * 10;
+    private static String PKI_PATH = "http://sebeco-dev-10:48582";
+    private static int minutes = 60 * 48;
 
     @Before
     public void setUp() {
