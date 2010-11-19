@@ -1013,6 +1013,39 @@ JBOSS_CONF="all"]]></programlisting>
 
 			</para>
 			</section>
+            <section>
+                <title>Audit logging</title>
+                <para>
+                    Following events will be logged by the FedICT eID Trust Service
+                    and can be consulted in the admin portal.
+                    <itemizedlist>
+                        <listitem>
+                            <para>Error contacting NTP server</para>
+                        </listitem>
+                        <listitem>
+                            <para>Maximum clock offset reached</para>
+                        </listitem>
+                        <listitem>
+                            <para>Failed to download CRL for CA=...</para>
+                        </listitem>
+                        <listitem>
+                            <para>Invalid CRL for CA=...</para>
+                        </listitem>
+                        <listitem>
+                            <para>Failed to parse CRL for CA=...</para>
+                        </listitem>
+                        <listitem>
+                            <para>Failed to notify harvester for CA=...</para>
+                        </listitem>
+                        <listitem>
+                            <para>Default trust domain not set</para>
+                        </listitem>
+                        <listitem>
+                            <para>CA not found for ...</para>
+                        </listitem>
+                    </itemizedlist>
+                </para>
+            </section>
 			<section>
 				<title>SNMP</title>
 				<para>
