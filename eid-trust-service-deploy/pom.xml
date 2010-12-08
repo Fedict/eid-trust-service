@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.0.RC3</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service EAR</name>
 	<description>Java EE 5 EAR for eID Trust Service</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-deploy</artifactId>
-	<version>1.0.0.RC3</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>ear</packaging>
 	<build>
 		<plugins>
@@ -147,7 +147,7 @@
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-service</artifactId>
 			<type>sar</type>
-			<version>1.0.0.RC3</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-applet</groupId>
@@ -157,49 +157,49 @@
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-entity</artifactId>
 			<type>ejb</type>
-			<version>1.0.0.RC3</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-model</artifactId>
 			<type>ejb</type>
-			<version>1.0.0.RC3</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-startup-runtime</artifactId>
 			<type>war</type>
-			<version>1.0.0.RC3</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-ws</artifactId>
 			<type>war</type>
-			<version>1.0.0.RC3</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-portal-model</artifactId>
 			<type>ejb</type>
-			<version>1.0.0.RC3</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-portal-webapp</artifactId>
 			<type>war</type>
-			<version>1.0.0.RC3</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-admin-portal-model</artifactId>
 			<type>ejb</type>
-			<version>1.0.0.RC3</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-admin-portal-webapp</artifactId>
 			<type>war</type>
-			<version>1.0.0.RC3</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict</groupId>
