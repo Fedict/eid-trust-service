@@ -134,7 +134,8 @@
 							<targetDirectory>target/files/jboss-as-distribution
 							</targetDirectory>
 							<patches>
-								<patch>jboss-txn.patch</patch>
+								<patch>default-jboss-txn.patch</patch>
+								<patch>all-jboss-txn.patch</patch>
 							</patches>
 						</configuration>
 					</execution>
