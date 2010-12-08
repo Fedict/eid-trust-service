@@ -21,6 +21,7 @@
 				<exclude>common/lib/hsqldb.jar</exclude>
 				<exclude>common/lib/hsqldb-plugin.jar</exclude>
 				<exclude>server/all/deploy/hsqldb-ds.xml</exclude>
+				<exclude>server/default/deploy/hsqldb-ds.xml</exclude>
 
 				<exclude>bin/run.sh</exclude>
 				<exclude>bin/shutdown.sh</exclude>
@@ -49,6 +50,10 @@
 		<fileSet>
 			<directory>target/deploy</directory>
 			<outputDirectory>jboss/server/all/deploy</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>target/deploy</directory>
+			<outputDirectory>jboss/server/default/deploy</outputDirectory>
 		</fileSet>
 
 		<!--
