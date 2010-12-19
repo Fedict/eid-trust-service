@@ -1,0 +1,11 @@
+--- server/default/deploy/transaction-jboss-beans.xml.orig	2010-12-08 15:11:17.774689152 +0100
++++ server/default/deploy/transaction-jboss-beans.xml	2010-12-08 15:11:37.276695486 +0100
+@@ -104,7 +104,7 @@
+         <constructor factoryClass="com.arjuna.ats.arjuna.common.arjPropertyManager" factoryMethod="getCoordinatorEnvironmentBean"/>
+ 
+         <property name="enableStatistics">false</property>
+-        <property name="defaultTimeout">300</property>
++        <property name="defaultTimeout">1200</property>
+     </bean>
+ 
+     <bean name="ObjectStoreEnvironmentBean" class="com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean">
