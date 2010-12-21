@@ -17,8 +17,10 @@
 			</author>
 		</authorgroup>
 		<abstract>
-			<para>This manual serves as an entry point for setting up the eID
-				Trust Service. The target audience is system administrators.</para>
+			<para>
+				This manual serves as an entry point for setting up the eID
+				Trust Service. The target audience is system administrators.
+			</para>
 		</abstract>
 	</articleinfo>
 	<section>
@@ -37,17 +39,21 @@
 					<para>
 						eID Trust Service portal
 					</para>
-					<para>Via this web portal citizens can check the validity of their
-						eID certificates.</para>
+					<para>
+						Via this web portal citizens can check the validity of their
+						eID certificates.
+					</para>
 				</listitem>
 				<listitem>
 					<para>
 						eID Trust Service validation web service
 					</para>
-					<para>Via this SOAP web service Relying Parties (aka Service
+					<para>
+						Via this SOAP web service Relying Parties (aka Service
 						Providers) can check the validity of certificate paths. This web
 						service is constructed according to the W3C XKMS2 web service
-						standard.</para>
+						standard.
+					</para>
 				</listitem>
 			</orderedlist>
 			Besides these two service artifacts, the eID Trust Service also comes
@@ -55,10 +61,8 @@
 			Trust Service via an easy to use web portal interface. In the
 			following paragraphs we will use
 			<code>$EID_TRUST_SERVICE_ADDRESS</code>
-			as the
-			(internal) web address where the eID Trust Service product has
-			been
-			deployed.
+			as the (internal) web address where the eID Trust Service product has
+			been deployed.
 		</para>
 		<para>
 			The source code of the Fedict eID Trust Service is publicly available
@@ -116,24 +120,16 @@
 		<section>
 			<title>eID Trust Service Portal</title>
 			<para>
-				After deployment of the eID Trust Service product, the eID
-				Trust
+				After deployment of the eID Trust Service product, the eID Trust
 				Service Portal is available at
 				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal/</code>
-				. This web
-				portal MUST be accessed over unilateral SSL. The SSL
-				SHOULD be
-				terminated on the front-end Apache HTTPD service so that
-				the SSL
-				information can be communicated to the JBoss Application
-				Service
-				over AJP. If such a setup is not possible this SHOULD be
-				clearly
-				communicated in advance to the eID Trust Service development
-				team so
-				they can properly configure the eID Applet Service that is
-				used
-				within the eID Trust Service Portal.
+				. This web portal MUST be accessed over unilateral SSL. The SSL
+				SHOULD be terminated on the front-end Apache HTTPD service so that
+				the SSL information can be communicated to the JBoss Application
+				Service over AJP. If such a setup is not possible this SHOULD be
+				clearly communicated in advance to the eID Trust Service development
+				team so they can properly configure the eID Applet Service that is
+				used within the eID Trust Service Portal.
 			</para>
 			<para>
 				Add following configuration to your SSL site to accomplish this:
@@ -167,26 +163,20 @@
 		<section>
 			<title>eID Trust Service Validation Web Service</title>
 			<para>
-				After deployment of the eID Trust Service product, the eID
-				Trust
+				After deployment of the eID Trust Service product, the eID Trust
 				Service validation web service is available at
 				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-ws/xkms2</code>
-				This web
-				service MUST be accessible via both HTTP and HTTPS (thus
-				unilateral
-				SSL). When this web service is accessed over plain HTTP,
-				the service
-				provides the possibility to sign the response messages
-				using
-				WS-Security. This can be configured in the Administrator
+				This web service MUST be accessible via both HTTP and HTTPS (thus
+				unilateral SSL). When this web service is accessed over plain HTTP,
+				the service provides the possibility to sign the response messages
+				using WS-Security. This can be configured in the Administrator
 				portal.
 			</para>
 		</section>
 		<section>
 			<title>eID Trust Service Admin Portal</title>
 			<para>
-				After deployment of the eID Trust Service, the eID Trust
-				Service
+				After deployment of the eID Trust Service, the eID Trust Service
 				Admin Portal is available via:
 				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-admin-portal/
 				</code>
@@ -195,12 +185,15 @@
 		</section>
 		<section>
 			<title>SNMP</title>
-			<para>The eID Trust Service yields different SNMP counters on port
-				7894.</para>
+			<para>
+				The eID Trust Service yields different SNMP counters on port
+				7894.
+			</para>
 		</section>
 		<section>
 			<title>Database</title>
-			<para>The eID Trust Service product requires a relational database
+			<para>
+				The eID Trust Service product requires a relational database
 				with JDBC driver to operate.
 			</para>
 		</section>
@@ -208,11 +201,9 @@
 			<title>Java Virtual Machine</title>
 			<para>
 				You need to have Java Sun 1.6.0_20 or higher installed. JDK or JRE
-				are sufficient.
-				These can be found at:
+				are sufficient. These can be found at:
 				<ulink url="http://www.java.com/en/download/index.jsp">Java download</ulink>
-				.
-				After installation you will have to make sure the environment
+				. After installation you will have to make sure the environment
 				variable
 				<code>$JAVA_HOME</code>
 				is properly set and the
@@ -248,8 +239,7 @@
 					</listitem>
 				</itemizedlist>
 				AJP is preferred for the connection between the front-end Apache
-				HTTPD
-				and the JBoss Application Server.
+				HTTPD and the JBoss Application Server.
 			</para>
 		</section>
 	</section>
@@ -257,8 +247,7 @@
 		<title>Installation</title>
 		<para>
 			This chapter explains how to install the Fedict eID Trust
-			Service
-			application.
+			Service application.
 		</para>
 		<para>
 			The Fedict eID Trust Service has to be run on the
@@ -274,14 +263,11 @@
 			<code>./sql</code>
 			. The
 			<code>./jboss</code>
-			directory contains the JBoss application server,
-			configured for your
-			database and pre-packaged with the Fedict eID
-			Trust Service
+			directory contains the JBoss application server, configured for your
+			database and pre-packaged with the Fedict eID Trust Service
 			application. The
 			<code>./sql</code>
-			directory contains the database
-			initialization scripts. MySQL and
+			directory contains the database initialization scripts. MySQL and
 			Oracle are supported.
 		</para>
 		<para>
@@ -305,8 +291,7 @@
 			<title>Database setup</title>
 			<para>
 				Before trying to start the JBoss Application Server you will have to
-				initialize your database. The initialization scripts can be found
-				in
+				initialize your database. The initialization scripts can be found in
 				the
 				<code>./sql</code>
 				directory. There are 3 scripts, one to create the database account,
@@ -421,8 +406,7 @@ QUIT;]]></programlisting>
 			</para>
 			<para>
 				As JPA requires prepared transactions we need to enable this feature
-				on the PostgreSQL database.
-				Change the PostgreSQL configuration file
+				on the PostgreSQL database. Change the PostgreSQL configuration file
 				<code>/var/lib/pgsql/data/postgresql.conf</code>
 				:
 				<programlisting><![CDATA[
@@ -466,12 +450,9 @@ DROP DATABASE trust;
 		<section>
 			<title>Resources</title>
 			<para>
-				As the harvesting of large CRLs can be memory intensive, the
-				JBoss
-				Application Server has been tweaked so the JVM can use more
-				memory.
-				By default it is set to reserve a total of 1GB of heap space.
-				The
+				As the harvesting of large CRLs can be memory intensive, the JBoss
+				Application Server has been tweaked so the JVM can use more memory.
+				By default it is set to reserve a total of 1GB of heap space. The
 				configuration can be found in
 				<code>./jboss/bin/run.conf</code>
 				See
@@ -634,19 +615,25 @@ CreateBalancers 1
 				with 4 trust domains.
 				<orderedlist>
 					<listitem>
-						<para>eID Authentication Trust Domain ( machine domain name
-							BE-AUTH )</para>
-					</listitem>
-					<listitem>
-						<para>eID Non Repudiation Trust Domain ( machine domain name BE )
+						<para>
+							eID Authentication Trust Domain ( machine domain name
+							BE-AUTH )
 						</para>
 					</listitem>
 					<listitem>
-						<para>eID National Registry Trust Domain ( machine domain name
-							BE-NAT-REG )</para>
+						<para>
+							eID Non Repudiation Trust Domain ( machine domain name BE )
+						</para>
 					</listitem>
 					<listitem>
-						<para>Belgian TSA Trust Domain ( machine domain name BE-TSA )
+						<para>
+							eID National Registry Trust Domain ( machine domain name
+							BE-NAT-REG )
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Belgian TSA Trust Domain ( machine domain name BE-TSA )
 						</para>
 					</listitem>
 				</orderedlist>
@@ -668,23 +655,17 @@ CreateBalancers 1
 				. The URI is retrieved from the specific certificate.
 			</para>
 			<para>
-				OCSP requests
-				for the Belgian eID Trust Domains are sent to
+				OCSP requests for the Belgian eID Trust Domains are sent to
 				<code>http://ocsp.eid.belgium.be</code>
 				. The URI is again retrieved from the specific certificate.
 			</para>
 			<para>
-				TSP requests
-				can be used for clock drift detection and the
-				location is
-				configurable
-				in the Administrator portal.
+				TSP requests can be used for clock drift detection and the
+				location is configurable in the Administrator portal.
 			</para>
 			<para>
-				The NTP protocol
-				can also be used for clock drift detection and
-				again the location is
-				configurable in the Administrator portal.
+				The NTP protocol can also be used for clock drift detection and
+				again the location is configurable in the Administrator portal.
 			</para>
 		</section>
 		<section>
@@ -728,16 +709,12 @@ JBOSS_CONF="all"]]></programlisting>
 		<section>
 			<title>Transaction timeouts</title>
 			<para>
-				The downloading and processing of large CRLs can sometimes take
-				a lot
-				of time. This can lead to internal transaction timeouts. By
-				default,
-				the custom JBoss MySQL and Oracle Distributions have a
-				transaction
-				timeout configured of 1200 seconds or 20 minutes. Which should be
-				sufficient.
-				If this still proves to be insufficient, this can be
-				changed in
+				The downloading and processing of large CRLs can sometimes take a
+				lot of time. This can lead to internal transaction timeouts. By
+				default, the custom JBoss MySQL and Oracle Distributions have a
+				transaction timeout configured of 1200 seconds or 20 minutes. Which
+				should be sufficient. If this still proves to be insufficient, this
+				can be changed in
 				<code>jboss/server/default/deploy/transaction-jboss-beans.xml</code>
 				Look for following line and change accordingly:
 				<programlisting role="XML"><![CDATA[
@@ -839,11 +816,8 @@ JBOSS_CONF="all"]]></programlisting>
 				compliant database.
 			</para>
 			<para>
-				To be able to connect to your HSQL/MySQL/Oracle
-				database you will
-				need
-				to configure a JDBC driver. You can download
-				the drivers @
+				To be able to connect to your HSQL/MySQL/Oracle database you will
+				need to configure a JDBC driver. You can download the drivers @
 				<ulink url="http://www.mysql.com/downloads/connector/j/">MySQL JDBC Driver</ulink>
 				and
 				<ulink
@@ -859,8 +833,7 @@ JBOSS_CONF="all"]]></programlisting>
 				tab.
 			</para>
 			<para>
-				When you are done with this, you can configure the connection to
-				the
+				When you are done with this, you can configure the connection to the
 				database by adding a new
 				<code>Alias</code>
 				. Select the appropriate driver, and configure the URL, username and
@@ -874,34 +847,24 @@ JBOSS_CONF="all"]]></programlisting>
 			<title>Administration Portal</title>
 			<para>
 				The Fedict eID Trust Service comes with an administration
-				portal.
-				This
-				portal allows you to setup your network proxy if any,
-				manage
-				trust
-				domains and other aspects of the service.
+				portal. This portal allows you to setup your network proxy if any,
+				manage trust domains and other aspects of the service.
 			</para>
 			<section>
 				<title>Administrator registration</title>
 				<para>
-					To authenticate to the administrator portal, an eID
-					authentication
-					will be performed. If the service was freshly
-					installed, the first
-					successfull authentication will be
-					automatically
-					registered as
-					administrator. Subsequent administrators
-					will have to
-					be accepted by
-					this one. There are two ways to accomplish this:
+					To authenticate to the administrator portal, an eID authentication
+					will be performed. If the service was freshly installed, the first
+					successfull authentication will be automatically registered as
+					administrator. Subsequent administrators will have to be accepted
+					by this one. There are two ways to accomplish this:
 					<orderedlist>
 						<listitem>
 							<para>
 								Perform a login which will add you as a pending
 								administrator which can subsequently be approved by an
 								administrator.
-						</para>
+							</para>
 						</listitem>
 						<listitem>
 							<para>
@@ -918,11 +881,10 @@ JBOSS_CONF="all"]]></programlisting>
 				<title>Configuration</title>
 				<section id="config_admin">
 					<title id="config_admin.title">Administrators</title>
-					<para>Here you can view existing and pending administrators,
-						approve
-						pending administrators, remove administrators and register
-						an
-						additional one. To register an additional one, a full eID
+					<para>
+						Here you can view existing and pending administrators,
+						approve pending administrators, remove administrators and register
+						an additional one. To register an additional one, a full eID
 						authentication has to be performed of this new administrator.
 					</para>
 				</section>
@@ -939,9 +901,10 @@ JBOSS_CONF="all"]]></programlisting>
 				</section>
 				<section>
 					<title>Network Configuration</title>
-					<para>If you are operating behind a proxy, you can setup this in
+					<para>
+						If you are operating behind a proxy, you can setup this in
 						here and enable or disable the proxy configuration.
-				</para>
+					</para>
 				</section>
 				<section>
 					<title>Clock Drift Detection</title>
@@ -950,25 +913,23 @@ JBOSS_CONF="all"]]></programlisting>
 						NTP and TSP. TSP or Timestamp Protocol is a protocol used for
 						certifying timestamps. A timestamp request will be sent to the
 						configured TSA server, returning a timestamp response containing a
-						timestamp token. The received timestamp token will be used
-						for clock drift detection.
+						timestamp token. The received timestamp token will be used for
+						clock drift detection.
 				    </para>
-                    <para>
-                        You can configure the times when to perform the clock drift detection check
-                        using a cron-like expression string.
-                        See <link linkend="cron">Cron schedules</link> for more info.
-                    </para>
+					<para>
+						You can configure the times when to perform the clock drift
+						detection check using a cron-like expression string. See
+						<link linkend="cron">Cron schedules</link>
+						for more info.
+					</para>
 				</section>
 				<section>
 					<title>Information Message</title>
 					<para>
 						The information message to be shown on
 						<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal</code>
-						can be
-						configured here for all available languages of the FedICT
-						eID
-						Trust
-						Service Portal.
+						can be configured here for all available languages of the FedICT
+						eID Trust Service Portal.
 					</para>
 				</section>
 			</section>
@@ -984,68 +945,62 @@ JBOSS_CONF="all"]]></programlisting>
 			<section>
 				<title>Trust Domains</title>
 				<para>
-					You can add, modify, remove trust domains here. Also you can
-					set the default trust domain for the FedICT eID Trust Service.
-					This
+					You can add, modify, remove trust domains here. Also you can set
+					the default trust domain for the FedICT eID Trust Service. This
 					trust domain will be used in the eID Trust Service Validation Web
-					Service if no specific trust domain was specified.
-					For each trust
+					Service if no specific trust domain was specified. For each trust
 					domain you can specify whether or not CRL caching should be used,
 					which trust points lie under this trust domain and which
-					certificate
-					contraints are too be enforced when validating against
-					this trust domain.
-                    See <link linkend="cron">Cron schedules</link> for more info.
-			</para>
+					certificate contraints are too be enforced when validating against
+					this trust domain. See
+					<link linkend="cron">Cron schedules</link>
+					for more info.
+				</para>
 			</section>
 			<section>
 				<title>Trust Points</title>
 				<para>
 					For each trust point, you can specify a cron expression for
-					specifying
-					the CRL cache cron schedule interval. This includes
-					refreshing all
-					underlying CA's that have been cached. You can also
+					specifying the CRL cache cron schedule interval. This includes
+					refreshing all underlying CA's that have been cached. You can also
 					refresh the CRL cache immediately here for debugging purposes. For
-					each trust point you can see the list of CA's associated with
-					this
+					each trust point you can see the list of CA's associated with this
 					trust point and for each CA refresh the cache individually.
-
 			</para>
 			</section>
-            <section>
-                <title>Audit logging</title>
-                <para>
-                    Following events will be logged by the FedICT eID Trust Service
-                    and can be consulted in the admin portal.
-                    <itemizedlist>
-                        <listitem>
-                            <para>Error contacting NTP server</para>
-                        </listitem>
-                        <listitem>
-                            <para>Maximum clock offset reached</para>
-                        </listitem>
-                        <listitem>
-                            <para>Failed to download CRL for CA=...</para>
-                        </listitem>
-                        <listitem>
-                            <para>Invalid CRL for CA=...</para>
-                        </listitem>
-                        <listitem>
-                            <para>Failed to parse CRL for CA=...</para>
-                        </listitem>
-                        <listitem>
-                            <para>Failed to notify harvester for CA=...</para>
-                        </listitem>
-                        <listitem>
-                            <para>Default trust domain not set</para>
-                        </listitem>
-                        <listitem>
-                            <para>CA not found for ...</para>
-                        </listitem>
-                    </itemizedlist>
-                </para>
-            </section>
+			<section>
+				<title>Audit logging</title>
+				<para>
+					Following events will be logged by the FedICT eID Trust Service and
+					can be consulted in the admin portal.
+					<itemizedlist>
+						<listitem>
+							<para>Error contacting NTP server</para>
+						</listitem>
+						<listitem>
+							<para>Maximum clock offset reached</para>
+						</listitem>
+						<listitem>
+							<para>Failed to download CRL for CA=...</para>
+						</listitem>
+						<listitem>
+							<para>Invalid CRL for CA=...</para>
+						</listitem>
+						<listitem>
+							<para>Failed to parse CRL for CA=...</para>
+						</listitem>
+						<listitem>
+							<para>Failed to notify harvester for CA=...</para>
+						</listitem>
+						<listitem>
+							<para>Default trust domain not set</para>
+						</listitem>
+						<listitem>
+							<para>CA not found for ...</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+			</section>
 			<section>
 				<title>SNMP</title>
 				<para>
@@ -1084,68 +1039,70 @@ JBOSS_CONF="all"]]></programlisting>
 					</itemizedlist>
 				</para>
 			</section>
-            <section id="cron">
-                <title>CRON expression</title>
-                <para>
-                    You can specify a cron-like expression for the clock drift detection task and for each
-                    trust point.
-                    So for example: <code>0 0 0/3 * * *</code> is valid and represents, every 3 hours.
-                    The cron schedule string consist of following fields.
-                    <table>
-                        <title>All cron fields and default values.</title>
-                        <tgroup cols="3">
-                            <colspec colwidth="2*" />
-                            <colspec colwidth="2*" />
-                            <colspec colwidth="2*" />
-                            <thead>
-                                <row>
-                                    <entry>Attribute</entry>
-                                    <entry>Allowable Values</entry>
-                                    <entry>Default</entry>
-                                </row>
-                            </thead>
-                            <tbody>
-                                <row>
-                                    <entry>Second</entry>
-                                    <entry>[0,59]</entry>
-                                    <entry>0</entry>
-                                </row>
-                                <row>
-                                    <entry>Minute</entry>
-                                    <entry>[0,59]</entry>
-                                    <entry>0</entry>
-                                </row>
-                                <row>
-                                    <entry>Hour</entry>
-                                    <entry>[0,23]</entry>
-                                    <entry>0</entry>
-                                </row>
-                                <row>
-                                    <entry>dayOfMonth</entry>
-                                    <entry>[1,31]</entry>
-                                    <entry>*</entry>
-                                </row>
-                                <row>
-                                    <entry>Month</entry>
-                                    <entry>[1,12]</entry>
-                                    <entry>*</entry>
-                                </row>
-                                <row>
-                                    <entry>dayOfWeek</entry>
-                                    <entry>[0,7]</entry>
-                                    <entry>*</entry>
-                                </row>
-                                <row>
-                                    <entry>Year</entry>
-                                    <entry>A four-digit calendar year</entry>
-                                    <entry>*</entry>
-                                </row>
-                            </tbody>
-                        </tgroup>
-                    </table>
-                    For a more complete view of what is allowed, check the EJB 3.1 specification's TimerService/ScheduleExpression section.
-                </para>
-            </section>
+			<section id="cron">
+				<title>CRON expression</title>
+				<para>
+					You can specify a cron-like expression for the clock drift
+					detection task and for each trust point. So for example:
+					<code>0 0 0/3 * * *</code>
+					is valid and represents, every 3 hours. The cron schedule string
+					consist of following fields.
+					<table>
+						<title>All cron fields and default values.</title>
+						<tgroup cols="3">
+							<colspec colwidth="2*" />
+							<colspec colwidth="2*" />
+							<colspec colwidth="2*" />
+							<thead>
+								<row>
+									<entry>Attribute</entry>
+									<entry>Allowable Values</entry>
+									<entry>Default</entry>
+								</row>
+							</thead>
+							<tbody>
+								<row>
+									<entry>Second</entry>
+									<entry>[0,59]</entry>
+									<entry>0</entry>
+								</row>
+								<row>
+									<entry>Minute</entry>
+									<entry>[0,59]</entry>
+									<entry>0</entry>
+								</row>
+								<row>
+									<entry>Hour</entry>
+									<entry>[0,23]</entry>
+									<entry>0</entry>
+								</row>
+								<row>
+									<entry>dayOfMonth</entry>
+									<entry>[1,31]</entry>
+									<entry>*</entry>
+								</row>
+								<row>
+									<entry>Month</entry>
+									<entry>[1,12]</entry>
+									<entry>*</entry>
+								</row>
+								<row>
+									<entry>dayOfWeek</entry>
+									<entry>[0,7]</entry>
+									<entry>*</entry>
+								</row>
+								<row>
+									<entry>Year</entry>
+									<entry>A four-digit calendar year</entry>
+									<entry>*</entry>
+								</row>
+							</tbody>
+						</tgroup>
+					</table>
+					For a more complete view of what is allowed, check the EJB 3.1
+					specification's TimerService/ScheduleExpression section.
+				</para>
+			</section>
 		</section>
 	</section>
 	<appendix id="links">
@@ -1189,11 +1146,11 @@ JBOSS_CONF="all"]]></programlisting>
 						<ulink url="http://www.jboss.org/mod_cluster.html">JBoss mod_cluster</ulink>
 					</para>
 				</listitem>
-                <listitem>
-                    <para>
-                        <ulink url="http://jcp.org/en/jsr/detail?id=318">EJB 3.1 specification</ulink>
-                    </para>
-                </listitem>
+				<listitem>
+					<para>
+						<ulink url="http://jcp.org/en/jsr/detail?id=318">EJB 3.1 specification</ulink>
+					</para>
+				</listitem>
 			</itemizedlist>
 		</para>
 	</appendix>
@@ -1243,27 +1200,26 @@ JBOSS_CONF="all"]]></programlisting>
 	</appendix>
 	<appendix>
 		<title>eID Trust Service License</title>
-		<para>The eID Trust Service source code has been released under the
-			GNU LGPL version 3.0.</para>
 		<para>
-			<code>This is free software; you can redistribute it and/or modify it
-				under the terms of the GNU Lesser General Public License version
-				3.0
+			The eID Trust Service source code has been released under the
+			GNU LGPL version 3.0.
+		</para>
+		<para>
+			<code>
+				This is free software; you can redistribute it and/or modify it
+				under the terms of the GNU Lesser General Public License version 3.0
 				as published by the Free Software Foundation.
 
 				This software is
-				distributed in the hope that it will be useful,
-				but WITHOUT ANY
-				WARRANTY; without even the implied warranty of
-				MERCHANTABILITY or
-				FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-				Lesser General Public
+				distributed in the hope that it will be useful, but WITHOUT ANY
+				WARRANTY; without even the implied warranty of MERCHANTABILITY or
+				FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
 				License for more details.
 
 				You should have received a copy of the GNU
-				Lesser General Public
-				License along with this software; if not, see
-				http://www.gnu.org/licenses/.</code>
+				Lesser General Public License along with this software; if not, see
+				http://www.gnu.org/licenses/.
+			</code>
 		</para>
 	</appendix>
 	<appendix>
@@ -1302,11 +1258,11 @@ JBOSS_CONF="all"]]></programlisting>
 						<entry>Frank Cornelis</entry>
 						<entry>JVM, logging, init scripts.</entry>
 					</row>
-                    <row>
-                        <entry>27 Oct 2010</entry>
-                        <entry>Wim Vandenhaute</entry>
-                        <entry>RFC.3: Cron schedule.</entry>
-                    </row>
+					<row>
+						<entry>27 Oct 2010</entry>
+						<entry>Wim Vandenhaute</entry>
+						<entry>RFC.3: Cron schedule.</entry>
+					</row>
 				</tbody>
 			</tgroup>
 		</table>
