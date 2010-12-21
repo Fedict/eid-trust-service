@@ -31,17 +31,14 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Type;
-
 @Entity
 @Table(name = "ts_admin")
-@NamedQueries( { @NamedQuery(name = AdminEntity.QUERY_LIST_ALL, query = "FROM AdminEntity") })
+@NamedQueries({ @NamedQuery(name = AdminEntity.QUERY_LIST_ALL, query = "FROM AdminEntity") })
 public class AdminEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -101,8 +98,6 @@ public class AdminEntity implements Serializable {
 		this.pending = pending;
 	}
 
-	@Lob
-	@Type(type = "org.hibernate.type.PrimitiveByteArrayBlobType")
 	@Basic(fetch = FetchType.LAZY)
 	public byte[] getEncodedPublicKey() {
 		return this.encodedPublicKey;

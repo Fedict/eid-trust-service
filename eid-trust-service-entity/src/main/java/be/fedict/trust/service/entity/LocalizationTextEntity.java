@@ -25,7 +25,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -95,7 +94,6 @@ public class LocalizationTextEntity implements Serializable {
 		this.language = language;
 	}
 
-	@Lob
 	@Column(length = 1024 * 1024)
 	public String getText() {
 

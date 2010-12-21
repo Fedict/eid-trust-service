@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
-<assembly xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.0.0.xsd">
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
+	<id>mysql-zip</id>
 
 	<!-- ================== -->
 	<!-- BASE CONFIGURATION -->
@@ -9,9 +12,7 @@
 
 	<fileSets>
 
-		<!--
-			Exclude default DS config
-		-->
+		<!-- Exclude default DS config -->
 		<fileSet>
 			<directory>target/files/jboss-as-distribution</directory>
 			<outputDirectory>jboss</outputDirectory>
@@ -44,9 +45,7 @@
 			<outputDirectory>jboss</outputDirectory>
 		</fileSet>
 
-		<!--
-			This artifact's EAR dependencies -> /jboss/server/all/lib
-		-->
+		<!-- This artifact's EAR dependencies -> /jboss/server/all/lib -->
 		<fileSet>
 			<directory>target/deploy</directory>
 			<outputDirectory>jboss/server/all/deploy</outputDirectory>
@@ -56,9 +55,7 @@
 			<outputDirectory>jboss/server/default/deploy</outputDirectory>
 		</fileSet>
 
-		<!--
-			This MySQL connector -> /jboss/common/lib
-		-->
+		<!-- This MySQL connector -> /jboss/common/lib -->
 		<fileSet>
 			<directory>target/dependency</directory>
 			<outputDirectory>jboss/common/lib</outputDirectory>
@@ -67,9 +64,7 @@
 	</fileSets>
 
 	<files>
-		<!--
-			The MySQL initialization scripts -> /sql 
-		 -->
+		<!-- The MySQL initialization scripts -> /sql -->
 		<file>
 			<source>target/files/mysql-trust-service-ddl.sql</source>
 			<outputDirectory>sql</outputDirectory>
@@ -82,7 +77,7 @@
 			<source>target/files/resources/mysql-create-database.sql</source>
 			<outputDirectory>sql</outputDirectory>
 		</file>
-		
+
 		<!-- Admin manual -> /manual -->
 		<file>
 			<source>target/files/eid-trust-service-admin-manual.pdf</source>
