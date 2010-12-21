@@ -36,7 +36,7 @@
 			<plugin>
 				<groupId>be.fedict.eid-applet</groupId>
 				<artifactId>eid-applet-sql-ddl-plugin</artifactId>
-				<version>1.0.2-SNAPSHOT</version>
+				<version>${eid-applet.version}</version>
 				<executions>
 					<execution>
 						<id>mysql</id>
