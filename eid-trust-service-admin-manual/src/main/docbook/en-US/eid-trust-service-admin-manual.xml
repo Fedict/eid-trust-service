@@ -9,7 +9,7 @@
 			<year>2010</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>3 Jun 2010</releaseinfo>
+		<releaseinfo>21 Dec 2010</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Wim</firstname>
@@ -68,15 +68,17 @@
 			The source code of the Fedict eID Trust Service is publicly available
 			and can be found at
 			<ulink url="http://code.google.com/p/eid-trust-service/source/checkout">eID Trust Service Source Code</ulink>
-			. Please not that the Fedict eID Trust Service has dependencies on
+			. Please note that the Fedict eID Trust Service has dependencies on
 			jTrust, a java library for trust validation of X509 certificates
 			which can be found at
 			<ulink url="http://code.google.com/p/jtrust/source/checkout">jTrust source code</ulink>
-			.
+			. The Fedict eID Trust Service also has a dependency on the eID
+			Applet project.
 		</para>
 		<section>
 			<title>Apache configuration under Redhat (Fedora)</title>
 			<para>
+				We assume that you have installed a vanilla RedHat operating system.
 				Activate the Apache HTTP Service via:
 				<programlisting><![CDATA[
 			sudo chkconfig --level 345 httpd on
@@ -132,7 +134,7 @@
 				used within the eID Trust Service Portal.
 			</para>
 			<para>
-				Add following configuration to your SSL site to accomplish this:
+				Add the following configuration to your SSL site to accomplish this:
 				<programlisting><![CDATA[<IfModule mod_proxy_ajp.c>
                 ProxyRequests On
                 ProxyVia On
@@ -182,6 +184,14 @@
 				</code>
 				. This web portal MUST be accessed over unilateral SSL.
 			</para>
+			<warning>
+				<title>Administrator Registrations</title>
+				<para>
+					After a first start up of the eID Trust Service you need to
+					register yourself an administrator by logging in into the eID Trust
+					Service admin portal.
+				</para>
+			</warning>
 		</section>
 		<section>
 			<title>SNMP</title>
@@ -194,7 +204,7 @@
 			<title>Database</title>
 			<para>
 				The eID Trust Service product requires a relational database
-				with JDBC driver to operate.
+				with a JDBC driver to operate.
 			</para>
 		</section>
 		<section>
@@ -252,7 +262,9 @@
 		<para>
 			The Fedict eID Trust Service has to be run on the
 			<ulink url="http://www.jboss.org/jbossas">JBoss Application Server</ulink>
-			. version 6.0.0.M2.
+			. version 6.0.0.M5. The eID Trust Service comes in pre-packaged
+			distributions containing a functional application server targetting a
+			specific database product.
 		</para>
 		<para>
 			The Fedict eID Trust Service application is delivered in a customized
@@ -267,25 +279,24 @@
 			database and pre-packaged with the Fedict eID Trust Service
 			application. The
 			<code>./sql</code>
-			directory contains the database initialization scripts. MySQL and
-			Oracle are supported.
+			directory contains the database initialization scripts. MySQL,
+			PostgreSQL and Oracle are supported.
 		</para>
 		<para>
 			It is also possible to run the Fedict eID Trust Service application
-			using HSQL, which is the default configured database for the JBoss
+			using HSQLDB, which is the default configured database for the JBoss
 			Application Server. You will have to use the JBoss distribution from
 			the Fedict eID Applet project. This customized distribution has all
 			necessary dependencies included to run the Fedict eID Trust Service.
 			To install simply unzip the eID applet JBoss zip and copy the .ear
 			file in
-			<code>./jboss-as-distribution/server/all/deploy</code>
+			<code>./jboss-as-distribution/server/default/deploy</code>
 			.
 		</para>
 		<para>
 			Please note that it is not recommended to use this setup in a
-			production environment. As the HSQL database is in-memory and parsing
-			of large CRL's also is memory intensive, you will run quickly into
-			memory problems.
+			production environment. The HSQLDB database product is not suited for
+			production deployments.
 		</para>
 		<section>
 			<title>Database setup</title>
@@ -301,10 +312,12 @@
 				database is
 				<code>trust/trust</code>
 				. Please note that if you wish to change this, you will have to
-				manually modify the datasource in the JBoss distribution. The
+				manually modify the datasource in the JBoss AS distribution. The
 				configuration for this can be found in
 				<code>/jboss/server/all/deploy/trust-service-ds.xml</code>
-				.
+				or
+				<code>/jboss/server/default/deploy/trust-service-ds.xml</code>
+				, depending on the JBoss configuration that you prefer.
 			</para>
 			<para>
 				The Fedict eID Trust Service has been successfully tested on:
@@ -315,13 +328,16 @@
 					<listitem>
 						<para>Oracle 10.2.0.1.0</para>
 					</listitem>
+					<listitem>
+						<para>PostgreSQL 8.4.5</para>
+					</listitem>
 				</itemizedlist>
 			</para>
 		</section>
 		<section>
 			<title>MySQL database setup on Redhat (Fedora)</title>
 			<para>
-				Following is needed for setting up the MySQL database on Redhat
+				The following is needed for setting up the MySQL database on Redhat
 				(Fedora):
 				<programlisting><![CDATA[
 					sudo yum install mysql-server.i686
@@ -383,8 +399,8 @@ QUIT;]]></programlisting>
 		<section>
 			<title>PostgreSQL database setup on Redhat (Fedora)</title>
 			<para>
-				Following is needed for setting up the PostgreSQL database on Redhat
-				(Fedora):
+				The following is needed for setting up the PostgreSQL database on
+				Redhat (Fedora):
 				<programlisting><![CDATA[
 					sudo yum install postgresql-server.i686
 					sudo service postgresql initdb
@@ -468,7 +484,7 @@ DROP DATABASE trust;
 			<title>Clustering</title>
 			<para>
 				Following is needed for a basic clustering with load balancing
-				setup. Since JBoss 6 M1, clustering has been simplified as
+				setup. Since JBoss 6 M1, clustering has been simplified via
 				<code>mod_cluster</code>
 				. Unlike
 				<code>mod_jk</code>
@@ -593,12 +609,28 @@ CreateBalancers 1
 		<section>
 			<title>Starting</title>
 			<para>
+				The eID Trust Service JBoss distribution comes with two JBoss
+				configurations. The
+				<code>default</code>
+				configuration and the
+				<code>all</code>
+				configuration. Use the
+				<code>all</code>
+				configuration if you are interested in running the eID Trust Service
+				as part of a cluster.
+			</para>
+			<para>
 				After you have correctly setup your database, you can start the
 				application by executing following command:
 				<programlisting><![CDATA[
+					./jboss/bin/run.sh -b 0.0.0.0 &
+				]]></programlisting>
+				. Or in case you want to run the JBoss configuration that enables
+				clustering you start via:
+				<programlisting><![CDATA[
 					./jboss/bin/run.sh -b 0.0.0.0 -c all &
 				]]></programlisting>
-				. The option
+				The option
 				<code>-b 0.0.0.0</code>
 				is to change the bind address of the server so its available to all
 				interfaces.
@@ -752,6 +784,10 @@ JBOSS_CONF="all"]]></programlisting>
 		</section>
 		<section>
 			<title>Configuration of the NTP-client on Redhat (Fedora)</title>
+			<para>
+				The eID Trust Service functionality is very dependent on a
+				correct local time.
+			</para>
 			<para>
 				Configure your NTP servers via
 				<code>/etc/ntp.conf</code>
@@ -1262,6 +1298,11 @@ JBOSS_CONF="all"]]></programlisting>
 						<entry>27 Oct 2010</entry>
 						<entry>Wim Vandenhaute</entry>
 						<entry>RFC.3: Cron schedule.</entry>
+					</row>
+					<row>
+						<entry>21 Dec 2010</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>JBoss configurations.</entry>
 					</row>
 				</tbody>
 			</tgroup>
