@@ -213,8 +213,10 @@ public class XKMS2Client {
     }
 
     private void setEndpointAddress(String location) {
-
-        LOG.debug("ws location=" + location);
+        LOG.debug("ws location: " + location);
+        if (null == location) {
+        	throw new IllegalArgumentException("XKMS2 location URL cannot be null");
+        }
         BindingProvider bindingProvider = (BindingProvider) this.port;
         bindingProvider.getRequestContext().put(
                 BindingProvider.ENDPOINT_ADDRESS_PROPERTY, location);
