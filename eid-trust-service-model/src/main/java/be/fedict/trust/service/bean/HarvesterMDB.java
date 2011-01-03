@@ -74,7 +74,7 @@ public class HarvesterMDB implements MessageListener {
 
     public static final String HARVESTER_QUEUE_NAME = "queue/trust/harvester";
 
-    private static final int BATCH_SIZE = 10000;
+    private static final int BATCH_SIZE = 500;
 
     @EJB
     private ConfigurationDAO configurationDAO;
