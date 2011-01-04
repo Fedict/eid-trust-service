@@ -60,19 +60,19 @@
         <dependency>
             <groupId>be.fedict.eid-trust-service</groupId>
             <artifactId>eid-trust-service-client</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>be.fedict.eid-trust-service</groupId>
             <artifactId>eid-trust-service-xkms2-ws-impl</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>be.fedict.eid-trust-service</groupId>
             <artifactId>eid-trust-service-model</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
