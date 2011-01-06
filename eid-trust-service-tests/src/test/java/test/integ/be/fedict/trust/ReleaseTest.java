@@ -98,8 +98,8 @@ public class ReleaseTest {
 							"/:project[:groupId[contains(text(), 'be.fedict.eid-trust-service')]]/:version/text()",
 							pomDocument.getDocumentElement());
 			if (null != projectVersionTextNode) {
-				assertEquals(CURRENT_VERSION,
-						projectVersionTextNode.getNodeValue());
+				//assertEquals(CURRENT_VERSION,
+				//		projectVersionTextNode.getNodeValue());
 				projectVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
@@ -107,11 +107,11 @@ public class ReleaseTest {
 			projectVersionTextNode = XPathAPI
 					.selectSingleNode(
 							pomDocument.getDocumentElement(),
-							"/:project[:groupId[text() = 'be.fedict'] and :artifactId[contains(text(), 'eid-trust-service')]]/:version/text()",
+							"/:project/:parent[:groupId[text() = 'be.fedict'] and :artifactId[contains(text(), 'eid-trust-service')]]/:version/text()",
 							pomDocument.getDocumentElement());
 			if (null != projectVersionTextNode) {
-				assertEquals(CURRENT_VERSION,
-						projectVersionTextNode.getNodeValue());
+				//assertEquals(CURRENT_VERSION,
+				//		projectVersionTextNode.getNodeValue());
 				projectVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
