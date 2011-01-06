@@ -9,7 +9,7 @@
 	<description>SQL DDL for eID Trust Service</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-sql-ddl</artifactId>
-	<version>1.0.0.RC4</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<build>

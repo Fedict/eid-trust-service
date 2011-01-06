@@ -8,7 +8,7 @@
 	<name>FedICT eID Trust Service XKMS2 Implementation</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-xkms2-ws-impl</artifactId>
-	<version>1.0.0.RC4</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
