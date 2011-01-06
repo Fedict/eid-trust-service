@@ -1,19 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-                <groupId>be.fedict</groupId>
-                <artifactId>eid-trust-service</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+		<groupId>be.fedict</groupId>
+		<artifactId>eid-trust-service</artifactId>
+		<version>1.0.0.RC4</version>
 	</parent>
 
 	<name>FedICT eID Trust Service .NET SDK</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-sdk-dotnet</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0.RC4</version>
 	<packaging>pom</packaging>
 
-    <build>
+	<build>
 
 		<resources>
 			<resource>
@@ -22,28 +24,29 @@
 			</resource>
 		</resources>
 
-        <plugins>
+		<plugins>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptors>
-                        <descriptor>src/main/assembly/package.xml</descriptor>
+						<descriptor>src/main/assembly/package.xml</descriptor>
 					</descriptors>
+					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 				<executions>
 					<execution>
 						<id>package</id>
 						<phase>package</phase>
 						<goals>
-							<goal>attached</goal>
+							<goal>single</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
 
 		</plugins>
-    </build>
+	</build>
 
 </project>
