@@ -51,6 +51,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.ProxySelector;
 import java.security.*;
 import java.security.cert.*;
 import java.util.*;
@@ -71,14 +72,24 @@ public class XKMS2Client {
     private WSSecurityClientHandler wsSecurityClientHandler;
 
     protected List<String> invalidReasonURIs;
+    
+    private String location;
 
+    private static XKMS2ProxySelector proxySelector;
+    
+    static {
+    	ProxySelector defaultProxySelector = ProxySelector.getDefault();
+    	XKMS2Client.proxySelector = new XKMS2ProxySelector(defaultProxySelector);
+    	ProxySelector.setDefault(XKMS2Client.proxySelector);
+    }
+    
     /**
      * Main constructor
      *
      * @param location location ( complete path ) of the XKMS2 web service
      */
     public XKMS2Client(String location) {
-
+    	this.location = location;
         this.invalidReasonURIs = new LinkedList<String>();
 
         XKMSService xkmsService = XKMSServiceFactory.getInstance();
@@ -104,11 +115,7 @@ public class XKMS2Client {
      * Proxy configuration setting ( both http as https ).
      */
     public void setProxy(String proxyHost, int proxyPort) {
-
-        System.setProperty("http.proxyHost", proxyHost);
-        System.setProperty("http.proxyPort", Integer.toString(proxyPort));
-        System.setProperty("https.proxyHost", proxyHost);
-        System.setProperty("https.proxyPort", Integer.toString(proxyPort));
+    	XKMS2Client.proxySelector.setProxy(this.location, proxyHost, proxyPort);
     }
 
     /**
