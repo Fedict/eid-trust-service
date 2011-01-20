@@ -66,6 +66,14 @@ public class XKMS2ProxySelector extends ProxySelector {
 		this.defaultProxySelector.connectFailed(uri, sa, ioe);
 	}
 
+	/**
+	 * Sets the proxy for a certain location URL. If the proxyHost is null, we
+	 * go DIRECT.
+	 * 
+	 * @param location
+	 * @param proxyHost
+	 * @param proxyPort
+	 */
 	public void setProxy(String location, String proxyHost, int proxyPort) {
 		String hostname;
 		try {
@@ -73,7 +81,13 @@ public class XKMS2ProxySelector extends ProxySelector {
 		} catch (MalformedURLException e) {
 			throw new RuntimeException("URL error: " + e.getMessage(), e);
 		}
-		this.proxies.put(hostname, new Proxy(Type.HTTP, new InetSocketAddress(
-				proxyHost, proxyPort)));
+		if (null == proxyHost) {
+			LOG.debug("removing proxy for: " + hostname);
+			this.proxies.remove(hostname);
+		} else {
+			LOG.debug("setting proxy for: " + hostname);
+			this.proxies.put(hostname, new Proxy(Type.HTTP,
+					new InetSocketAddress(proxyHost, proxyPort)));
+		}
 	}
 }
