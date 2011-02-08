@@ -6,14 +6,18 @@
 	<articleinfo>
 		<title>Fedict eID Trust Service Administrator Manual</title>
 		<copyright>
-			<year>2010</year>
+			<year>2010-2011</year>
 			<holder>Fedict</holder>
 		</copyright>
-		<releaseinfo>21 Dec 2010</releaseinfo>
+		<releaseinfo>8 Feb 2011</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Wim</firstname>
 				<surname>Vandenhaute</surname>
+			</author>
+			<author>
+				<firstname>Frank</firstname>
+				<surname>Cornelis</surname>
 			</author>
 		</authorgroup>
 		<abstract>
@@ -50,52 +54,69 @@
 					</para>
 					<para>
 						Via this SOAP web service Relying Parties (aka Service
-						Providers) can check the validity of certificate paths. This web
-						service is constructed according to the W3C XKMS2 web service
-						standard.
+						Providers) can check the validity of certificate chains. This web
+						service has been implemented according to the W3C XKMS2 web
+						service standard.
 					</para>
 				</listitem>
 			</orderedlist>
 			Besides these two service artifacts, the eID Trust Service also comes
-			with an Admin portal that allows administrators to manage the eID
-			Trust Service via an easy to use web portal interface. In the
-			following paragraphs we will use
+			with an Admin portal. This portal allows administrators to manage the
+			eID Trust Service via an easy to use interface. In the following
+			sections we will use
 			<code>$EID_TRUST_SERVICE_ADDRESS</code>
-			as the (internal) web address where the eID Trust Service product has
-			been deployed.
+			as the (internal) web address where the eID Trust Service has been
+			deployed.
 		</para>
 		<para>
 			The source code of the Fedict eID Trust Service is publicly available
 			and can be found at
 			<ulink url="http://code.google.com/p/eid-trust-service/source/checkout">eID Trust Service Source Code</ulink>
-			. Please note that the Fedict eID Trust Service has dependencies on
-			jTrust, a java library for trust validation of X509 certificates
-			which can be found at
+			. The Fedict eID Trust Service has dependencies on jTrust, a java
+			library for trust validation of X509 certificates. This library can
+			be found at
 			<ulink url="http://code.google.com/p/jtrust/source/checkout">jTrust source code</ulink>
 			. The Fedict eID Trust Service also has a dependency on the eID
-			Applet project.
+			Applet project. This project can be found at
+			<ulink url="http://code.google.com/p/eid-applet/source/checkout">eID Applet Project page</ulink>
+			.
 		</para>
 		<section>
 			<title>Apache configuration under Redhat (Fedora)</title>
 			<para>
-				We assume that you have installed a vanilla RedHat operating system.
-				Activate the Apache HTTP Service via:
+				The eID Trust Service runs on a JBoss 6 application server. Proper
+				firewalling/front-end protection should be put in place to prevent
+				unauthorized access towards this application server. In a production
+				environment special care should be given not to expose the entire
+				context path, i.e.
+				<code>/</code>
+				, towards the internet. This would allow anyone to deploy Java EE
+				application via the JBoss JMX Console. A commonly used front-end is
+				the Apache HTTPD web service.
+			</para>
+			<para>
+				We assume that you have installed a vanilla RedHat/CentOS operating
+				system. Activate the Apache HTTP Service via:
 				<programlisting><![CDATA[
 			sudo chkconfig --level 345 httpd on
 			chkconfig --list httpd
 			sudo /etc/init.d/httpd restart
 			]]></programlisting>
-				Install the SSL via:
+				In case you want to terminate the unilateral SSL on Apache you need
+				to install the SSL module via:
 				<programlisting><![CDATA[
 				sudo yum install mod_ssl.i686
 			]]></programlisting>
-				Open up the iptables (under
+			</para>
+		</section>
+		<section>
+			<title>iptables configuration under RedHat</title>
+			<para>
+				Open up the iptables firewall on the Apache server to allow for both
+				HTTP (port 80) and HTTPS (port 443). Relevant iptables configuration
+				lines (under
 				<code>/etc/sysconfig/iptables</code>
-				) firewall on the Apache server to allow for both
-				HTTP (port 80) and
-				HTTPS (port 443).
-				Relevant iptables config lines
-				are:
+				) are:
 				<programlisting><![CDATA[
 					-A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
 					-A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
@@ -118,6 +139,12 @@
 				]]></programlisting>
 				and check whether the levels 3, 4, and 5 are on.
 			</para>
+			<para>
+				The default network configuration can be found under:
+				<programlisting><![CDATA[
+					/etc/sysconfig/network-scripts/ifcfg-eth0
+				]]></programlisting>
+			</para>
 		</section>
 		<section>
 			<title>eID Trust Service Portal</title>
@@ -125,16 +152,18 @@
 				After deployment of the eID Trust Service product, the eID Trust
 				Service Portal is available at
 				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal/</code>
-				. This web portal MUST be accessed over unilateral SSL. The SSL
-				SHOULD be terminated on the front-end Apache HTTPD service so that
-				the SSL information can be communicated to the JBoss Application
-				Service over AJP. If such a setup is not possible this SHOULD be
-				clearly communicated in advance to the eID Trust Service development
-				team so they can properly configure the eID Applet Service that is
-				used within the eID Trust Service Portal.
+				. This web portal MUST be accessed over unilateral SSL. If not, the
+				eID Applet will refuse to operate. The SSL SHOULD be terminated on
+				the front-end Apache HTTPD service so that the SSL information can
+				be communicated to the JBoss Application Service over the AJP
+				protocol. If such a setup is not possible this SHOULD be clearly
+				communicated in advance to the eID Trust Service development team so
+				they can properly configure the eID Applet Service that is used
+				within the eID Trust Service Portal.
 			</para>
 			<para>
-				Add the following configuration to your SSL site to accomplish this:
+				Add the following configuration to your Apache HTTPD service to
+				accomplish this:
 				<programlisting><![CDATA[<IfModule mod_proxy_ajp.c>
                 ProxyRequests On
                 ProxyVia On
@@ -161,6 +190,42 @@
 				<code>/etc/httpd/conf.d/trust-service.conf</code>
 				.
 			</para>
+			<para>
+				Restart Apache via:
+				<programlisting><![CDATA[
+					sudo /etc/init.dhttpd restart
+				]]></programlisting>
+			</para>
+			<para>
+				If you don't want to use the AJP protocol between the Apache
+				web
+				server and the JBoss application server, you can use the
+				following
+				configuration.
+				<programlisting><![CDATA[<IfModule mod_proxy_ajp.c>
+ProxyRequests Off
+
+	<Location /eid-trust-service-portal>
+		Order allow,deny
+		Allow from all
+		ProxyPass http://localhost:8080/eid-trust-service-portal
+		ProxyPass http://localhost:8080/eid-trust-service-portal
+	</Location>
+
+	<Location /eid-trust-service-admin-portal>
+		Order allow,deny
+		Allow from all
+		ProxyPass http://localhost:8080/eid-trust-service-admin-portal
+		ProxyPassReverse http://localhost:8080/eid-trust-service-admin-portal
+	</Location>
+
+	<Location /eid-trust-service-ws>
+		Order allow,deny
+		Allow from all
+		ProxyPass http://localhost:8080/eid-trust-service-ws
+	</Location>
+</IfModule>]]></programlisting>
+			</para>
 		</section>
 		<section>
 			<title>eID Trust Service Validation Web Service</title>
@@ -168,8 +233,8 @@
 				After deployment of the eID Trust Service product, the eID Trust
 				Service validation web service is available at
 				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-ws/xkms2</code>
-				This web service MUST be accessible via both HTTP and HTTPS (thus
-				unilateral SSL). When this web service is accessed over plain HTTP,
+				. This SOAP web service MUST be accessible via both HTTP and HTTPS
+				(unilateral SSL). When this web service is accessed over plain HTTP,
 				the service provides the possibility to sign the response messages
 				using WS-Security. This can be configured in the Administrator
 				portal.
@@ -182,14 +247,15 @@
 				Admin Portal is available via:
 				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-admin-portal/
 				</code>
-				. This web portal MUST be accessed over unilateral SSL.
+				. This web portal MUST be accessed over unilateral SSL. If not, the
+				eID Applet will refuse to operate.
 			</para>
 			<warning>
 				<title>Administrator Registrations</title>
 				<para>
 					After a first start up of the eID Trust Service you need to
 					register yourself an administrator by logging in into the eID Trust
-					Service admin portal.
+					Service admin portal. Multiple administrators are possible.
 				</para>
 			</warning>
 		</section>
@@ -203,8 +269,9 @@
 		<section>
 			<title>Database</title>
 			<para>
-				The eID Trust Service product requires a relational database
-				with a JDBC driver to operate.
+				The eID Trust Service product requires a relational database to
+				operate. The application server requires the proper JDBC driver to
+				access the DBMS.
 			</para>
 		</section>
 		<section>
@@ -213,7 +280,7 @@
 				You need to have Java Sun 1.6.0_20 or higher installed. JDK or JRE
 				are sufficient. These can be found at:
 				<ulink url="http://www.java.com/en/download/index.jsp">Java download</ulink>
-				. After installation you will have to make sure the environment
+				. After installation you will have to make sure that the environment
 				variable
 				<code>$JAVA_HOME</code>
 				is properly set and the
@@ -227,7 +294,10 @@
 					export JAVA_HOME=/usr/local/jdk1.6
 					export PATH=$JAVA_HOME/bin:$PATH
 				]]></programlisting>
-				Ensure Sun Java 1.6.0_20+ is installed via the following command:
+				Where we assume that you installed the JDK under
+				<code>/usr/local/jdk1.6</code>
+				. Check whether Sun Java 1.6.0_20+ is installed via the following
+				command:
 				<programlisting><![CDATA[
 					java -version
 				]]></programlisting>
@@ -251,6 +321,12 @@
 				AJP is preferred for the connection between the front-end Apache
 				HTTPD and the JBoss Application Server.
 			</para>
+			<para>
+				The JBoss application server comes with an SSL configuration
+				using a self-signed certificate. This SSL configuration is for
+				testing purposes only and should not be used in production
+				environments.
+			</para>
 		</section>
 	</section>
 	<section>
@@ -260,23 +336,23 @@
 			Service application.
 		</para>
 		<para>
-			The Fedict eID Trust Service has to be run on the
+			The Fedict eID Trust Service application server is based on the
 			<ulink url="http://www.jboss.org/jbossas">JBoss Application Server</ulink>
-			. version 6.0.0.M5. The eID Trust Service comes in pre-packaged
+			version 6.0.0.Final. The eID Trust Service comes in pre-packaged
 			distributions containing a functional application server targetting a
 			specific database product.
 		</para>
 		<para>
 			The Fedict eID Trust Service application is delivered in a customized
-			database specific zip file. Unpacking this zip file you will notice 2
-			directories:
+			database specific zip file. When unpacking this zip file, you will
+			notice 2 directories:
 			<code>./jboss</code>
 			and
 			<code>./sql</code>
 			. The
 			<code>./jboss</code>
 			directory contains the JBoss application server, configured for your
-			database and pre-packaged with the Fedict eID Trust Service
+			DBMS product and pre-packaged with the Fedict eID Trust Service
 			application. The
 			<code>./sql</code>
 			directory contains the database initialization scripts. MySQL,
@@ -288,32 +364,31 @@
 			Application Server. You will have to use the JBoss distribution from
 			the Fedict eID Applet project. This customized distribution has all
 			necessary dependencies included to run the Fedict eID Trust Service.
-			To install simply unzip the eID applet JBoss zip and copy the .ear
+			To install, simply unzip the eID applet JBoss zip and copy the .ear
 			file in
 			<code>./jboss-as-distribution/server/default/deploy</code>
 			.
-		</para>
-		<para>
 			Please note that it is not recommended to use this setup in a
 			production environment. The HSQLDB database product is not suited for
-			production deployments.
+			production deployments. This setup should only be used for
+			development and testing purposes.
 		</para>
 		<section>
 			<title>Database setup</title>
 			<para>
-				Before trying to start the JBoss Application Server you will have to
+				Before starting the JBoss Application Server you will have to
 				initialize your database. The initialization scripts can be found in
 				the
 				<code>./sql</code>
-				directory. There are 3 scripts, one to create the database account,
-				one to create the Fedict eID Trust Service database and one to
-				initialize its tables. The default username/password for
+				directory. There are 3 scripts: one to create the database account,
+				one to create the Fedict eID Trust Service database, and one to
+				initialize its tables. The default username/password for the
 				<code>trust</code>
 				database is
 				<code>trust/trust</code>
-				. Please note that if you wish to change this, you will have to
-				manually modify the datasource in the JBoss AS distribution. The
-				configuration for this can be found in
+				. Please note that if you change this, you have to manually modify
+				the datasource configuration in the JBoss AS distribution. This
+				configuration can be found in
 				<code>/jboss/server/all/deploy/trust-service-ds.xml</code>
 				or
 				<code>/jboss/server/default/deploy/trust-service-ds.xml</code>
@@ -353,7 +428,7 @@
 					SHOW tables;
 					QUIT;
 				]]></programlisting>
-				Check whether the MySQL service will be started at boot time via:
+				Check whether the MySQL service is started at boot time via:
 				<programlisting><![CDATA[
 					chkconfig --list mysqld
 				]]></programlisting>
@@ -408,7 +483,7 @@ QUIT;]]></programlisting>
 				]]></programlisting>
 			</para>
 			<para>
-				Check whether the PostgreSQL service will be started at boot time
+				Check whether the PostgreSQL service is started at boot time
 				via:
 				<programlisting><![CDATA[
 					chkconfig --list postgresql
@@ -421,8 +496,10 @@ QUIT;]]></programlisting>
 				]]></programlisting>
 			</para>
 			<para>
-				As JPA requires prepared transactions we need to enable this feature
-				on the PostgreSQL database. Change the PostgreSQL configuration file
+				As JPA requires prepared transactions, we need to enable this
+				feature
+				on the PostgreSQL database. Change the PostgreSQL
+				configuration file
 				<code>/var/lib/pgsql/data/postgresql.conf</code>
 				:
 				<programlisting><![CDATA[
@@ -434,8 +511,10 @@ QUIT;]]></programlisting>
 				<code>/var/lib/pgsql/data/pg_hba.conf</code>
 				:
 				<programlisting><![CDATA[
-					local	all 	all						trust
-					host	all		all 	127.0.0.1/32	trust]]></programlisting>
+					local	all 	all						md5
+					host	all		all 	127.0.0.1/32	md5]]></programlisting>
+				Of course this assumes that the JBoss application server and the
+				PostgreSQL DBMS are running on the same machine.
 			</para>
 			<para>
 				Create a PostgreSQL user and database via:
@@ -467,17 +546,45 @@ DROP DATABASE trust;
 			<title>Resources</title>
 			<para>
 				As the harvesting of large CRLs can be memory intensive, the JBoss
-				Application Server has been tweaked so the JVM can use more memory.
-				By default it is set to reserve a total of 1GB of heap space. The
-				configuration can be found in
+				Application Server has been tweaked so the JVM has more available
+				memory. By default it is set to reserve a total of 1GB of heap
+				space. The configuration can be found in
 				<code>./jboss/bin/run.conf</code>
 				See
 				<link linkend="links">Useful links</link>
-				for more info on tweaking this.
+				for more info on tweaking this. The machine hosting the JBoss
+				application server should have at least 2 GiB of available memory.
 			</para>
 			<para>
 				As to the amount of network traffic, this is highly related as
 				to how CRL caching is configured.
+			</para>
+			<para>
+				The default connection pool size is 20. The maximum size of the
+				database depends on the used DBMS and is approximately 4 GiB. Since
+				the database mainly contains data which is available in the public
+				CRLs, no extra backup strategy is required.
+			</para>
+			<para>
+				The application does not use any local storage.
+			</para>
+			<para>
+				The application requires a private key (JKS, PKCS#12 or PKCS#11
+				are possible) to be able to sign outgoing XKMS responses
+				(WS-Security based message signing).
+			</para>
+			<para>
+				One can use the
+				<code>jvisualvm</code>
+				tool that comes with the Sun JDK to inspect the local running JBoss
+				application server. Connect to a remove server via:
+				<programlisting><![CDATA[
+					ssh -X 192.168.1.101
+					jvisualvm &
+				]]></programlisting>
+				Different plugins can be configured as part of
+				<code>jvisualvm</code>
+				to enhance its monitoring capabilities.
 			</para>
 		</section>
 		<section>
@@ -520,7 +627,7 @@ DROP DATABASE trust;
 						// to:
 						// <property name="advertise">true</property>
 					]]></programlisting>
-					The advertise property is to make sure the
+					The advertise property is to make sure that the
 					<code>HAModClusterService</code>
 					discovers the httpd front-end through the
 					<code>mod_advertise</code>
@@ -552,7 +659,7 @@ DROP DATABASE trust;
 				<para>
 					First you will have to download the
 					<code>mod_cluster</code>
-					's needed modules @
+					's needed Apache modules @
 					<ulink url="http://www.jboss.org/mod_cluster">mod_cluster</ulink>
 					.
 					After having completed the installation, here is a basic
@@ -621,19 +728,19 @@ CreateBalancers 1
 			</para>
 			<para>
 				After you have correctly setup your database, you can start the
-				application by executing following command:
+				application server by executing the following command:
 				<programlisting><![CDATA[
 					./jboss/bin/run.sh -b 0.0.0.0 &
 				]]></programlisting>
 				. Or in case you want to run the JBoss configuration that enables
-				clustering you start via:
+				clustering, you start via:
 				<programlisting><![CDATA[
 					./jboss/bin/run.sh -b 0.0.0.0 -c all &
 				]]></programlisting>
 				The option
 				<code>-b 0.0.0.0</code>
-				is to change the bind address of the server so its available to all
-				interfaces.
+				changes the bind address of the server so it becomes available on
+				all interfaces.
 			</para>
 			<warning>
 				<title>eID Trust Service Administrator registration</title>
@@ -676,28 +783,30 @@ CreateBalancers 1
 			</para>
 			<para>
 				In order to function properly, the application needs to be able
-				to make outgoing calls for CRL, OCSP, TSP and NTP. If you are
-				running behind a proxy, you can setup the proxy using the
-				administration webapp.
+				to make outgoing calls for CRL, OCSP. If you are running behind a
+				proxy, you can setup the proxy using the administration portal.
+				Optionally the application also needs to be able to make outgoing
+				calls for TSP or NTP.
 			</para>
 			<para>
-				CRL downloading for the Belgian eID Trust Domains are typically
+				CRL download URLs for the Belgian eID Trust Domains are typically
 				something like
 				<code>http://crl.eid.belgium.be/eidc200501.crl</code>
-				. The URI is retrieved from the specific certificate.
+				. The URI is retrieved from the validated certificate chain.
 			</para>
 			<para>
-				OCSP requests for the Belgian eID Trust Domains are sent to
+				OCSP requests for the Belgian eID Trust Domains are typically sent
+				to
 				<code>http://ocsp.eid.belgium.be</code>
-				. The URI is again retrieved from the specific certificate.
+				. The URI is again retrieved from the validated certificate chain.
 			</para>
 			<para>
-				TSP requests can be used for clock drift detection and the
+				TSP requests can be used for clock drift detection. The
 				location is configurable in the Administrator portal.
 			</para>
 			<para>
-				The NTP protocol can also be used for clock drift detection and
-				again the location is configurable in the Administrator portal.
+				The NTP protocol can also be used for clock drift detection.
+				The location is configurable in the Administrator portal.
 			</para>
 		</section>
 		<section>
@@ -716,20 +825,20 @@ CreateBalancers 1
 		<section>
 			<title>Init script for Redhat (Fedora)</title>
 			<para>
-				Copied orginal supplied init script:
+				Copy the orginal supplied init script:
 				<programlisting><![CDATA[cp $JBOSS_HOME/bin/jboss_init_redhat.sh /etc/init.d/jboss]]></programlisting>
-				Changed permissions on new jboss init script:
+				Change the permissions on the new jboss init script:
 				<programlisting><![CDATA[sudo chmod 755 /etc/init.d/jboss]]></programlisting>
 				You might need to changed the following in the JBoss script:
 				<programlisting><![CDATA[JBOSS_HOME="location of your JBoss distribution"
 JBOSS_USER="the user that will be used to run the JBoss application server under"
 JAVAPTH="the location of your JVM"
-JBOSS_CONF="all"]]></programlisting>
-				To bind to the correct IP address, this line modified:
+JBOSS_CONF="default"]]></programlisting>
+				To bind to the correct IP address, modify the line:
 				<programlisting><![CDATA[JBOSS_BIND_ADDR=${JBOSS_HOST:+"-b $JBOSS_HOST"}]]></programlisting>
 				to
 				<programlisting><![CDATA[JBOSS_BIND_ADDR=${JBOSS_BIND_ADDR:-"-b your.ip.address.here"}]]></programlisting>
-				To get a log file, this line modified:
+				To get a log file, modify the line:
 				<programlisting><![CDATA[JBOSS_CONSOLE=${JBOSS_CONSOLE:-"/dev/null"}]]></programlisting>
 				to
 				<programlisting><![CDATA[JBOSS_CONSOLE=${JBOSS_CONSOLE:-"/location/of/your/logs/jboss-console.log"]]></programlisting>
@@ -741,14 +850,14 @@ JBOSS_CONF="all"]]></programlisting>
 		<section>
 			<title>Transaction timeouts</title>
 			<para>
-				The downloading and processing of large CRLs can sometimes take a
-				lot of time. This can lead to internal transaction timeouts. By
-				default, the custom JBoss MySQL and Oracle Distributions have a
-				transaction timeout configured of 1200 seconds or 20 minutes. Which
-				should be sufficient. If this still proves to be insufficient, this
-				can be changed in
+				The downloading and processing of large CRLs can take a lot of time.
+				This can lead to MDB transaction timeouts. By default, the custom
+				JBoss MySQL and Oracle Distributions have a transaction timeout
+				configured of 1200 seconds or 20 minutes. This should be sufficient.
+				If this still proves to be insufficient, this can be changed in
 				<code>jboss/server/default/deploy/transaction-jboss-beans.xml</code>
-				Look for following line and change accordingly:
+				.
+				Look for the following line and change accordingly:
 				<programlisting role="XML"><![CDATA[
 					<property name="defaultTimeout">1200</property>
 				]]></programlisting>
@@ -756,9 +865,9 @@ JBOSS_CONF="all"]]></programlisting>
 				restarted as followed:
 				<programlisting><![CDATA[
 					./jboss/bin/shutdown.sh -S
-					./jboss/bin/run.sh -b 0.0.0.0 -c all
+					./jboss/bin/run.sh -b 0.0.0.0
 				]]></programlisting>
-				Please note to check if shutdown was completed before starting.
+				Please check if the shutdown was completed before restarting.
 			</para>
 		</section>
 		<section>
@@ -767,7 +876,7 @@ JBOSS_CONF="all"]]></programlisting>
 				The network interface should not be managed by the NetworkManager
 				but should start at boot time. Check that
 				<code>/etc/sysconfig/network_scripts/ifcfg_eth0</code>
-				contains following lines:
+				contains the following lines:
 				<programlisting><![CDATA[
 					ONBOOT=yes
 					NM_CONTROLLED=no
@@ -792,7 +901,7 @@ JBOSS_CONF="all"]]></programlisting>
 				Configure your NTP servers via
 				<code>/etc/ntp.conf</code>
 				.
-				Configure the NTP service via:
+				Configure the NTP client service via:
 				<programlisting><![CDATA[
 					sudo chkconfig --level 345 ntpd on
 					chkconfig --list ntpd
@@ -802,6 +911,10 @@ JBOSS_CONF="all"]]></programlisting>
 					sudo /etc/init.d/ntpd start
 				]]></programlisting>
 				.
+				Check whether the local clock is correctly synchronized via:
+				<programlisting><![CDATA[
+					ntpdate -q your.ntp.server.com
+				]]></programlisting>
 			</para>
 		</section>
 		<section>
@@ -810,8 +923,8 @@ JBOSS_CONF="all"]]></programlisting>
 				The JBoss Application Server's logging configuration can be found in
 				<code>./jboss/server/default/deploy/jboss-logging.xml</code>
 				.
-				All logging from the Fedict eID Trust Service is configured to a
-				seperate log file which can be found in
+				All logging from the Fedict eID Trust Service components is
+				configured to output to a seperate log file which can be found in
 				<code>./jboss/server/default/log/fedict.log</code>
 				.
 				By default the logging granularity is set to
@@ -826,7 +939,7 @@ JBOSS_CONF="all"]]></programlisting>
       					</handlers>
    					</logger>
    				]]></programlisting>
-				In the same way here you can change JBoss' logging too.
+				In the same way you can change JBoss' logging too.
 				<note>
 					<title>Production configuration</title>
 					<para>
@@ -845,11 +958,11 @@ JBOSS_CONF="all"]]></programlisting>
 		<section>
 			<title>Database</title>
 			<para>
-				To view the contents of the database behind the FedICT eID Trust
+				To view the contents of the database behind the Fedict eID Trust
 				Service, one can use the
 				<ulink url="http://www.squirrelsql.org/">SQuirrel SQL Client</ulink>
-				. This SQL client allows you to view the structure of any JDBC
-				compliant database.
+				. This SQL client allows you to view the structure of any database
+				that comes with a JDBC driver.
 			</para>
 			<para>
 				To be able to connect to your HSQL/MySQL/Oracle database you will
@@ -864,7 +977,7 @@ JBOSS_CONF="all"]]></programlisting>
 				Configure your driver in SQuirrel SQL by selecting the appropriate
 				one, select
 				<code>Modify Driver...</code>
-				and add your JDBC driver jar in the
+				and add your JDBC driver JAR in the
 				<code>Extra Class Path</code>
 				tab.
 			</para>
@@ -873,7 +986,7 @@ JBOSS_CONF="all"]]></programlisting>
 				database by adding a new
 				<code>Alias</code>
 				. Select the appropriate driver, and configure the URL, username and
-				password as is configured in the FedICT eID Trust Service datasource
+				password as is configured in the Fedict eID Trust Service datasource
 				file (
 				<code>/jboss/server/default/deploy/trust-service-ds.xml</code>
 				).
@@ -889,9 +1002,9 @@ JBOSS_CONF="all"]]></programlisting>
 			<section>
 				<title>Administrator registration</title>
 				<para>
-					To authenticate to the administrator portal, an eID authentication
-					will be performed. If the service was freshly installed, the first
-					successfull authentication will be automatically registered as
+					To login into the administrator portal, an eID authentication will
+					be performed. If the service was freshly installed, the first
+					successfully authenticated user will be automatically registered as
 					administrator. Subsequent administrators will have to be accepted
 					by this one. There are two ways to accomplish this:
 					<orderedlist>
@@ -930,16 +1043,18 @@ JBOSS_CONF="all"]]></programlisting>
 						The eID Trust Service Validation Web Service has the
 						possibility to optionally sign its response message using
 						WS-Security. The keystore to be used for this can be configured
-						here. There is support for JKS, PKCS#11 and PKCS#12 keystores. The
-						keystore path in case of PKCS#11 is the path to the configuration
-						file which will be used by the Sun PKCS#11 provider.
+						via the admin portal. There is support for JKS, PKCS#11 and
+						PKCS#12 keystores. The keystore path in case of PKCS#11 is the
+						path to the configuration file which will be used by the Sun
+						PKCS#11 provider.
 				</para>
 				</section>
 				<section>
 					<title>Network Configuration</title>
 					<para>
 						If you are operating behind a proxy, you can setup this in
-						here and enable or disable the proxy configuration.
+						here and enable or disable the proxy configuration. The proxy
+						configuration is used for CRL downloads and for OCSP requests.
 					</para>
 				</section>
 				<section>
@@ -964,7 +1079,7 @@ JBOSS_CONF="all"]]></programlisting>
 					<para>
 						The information message to be shown on
 						<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal</code>
-						can be configured here for all available languages of the FedICT
+						can be configured here for all available languages of the Fedict
 						eID Trust Service Portal.
 					</para>
 				</section>
@@ -974,21 +1089,19 @@ JBOSS_CONF="all"]]></programlisting>
 				<para>
 					Virtual trust domains are a group of existing trust domains.
 					Users of the eID Trust Service Validation Web Service have the
-					possibility to specify a virtual trust domain to validate against
-					all of its trust domains configured.
-			</para>
+					possibility to specify a virtual trust domain to validate against.
+				</para>
 			</section>
 			<section>
 				<title>Trust Domains</title>
 				<para>
 					You can add, modify, remove trust domains here. Also you can set
-					the default trust domain for the FedICT eID Trust Service. This
+					the default trust domain for the Fedict eID Trust Service. This
 					trust domain will be used in the eID Trust Service Validation Web
-					Service if no specific trust domain was specified. For each trust
-					domain you can specify whether or not CRL caching should be used,
-					which trust points lie under this trust domain and which
-					certificate contraints are too be enforced when validating against
-					this trust domain. See
+					Service if no trust domain was specified. For each trust domain you
+					can specify whether or not CRL caching should be used, which trust
+					points lie under this trust domain and which certificate contraints
+					are too be enforced when validating against this trust domain. See
 					<link linkend="cron">Cron schedules</link>
 					for more info.
 				</para>
@@ -1001,8 +1114,8 @@ JBOSS_CONF="all"]]></programlisting>
 					refreshing all underlying CA's that have been cached. You can also
 					refresh the CRL cache immediately here for debugging purposes. For
 					each trust point you can see the list of CA's associated with this
-					trust point and for each CA refresh the cache individually.
-			</para>
+					trust point and for each CA you can refresh the cache individually.
+				</para>
 			</section>
 			<section>
 				<title>Audit logging</title>
@@ -1040,9 +1153,9 @@ JBOSS_CONF="all"]]></programlisting>
 			<section>
 				<title>SNMP</title>
 				<para>
-					The FedICT eID Trust Service has several SNMP counters
-					available.
-					These counters can be retrieved by invoking the command:
+					The Fedict eID Trust Service has several SNMP counters available to
+					monitor the health of the application. These counters can be
+					retrieved by invoking the command:
 					<programlisting role="XML"><![CDATA[
 					snmpget -v 2c -c public localhost:7894 1.3.6.1.4.1.7890.0.0
 				]]></programlisting>
@@ -1073,13 +1186,22 @@ JBOSS_CONF="all"]]></programlisting>
 							</para>
 						</listitem>
 					</itemizedlist>
+					Install the SNMP tools on RedHat (Fedora) via:
+					<programlisting><![CDATA[
+						sudo yum install net-snmp-utils.i686
+					]]></programlisting>
+					Check all available SNMP counters via:
+					<programlisting><![CDATA[
+						snmpwalk -v 2c -c public localhost:7894 1.3.6.1.4.1.7890
+					]]></programlisting>
 				</para>
 			</section>
 			<section id="cron">
 				<title>CRON expression</title>
 				<para>
 					You can specify a cron-like expression for the clock drift
-					detection task and for each trust point. So for example:
+					detection task and for each trust point's cache refreshment. So for
+					example:
 					<code>0 0 0/3 * * *</code>
 					is valid and represents, every 3 hours. The cron schedule string
 					consist of following fields.
@@ -1140,9 +1262,24 @@ JBOSS_CONF="all"]]></programlisting>
 				</para>
 			</section>
 		</section>
+		<section>
+			<title>Sanity checks</title>
+			<para>
+				To check whether an installed eID Trust Service instance
+				operates
+				normally you can try to validate your eID certificates via
+				the eID
+				Trust Service portal. This portal is available at:
+				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal/</code>
+				. The following page can be used to check whether the eID Trust
+				Service instance is still alive:
+				<code>$EID_TRUST_SERVICE_ADDRESS/eid-trust-service-portal/main.seam
+				</code>
+			</para>
+		</section>
 	</section>
 	<appendix id="links">
-		<title>Useful links</title>
+		<title>References</title>
 		<para>
 			<itemizedlist>
 				<listitem>
@@ -1245,15 +1382,20 @@ JBOSS_CONF="all"]]></programlisting>
 				This is free software; you can redistribute it and/or modify it
 				under the terms of the GNU Lesser General Public License version 3.0
 				as published by the Free Software Foundation.
-
-				This software is
-				distributed in the hope that it will be useful, but WITHOUT ANY
-				WARRANTY; without even the implied warranty of MERCHANTABILITY or
-				FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-				License for more details.
-
-				You should have received a copy of the GNU
-				Lesser General Public License along with this software; if not, see
+			</code>
+		</para>
+		<para>
+			<code>
+				This software is distributed in the hope that it will be
+				useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+				of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+				Lesser General Public License for more details.
+			</code>
+		</para>
+		<para>
+			<code>
+				You should have received a copy of the GNU Lesser General
+				Public License along with this software; if not, see
 				http://www.gnu.org/licenses/.
 			</code>
 		</para>
@@ -1303,6 +1445,11 @@ JBOSS_CONF="all"]]></programlisting>
 						<entry>21 Dec 2010</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>JBoss configurations.</entry>
+					</row>
+					<row>
+						<entry>8 Feb 2011</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>Various improvements.</entry>
 					</row>
 				</tbody>
 			</tgroup>
