@@ -263,7 +263,7 @@ ProxyRequests Off
 			<title>SNMP</title>
 			<para>
 				The eID Trust Service yields different SNMP counters on port
-				7894.
+				7894 (UDP).
 			</para>
 		</section>
 		<section>
