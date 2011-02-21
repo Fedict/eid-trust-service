@@ -56,15 +56,6 @@
                                 <include>login.xhtml</include>
                             </includes>
                         </resource>
-                        <!--<webResource>-->
-                            <!--<directory>${basedir}/src/main/webapp/WEB-INF-->
-                            <!--</directory>-->
-                            <!--<includes>-->
-                                <!--<include>web.xml</include>-->
-                            <!--</includes>-->
-                            <!--<targetPath>WEB-INF</targetPath>-->
-                            <!--<filtering>true</filtering>-->
-                        <!--</webResource>-->
                     </webResources>
                 </configuration>
             </plugin>
