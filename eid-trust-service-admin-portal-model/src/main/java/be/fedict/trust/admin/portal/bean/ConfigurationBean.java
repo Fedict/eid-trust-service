@@ -30,6 +30,7 @@ import be.fedict.trust.service.exception.KeyStoreLoadException;
 import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.annotations.security.Admin;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
@@ -139,6 +140,7 @@ public class ConfigurationBean implements Configuration {
      * {@inheritDoc}
      */
     @End
+    @Admin
     public String saveNetworkConfig() {
 
         this.log.debug(
@@ -155,6 +157,7 @@ public class ConfigurationBean implements Configuration {
      * {@inheritDoc}
      */
     @End
+    @Admin
     public String saveWSSecurityConfig() {
 
         this.log
@@ -185,6 +188,7 @@ public class ConfigurationBean implements Configuration {
      * {@inheritDoc}
      */
     @End
+    @Admin
     public String saveClockDriftConfig() {
 
         this.log
@@ -233,6 +237,7 @@ public class ConfigurationBean implements Configuration {
      * {@inheritDoc}
      */
     @End
+    @Admin
     public String saveInfoMessage() {
 
         this.log.debug("save info message for language=#0", this.language);

@@ -32,6 +32,7 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.datamodel.DataModel;
 import org.jboss.seam.annotations.datamodel.DataModelSelection;
+import org.jboss.seam.annotations.security.Admin;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
@@ -128,6 +129,7 @@ public class TrustPointBean implements TrustPoint {
      * {@inheritDoc}
      */
     @Begin(join = true)
+    @Admin
     public String modify() {
 
         this.log.debug("modify: #0", this.selectedTrustPoint.getName());
@@ -148,6 +150,7 @@ public class TrustPointBean implements TrustPoint {
      * {@inheritDoc}
      */
     @End
+    @Admin
     public String remove() {
 
         this.log.debug("remove trust point: #0", this.selectedTrustPoint
@@ -165,6 +168,7 @@ public class TrustPointBean implements TrustPoint {
      * {@inheritDoc}
      */
     @End
+    @Admin
     public String save() {
 
         if (null != this.selectedTrustPoint) {
@@ -203,6 +207,7 @@ public class TrustPointBean implements TrustPoint {
      * {@inheritDoc}
      */
     @End
+    @Admin
     public String add() {
 
         this.log.debug("add trust point: crlRefreshCronSchedule=#0",
@@ -241,6 +246,7 @@ public class TrustPointBean implements TrustPoint {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String refresh() {
 
         this.log.debug("refresh trust point: #0", this.selectedTrustPoint
@@ -254,6 +260,7 @@ public class TrustPointBean implements TrustPoint {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String refreshCA() {
 
         this.log.debug("refresh CA: #0", this.selectedCA.getName());

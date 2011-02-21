@@ -31,6 +31,7 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.datamodel.DataModel;
+import org.jboss.seam.annotations.security.Admin;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.log.Log;
 
@@ -83,6 +84,7 @@ public class AuditBean implements Audit {
 	/**
 	 * {@inheritDoc}
 	 */
+    @Admin
 	public String clear() {
 
 		this.log.debug("clear audit logs");

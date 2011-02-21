@@ -35,6 +35,7 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.datamodel.DataModel;
 import org.jboss.seam.annotations.datamodel.DataModelSelection;
+import org.jboss.seam.annotations.security.Admin;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
@@ -203,6 +204,7 @@ public class TrustDomainBean implements TrustDomain {
      * {@inheritDoc}
      */
     @Begin(join = true)
+    @Admin
     public String modify() {
 
         this.log.debug("modify trust domain: #0", this.selectedTrustDomain
@@ -227,6 +229,7 @@ public class TrustDomainBean implements TrustDomain {
      * {@inheritDoc}
      */
     @Begin(join = true)
+    @Admin
     public String modifyVirtual() {
 
         this.log.debug("modify virtual trust domain: #0",
@@ -238,6 +241,7 @@ public class TrustDomainBean implements TrustDomain {
      * {@inheritDoc}
      */
     @Begin(join = true)
+    @Admin
     public String add() {
 
         this.log.debug("add trust domain #0", this.name);
@@ -258,6 +262,7 @@ public class TrustDomainBean implements TrustDomain {
      * {@inheritDoc}
      */
     @Begin(join = true)
+    @Admin
     public String addVirtual() {
 
         this.log.debug("add virtual trust domain #0", this.nameVirtual);
@@ -302,6 +307,7 @@ public class TrustDomainBean implements TrustDomain {
      * {@inheritDoc}
      */
     @End
+    @Admin
     public String remove() {
 
         this.log.debug("remove: #0", this.selectedTrustDomain.getName());
@@ -314,6 +320,7 @@ public class TrustDomainBean implements TrustDomain {
      * {@inheritDoc}
      */
     @End
+    @Admin
     public String removeVirtual() {
 
         this.log.debug("remove virtual: #0", this.selectedVirtualTrustDomain
@@ -421,6 +428,7 @@ public class TrustDomainBean implements TrustDomain {
      * {@inheritDoc}
      */
     @End
+    @Admin
     public String save() {
 
         if (null != this.selectedTrustDomain) {
@@ -435,6 +443,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String setDefault() {
 
         this.log.debug("set default trust domain: #0", this.selectedTrustDomain
@@ -537,6 +546,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String saveSelect() {
 
         try {
@@ -594,6 +604,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String saveSelectVirtual() {
 
         try {
@@ -631,6 +642,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String removeConstraintPolicy() {
 
         if (null != this.selectedPolicyConstraint) {
@@ -649,6 +661,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String addConstraintPolicy() {
 
         if (null != this.certificatePolicy) {
@@ -699,6 +712,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String addConstraintKeyUsage() {
 
         if (null != this.keyUsage) {
@@ -716,6 +730,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String removeConstraintKeyUsage() {
 
         if (null != this.selectedKeyUsageConstraint) {
@@ -734,6 +749,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String saveConstraintKeyUsage() {
 
         this.log.debug("save key usage constraints");
@@ -746,6 +762,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String addConstraintDn() {
 
         this.log.debug("Add DN Statements constraint: #0", this.dn);
@@ -758,6 +775,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String removeConstraintDn() {
 
         if (null != this.dnConstraint) {
@@ -774,6 +792,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String saveConstraintDn() {
 
         this.log.debug("Save DN Statements constraint: #0", this.dn);
@@ -805,6 +824,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String addConstraintEndEntity() {
 
         if (null != this.certificateBytes) {
@@ -829,6 +849,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String removeConstraintEndEntity() {
 
         if (null != this.selectedEndEntityConstraint) {
@@ -848,6 +869,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String addConstraintQc() {
 
         this.log.debug("Add QC Statements constraint: #0", this.qc);
@@ -860,6 +882,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String removeConstraintQc() {
 
         if (null != this.qcConstraint) {
@@ -876,6 +899,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String saveConstraintQc() {
 
         this.log.debug("Save QC Statements constraint: #0", this.qc);
@@ -888,6 +912,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String addConstraintTsa() {
 
         this.log.debug("Add TSA constraint");
@@ -900,6 +925,7 @@ public class TrustDomainBean implements TrustDomain {
     /**
      * {@inheritDoc}
      */
+    @Admin
     public String removeConstraintTsa() {
 
         if (null != this.tsaConstraint) {
