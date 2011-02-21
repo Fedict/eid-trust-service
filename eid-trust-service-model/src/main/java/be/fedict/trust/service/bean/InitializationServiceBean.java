@@ -80,6 +80,7 @@ public class InitializationServiceBean implements InitializationService {
         initBelgianEidAuthTrustDomain(trustPoints);
         initBelgianEidNonRepudiationDomain(trustPoints);
         initBelgianEidNationalRegistryTrustDomain(trustPoints);
+        initBelgianEidTestCardsTrustDomain();
 
         initBelgianTSATrustDomain();
     }
@@ -176,6 +177,37 @@ public class InitializationServiceBean implements InitializationService {
     /*
      * Initialize the Belgian eID authentication trust domain.
      */
+
+    private void initBelgianEidTestCardsTrustDomain() {
+
+        List<TrustPointEntity> trustPoints = new LinkedList<TrustPointEntity>();
+
+        // Belgian Test Root CA trust point
+        X509Certificate rootCertificate = loadCertificate("be/fedict/trust/belgiumtestrca.crt");
+        CertificateAuthorityEntity rootCa = this.certificateAuthorityDAO
+                .findCertificateAuthority(rootCertificate);
+        if (null == rootCa) {
+            rootCa = this.certificateAuthorityDAO.addCertificateAuthority(
+                    rootCertificate, null);
+        }
+
+        if (null == rootCa.getTrustPoint()) {
+            TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
+                    .addTrustPoint(TrustServiceConstants.DEFAULT_CRON_EXPRESSION, rootCa);
+            rootCa.setTrustPoint(rootCaTrustPoint);
+        }
+        trustPoints.add(rootCa.getTrustPoint());
+
+        TrustDomainEntity trustDomain = this.trustDomainDAO
+                .findTrustDomain(TrustServiceDomains.BELGIAN_EID_TEST_TRUST_DOMAIN);
+        if (null == trustDomain) {
+            LOG.debug("create Belgian eID TEST trust domain");
+            trustDomain = this.trustDomainDAO
+                    .addTrustDomain(TrustServiceDomains.BELGIAN_EID_TEST_TRUST_DOMAIN);
+        }
+
+        trustDomain.setTrustPoints(trustPoints);
+    }
 
     private void initBelgianEidAuthTrustDomain(
             List<TrustPointEntity> trustPoints) {
