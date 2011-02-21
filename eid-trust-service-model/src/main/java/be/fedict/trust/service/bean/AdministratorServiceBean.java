@@ -18,88 +18,83 @@
 
 package be.fedict.trust.service.bean;
 
-import java.security.cert.X509Certificate;
-import java.util.List;
+import be.fedict.trust.service.AdministratorService;
+import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.AdministratorDAO;
+import be.fedict.trust.service.entity.AdministratorEntity;
+import be.fedict.trust.service.exception.RemoveLastAdminException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.SecurityDomain;
-
-import be.fedict.trust.service.AdministratorService;
-import be.fedict.trust.service.TrustServiceConstants;
-import be.fedict.trust.service.dao.AdministratorDAO;
-import be.fedict.trust.service.entity.AdminEntity;
-import be.fedict.trust.service.exception.RemoveLastAdminException;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
  * Administrator Service Bean implementation.
- * 
+ *
  * @author wvdhaute
- * 
  */
 @Stateless
-@SecurityDomain(TrustServiceConstants.ADMIN_SECURITY_DOMAIN)
 public class AdministratorServiceBean implements AdministratorService {
 
-	private static final Log LOG = LogFactory
-			.getLog(AdministratorServiceBean.class);
+    private static final Log LOG = LogFactory
+            .getLog(AdministratorServiceBean.class);
 
-	@EJB
-	private AdministratorDAO administratorDAO;
+    @EJB
+    private AdministratorDAO administratorDAO;
 
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public List<AdminEntity> listAdmins() {
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public List<AdministratorEntity> listAdmins() {
 
-		return this.administratorDAO.listAdmins();
-	}
+        return this.administratorDAO.listAdmins();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public AdminEntity register(X509Certificate authnCert) {
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public AdministratorEntity register(X509Certificate authnCert) {
 
-		LOG.debug("register");
+        LOG.debug("register");
 
-		if (null == this.administratorDAO.findAdmin(authnCert.getPublicKey())) {
-			return this.administratorDAO.addAdmin(authnCert, false);
-		}
+        if (null == this.administratorDAO.findAdmin(authnCert)) {
+            return this.administratorDAO.addAdmin(authnCert, false);
+        }
 
-		LOG.error("failed to register administrator");
-		return null;
-	}
+        LOG.error("failed to register administrator");
+        return null;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void register(AdminEntity admin) {
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public void register(AdministratorEntity admin) {
 
-		LOG.debug("register pending admin");
-		AdminEntity attachedAdminEntity = this.administratorDAO
-				.attachAdmin(admin);
-		attachedAdminEntity.setPending(false);
-	}
+        LOG.debug("register pending admin");
+        AdministratorEntity attachedAdminEntity = this.administratorDAO
+                .attachAdmin(admin);
+        attachedAdminEntity.setPending(false);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-	public void remove(AdminEntity admin) throws RemoveLastAdminException {
+    /**
+     * {@inheritDoc}
+     */
+    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
+    public void remove(AdministratorEntity admin) throws RemoveLastAdminException {
 
-		LOG.debug("remove admin: " + admin.getName());
+        LOG.debug("remove admin: " + admin.getName());
 
-		// check not last administrator
-		if (listAdmins().size() == 1) {
-			LOG.error("cannot remove last administrator");
-			throw new RemoveLastAdminException();
-		}
+        // check not last administrator
+        if (listAdmins().size() == 1) {
+            LOG.error("cannot remove last administrator");
+            throw new RemoveLastAdminException();
+        }
 
-		// remove
-		this.administratorDAO.removeAdmin(admin);
-	}
+        // remove
+        this.administratorDAO.removeAdmin(admin);
+    }
 }

@@ -62,7 +62,7 @@ public class ClockDriftDetectionTest {
         // Setup data
         ClockDriftConfigEntity clockDriftConfig = new ClockDriftConfigEntity("test", TimeProtocol.NTP,
                 TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER, TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
-                TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET, 0);
+                TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET, null);
 
         // Operate
         TimeInfo timeInfo = ClockDriftUtil.executeNTP(clockDriftConfig, NETWORK_CONFIG);
@@ -80,7 +80,7 @@ public class ClockDriftDetectionTest {
         // Setup data
         ClockDriftConfigEntity clockDriftConfig = new ClockDriftConfigEntity("test", TimeProtocol.TSP,
                 "http://www.cryptopro.ru/tsp/tsp.srf", TrustServiceConstants.CLOCK_DRIFT_TIMEOUT, 1000 * 60 * 5
-                , 0);
+                , null);
         Date now = new Date();
 
         // Operate

@@ -44,7 +44,7 @@ import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
 import be.fedict.trust.admin.portal.AdminConstants;
 import be.fedict.trust.admin.portal.Administrator;
 import be.fedict.trust.service.AdministratorService;
-import be.fedict.trust.service.entity.AdminEntity;
+import be.fedict.trust.service.entity.AdministratorEntity;
 import be.fedict.trust.service.exception.RemoveLastAdminException;
 
 @Stateful
@@ -71,12 +71,12 @@ public class AdministratorBean implements Administrator {
 
 	@SuppressWarnings("unused")
 	@DataModel(ADMIN_LIST_NAME)
-	private List<AdminEntity> adminList;
+	private List<AdministratorEntity> adminList;
 
 	@DataModelSelection(ADMIN_LIST_NAME)
 	@In(value = SELECTED_ADMIN, required = false)
 	@Out(value = SELECTED_ADMIN, required = false, scope = ScopeType.PAGE)
-	private AdminEntity selectedAdmin;
+	private AdministratorEntity selectedAdmin;
 
 	/**
 	 * {@inheritDoc}

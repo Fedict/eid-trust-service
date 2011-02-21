@@ -18,48 +18,34 @@
 
 package be.fedict.trust.service.bean;
 
-import be.fedict.trust.service.AuditService;
+import be.fedict.eid.applet.service.spi.AuthenticationService;
 import be.fedict.trust.service.TrustServiceConstants;
-import be.fedict.trust.service.dao.AuditDAO;
-import be.fedict.trust.service.entity.AuditEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.ejb3.annotation.LocalBinding;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
+import javax.ejb.Local;
 import javax.ejb.Stateless;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
- * Administrator Service Bean implementation.
+ * Administrator Authorization Service Bean implementation.
  *
  * @author wvdhaute
  */
 @Stateless
-public class AuditServiceBean implements AuditService {
+@Local(AuthenticationService.class)
+@LocalBinding(jndiBinding = TrustServiceConstants.TRUST_JNDI_CONTEXT +
+        "AuthenticationServiceBean")
+public class AuthenticationServiceBean implements AuthenticationService {
 
-    private static final Log LOG = LogFactory.getLog(AuditServiceBean.class);
+    private static final Log LOG = LogFactory.getLog(AuthenticationServiceBean.class);
 
-    @EJB
-    private AuditDAO auditDAO;
+    public void validateCertificateChain(List<X509Certificate> certificateChain)
+            throws SecurityException {
 
-    /**
-     * {@inheritDoc}
-     */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-    public List<AuditEntity> listAudits() {
-
-        LOG.debug("list audit entries");
-        return this.auditDAO.listAudits();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
-    public void clearAudits() {
-
-        LOG.debug("clear audit entries");
-        this.auditDAO.clearAudits();
+        LOG.debug("validate");
+        // do nothing
     }
 }

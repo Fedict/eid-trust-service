@@ -11,16 +11,20 @@
 	</appender>
 
 	<category name="test">
-		<priority value="DEBUG" />
+		<priority value="INFO" />
 	</category>
 
 	<category name="be.fedict">
-		<priority value="DEBUG" />
+		<priority value="INFO" />
 	</category>
 
 	<category name="httpclient">
 		<priority value="ERROR" />
 	</category>
+
+    <category name="org.apache">
+        <priority value="INFO" />
+    </category>
 
 	<root>
 		<appender-ref ref="CONSOLE" />

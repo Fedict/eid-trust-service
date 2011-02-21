@@ -225,19 +225,18 @@ public class TestUtils {
                     keyUsage);
         }
 
-        X509Certificate certificate = certificateGenerator
-                .generate(issuerPrivateKey);
+        return certificateGenerator.generate(issuerPrivateKey);
 
-        /*
-           * Make sure the default certificate provider is active.
-           */
-        CertificateFactory certificateFactory = CertificateFactory
-                .getInstance("X.509");
-        certificate = (X509Certificate) certificateFactory
-                .generateCertificate(new ByteArrayInputStream(certificate
-                        .getEncoded()));
-
-        return certificate;
+//        /*
+//           * Make sure the default certificate provider is active.
+//           */
+//        CertificateFactory certificateFactory = CertificateFactory
+//                .getInstance("X.509");
+//        certificate = (X509Certificate) certificateFactory
+//                .generateCertificate(new ByteArrayInputStream(certificate
+//                        .getEncoded()));
+//
+//        return certificate;
     }
 
     /**

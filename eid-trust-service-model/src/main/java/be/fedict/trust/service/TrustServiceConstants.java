@@ -25,9 +25,8 @@ package be.fedict.trust.service;
  */
 public abstract class TrustServiceConstants {
 
-    public static final String JNDI_CONTEXT = "TrustService";
+    public static final String TRUST_JNDI_CONTEXT = "be/fedict/eid/trust/";
 
-    public static final String ADMIN_SECURITY_DOMAIN = "trust-service-admin";
     public static final String ADMIN_ROLE = "admin";
 
     public static final String CLOCK_DRIFT_TIMER = "clock-drift-timer";

@@ -46,7 +46,6 @@ import java.util.Locale;
  * @author wvdhaute
  */
 @Stateless
-@SecurityDomain(TrustServiceConstants.ADMIN_SECURITY_DOMAIN)
 public class ConfigurationServiceBean implements ConfigurationService {
 
     private static final Log LOG = LogFactory

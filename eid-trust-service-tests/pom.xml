@@ -45,10 +45,11 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <testFailureIgnore>true</testFailureIgnore>
+                            <disableXmlReport>true</disableXmlReport>
                             <!--
                                        For running with a runtime without 32-bit mode support.
                                    -->
-                            <argLine>-d64 -Xms512m -Xmx1024m</argLine>
+                            <argLine>-d64 -Xms512m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError</argLine>
                         </configuration>
                     </plugin>
                 </plugins>

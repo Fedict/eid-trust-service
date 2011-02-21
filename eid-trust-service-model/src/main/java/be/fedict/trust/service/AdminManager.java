@@ -18,32 +18,21 @@
 
 package be.fedict.trust.service;
 
+import javax.ejb.Local;
 import java.security.cert.X509Certificate;
 
-import javax.ejb.Local;
-
-import be.fedict.eid.applet.service.spi.AuthenticationService;
-import be.fedict.trust.service.entity.AdminEntity;
-
 /**
- * Admin authorization service.
- * 
+ * Administrator manager.
+ *
  * @author wvdhaute
- * 
  */
 @Local
-public interface AdminAuthorizationService extends AuthenticationService {
+public interface AdminManager {
 
-	public static final String JNDI_BINDING = TrustServiceConstants.JNDI_CONTEXT
-			+ "/AdminAuthorizationServiceBean";
-
-	/**
-	 * Authenticate the specified authentication certificate chain. Does a basic
-	 * public key verification and looks up if an {@link AdminEntity} matching
-	 * the public key.
-	 * 
-	 * @param authnCert
-	 * @return id The {@link AdminEntity}'s id.
-	 */
-	String authenticate(X509Certificate authnCert);
+    /**
+     * @param certificate certificate
+     * @return whether the (already authenticated) admin identifier indeed belongs
+     *         to an admin.
+     */
+    boolean isAdmin(X509Certificate certificate);
 }

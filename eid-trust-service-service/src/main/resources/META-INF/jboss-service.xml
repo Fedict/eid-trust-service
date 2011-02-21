@@ -4,19 +4,6 @@
     "http://www.jboss.org/j2ee/dtd/jboss-service_5_0.dtd">
 <server>
 
-	<mbean code="org.jboss.security.auth.login.DynamicLoginConfig"
-		name="trust:service=DynamicLoginConfig">
-		<attribute name="AuthConfig">
-			META-INF/trust-service-admin-login-config.xml
-		</attribute>
-		<depends optional-attribute-name="LoginConfigService">
-			jboss.security:service=XMLLoginConfig
-		</depends>
-		<depends optional-attribute-name="SecurityManagerService">
-			jboss.security:service=JaasSecurityManager
-		</depends>
-	</mbean>
-
 	<mbean name="trust:service=SNMP" code="be.fedict.trust.service.snmp.mbean.SNMPService"
 		xmbean-dd="META-INF/snmp-xmbean.xml">
 		<attribute name="Address">0.0.0.0/7894</attribute>

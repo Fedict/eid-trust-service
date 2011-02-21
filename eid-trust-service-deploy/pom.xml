@@ -22,12 +22,26 @@
 							<groupId>be.fedict.eid-trust-service</groupId>
 							<artifactId>eid-trust-service-service</artifactId>
 						</sarModule>
-						<jarModule>
-							<groupId>be.fedict.eid-applet</groupId>
-							<artifactId>eid-applet-service-spi</artifactId>
-							<includeInApplicationXml>true
+                        <jarModule>
+                            <groupId>be.fedict.eid-applet</groupId>
+                            <artifactId>eid-applet-service</artifactId>
+                            <includeInApplicationXml>true
                             </includeInApplicationXml>
-						</jarModule>
+                            <bundleDir>lib</bundleDir>
+                        </jarModule>
+                        <jarModule>
+                            <groupId>be.fedict.eid-applet</groupId>
+                            <artifactId>eid-applet-shared</artifactId>
+                            <includeInApplicationXml>true
+                            </includeInApplicationXml>
+                            <bundleDir>lib</bundleDir>
+                        </jarModule>
+                        <jarModule>
+                            <groupId>be.fedict.eid-applet</groupId>
+                            <artifactId>eid-applet-service-spi</artifactId>
+                            <includeInApplicationXml>true
+                            </includeInApplicationXml>
+                        </jarModule>
 						<jarModule>
 							<groupId>be.fedict</groupId>
 							<artifactId>jtrust</artifactId>
@@ -149,10 +163,24 @@
 			<type>sar</type>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>be.fedict.eid-applet</groupId>
-			<artifactId>eid-applet-service-spi</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>be.fedict.eid-applet</groupId>
+            <artifactId>eid-applet-service-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>be.fedict.eid-applet</groupId>
+            <artifactId>eid-applet-service</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.lowagie</groupId>
+                    <artifactId>itext</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>be.fedict.eid-applet</groupId>
+            <artifactId>eid-applet-shared</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-entity</artifactId>

@@ -21,17 +21,15 @@ package test.integ.be.fedict.performance;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.client.exception.ValidationFailedException;
 import be.fedict.trust.xkms2.XKMSConstants;
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMReader;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import test.integ.be.fedict.performance.servlet.*;
+import test.integ.be.fedict.performance.servlet.CrlServlet;
+import test.integ.be.fedict.performance.servlet.OcspServlet;
 import test.integ.be.fedict.performance.util.*;
 import test.integ.be.fedict.trust.util.TestUtils;
 
@@ -40,13 +38,9 @@ import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.swing.*;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.Security;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -77,13 +71,13 @@ public class TestPKIPerformanceTest implements PerformanceTest {
 
     private static final Log LOG = LogFactory.getLog(TestPKIPerformanceTest.class);
 
-    private static final String HOST = "sebeco-dev-11";
+    private static final String HOST = "sebeco-dev-12";
     private static final String XKMS_LOCATION = "http://" + HOST + ":8080/eid-trust-service-ws/xkms2";
 
-    private static final int INTERVAL_SIZE = 1000 * 60 * 15; // ms
+    private static final int INTERVAL_SIZE = 1000 * 60 * 30; // ms
 
     private static boolean interactive = false;
-    private static String PKI_PATH = "http://sebeco-dev-10:48582";
+    private static String PKI_PATH = "http://sebeco-dev-11:50292";
     private static int minutes = 60 * 48;
 
     @Before
@@ -155,9 +149,6 @@ public class TestPKIPerformanceTest implements PerformanceTest {
         }
         testPKI = TestPKI.load(testPkiPath);
 
-        // initialize XKMS2 client
-        XKMS2Client client = new XKMS2Client(XKMS_LOCATION);
-
         // initialize test framework
         List<PerformanceData> performance = new LinkedList<PerformanceData>();
         List<MemoryData> memory = new LinkedList<MemoryData>();
@@ -170,8 +161,7 @@ public class TestPKIPerformanceTest implements PerformanceTest {
         Hashtable<String, String> environment = new Hashtable<String, String>();
         environment.put(Context.INITIAL_CONTEXT_FACTORY, "org.jnp.interfaces.NamingContextFactory");
         environment.put(Context.PROVIDER_URL, jnpLocation);
-        rmi = (MBeanServerConnection) new InitialContext(environment)
-                .lookup("jmx/invoker/RMIAdaptor");
+        rmi = (MBeanServerConnection) new InitialContext(environment).lookup("jmx/invoker/RMIAdaptor");
 
         if (interactive) {
             new PerformanceWorkingFrame(this);
@@ -191,6 +181,9 @@ public class TestPKIPerformanceTest implements PerformanceTest {
             try {
                 List<X509Certificate> certificateChain = getCertificateChain(testKeyPair,
                         leaves, random, notBefore, notAfter);
+
+                // initialize XKMS2 client
+                XKMS2Client client = new XKMS2Client(XKMS_LOCATION);
                 client.validate("performance", certificateChain);
                 currentPerformance.inc();
                 this.count++;

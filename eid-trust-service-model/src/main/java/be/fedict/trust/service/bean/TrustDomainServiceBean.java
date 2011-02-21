@@ -31,7 +31,6 @@ import be.fedict.trust.service.entity.constraints.*;
 import be.fedict.trust.service.exception.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.SecurityDomain;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
@@ -52,7 +51,6 @@ import java.util.Set;
  * @author wvdhaute
  */
 @Stateless
-@SecurityDomain(TrustServiceConstants.ADMIN_SECURITY_DOMAIN)
 public class TrustDomainServiceBean implements TrustDomainService {
 
     private static final Log LOG = LogFactory
