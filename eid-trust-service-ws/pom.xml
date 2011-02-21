@@ -19,6 +19,10 @@
 			<artifactId>eid-trust-service-xkms2-ws-impl</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
+                <exclusion>
+                    <groupId>be.fedict.eid-trust-service</groupId>
+                    <artifactId>eid-trust-service-xkms2-ws</artifactId>
+                </exclusion>
 				<exclusion>
 					<groupId>joda-time</groupId>
 					<artifactId>joda-time</artifactId>

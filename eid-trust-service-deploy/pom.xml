@@ -41,12 +41,14 @@
                             <artifactId>eid-applet-service-spi</artifactId>
                             <includeInApplicationXml>true
                             </includeInApplicationXml>
+                            <bundleDir>lib</bundleDir>
                         </jarModule>
 						<jarModule>
 							<groupId>be.fedict</groupId>
 							<artifactId>jtrust</artifactId>
 							<includeInApplicationXml>true
                             </includeInApplicationXml>
+                            <bundleDir>lib</bundleDir>
 						</jarModule>
 						<ejbModule>
 							<groupId>be.fedict.eid-trust-service</groupId>
@@ -141,6 +143,9 @@
 
 					</modules>
 					<version>5</version>
+                    <earSourceDirectory>${project.build.outputDirectory}
+                    </earSourceDirectory>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -421,5 +426,10 @@
 			<artifactId>hibernate-jpa-2.0-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>el-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 	</dependencies>
 </project>
