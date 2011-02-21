@@ -45,16 +45,17 @@
 			<h1>#{messages.title}</h1>
 		</div>
 
-		<f:view>
+        <!-- Seems to resolve deployJava.js/Chrome issue ... -->
+        <f:view contentType="text/html">
 			<h:form>
 				<div id="menu">
 					<ul>
 						<li id="menu_item_main">
-							<a href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
+							<a href="#{facesContext.externalContext.requestContextPath}/main">#{messages.home}</a>
 						</li>
 						<li id="menu_item_validate">
 							<a
-								href="#{facesContext.externalContext.requestContextPath}/validate.seam">#{messages.validate}</a>
+								href="#{facesContext.externalContext.requestContextPath}/validate">#{messages.validate}</a>
 						</li>
 					</ul>
 				</div>

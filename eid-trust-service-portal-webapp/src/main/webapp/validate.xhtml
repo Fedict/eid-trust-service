@@ -7,16 +7,19 @@
 			<ui:define name="body">
 				<h2>#{messages.validating}</h2>
 				<p>#{messages.validatingMsg}</p>
-				<script src="https://www.java.com/js/deployJava.js"></script>
+
+                <script language="javascript1.2" type="text/javascript"
+                        src="./deployJava.js"></script>
+
 				<script>
 					var attributes = {
 						code :'be.fedict.eid.applet.Applet.class',
-                    archive :'eid-applet-package-${eid-applet.version}.jar',
+                        archive :'eid-applet-package-${eid-applet.version}.jar',
 						width :600,
 						height :300
 					};
 					var parameters = {
-						TargetPage :'validation-results.seam',
+						TargetPage :'validation-results',
 						AppletService :'applet-service',
 						Language :'#{localeSelector.language}'
 					};

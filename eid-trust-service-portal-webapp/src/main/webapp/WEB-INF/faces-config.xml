@@ -12,13 +12,12 @@
         <phase-listener>be.fedict.trust.listener.CacheControlPhaseListener</phase-listener>
     </lifecycle>
 
-	<navigation-rule>
-		<from-view-id>/main.xhtml</from-view-id>
-		<navigation-case>
-			<from-outcome>validate</from-outcome>
-			<to-view-id>/validate.seam</to-view-id>
-			<redirect />
-		</navigation-case>
-	</navigation-rule>
+	<!--<navigation-rule>-->
+		<!--<from-view-id>/main.xhtml</from-view-id>-->
+		<!--<navigation-case>-->
+			<!--<from-outcome>validate</from-outcome>-->
+			<!--<to-view-id>/validate</to-view-id>-->
+		<!--</navigation-case>-->
+	<!--</navigation-rule>-->
 
 </faces-config>
