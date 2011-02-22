@@ -75,6 +75,7 @@ public class AuditBean implements Audit {
 	 * {@inheritDoc}
 	 */
 	@Factory(AUDIT_LIST_NAME)
+    @Admin
 	public void auditListFactory() {
 
 		this.log.debug("audit list factory");

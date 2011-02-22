@@ -21,28 +21,28 @@
 	</build>
 
 	<dependencies>
-		<dependency>
-			<groupId>be.fedict.eid-applet</groupId>
-			<artifactId>eid-applet-service-spi</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>be.fedict.eid-trust-service</groupId>
-			<artifactId>eid-trust-service-model</artifactId>
-			<version>${project.version}</version>
-			<type>ejb-client</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>be.fedict.eid-trust-service</groupId>
-			<artifactId>eid-trust-service-snmp</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.security</groupId>
-			<artifactId>jbosssx-client</artifactId>
-			<scope>provided</scope>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>be.fedict.eid-applet</groupId>-->
+			<!--<artifactId>eid-applet-service-spi</artifactId>-->
+			<!--<scope>provided</scope>-->
+		<!--</dependency>-->
+		<!--<dependency>-->
+			<!--<groupId>be.fedict.eid-trust-service</groupId>-->
+			<!--<artifactId>eid-trust-service-model</artifactId>-->
+			<!--<version>${project.version}</version>-->
+			<!--<type>ejb-client</type>-->
+			<!--<scope>provided</scope>-->
+		<!--</dependency>-->
+		<!--<dependency>-->
+			<!--<groupId>be.fedict.eid-trust-service</groupId>-->
+			<!--<artifactId>eid-trust-service-snmp</artifactId>-->
+			<!--<version>${project.version}</version>-->
+			<!--<scope>provided</scope>-->
+		<!--</dependency>-->
+		<!--<dependency>-->
+			<!--<groupId>org.jboss.security</groupId>-->
+			<!--<artifactId>jbosssx-client</artifactId>-->
+			<!--<scope>provided</scope>-->
+		<!--</dependency>-->
 	</dependencies>
 </project>

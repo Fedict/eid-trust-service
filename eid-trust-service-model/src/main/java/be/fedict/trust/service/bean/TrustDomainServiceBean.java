@@ -68,7 +68,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public TrustDomainEntity addTrustDomain(String name)
             throws TrustDomainAlreadyExistsException {
 
@@ -83,7 +82,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public VirtualTrustDomainEntity addVirtualTrustDomain(String name)
             throws VirtualTrustDomainAlreadyExistsException,
             TrustDomainAlreadyExistsException {
@@ -103,7 +101,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void removeTrustDomain(TrustDomainEntity trustDomain) {
 
         LOG.debug("remove trust domain: " + trustDomain.getName());
@@ -113,7 +110,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void removeVirtualTrustDomain(
             VirtualTrustDomainEntity virtualTrustDomain) {
 
@@ -125,7 +121,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public List<TrustDomainEntity> listTrustDomains() {
 
         LOG.debug("list trust domains");
@@ -135,7 +130,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public List<VirtualTrustDomainEntity> listVirtualTrustDomains() {
 
         LOG.debug("list virtual trust domains");
@@ -145,7 +139,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public List<TrustPointEntity> listTrustPoints() {
 
         LOG.debug("list trust points");
@@ -155,7 +148,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void save(TrustDomainEntity trustDomain) {
 
         LOG.debug("save trust domain: " + trustDomain.getName());
@@ -167,7 +159,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void save(TrustPointEntity trustPoint) throws InvalidCronExpressionException {
 
         LOG.debug("save trust point: " + trustPoint.getName());
@@ -180,7 +171,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public List<TrustPointEntity> listTrustPoints(TrustDomainEntity trustDomain) {
 
         LOG.debug("list trust points for " + trustDomain.getName());
@@ -190,7 +180,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void setDefault(TrustDomainEntity trustDomain) {
 
         LOG.debug("set default trust domain: " + trustDomain.getName());
@@ -201,7 +190,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void removeTrustPoint(TrustPointEntity trustPoint) {
 
         LOG.debug("remove trust point: " + trustPoint.getName());
@@ -237,7 +225,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public TrustPointEntity addTrustPoint(String crlRefreshCronSchedule,
                                           byte[] certificateBytes) throws TrustPointAlreadyExistsException,
             CertificateException, InvalidCronExpressionException {
@@ -281,7 +268,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public TrustPointEntity findTrustPoint(String name) {
 
         return this.trustDomainDAO.findTrustPoint(name);
@@ -290,7 +276,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void setTrustPoints(TrustDomainEntity trustDomain,
                                List<String> trustPointNames) throws TrustDomainNotFoundException {
 
@@ -308,7 +293,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public VirtualTrustDomainEntity setTrustDomains(
             VirtualTrustDomainEntity virtualTrustDomain,
             List<String> trustDomainNames)
@@ -330,7 +314,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public PolicyConstraintEntity addCertificatePolicy(
             TrustDomainEntity trustDomain, String policy) {
 
@@ -342,7 +325,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public KeyUsageConstraintEntity addKeyUsageConstraint(
             TrustDomainEntity trustDomain, KeyUsageType keyUsage,
             boolean allowed) {
@@ -356,7 +338,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void saveKeyUsageConstraints(
             List<KeyUsageConstraintEntity> keyUsageConstraints) {
 
@@ -372,7 +353,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public DNConstraintEntity addDNConstraint(TrustDomainEntity trustDomain,
                                               String dn) {
 
@@ -383,7 +363,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void saveDNConstraint(DNConstraintEntity dnConstraint) {
 
         LOG.debug("Save DN constraint: " + dnConstraint);
@@ -395,7 +374,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public EndEntityConstraintEntity addEndEntityConstraint(
             TrustDomainEntity trustDomain, byte[] certificateBytes)
             throws CertificateException {
@@ -408,7 +386,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public QCStatementsConstraintEntity addQCConstraint(
             TrustDomainEntity trustDomain, boolean qc) {
 
@@ -419,7 +396,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void saveQCConstraint(QCStatementsConstraintEntity qcConstraint) {
 
         LOG.debug("Save QC constraint: " + qcConstraint);
@@ -432,7 +408,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public TSAConstraintEntity addTSAConstraint(TrustDomainEntity trustDomain) {
 
         LOG.debug("Add TSA constraint");
@@ -442,7 +417,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void removeCertificateConstraint(
             CertificateConstraintEntity certificateConstraint) {
 
@@ -455,7 +429,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void refreshTrustPointCache(TrustPointEntity trustPoint) {
 
         LOG.debug("refresh trust point revocation cache: "
@@ -466,7 +439,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public List<CertificateAuthorityEntity> listTrustPointCAs(
             TrustPointEntity trustPoint) {
 
@@ -477,7 +449,6 @@ public class TrustDomainServiceBean implements TrustDomainService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void refreshCACache(CertificateAuthorityEntity ca)
             throws JMSException {
 

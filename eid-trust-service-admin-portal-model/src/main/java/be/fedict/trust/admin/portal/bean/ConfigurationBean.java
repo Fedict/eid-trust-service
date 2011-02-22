@@ -162,7 +162,8 @@ public class ConfigurationBean implements Configuration {
 
         this.log
                 .debug(
-                        "save ws security config: signing=#0 type=#1, path=#2 store pw=#3 entry pw=#4 alias=#5",
+                        "save ws security config: signing=#0 type=#1, path=#2 " +
+                                "store pw=#3 entry pw=#4 alias=#5",
                         this.wsSecuritySigning, this.wsSecurityKeyStoreType,
                         this.wsSecurityKeyStorePath,
                         this.wsSecurityKeyStorePassword,
@@ -170,14 +171,14 @@ public class ConfigurationBean implements Configuration {
         try {
             this.configurationService.saveWSSecurityConfig(
                     this.wsSecuritySigning, KeyStoreType
-                            .valueOf(this.wsSecurityKeyStoreType),
+                    .valueOf(this.wsSecurityKeyStoreType),
                     this.wsSecurityKeyStorePath,
                     this.wsSecurityKeyStorePassword,
                     this.wsSecurityKeyEntryPassword, this.wsSecurityAlias);
         } catch (KeyStoreLoadException e) {
             this.facesMessages.addToControlFromResourceBundle("wssec_path",
                     StatusMessage.Severity.ERROR, "errorLoadKeyStore", e
-                            .getMessage());
+                    .getMessage());
             return null;
         }
         this.selectedTab = ConfigurationTab.tab_wssec.name();
@@ -193,7 +194,9 @@ public class ConfigurationBean implements Configuration {
 
         this.log
                 .debug(
-                        "save clock drift config: protocol=#0 server=#1 timeout=#2 maxClockOffset=#3 clockDriftCronSchedule=#4 enabled=#5",
+                        "save clock drift config: protocol=#0 server=#1 " +
+                                "timeout=#2 maxClockOffset=#3 " +
+                                "clockDriftCronSchedule=#4 enabled=#5",
                         this.clockDriftProtocol, this.clockDriftServer,
                         this.clockDriftTimeout, this.clockDriftMaxClockOffset,
                         this.clockDriftCronSchedule, this.clockDriftEnabled);

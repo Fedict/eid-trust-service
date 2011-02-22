@@ -19,13 +19,11 @@
 package be.fedict.trust.service.bean;
 
 import be.fedict.trust.service.AuditService;
-import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.entity.AuditEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.util.List;
@@ -46,7 +44,6 @@ public class AuditServiceBean implements AuditService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public List<AuditEntity> listAudits() {
 
         LOG.debug("list audit entries");
@@ -56,7 +53,6 @@ public class AuditServiceBean implements AuditService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void clearAudits() {
 
         LOG.debug("clear audit entries");

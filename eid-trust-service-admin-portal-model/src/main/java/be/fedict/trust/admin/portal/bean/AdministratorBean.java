@@ -35,6 +35,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.datamodel.DataModel;
 import org.jboss.seam.annotations.datamodel.DataModelSelection;
+import org.jboss.seam.annotations.security.Admin;
 import org.jboss.seam.contexts.SessionContext;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
@@ -101,6 +102,7 @@ public class AdministratorBean implements Administrator {
 	/**
 	 * {@inheritDoc}
 	 */
+    @Admin
 	public void register() {
 
 		this.log.debug("register");
@@ -114,6 +116,7 @@ public class AdministratorBean implements Administrator {
 	/**
 	 * {@inheritDoc}
 	 */
+    @Admin
 	public String registerPending() {
 
 		this.log.debug("register pending admin");
@@ -133,6 +136,7 @@ public class AdministratorBean implements Administrator {
 	/**
 	 * {@inheritDoc}
 	 */
+    @Admin
 	public String remove() {
 
 		this.log.debug("remove administrator");

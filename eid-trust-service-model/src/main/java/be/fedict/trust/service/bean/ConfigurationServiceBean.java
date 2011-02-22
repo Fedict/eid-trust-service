@@ -21,7 +21,6 @@ package be.fedict.trust.service.bean;
 import be.fedict.trust.service.ConfigurationService;
 import be.fedict.trust.service.KeyStoreUtils;
 import be.fedict.trust.service.SchedulingService;
-import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.LocalizationDAO;
 import be.fedict.trust.service.entity.*;
@@ -31,9 +30,7 @@ import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.SecurityDomain;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.util.LinkedList;
@@ -66,7 +63,6 @@ public class ConfigurationServiceBean implements ConfigurationService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public NetworkConfigEntity getNetworkConfig() {
 
         return this.configurationDAO.getNetworkConfigEntity();
@@ -75,7 +71,6 @@ public class ConfigurationServiceBean implements ConfigurationService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void saveNetworkConfig(String proxyHost, int proxyPort,
                                   boolean enabled) {
 
@@ -90,7 +85,6 @@ public class ConfigurationServiceBean implements ConfigurationService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public ClockDriftConfigEntity getClockDriftDetectionConfig() {
 
         return this.configurationDAO.getClockDriftConfig();
@@ -99,7 +93,6 @@ public class ConfigurationServiceBean implements ConfigurationService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
                                      int timeout, int maxClockOffset,
                                      String cronSchedule, boolean enabled)
@@ -131,7 +124,6 @@ public class ConfigurationServiceBean implements ConfigurationService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public List<String> listLanguages(String key) {
 
         LOG.debug("list languages for: " + key);
@@ -149,7 +141,6 @@ public class ConfigurationServiceBean implements ConfigurationService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public String findText(String key, Locale locale) {
 
         LOG.debug("find text for key=" + key + " language="
@@ -167,7 +158,6 @@ public class ConfigurationServiceBean implements ConfigurationService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void saveText(String key, Locale locale, String text) {
 
         LOG.debug("save text for key=" + key + " language="
@@ -185,7 +175,6 @@ public class ConfigurationServiceBean implements ConfigurationService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public WSSecurityConfigEntity getWSSecurityConfig() {
 
         return this.configurationDAO.getWSSecurityConfig();
@@ -194,7 +183,6 @@ public class ConfigurationServiceBean implements ConfigurationService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void saveWSSecurityConfig(boolean signing,
                                      KeyStoreType keyStoreType, String keyStorePath,
                                      String keyStorePassword, String keyEntryPassword, String alias)

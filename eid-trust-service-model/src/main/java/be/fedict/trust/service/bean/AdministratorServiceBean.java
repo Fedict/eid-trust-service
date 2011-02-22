@@ -19,14 +19,12 @@
 package be.fedict.trust.service.bean;
 
 import be.fedict.trust.service.AdministratorService;
-import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.AdministratorDAO;
 import be.fedict.trust.service.entity.AdministratorEntity;
 import be.fedict.trust.service.exception.RemoveLastAdminException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.security.cert.X509Certificate;
@@ -46,7 +44,6 @@ public class AdministratorServiceBean implements AdministratorService {
     @EJB
     private AdministratorDAO administratorDAO;
 
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public List<AdministratorEntity> listAdmins() {
 
         return this.administratorDAO.listAdmins();
@@ -55,7 +52,6 @@ public class AdministratorServiceBean implements AdministratorService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public AdministratorEntity register(X509Certificate authnCert) {
 
         LOG.debug("register");
@@ -71,7 +67,6 @@ public class AdministratorServiceBean implements AdministratorService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void register(AdministratorEntity admin) {
 
         LOG.debug("register pending admin");
@@ -83,7 +78,6 @@ public class AdministratorServiceBean implements AdministratorService {
     /**
      * {@inheritDoc}
      */
-    @RolesAllowed(TrustServiceConstants.ADMIN_ROLE)
     public void remove(AdministratorEntity admin) throws RemoveLastAdminException {
 
         LOG.debug("remove admin: " + admin.getName());
