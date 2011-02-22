@@ -207,6 +207,13 @@ public class InitializationServiceBean implements InitializationService {
         }
 
         trustDomain.setTrustPoints(trustPoints);
+
+        // initialize certificate constraints
+        if (trustDomain.getCertificateConstraints().isEmpty()) {
+
+            this.trustDomainDAO.addCertificatePolicy(trustDomain,
+                    "2.16.56.1.40.40.40.1");
+        }
     }
 
     private void initBelgianEidAuthTrustDomain(
