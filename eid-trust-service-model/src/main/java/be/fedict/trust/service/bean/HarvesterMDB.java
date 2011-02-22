@@ -66,13 +66,14 @@ import java.util.Set;
 @MessageDriven(activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
         @ActivationConfigProperty(propertyName = "maxSession", propertyValue = "1"),
-        @ActivationConfigProperty(propertyName = "destination", propertyValue = HarvesterMDB.HARVESTER_QUEUE_NAME)})
+        @ActivationConfigProperty(propertyName = "destination", propertyValue = HarvesterMDB.HARVESTER_QUEUE_LOCATION)})
 @Interceptors(SNMPInterceptor.class)
 public class HarvesterMDB implements MessageListener {
 
     private static final Log LOG = LogFactory.getLog(HarvesterMDB.class);
 
-    public static final String HARVESTER_QUEUE_NAME = "queue/trust/harvester";
+    public static final String HARVESTER_QUEUE_NAME = "TrustServiceHarvester";
+    public static final String HARVESTER_QUEUE_LOCATION = "queue/trust/harvester";
 
     private static final int BATCH_SIZE = 500;
 
@@ -196,7 +197,7 @@ public class HarvesterMDB implements MessageListener {
                     */
                     this.certificateAuthorityDAO.updateRevokedCertificates(
                             revokedCertsBatch, crlNumber, crl
-                                    .getIssuerX500Principal());
+                            .getIssuerX500Principal());
                     entries += revokedCertsBatch.size();
                     revokedCertsBatch.clear();
                     added = 0;
@@ -207,7 +208,7 @@ public class HarvesterMDB implements MessageListener {
             */
             this.certificateAuthorityDAO.updateRevokedCertificates(
                     revokedCertsBatch, crlNumber, crl
-                            .getIssuerX500Principal());
+                    .getIssuerX500Principal());
             entries += revokedCertsBatch.size();
 
             /*
@@ -286,8 +287,7 @@ public class HarvesterMDB implements MessageListener {
                         X509ExtensionUtil.fromExtensionValue(idp))
                         .isIndirectCRL();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new CRLException("Exception reading IssuingDistributionPoint", e);
         }
 

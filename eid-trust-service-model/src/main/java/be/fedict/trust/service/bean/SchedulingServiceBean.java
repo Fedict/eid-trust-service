@@ -31,6 +31,7 @@ import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.ejb3.annotation.Depends;
 
 import javax.annotation.Resource;
 import javax.ejb.*;
@@ -45,6 +46,7 @@ import java.util.Collection;
  * @author wvdhaute
  */
 @Stateless
+@Depends("org.hornetq:module=JMS,name=\"" + HarvesterMDB.HARVESTER_QUEUE_NAME + "\",type=Queue")
 public class SchedulingServiceBean implements SchedulingService {
 
     private static final Log LOG = LogFactory
@@ -56,7 +58,7 @@ public class SchedulingServiceBean implements SchedulingService {
     @Resource(mappedName = "java:JmsXA")
     private QueueConnectionFactory queueConnectionFactory;
 
-    @Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_NAME)
+    @Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_LOCATION)
     private Queue queue;
 
     @EJB

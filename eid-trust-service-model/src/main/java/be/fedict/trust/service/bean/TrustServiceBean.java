@@ -48,6 +48,7 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.tsp.TimeStampToken;
+import org.jboss.ejb3.annotation.Depends;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -72,6 +73,7 @@ import java.util.*;
  */
 @Stateless
 @Interceptors(SNMPInterceptor.class)
+@Depends("org.hornetq:module=JMS,name=\"" + HarvesterMDB.HARVESTER_QUEUE_NAME + "\",type=Queue")
 public class TrustServiceBean implements TrustService {
 
     private static final Log LOG = LogFactory.getLog(TrustServiceBean.class);
@@ -85,7 +87,7 @@ public class TrustServiceBean implements TrustService {
     @Resource(mappedName = "java:JmsXA")
     private QueueConnectionFactory queueConnectionFactory;
 
-    @Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_NAME)
+    @Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_LOCATION)
     private Queue queue;
 
     @EJB
