@@ -51,6 +51,7 @@
                             <filtering>true</filtering>
                             <includes>
                                 <include>validate.xhtml</include>
+                                <include>WEB-INF/web.xml</include>
                             </includes>
                         </resource>
                     </webResources>
