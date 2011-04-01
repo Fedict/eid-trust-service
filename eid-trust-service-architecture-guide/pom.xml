@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0.RC6</version>
 	</parent>
 	<name>FedICT eID Trust Service Architecture Guide</name>
 	<description>Architecture Guide for the eID Trust Service.</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-architecture-guide</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0.RC6</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>

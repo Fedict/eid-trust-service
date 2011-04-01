@@ -93,6 +93,7 @@ public class TSATest {
             LOG.debug("certificate: " + certificate.toString());
         }
 
+        LOG.debug("token received");
         // send token to trust service
         XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
         client.validate(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN,

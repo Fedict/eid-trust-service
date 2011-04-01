@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0.RC6</version>
 	</parent>
 	<name>FedICT eID Trust Service PostgreSQL Distribution</name>
 	<description>PostgreSQL Distribution for eID Trust Service</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-postgresql-distribution</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0.RC6</version>
 	<packaging>pom</packaging>
 
 	<build>
