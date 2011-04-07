@@ -165,7 +165,6 @@
 				Add the following configuration to your Apache HTTPD service to
 				accomplish this:
 				<programlisting><![CDATA[<IfModule mod_proxy_ajp.c>
-                ProxyRequests On
                 ProxyVia On
 
                 <Location /eid-trust-service-portal>
