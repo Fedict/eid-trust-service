@@ -112,6 +112,7 @@ public class CertificateAuthorityEntity implements Serializable {
 		this.status = status;
 	}
 
+    @Lob
 	@Column(length = 4 * 1024)
 	@Basic(fetch = FetchType.LAZY)
 	public byte[] getEncodedCertificate() {
