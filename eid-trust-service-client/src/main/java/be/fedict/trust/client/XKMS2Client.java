@@ -72,17 +72,17 @@ public class XKMS2Client {
     private WSSecurityClientHandler wsSecurityClientHandler;
 
     protected List<String> invalidReasonURIs;
-    
+
     private String location;
 
     private static XKMS2ProxySelector proxySelector;
-    
+
     static {
     	ProxySelector defaultProxySelector = ProxySelector.getDefault();
     	XKMS2Client.proxySelector = new XKMS2ProxySelector(defaultProxySelector);
     	ProxySelector.setDefault(XKMS2Client.proxySelector);
     }
-    
+
     /**
      * Main constructor
      *
@@ -101,6 +101,7 @@ public class XKMS2Client {
 
     /**
      * Enables/disables logging of all SOAP requests/responses.
+     * @param logging enable logging on or not
      */
     public void setLogging(boolean logging) {
 
@@ -113,6 +114,8 @@ public class XKMS2Client {
 
     /**
      * Proxy configuration setting ( both http as https ).
+     * @param proxyHost proxy host
+     * @param proxyPort proxy port
      */
     public void setProxy(String proxyHost, int proxyPort) {
     	XKMS2Client.proxySelector.setProxy(this.location, proxyHost, proxyPort);
@@ -333,7 +336,7 @@ public class XKMS2Client {
         validate(trustDomain, certificateChain, returnRevocationData, null,
                 null, null, null, null, null);
     }
-    
+
     /**
      * Validate the specified certificate chain against the specified trust
      * domain using historical validation using the specified revocation data.
