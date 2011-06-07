@@ -457,7 +457,7 @@ QUIT;]]></programlisting>
 				<programlisting><![CDATA[
 					sqlplus @oracle-init-trust-service.sql
 				]]></programlisting>
-				This might require settings some environment variables:
+				This might require setting some environment variables:
 				<programlisting><![CDATA[
 					export ORACLE_HOME=/usr/lib/oracle/xe/app/oracle/product/10.2.0/server
 					export PATH=$ORACLE_HOME/bin:$PATH
@@ -469,6 +469,14 @@ QUIT;]]></programlisting>
 					SQL> exit
 				]]></programlisting>
 			</para>
+            <warning>
+                As the JBoss Oracle distribution is configured for an XA datasource
+                some extra permissions are required to be granted to the
+                trust database user. The oracle-create-account.sql script does
+                this for you but is preconfigured for Oracle 10g Release 2
+                without patch for bug 5945463. For later versions the grant on
+                sys.dbms_system needs to be changed to sys.dbms_xa.
+            </warning>
 		</section>
 		<section>
 			<title>PostgreSQL database setup on Redhat (Fedora)</title>

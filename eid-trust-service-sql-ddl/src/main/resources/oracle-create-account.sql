@@ -11,3 +11,12 @@ grant create sequence to trust;
 grant create view to trust;
 grant alter session to trust;
 grant create table to trust;
+
+-- XA DataSource support
+GRANT SELECT ON sys.dba_pending_transactions TO trust;
+GRANT SELECT ON sys.pending_trans$ TO trust;
+GRANT SELECT ON sys.dba_2pc_pending TO trust;
+-- for Oracle 10g R2 with patch for bug 5945463 applied and higher:
+-- GRANT EXECUTE ON sys.dbms_xa TO trust;
+-- else
+GRANT EXECUTE ON sys.dbms_system TO trust;
