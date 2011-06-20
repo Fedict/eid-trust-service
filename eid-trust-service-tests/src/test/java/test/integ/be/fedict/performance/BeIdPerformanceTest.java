@@ -42,7 +42,7 @@ public class BeIdPerformanceTest implements PerformanceTest {
 
 	// private static final String XKMS_LOCATION =
 	// "http://192.168.1.101/eid-trust-service-ws/xkms2";
-	private static final String XKMS_LOCATION = "https://trust.ta.belgium.be/eid-trust-service-ws/xkms2";
+	private static final String XKMS_LOCATION = "https://trust-ws.ta.belgium.be/eid-trust-service-ws/xkms2";
 	// private static final String XKMS_LOCATION =
 	// "http://localhost/eid-trust-service-ws/xkms2";
 	// private static final String XKMS_LOCATION =
@@ -117,7 +117,7 @@ public class BeIdPerformanceTest implements PerformanceTest {
 
 		XKMS2Client client = new XKMS2Client(XKMS_LOCATION);
 		if (null != PROXY_HOST) {
-			// client.setProxy(PROXY_HOST, PROXY_PORT);
+			client.setProxy(PROXY_HOST, PROXY_PORT);
 		}
 
 		List<PerformanceData> performance = new LinkedList<PerformanceData>();
