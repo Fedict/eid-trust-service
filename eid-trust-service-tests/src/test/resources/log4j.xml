@@ -11,7 +11,7 @@
 	</appender>
 
 	<category name="test">
-		<priority value="INFO" />
+		<priority value="DEBUG" />
 	</category>
 
 	<category name="be.fedict">
