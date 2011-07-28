@@ -29,6 +29,7 @@ import be.fedict.trust.service.dao.LocalizationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.*;
 import be.fedict.trust.service.entity.constraints.KeyUsageType;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.snmp.SNMPInterceptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,6 +88,8 @@ public class InitializationServiceBean implements InitializationService {
                 initBelgianEidTestCardsTrustDomain();
 
                 initBelgianTSATrustDomain();
+
+                initTimers();
         }
 
         private void initSnmpCounters() {
@@ -388,6 +391,31 @@ public class InitializationServiceBean implements InitializationService {
                                 .generateCertificate(certificateInputStream);
                 } catch (CertificateException e) {
                         throw new RuntimeException("X509 error: " + e.getMessage(), e);
+                }
+        }
+
+        /**
+         * Initialize timers for all trust points found and the clock drift config if enabled.
+         */
+        private void initTimers() {
+
+                for (TrustPointEntity trustPoint : this.trustDomainDAO.listTrustPoints()) {
+                        try {
+                                this.schedulingService.startTimer(trustPoint);
+                        } catch (InvalidCronExpressionException e) {
+                                throw new RuntimeException(
+                                        String.format("Failed to start timer for trustpoint \"%s\"", trustPoint.getName()), e);
+                        }
+                }
+
+                ClockDriftConfigEntity clockDriftConfig = this.configurationDAO.findClockDriftConfig();
+                if (null != clockDriftConfig && clockDriftConfig.isEnabled()) {
+                        try {
+                                this.schedulingService.startTimer(clockDriftConfig);
+                        } catch (InvalidCronExpressionException e) {
+                                throw new RuntimeException(
+                                        "Failed to start timer for clockdrift config,", e);
+                        }
                 }
         }
 
