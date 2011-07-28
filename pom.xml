@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>FedICT eID Trust Service Project</name>
     <parent>
@@ -123,7 +126,7 @@
             </activation>
             <modules>
                 <module>eid-trust-service-devel-guide</module>
-		<module>eid-trust-service-architecture-guide</module>
+                <module>eid-trust-service-architecture-guide</module>
                 <module>eid-trust-service-sdk</module>
                 <module>eid-trust-service-sdk-dotnet</module>
             </modules>
@@ -142,7 +145,7 @@
                 <module>eid-trust-service-postgresql-distribution</module>
                 <module>eid-trust-service-oracle-distribution</module>
                 <module>eid-trust-service-admin-manual</module>
-		<module>eid-trust-service-architecture-guide</module>
+                <module>eid-trust-service-architecture-guide</module>
                 <module>eid-trust-service-devel-guide</module>
                 <module>eid-trust-service-sdk</module>
                 <module>eid-trust-service-sdk-dotnet</module>
@@ -284,6 +287,17 @@
     </repositories>
 
     <pluginRepositories>
+        <pluginRepository>
+            <!-- required for eID Applet SQL DDL Plugin-->
+            <id>e-contract.be</id>
+            <url>http://www.e-contract.be/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
         <pluginRepository>
             <id>codehaus-nexus</id>
             <url>https://nexus.codehaus.org/content/repositories/releases/</url>
