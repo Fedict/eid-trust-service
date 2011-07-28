@@ -80,14 +80,16 @@ public class InitializationServiceBean implements InitializationService {
 
                 initSnmpCounters();
 
-                List<TrustPointEntity> trustPoints = initBelgianEidTrustPoints();
+                if (this.trustDomainDAO.listTrustDomains().isEmpty()) {
+                        List<TrustPointEntity> trustPoints = initBelgianEidTrustPoints();
 
-                initBelgianEidAuthTrustDomain(trustPoints);
-                initBelgianEidNonRepudiationDomain(trustPoints);
-                initBelgianEidNationalRegistryTrustDomain(trustPoints);
-                initBelgianEidTestCardsTrustDomain();
+                        initBelgianEidAuthTrustDomain(trustPoints);
+                        initBelgianEidNonRepudiationDomain(trustPoints);
+                        initBelgianEidNationalRegistryTrustDomain(trustPoints);
+                        initBelgianEidTestCardsTrustDomain();
 
-                initBelgianTSATrustDomain();
+                        initBelgianTSATrustDomain();
+                }
 
                 initTimers();
         }
