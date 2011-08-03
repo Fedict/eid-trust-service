@@ -189,8 +189,6 @@ public class SchedulingServiceBean implements SchedulingService {
                         throw new InvalidCronExpressionException(e);
                 }
 
-                System.err.println("Start timer for: " + trustPoint.getName() + " at " + timer.getNextTimeout().toString());
-
                 LOG.debug("created timer for trustpoint " + trustPoint.getName()
                         + " at " + timer.getNextTimeout().toString());
                 trustPoint.setFireDate(timer.getNextTimeout());
