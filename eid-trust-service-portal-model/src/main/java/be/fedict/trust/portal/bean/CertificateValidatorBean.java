@@ -114,8 +114,11 @@ public class CertificateValidatorBean implements CertificateValidator {
                             TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
                             signCertChain, false);
         } catch (TrustDomainNotFoundException e) {
+        	this.log.error("error validating eID certificates: " + e.getMessage(), e);
             this.facesMessages.addFromResourceBundle(
                     StatusMessage.Severity.ERROR, "errorTrustDomainNotFound");
+            this.authnResult = new ValidationResult(new TrustLinkerResult(false), null);
+            this.signResult = new ValidationResult(new TrustLinkerResult(false), null);
         }
     }
 
