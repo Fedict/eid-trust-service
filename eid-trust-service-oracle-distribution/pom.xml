@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.0.RC9</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service Oracle Distribution</name>
 	<description>Oracle Distribution for eID Trust Service</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-oracle-distribution</artifactId>
-	<version>1.0.0.RC9</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<build>

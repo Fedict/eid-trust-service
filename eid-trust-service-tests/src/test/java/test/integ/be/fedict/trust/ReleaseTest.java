@@ -62,7 +62,7 @@ public class ReleaseTest {
 	private static final Log LOG = LogFactory.getLog(ReleaseTest.class);
 
 	// 1.0.0-SNAPSHOT
-	private static final String CURRENT_VERSION = "1.0.0.RC8";
+	private static final String CURRENT_VERSION = "1.0.0.RC9";
 
 	// 1.0.0.RC1
 	private static final String NEW_VERSION = "1.0.0-SNAPSHOT";
@@ -108,6 +108,17 @@ public class ReleaseTest {
 					.selectSingleNode(
 							pomDocument.getDocumentElement(),
 							"/:project/:parent[:groupId[text() = 'be.fedict'] and :artifactId[contains(text(), 'eid-trust-service')]]/:version/text()",
+							pomDocument.getDocumentElement());
+			if (null != projectVersionTextNode) {
+				//assertEquals(CURRENT_VERSION,
+				//		projectVersionTextNode.getNodeValue());
+				projectVersionTextNode.setNodeValue(NEW_VERSION);
+			}
+			
+			projectVersionTextNode = XPathAPI
+					.selectSingleNode(
+							pomDocument.getDocumentElement(),
+							"/:project/:version/text()",
 							pomDocument.getDocumentElement());
 			if (null != projectVersionTextNode) {
 				//assertEquals(CURRENT_VERSION,
