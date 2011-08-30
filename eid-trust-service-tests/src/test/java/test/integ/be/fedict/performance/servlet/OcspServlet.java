@@ -38,84 +38,89 @@ import java.util.Date;
 
 public class OcspServlet extends HttpServlet {
 
-    private static final Log LOG = LogFactory.getLog(OcspServlet.class);
+	private static final long serialVersionUID = 1L;
 
-    public static final String PATH = "ocsp";
+	private static final Log LOG = LogFactory.getLog(OcspServlet.class);
 
-    public static final String CA_QUERY_PARAM = "ca";
+	public static final String PATH = "ocsp";
 
-    @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response) throws ServletException, IOException {
+	public static final String CA_QUERY_PARAM = "ca";
 
-        String caName = request.getParameter(CA_QUERY_PARAM);
-        if (null == caName) {
-            throw new ServletException("No CA name found.");
-        }
+	@Override
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
-        CAConfiguration ca = TestPKI.get().findCa(caName);
-        if (null == ca) {
-            throw new ServletException("CA Config not found for " + caName);
-        }
+		String caName = request.getParameter(CA_QUERY_PARAM);
+		if (null == caName) {
+			throw new ServletException("No CA name found.");
+		}
 
-        try {
+		CAConfiguration ca = TestPKI.get().findCa(caName);
+		if (null == ca) {
+			throw new ServletException("CA Config not found for " + caName);
+		}
 
-            if (null == request.getContentType()
-                    || !request.getContentType().equals(
-                    "application/ocsp-request")) {
-                LOG.error("Wrong content type: " + request.getContentType());
-                return;
-            }
+		try {
 
-            int len = request.getContentLength();
-            byte[] ocspRequestData = new byte[len];
-            ServletInputStream reader = request.getInputStream();
-            int result = reader.read(ocspRequestData);
-            if (-1 == result) {
-                LOG.error("No data found ?!");
-                return;
-            }
+			if (null == request.getContentType()
+					|| !request.getContentType().equals(
+							"application/ocsp-request")) {
+				LOG.error("Wrong content type: " + request.getContentType());
+				return;
+			}
 
-            BigInteger maxRevokedSN = new BigInteger(Long.toString(ca.getCrlRecords()));
+			int len = request.getContentLength();
+			byte[] ocspRequestData = new byte[len];
+			ServletInputStream reader = request.getInputStream();
+			int result = reader.read(ocspRequestData);
+			if (-1 == result) {
+				LOG.error("No data found ?!");
+				return;
+			}
 
-            OCSPReq ocspRequest = new OCSPReq(ocspRequestData);
+			BigInteger maxRevokedSN = new BigInteger(Long.toString(ca
+					.getCrlRecords()));
 
-            BasicOCSPRespGenerator ocspRespGen = new BasicOCSPRespGenerator(
-                    ca.getKeyPair().getPublic());
-            for (Req req : ocspRequest.getRequestList()) {
+			OCSPReq ocspRequest = new OCSPReq(ocspRequestData);
 
-                LOG.debug("OCSP request for CA=" + caName
-                        + " sn=" + req.getCertID().getSerialNumber());
+			BasicOCSPRespGenerator ocspRespGen = new BasicOCSPRespGenerator(ca
+					.getKeyPair().getPublic());
+			for (Req req : ocspRequest.getRequestList()) {
 
-                if (-1 == req.getCertID().getSerialNumber().compareTo(maxRevokedSN)) {
-                    LOG.debug("revoked");
-                    ocspRespGen.addResponse(req.getCertID(), new RevokedStatus(
-                            new RevokedInfo(new DERGeneralizedTime(new Date()),
-                                    null)));
-                } else {
-                    ocspRespGen.addResponse(req.getCertID(),
-                            CertificateStatus.GOOD);
-                }
-            }
+				LOG.debug("OCSP request for CA=" + caName + " sn="
+						+ req.getCertID().getSerialNumber());
 
-            BasicOCSPResp ocspResp;
-            ocspResp = ocspRespGen.generate("SHA1WITHRSA",
-                    ca.getKeyPair().getPrivate(), null, new Date(), "BC");
+				if (-1 == req.getCertID().getSerialNumber()
+						.compareTo(maxRevokedSN)) {
+					LOG.debug("revoked");
+					ocspRespGen.addResponse(req.getCertID(), new RevokedStatus(
+							new RevokedInfo(new DERGeneralizedTime(new Date()),
+									null)));
+				} else {
+					ocspRespGen.addResponse(req.getCertID(),
+							CertificateStatus.GOOD);
+				}
+			}
 
-            OCSPRespGenerator og = new OCSPRespGenerator();
+			BasicOCSPResp ocspResp;
+			ocspResp = ocspRespGen.generate("SHA1WITHRSA", ca.getKeyPair()
+					.getPrivate(), null, new Date(), "BC");
 
-            response.setContentType("application/ocsp-response");
-            response.getOutputStream().write(
-                    (og.generate(OCSPRespGenerator.SUCCESSFUL, ocspResp))
-                            .getEncoded());
+			OCSPRespGenerator og = new OCSPRespGenerator();
 
-        } catch (Exception e) {
-            LOG.error("Exception: " + e.getMessage(), e);
-            throw new ServletException(e);
-        }
-    }
+			response.setContentType("application/ocsp-response");
+			response.getOutputStream().write(
+					(og.generate(OCSPRespGenerator.SUCCESSFUL, ocspResp))
+							.getEncoded());
 
-    public static String getPath(String caName) throws Exception {
-        return new URI(TestPKI.get().getPath() + "/" + PATH + "?" + CA_QUERY_PARAM + "=" + caName, false).toString();
-    }
+		} catch (Exception e) {
+			LOG.error("Exception: " + e.getMessage(), e);
+			throw new ServletException(e);
+		}
+	}
+
+	public static String getPath(String caName) throws Exception {
+		return new URI(TestPKI.get().getPath() + "/" + PATH + "?"
+				+ CA_QUERY_PARAM + "=" + caName, false).toString();
+	}
 }

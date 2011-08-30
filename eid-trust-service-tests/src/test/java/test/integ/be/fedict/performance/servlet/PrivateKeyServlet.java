@@ -33,33 +33,35 @@ import java.io.PrintWriter;
 
 public class PrivateKeyServlet extends HttpServlet {
 
-    private static final Log LOG = LogFactory.getLog(PrivateKeyServlet.class);
+	private static final long serialVersionUID = 1L;
 
-    public static final String PATH = "private";
+	private static final Log LOG = LogFactory.getLog(PrivateKeyServlet.class);
 
-    public static final String CA_QUERY_PARAM = "ca";
+	public static final String PATH = "private";
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	public static final String CA_QUERY_PARAM = "ca";
 
-        String caName = request.getParameter(CA_QUERY_PARAM);
-        if (null == caName) {
-            throw new ServletException("No CA name found.");
-        }
-        LOG.debug("get private key for CA=" + caName);
+	@Override
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
-        CAConfiguration ca = TestPKI.get().findCa(caName);
-        if (null == ca) {
-            throw new ServletException("CA Config not found for " + caName);
-        }
+		String caName = request.getParameter(CA_QUERY_PARAM);
+		if (null == caName) {
+			throw new ServletException("No CA name found.");
+		}
+		LOG.debug("get private key for CA=" + caName);
 
-        String pemCertificate = TestUtils.toPem(ca.getKeyPair().getPrivate());
+		CAConfiguration ca = TestPKI.get().findCa(caName);
+		if (null == ca) {
+			throw new ServletException("CA Config not found for " + caName);
+		}
 
-        response.setContentType("text/plain");
-        PrintWriter out = response.getWriter();
-        out.print(pemCertificate);
-        out.close();
-    }
+		String pemCertificate = TestUtils.toPem(ca.getKeyPair().getPrivate());
+
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
+		out.print(pemCertificate);
+		out.close();
+	}
 
 }

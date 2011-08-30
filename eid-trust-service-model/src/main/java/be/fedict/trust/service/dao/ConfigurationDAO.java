@@ -29,9 +29,9 @@ import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 
 /**
  * Configuration DAO.
- *
+ * 
  * @author wvdhaute
- *
+ * 
  */
 @Local
 public interface ConfigurationDAO {
@@ -55,7 +55,7 @@ public interface ConfigurationDAO {
 
 	/**
 	 * Add/update the {@link NetworkConfigEntity}.
-	 *
+	 * 
 	 * @param proxyHost
 	 * @param proxyPort
 	 */
@@ -63,7 +63,7 @@ public interface ConfigurationDAO {
 
 	/**
 	 * Enable/disable the {@link NetworkConfigEntity}.
-	 *
+	 * 
 	 * @param enabled
 	 */
 	void setNetworkConfigEnabled(boolean enabled);
@@ -81,7 +81,7 @@ public interface ConfigurationDAO {
 
 	/**
 	 * Add/update the {@link ClockDriftConfigEntity}.
-	 *
+	 * 
 	 * @param timeProtocol
 	 *            the {@link TimeProtocol} to be used.
 	 * @param server
@@ -90,8 +90,8 @@ public interface ConfigurationDAO {
 	 *            used by the NTP client as timeout to the NTP server, in ms
 	 * @param maxClockOffset
 	 *            maximum clock offset accepted, in ms
-     * @param cronSchedule
-     *            cron schedule.
+	 * @param cronSchedule
+	 *            cron schedule.
 	 * @return
 	 */
 	ClockDriftConfigEntity setClockDriftConfig(TimeProtocol timeProtocol,
@@ -99,7 +99,7 @@ public interface ConfigurationDAO {
 
 	/**
 	 * Enable/disable the {@link ClockDriftConfigEntity}.
-	 *
+	 * 
 	 * @param enabled
 	 */
 	void setClockDriftConfigEnabled(boolean enabled);
@@ -117,7 +117,7 @@ public interface ConfigurationDAO {
 
 	/**
 	 * Add/update the {@link WSSecurityConfigEntity}.
-	 *
+	 * 
 	 * @param signing
 	 * @param keyStoreType
 	 * @param keyStorePath

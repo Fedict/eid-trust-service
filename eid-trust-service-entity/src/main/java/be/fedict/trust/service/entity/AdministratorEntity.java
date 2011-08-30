@@ -18,73 +18,76 @@
 
 package be.fedict.trust.service.entity;
 
-import javax.persistence.*;
 import java.io.Serializable;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "ts_admin")
-@NamedQueries({@NamedQuery(name = AdministratorEntity.QUERY_LIST_ALL,
-        query = "FROM AdministratorEntity")})
+@NamedQueries({ @NamedQuery(name = AdministratorEntity.QUERY_LIST_ALL, query = "FROM AdministratorEntity") })
 public class AdministratorEntity implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public static final String QUERY_LIST_ALL = "ts_admin.all";
+	public static final String QUERY_LIST_ALL = "ts_admin.all";
 
-    private String id;
-    private String name;
-    private boolean pending;
+	private String id;
+	private String name;
+	private boolean pending;
 
-    /**
-     * Default constructor.
-     */
-    public AdministratorEntity() {
-        super();
-    }
+	/**
+	 * Default constructor.
+	 */
+	public AdministratorEntity() {
+		super();
+	}
 
-    public AdministratorEntity(String id, String name) {
+	public AdministratorEntity(String id, String name) {
 
-        this(id, name, false);
-    }
+		this(id, name, false);
+	}
 
-    public AdministratorEntity(String id, String name, boolean pending) {
-        this.id = id;
-        this.name = name;
-        this.pending = pending;
-    }
+	public AdministratorEntity(String id, String name, boolean pending) {
+		this.id = id;
+		this.name = name;
+		this.pending = pending;
+	}
 
-    @Id
-    public String getId() {
-        return this.id;
-    }
+	@Id
+	public String getId() {
+		return this.id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    /**
-     * @return name of the administrator. This is the Subject of the
-     *         authentication certificate
-     */
-    @Column(nullable = false)
-    public String getName() {
-        return this.name;
-    }
+	/**
+	 * @return name of the administrator. This is the Subject of the
+	 *         authentication certificate
+	 */
+	@Column(nullable = false)
+	public String getName() {
+		return this.name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    /**
-     * @return whether or not this is a pending administrator.
-     */
-    public boolean isPending() {
-        return this.pending;
-    }
+	/**
+	 * @return whether or not this is a pending administrator.
+	 */
+	public boolean isPending() {
+		return this.pending;
+	}
 
-    public void setPending(boolean pending) {
-        this.pending = pending;
-    }
+	public void setPending(boolean pending) {
+		this.pending = pending;
+	}
 }

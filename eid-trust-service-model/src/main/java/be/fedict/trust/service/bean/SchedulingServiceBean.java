@@ -41,261 +41,275 @@ import java.util.Collection;
 
 /**
  * Scheduler Service Bean implementation.
- *
+ * 
  * @author wvdhaute
  */
 @Stateless
-@Depends("org.hornetq:module=JMS,name=\"" + HarvesterMDB.HARVESTER_QUEUE_NAME + "\",type=Queue")
+@Depends("org.hornetq:module=JMS,name=\"" + HarvesterMDB.HARVESTER_QUEUE_NAME
+		+ "\",type=Queue")
 public class SchedulingServiceBean implements SchedulingService {
 
-        private static final Log LOG = LogFactory
-                .getLog(SchedulingServiceBean.class);
+	private static final Log LOG = LogFactory
+			.getLog(SchedulingServiceBean.class);
 
-        @Resource
-        private TimerService timerService;
+	@Resource
+	private TimerService timerService;
 
-        @Resource(mappedName = "java:JmsXA")
-        private QueueConnectionFactory queueConnectionFactory;
+	@Resource(mappedName = "java:JmsXA")
+	private QueueConnectionFactory queueConnectionFactory;
 
-        @Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_LOCATION)
-        private Queue queue;
+	@Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_LOCATION)
+	private Queue queue;
 
-        @EJB
-        private TrustDomainDAO trustDomainDAO;
+	@EJB
+	private TrustDomainDAO trustDomainDAO;
 
-        @EJB
-        private ClockDriftService clockDriftService;
+	@EJB
+	private ClockDriftService clockDriftService;
 
-        @EJB
-        private AuditDAO auditDAO;
+	@EJB
+	private AuditDAO auditDAO;
 
-        @PersistenceContext
-        private EntityManager entityManager;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-        /**
-         * {@inheritDoc}
-         */
-        @Timeout
-        public void timeOut(Timer timer) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Timeout
+	public void timeOut(Timer timer) {
 
-                String timerInfo = (String) timer.getInfo();
-                if (null == timerInfo) {
-                        LOG.error("no timer info ?? cancel timer");
-                        timer.cancel();
-                        return;
-                }
+		String timerInfo = (String) timer.getInfo();
+		if (null == timerInfo) {
+			LOG.error("no timer info ?? cancel timer");
+			timer.cancel();
+			return;
+		}
 
-                LOG.debug("scheduler timeout for: " + timerInfo);
-                if (timerInfo.equals(TrustServiceConstants.CLOCK_DRIFT_TIMER)) {
-                        handleClockDriftTimeout();
-                } else {
-                        handleTrustPointTimeout(timerInfo);
-                }
-        }
+		LOG.debug("scheduler timeout for: " + timerInfo);
+		if (timerInfo.equals(TrustServiceConstants.CLOCK_DRIFT_TIMER)) {
+			handleClockDriftTimeout();
+		} else {
+			handleTrustPointTimeout(timerInfo);
+		}
+	}
 
-        private void handleClockDriftTimeout() {
+	private void handleClockDriftTimeout() {
 
-                // perform clock drift detection
-                this.clockDriftService.execute();
-        }
+		// perform clock drift detection
+		this.clockDriftService.execute();
+	}
 
-        private void handleTrustPointTimeout(String name) {
+	private void handleTrustPointTimeout(String name) {
 
-                TrustPointEntity trustPoint = this.entityManager.find(
-                        TrustPointEntity.class, name);
-                if (null == trustPoint) {
-                        LOG.warn("unknown trust point: " + name);
-                        return;
-                }
+		TrustPointEntity trustPoint = this.entityManager.find(
+				TrustPointEntity.class, name);
+		if (null == trustPoint) {
+			LOG.warn("unknown trust point: " + name);
+			return;
+		}
 
-                // notify harvester
-                for (CertificateAuthorityEntity certificateAuthority : this.trustDomainDAO
-                        .listCertificateAuthorities(trustPoint)) {
-                        try {
-                                if (!certificateAuthority.getStatus().equals(Status.PROCESSING)) {
-                                        notifyHarvester(certificateAuthority.getName());
-                                        LOG.debug("harvester notified for "
-                                                + certificateAuthority.getName());
-                                }
-                        } catch (JMSException e) {
-                                this.auditDAO.logAudit("Failed to notify harvester for CA="
-                                        + certificateAuthority.getName());
-                        }
-                }
-        }
+		// notify harvester
+		for (CertificateAuthorityEntity certificateAuthority : this.trustDomainDAO
+				.listCertificateAuthorities(trustPoint)) {
+			try {
+				if (!certificateAuthority.getStatus().equals(Status.PROCESSING)) {
+					notifyHarvester(certificateAuthority.getName());
+					LOG.debug("harvester notified for "
+							+ certificateAuthority.getName());
+				}
+			} catch (JMSException e) {
+				this.auditDAO.logAudit("Failed to notify harvester for CA="
+						+ certificateAuthority.getName());
+			}
+		}
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        public void startTimer(ClockDriftConfigEntity clockDriftConfig
-        ) throws InvalidCronExpressionException {
-                LOG.debug("start timer for clock drift detection");
+	/**
+	 * {@inheritDoc}
+	 */
+	public void startTimer(ClockDriftConfigEntity clockDriftConfig)
+			throws InvalidCronExpressionException {
+		LOG.debug("start timer for clock drift detection");
 
-                if (null == clockDriftConfig.getCronSchedule() ||
-                        clockDriftConfig.getCronSchedule().isEmpty()) {
-                        LOG.debug("no interval set for clock drift, ignoring...");
-                        return;
-                }
+		if (null == clockDriftConfig.getCronSchedule()
+				|| clockDriftConfig.getCronSchedule().isEmpty()) {
+			LOG.debug("no interval set for clock drift, ignoring...");
+			return;
+		}
 
-                // remove old timers
-                cancelTimers(TrustServiceConstants.CLOCK_DRIFT_TIMER);
+		// remove old timers
+		cancelTimers(TrustServiceConstants.CLOCK_DRIFT_TIMER);
 
-                TimerConfig timerConfig = new TimerConfig();
-                timerConfig.setInfo(TrustServiceConstants.CLOCK_DRIFT_TIMER);
-                timerConfig.setPersistent(false);
+		TimerConfig timerConfig = new TimerConfig();
+		timerConfig.setInfo(TrustServiceConstants.CLOCK_DRIFT_TIMER);
+		timerConfig.setPersistent(false);
 
-                ScheduleExpression schedule = getScheduleExpression(clockDriftConfig.getCronSchedule());
+		ScheduleExpression schedule = getScheduleExpression(clockDriftConfig
+				.getCronSchedule());
 
-                Timer timer;
-                try {
-                        timer = this.timerService.createCalendarTimer(schedule, timerConfig);
-                } catch (Exception e) {
-                        LOG.error("Exception while creating timer for clock drift: " + e.getMessage(), e);
-                        throw new InvalidCronExpressionException(e);
-                }
+		Timer timer;
+		try {
+			timer = this.timerService
+					.createCalendarTimer(schedule, timerConfig);
+		} catch (Exception e) {
+			LOG.error(
+					"Exception while creating timer for clock drift: "
+							+ e.getMessage(), e);
+			throw new InvalidCronExpressionException(e);
+		}
 
-                LOG.debug("created timer for clock drift at " + timer.getNextTimeout().toString());
-                clockDriftConfig.setFireDate(timer.getNextTimeout());
-        }
+		LOG.debug("created timer for clock drift at "
+				+ timer.getNextTimeout().toString());
+		clockDriftConfig.setFireDate(timer.getNextTimeout());
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        public void startTimer(TrustPointEntity trustPoint) throws InvalidCronExpressionException {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void startTimer(TrustPointEntity trustPoint)
+			throws InvalidCronExpressionException {
 
-                LOG.debug("start timer for " + trustPoint.getName());
+		LOG.debug("start timer for " + trustPoint.getName());
 
-                if (null == trustPoint.getCrlRefreshCronSchedule() ||
-                        trustPoint.getCrlRefreshCronSchedule().isEmpty()) {
-                        LOG.debug("no CRL refresh set for trust point "
-                                + trustPoint.getName() + " ignoring...");
-                        return;
-                }
+		if (null == trustPoint.getCrlRefreshCronSchedule()
+				|| trustPoint.getCrlRefreshCronSchedule().isEmpty()) {
+			LOG.debug("no CRL refresh set for trust point "
+					+ trustPoint.getName() + " ignoring...");
+			return;
+		}
 
-                // remove old timers
-                cancelTimers(trustPoint.getName());
+		// remove old timers
+		cancelTimers(trustPoint.getName());
 
-                TimerConfig timerConfig = new TimerConfig();
-                timerConfig.setInfo(trustPoint.getName());
-                timerConfig.setPersistent(false);
+		TimerConfig timerConfig = new TimerConfig();
+		timerConfig.setInfo(trustPoint.getName());
+		timerConfig.setPersistent(false);
 
-                ScheduleExpression schedule = getScheduleExpression(trustPoint.getCrlRefreshCronSchedule());
+		ScheduleExpression schedule = getScheduleExpression(trustPoint
+				.getCrlRefreshCronSchedule());
 
-                Timer timer;
-                try {
-                        timer = this.timerService.createCalendarTimer(schedule, timerConfig);
-                } catch (Exception e) {
-                        LOG.error("Exception while creating timer for clock drift: " + e.getMessage(), e);
-                        throw new InvalidCronExpressionException(e);
-                }
+		Timer timer;
+		try {
+			timer = this.timerService
+					.createCalendarTimer(schedule, timerConfig);
+		} catch (Exception e) {
+			LOG.error(
+					"Exception while creating timer for clock drift: "
+							+ e.getMessage(), e);
+			throw new InvalidCronExpressionException(e);
+		}
 
-                LOG.debug("created timer for trustpoint " + trustPoint.getName()
-                        + " at " + timer.getNextTimeout().toString());
-                trustPoint.setFireDate(timer.getNextTimeout());
-        }
+		LOG.debug("created timer for trustpoint " + trustPoint.getName()
+				+ " at " + timer.getNextTimeout().toString());
+		trustPoint.setFireDate(timer.getNextTimeout());
+	}
 
-        private ScheduleExpression getScheduleExpression(String cronSchedule) {
+	private ScheduleExpression getScheduleExpression(String cronSchedule) {
 
-                ScheduleExpression schedule = new ScheduleExpression();
-                String[] fields = cronSchedule.split(" ");
-                if (fields.length > 8) {
-                        throw new IllegalArgumentException("Too many fields in cronexpression: " + cronSchedule);
-                }
-                if (fields.length > 1) {
-                        schedule.second(fields[0]);
-                }
-                if (fields.length > 2) {
-                        schedule.minute(fields[1]);
-                }
-                if (fields.length > 3) {
-                        schedule.hour(fields[2]);
-                }
-                if (fields.length > 4) {
-                        schedule.dayOfMonth(fields[3]);
-                }
-                if (fields.length > 5) {
-                        schedule.month(fields[4]);
-                }
-                if (fields.length > 6) {
-                        schedule.dayOfWeek(fields[5]);
-                }
-                if (fields.length > 7) {
-                        schedule.year(fields[6]);
-                }
+		ScheduleExpression schedule = new ScheduleExpression();
+		String[] fields = cronSchedule.split(" ");
+		if (fields.length > 8) {
+			throw new IllegalArgumentException(
+					"Too many fields in cronexpression: " + cronSchedule);
+		}
+		if (fields.length > 1) {
+			schedule.second(fields[0]);
+		}
+		if (fields.length > 2) {
+			schedule.minute(fields[1]);
+		}
+		if (fields.length > 3) {
+			schedule.hour(fields[2]);
+		}
+		if (fields.length > 4) {
+			schedule.dayOfMonth(fields[3]);
+		}
+		if (fields.length > 5) {
+			schedule.month(fields[4]);
+		}
+		if (fields.length > 6) {
+			schedule.dayOfWeek(fields[5]);
+		}
+		if (fields.length > 7) {
+			schedule.year(fields[6]);
+		}
 
-                return schedule;
-        }
+		return schedule;
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        public void startTimerNow(TrustPointEntity trustPoint) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void startTimerNow(TrustPointEntity trustPoint) {
 
-                TimerConfig timerConfig = new TimerConfig();
-                timerConfig.setInfo(trustPoint.getName());
-                timerConfig.setPersistent(false);
+		TimerConfig timerConfig = new TimerConfig();
+		timerConfig.setInfo(trustPoint.getName());
+		timerConfig.setPersistent(false);
 
-                Timer timer = this.timerService.createSingleActionTimer(1000 * 10, timerConfig);
+		Timer timer = this.timerService.createSingleActionTimer(1000 * 10,
+				timerConfig);
 
-                LOG.debug("created single action timer for trustpoint " + trustPoint.getName()
-                        + " at " + timer.getNextTimeout().toString());
-        }
+		LOG.debug("created single action timer for trustpoint "
+				+ trustPoint.getName() + " at "
+				+ timer.getNextTimeout().toString());
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        public void cancelTimers(ClockDriftConfigEntity clockDriftConfig) {
-                cancelTimers(TrustServiceConstants.CLOCK_DRIFT_TIMER);
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public void cancelTimers(ClockDriftConfigEntity clockDriftConfig) {
+		cancelTimers(TrustServiceConstants.CLOCK_DRIFT_TIMER);
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        @SuppressWarnings("unchecked")
-        public void cancelTimers(String timerInfo) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public void cancelTimers(String timerInfo) {
 
-                Collection<Timer> timers = this.timerService.getTimers();
-                for (Timer timer : timers) {
-                        if (timer.getInfo() != null) {
-                                if (timer.getInfo().equals(timerInfo)) {
-                                        timer.cancel();
-                                        LOG.debug("cancel timer: " + timerInfo);
-                                }
-                        }
+		Collection<Timer> timers = this.timerService.getTimers();
+		for (Timer timer : timers) {
+			if (timer.getInfo() != null) {
+				if (timer.getInfo().equals(timerInfo)) {
+					timer.cancel();
+					LOG.debug("cancel timer: " + timerInfo);
+				}
+			}
 
-                }
-        }
+		}
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        public void refreshCA(CertificateAuthorityEntity ca) throws JMSException {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void refreshCA(CertificateAuthorityEntity ca) throws JMSException {
 
-                notifyHarvester(ca.getName());
-        }
+		notifyHarvester(ca.getName());
+	}
 
-        private void notifyHarvester(String issuerName) throws JMSException {
-                QueueConnection queueConnection = this.queueConnectionFactory
-                        .createQueueConnection();
-                try {
-                        QueueSession queueSession = queueConnection.createQueueSession(
-                                true, Session.AUTO_ACKNOWLEDGE);
-                        try {
-                                HarvestMessage harvestMessage = new HarvestMessage(issuerName,
-                                        true);
-                                QueueSender queueSender = queueSession.createSender(this.queue);
-                                try {
-                                        queueSender
-                                                .send(harvestMessage.getJMSMessage(queueSession));
-                                } finally {
-                                        queueSender.close();
-                                }
-                        } finally {
-                                queueSession.close();
-                        }
-                } finally {
-                        queueConnection.close();
-                }
-        }
+	private void notifyHarvester(String issuerName) throws JMSException {
+		QueueConnection queueConnection = this.queueConnectionFactory
+				.createQueueConnection();
+		try {
+			QueueSession queueSession = queueConnection.createQueueSession(
+					true, Session.AUTO_ACKNOWLEDGE);
+			try {
+				HarvestMessage harvestMessage = new HarvestMessage(issuerName,
+						true);
+				QueueSender queueSender = queueSession.createSender(this.queue);
+				try {
+					queueSender
+							.send(harvestMessage.getJMSMessage(queueSession));
+				} finally {
+					queueSender.close();
+				}
+			} finally {
+				queueSession.close();
+			}
+		} finally {
+			queueConnection.close();
+		}
+	}
 
 }

@@ -30,41 +30,40 @@ import java.security.cert.X509Certificate;
 
 /**
  * Administrator Service Bean implementation.
- *
+ * 
  * @author wvdhaute
  */
 @Stateless
 public class AdminManagerBean implements AdminManager {
 
-    private static final Log LOG = LogFactory
-            .getLog(AdminManagerBean.class);
+	private static final Log LOG = LogFactory.getLog(AdminManagerBean.class);
 
-    @EJB
-    private AdministratorDAO administratorDAO;
+	@EJB
+	private AdministratorDAO administratorDAO;
 
-    public boolean isAdmin(X509Certificate certificate) {
+	public boolean isAdmin(X509Certificate certificate) {
 
-        AdministratorEntity adminEntity =
-                this.administratorDAO.findAdmin(certificate);
-        if (null != adminEntity && !adminEntity.isPending()) {
-            return true;
-        } else if (null != adminEntity) {
-            // admin exist but is not yet approvied
-            return false;
-        }
+		AdministratorEntity adminEntity = this.administratorDAO
+				.findAdmin(certificate);
+		if (null != adminEntity && !adminEntity.isPending()) {
+			return true;
+		} else if (null != adminEntity) {
+			// admin exist but is not yet approvied
+			return false;
+		}
 
-        if (!administratorDAO.listAdmins().isEmpty()) {
-            /*
-             * We register a 'pending' admin.
-             */
-            this.administratorDAO.addAdmin(certificate, true);
-            return false;
-        }
-        /*
-         * Else we bootstrap the admin.
-         */
+		if (!administratorDAO.listAdmins().isEmpty()) {
+			/*
+			 * We register a 'pending' admin.
+			 */
+			this.administratorDAO.addAdmin(certificate, true);
+			return false;
+		}
+		/*
+		 * Else we bootstrap the admin.
+		 */
 
-        this.administratorDAO.addAdmin(certificate, false);
-        return true;
-    }
+		this.administratorDAO.addAdmin(certificate, false);
+		return true;
+	}
 }

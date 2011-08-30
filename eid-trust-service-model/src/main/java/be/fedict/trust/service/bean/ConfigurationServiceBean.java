@@ -39,164 +39,163 @@ import java.util.Locale;
 
 /**
  * Configuration Service Bean implementation.
- *
+ * 
  * @author wvdhaute
  */
 @Stateless
 public class ConfigurationServiceBean implements ConfigurationService {
 
-    private static final Log LOG = LogFactory
-            .getLog(ConfigurationServiceBean.class);
+	private static final Log LOG = LogFactory
+			.getLog(ConfigurationServiceBean.class);
 
-    @EJB
-    private ConfigurationDAO configurationDAO;
+	@EJB
+	private ConfigurationDAO configurationDAO;
 
-    @EJB
-    private LocalizationDAO localizationDAO;
+	@EJB
+	private LocalizationDAO localizationDAO;
 
-    @EJB
-    private SchedulingService schedulingService;
+	@EJB
+	private SchedulingService schedulingService;
 
-    @EJB
-    private CrlRepositoryServiceBean crlRepositoryServiceBean;
+	@EJB
+	private CrlRepositoryServiceBean crlRepositoryServiceBean;
 
-    /**
-     * {@inheritDoc}
-     */
-    public NetworkConfigEntity getNetworkConfig() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public NetworkConfigEntity getNetworkConfig() {
 
-        return this.configurationDAO.getNetworkConfigEntity();
-    }
+		return this.configurationDAO.getNetworkConfigEntity();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void saveNetworkConfig(String proxyHost, int proxyPort,
-                                  boolean enabled) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void saveNetworkConfig(String proxyHost, int proxyPort,
+			boolean enabled) {
 
-        LOG.debug("save network config");
-        this.configurationDAO.setNetworkConfig(proxyHost, proxyPort);
-        this.configurationDAO.setNetworkConfigEnabled(enabled);
+		LOG.debug("save network config");
+		this.configurationDAO.setNetworkConfig(proxyHost, proxyPort);
+		this.configurationDAO.setNetworkConfigEnabled(enabled);
 
-        // reset the CRL cache on new network configuration.
-        crlRepositoryServiceBean.resetCachedCrlRepository();
-    }
+		// reset the CRL cache on new network configuration.
+		crlRepositoryServiceBean.resetCachedCrlRepository();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public ClockDriftConfigEntity getClockDriftDetectionConfig() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public ClockDriftConfigEntity getClockDriftDetectionConfig() {
 
-        return this.configurationDAO.getClockDriftConfig();
-    }
+		return this.configurationDAO.getClockDriftConfig();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
-                                     int timeout, int maxClockOffset,
-                                     String cronSchedule, boolean enabled)
-            throws InvalidTimeoutException, InvalidMaxClockOffsetException,
-            InvalidCronExpressionException {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void saveClockDriftConfig(TimeProtocol timeProtocol, String server,
+			int timeout, int maxClockOffset, String cronSchedule,
+			boolean enabled) throws InvalidTimeoutException,
+			InvalidMaxClockOffsetException, InvalidCronExpressionException {
 
-        LOG.debug("save clock drift detection config");
+		LOG.debug("save clock drift detection config");
 
-        // input validation
-        if (timeout <= 0) {
-            throw new InvalidTimeoutException();
-        }
-        if (maxClockOffset < 0) {
-            throw new InvalidMaxClockOffsetException();
-        }
+		// input validation
+		if (timeout <= 0) {
+			throw new InvalidTimeoutException();
+		}
+		if (maxClockOffset < 0) {
+			throw new InvalidMaxClockOffsetException();
+		}
 
-        // save
-        ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
-                .setClockDriftConfig(timeProtocol, server, timeout,
-                        maxClockOffset, cronSchedule);
-        this.configurationDAO.setClockDriftConfigEnabled(enabled);
-        if (enabled) {
-            this.schedulingService.startTimer(clockDriftConfig);
-        } else {
-            this.schedulingService.cancelTimers(clockDriftConfig);
-        }
-    }
+		// save
+		ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
+				.setClockDriftConfig(timeProtocol, server, timeout,
+						maxClockOffset, cronSchedule);
+		this.configurationDAO.setClockDriftConfigEnabled(enabled);
+		if (enabled) {
+			this.schedulingService.startTimer(clockDriftConfig);
+		} else {
+			this.schedulingService.cancelTimers(clockDriftConfig);
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> listLanguages(String key) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> listLanguages(String key) {
 
-        LOG.debug("list languages for: " + key);
-        List<String> languages = new LinkedList<String>();
-        LocalizationKeyEntity localizationKey = this.localizationDAO
-                .findLocalization(key);
-        if (null != localizationKey) {
-            for (LocalizationTextEntity text : localizationKey.getTexts()) {
-                languages.add(text.getLanguage());
-            }
-        }
-        return languages;
-    }
+		LOG.debug("list languages for: " + key);
+		List<String> languages = new LinkedList<String>();
+		LocalizationKeyEntity localizationKey = this.localizationDAO
+				.findLocalization(key);
+		if (null != localizationKey) {
+			for (LocalizationTextEntity text : localizationKey.getTexts()) {
+				languages.add(text.getLanguage());
+			}
+		}
+		return languages;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public String findText(String key, Locale locale) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public String findText(String key, Locale locale) {
 
-        LOG.debug("find text for key=" + key + " language="
-                + locale.getLanguage());
-        LocalizationKeyEntity localizationKey = this.localizationDAO
-                .findLocalization(key);
-        for (LocalizationTextEntity text : localizationKey.getTexts()) {
-            if (text.getLanguage().equals(locale.getLanguage())) {
-                return text.getText();
-            }
-        }
-        return null;
-    }
+		LOG.debug("find text for key=" + key + " language="
+				+ locale.getLanguage());
+		LocalizationKeyEntity localizationKey = this.localizationDAO
+				.findLocalization(key);
+		for (LocalizationTextEntity text : localizationKey.getTexts()) {
+			if (text.getLanguage().equals(locale.getLanguage())) {
+				return text.getText();
+			}
+		}
+		return null;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void saveText(String key, Locale locale, String text) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void saveText(String key, Locale locale, String text) {
 
-        LOG.debug("save text for key=" + key + " language="
-                + locale.getLanguage());
-        LocalizationKeyEntity localizationKey = this.localizationDAO
-                .findLocalization(key);
-        for (LocalizationTextEntity localizationText : localizationKey
-                .getTexts()) {
-            if (localizationText.getLanguage().equals(locale.getLanguage())) {
-                localizationText.setText(text);
-            }
-        }
-    }
+		LOG.debug("save text for key=" + key + " language="
+				+ locale.getLanguage());
+		LocalizationKeyEntity localizationKey = this.localizationDAO
+				.findLocalization(key);
+		for (LocalizationTextEntity localizationText : localizationKey
+				.getTexts()) {
+			if (localizationText.getLanguage().equals(locale.getLanguage())) {
+				localizationText.setText(text);
+			}
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public WSSecurityConfigEntity getWSSecurityConfig() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public WSSecurityConfigEntity getWSSecurityConfig() {
 
-        return this.configurationDAO.getWSSecurityConfig();
-    }
+		return this.configurationDAO.getWSSecurityConfig();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void saveWSSecurityConfig(boolean signing,
-                                     KeyStoreType keyStoreType, String keyStorePath,
-                                     String keyStorePassword, String keyEntryPassword, String alias)
-            throws KeyStoreLoadException {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void saveWSSecurityConfig(boolean signing,
+			KeyStoreType keyStoreType, String keyStorePath,
+			String keyStorePassword, String keyEntryPassword, String alias)
+			throws KeyStoreLoadException {
 
-        /*
-           * Check if valid keystore configuration
-           */
-        if (null != keyStorePath) {
-            KeyStoreUtils.loadPrivateKeyEntry(keyStoreType, keyStorePath,
-                    keyStorePassword, keyEntryPassword, alias);
-        }
+		/*
+		 * Check if valid keystore configuration
+		 */
+		if (null != keyStorePath) {
+			KeyStoreUtils.loadPrivateKeyEntry(keyStoreType, keyStorePath,
+					keyStorePassword, keyEntryPassword, alias);
+		}
 
-        this.configurationDAO.setWSSecurityConfig(signing, keyStoreType,
-                keyStorePath, keyStorePassword, keyEntryPassword, alias);
-    }
+		this.configurationDAO.setWSSecurityConfig(signing, keyStoreType,
+				keyStorePath, keyStorePassword, keyEntryPassword, alias);
+	}
 }

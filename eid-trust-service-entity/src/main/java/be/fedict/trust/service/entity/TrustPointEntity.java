@@ -28,109 +28,110 @@ import java.util.Date;
 
 @Entity
 @Table(name = "ts_trust_point")
-@NamedQueries({@NamedQuery(name = TrustPointEntity.QUERY_ALL, query = "FROM TrustPointEntity")})
+@NamedQueries({ @NamedQuery(name = TrustPointEntity.QUERY_ALL, query = "FROM TrustPointEntity") })
 public class TrustPointEntity implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public static final String QUERY_ALL = "ts_tp.q.all";
+	public static final String QUERY_ALL = "ts_tp.q.all";
 
-    private String name;
+	private String name;
 
-    private String crlRefreshCronSchedule;
-    private Date fireDate;
+	private String crlRefreshCronSchedule;
+	private Date fireDate;
 
-    private CertificateAuthorityEntity certificateAuthority;
+	private CertificateAuthorityEntity certificateAuthority;
 
-    /**
-     * Default constructor.
-     */
-    public TrustPointEntity() {
-        super();
-    }
+	/**
+	 * Default constructor.
+	 */
+	public TrustPointEntity() {
+		super();
+	}
 
-    /**
-     * Main constructor.
-     *
-     * @param crlRefreshCronSchedule
-     * @param certificateAuthority
-     */
-    public TrustPointEntity(String crlRefreshCronSchedule,
-                            CertificateAuthorityEntity certificateAuthority) {
-        this.name = certificateAuthority.getName();
-        this.certificateAuthority = certificateAuthority;
-        this.crlRefreshCronSchedule = crlRefreshCronSchedule;
-    }
+	/**
+	 * Main constructor.
+	 * 
+	 * @param crlRefreshCronSchedule
+	 * @param certificateAuthority
+	 */
+	public TrustPointEntity(String crlRefreshCronSchedule,
+			CertificateAuthorityEntity certificateAuthority) {
+		this.name = certificateAuthority.getName();
+		this.certificateAuthority = certificateAuthority;
+		this.crlRefreshCronSchedule = crlRefreshCronSchedule;
+	}
 
-    @Id
-    public String getName() {
-        return this.name;
-    }
+	@Id
+	public String getName() {
+		return this.name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    @OneToOne(optional = false, cascade = CascadeType.REMOVE)
-    public CertificateAuthorityEntity getCertificateAuthority() {
+	@OneToOne(optional = false, cascade = CascadeType.REMOVE)
+	public CertificateAuthorityEntity getCertificateAuthority() {
 
-        return this.certificateAuthority;
-    }
+		return this.certificateAuthority;
+	}
 
-    public void setCertificateAuthority(
-            CertificateAuthorityEntity certificateAuthority) {
+	public void setCertificateAuthority(
+			CertificateAuthorityEntity certificateAuthority) {
 
-        this.certificateAuthority = certificateAuthority;
-    }
+		this.certificateAuthority = certificateAuthority;
+	}
 
-    public String getCrlRefreshCronSchedule() {
+	public String getCrlRefreshCronSchedule() {
 
-        return this.crlRefreshCronSchedule;
-    }
+		return this.crlRefreshCronSchedule;
+	}
 
-    public void setCrlRefreshCronSchedule(String crlRefreshCronSchedule) {
+	public void setCrlRefreshCronSchedule(String crlRefreshCronSchedule) {
 
-        this.crlRefreshCronSchedule = crlRefreshCronSchedule;
-    }
+		this.crlRefreshCronSchedule = crlRefreshCronSchedule;
+	}
 
-    public Date getFireDate() {
+	public Date getFireDate() {
 
-        return this.fireDate;
-    }
+		return this.fireDate;
+	}
 
-    public void setFireDate(Date fireDate) {
+	public void setFireDate(Date fireDate) {
 
-        this.fireDate = fireDate;
-    }
+		this.fireDate = fireDate;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
+	@Override
+	public boolean equals(Object obj) {
 
-        if (this == obj) {
-            return true;
-        }
-        if (null == obj) {
-            return false;
-        }
-        if (!(obj instanceof TrustPointEntity)) {
-            return false;
-        }
-        TrustPointEntity rhs = (TrustPointEntity) obj;
-        return new EqualsBuilder().append(this.name, rhs.name).isEquals();
+		if (this == obj) {
+			return true;
+		}
+		if (null == obj) {
+			return false;
+		}
+		if (!(obj instanceof TrustPointEntity)) {
+			return false;
+		}
+		TrustPointEntity rhs = (TrustPointEntity) obj;
+		return new EqualsBuilder().append(this.name, rhs.name).isEquals();
 
-    }
+	}
 
-    @Override
-    public int hashCode() {
+	@Override
+	public int hashCode() {
 
-        return new HashCodeBuilder().append(this.name).toHashCode();
-    }
+		return new HashCodeBuilder().append(this.name).toHashCode();
+	}
 
-    @Override
-    public String toString() {
+	@Override
+	public String toString() {
 
-        return new ToStringBuilder(this).append("name", this.name).append(
-                "crlRefreshCronSchedule", this.crlRefreshCronSchedule).toString();
-    }
+		return new ToStringBuilder(this).append("name", this.name)
+				.append("crlRefreshCronSchedule", this.crlRefreshCronSchedule)
+				.toString();
+	}
 
 }

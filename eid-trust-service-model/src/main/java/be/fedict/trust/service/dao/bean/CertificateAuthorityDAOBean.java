@@ -43,168 +43,170 @@ import java.util.Set;
 
 /**
  * Certificate Authority DAO Bean implementation.
- *
+ * 
  * @author wvdhaute
  */
 @Stateless
 public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 
-        private static final Log LOG = LogFactory
-                .getLog(CertificateAuthorityDAOBean.class);
+	private static final Log LOG = LogFactory
+			.getLog(CertificateAuthorityDAOBean.class);
 
-        @PersistenceContext
-        private EntityManager entityManager;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-        /**
-         * {@inheritDoc}
-         */
-        public CertificateAuthorityEntity findCertificateAuthority(String name) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public CertificateAuthorityEntity findCertificateAuthority(String name) {
 
-                LOG.debug("find CA: " + name);
-                return this.entityManager.find(CertificateAuthorityEntity.class, name);
-        }
+		LOG.debug("find CA: " + name);
+		return this.entityManager.find(CertificateAuthorityEntity.class, name);
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        public CertificateAuthorityEntity findCertificateAuthority(
-                X509Certificate certificate) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public CertificateAuthorityEntity findCertificateAuthority(
+			X509Certificate certificate) {
 
-                LOG.debug("find CA: "
-                        + certificate.getSubjectX500Principal().toString());
-                return this.entityManager.find(CertificateAuthorityEntity.class,
-                        certificate.getSubjectX500Principal().toString());
-        }
+		LOG.debug("find CA: "
+				+ certificate.getSubjectX500Principal().toString());
+		return this.entityManager.find(CertificateAuthorityEntity.class,
+				certificate.getSubjectX500Principal().toString());
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        public CertificateAuthorityEntity addCertificateAuthority(
-                X509Certificate certificate, String crlUrl) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public CertificateAuthorityEntity addCertificateAuthority(
+			X509Certificate certificate, String crlUrl) {
 
-                LOG.debug("add  CA: "
-                        + certificate.getSubjectX500Principal().toString());
-                CertificateAuthorityEntity certificateAuthority;
-                try {
-                        certificateAuthority = new CertificateAuthorityEntity(crlUrl,
-                                certificate);
-                } catch (CertificateEncodingException e) {
-                        LOG.error("Certificate encoding exception: " + e.getMessage());
-                        return null;
-                }
-                this.entityManager.persist(certificateAuthority);
-                return certificateAuthority;
-        }
+		LOG.debug("add  CA: "
+				+ certificate.getSubjectX500Principal().toString());
+		CertificateAuthorityEntity certificateAuthority;
+		try {
+			certificateAuthority = new CertificateAuthorityEntity(crlUrl,
+					certificate);
+		} catch (CertificateEncodingException e) {
+			LOG.error("Certificate encoding exception: " + e.getMessage());
+			return null;
+		}
+		this.entityManager.persist(certificateAuthority);
+		return certificateAuthority;
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        public void removeCertificateAuthorities(TrustPointEntity trustPoint) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeCertificateAuthorities(TrustPointEntity trustPoint) {
 
-                LOG.debug("remove CA's for trust point " + trustPoint.getName());
-                Query query = this.entityManager
-                        .createNamedQuery(CertificateAuthorityEntity.DELETE_WHERE_TRUST_POINT);
-                query.setParameter("trustPoint", trustPoint);
-                int result = query.executeUpdate();
-                LOG.debug("CA's removed: " + result);
-        }
+		LOG.debug("remove CA's for trust point " + trustPoint.getName());
+		Query query = this.entityManager
+				.createNamedQuery(CertificateAuthorityEntity.DELETE_WHERE_TRUST_POINT);
+		query.setParameter("trustPoint", trustPoint);
+		int result = query.executeUpdate();
+		LOG.debug("CA's removed: " + result);
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        @TransactionAttribute(TransactionAttributeType.REQUIRED)
-        public RevokedCertificateEntity addRevokedCertificate(String issuerName,
-                                                              BigInteger serialNumber, Date revocationDate, BigInteger crlNumber) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public RevokedCertificateEntity addRevokedCertificate(String issuerName,
+			BigInteger serialNumber, Date revocationDate, BigInteger crlNumber) {
 
-                RevokedCertificateEntity revokedCertificate = new RevokedCertificateEntity(
-                        issuerName, serialNumber, revocationDate, crlNumber);
-                this.entityManager.persist(revokedCertificate);
-                return revokedCertificate;
-        }
+		RevokedCertificateEntity revokedCertificate = new RevokedCertificateEntity(
+				issuerName, serialNumber, revocationDate, crlNumber);
+		this.entityManager.persist(revokedCertificate);
+		return revokedCertificate;
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-        public void updateRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
-                                              BigInteger crlNumber, X500Principal crlIssuer) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public void updateRevokedCertificates(
+			Set<X509CRLEntry> revokedCertificates, BigInteger crlNumber,
+			X500Principal crlIssuer) {
 
-                LOG.debug("Update " + revokedCertificates.size()
-                        + " revoked certificates (crlNumber=" + crlNumber + ")");
-                for (X509CRLEntry revokedCertificate : revokedCertificates) {
-                        X500Principal certificateIssuer = revokedCertificate
-                                .getCertificateIssuer();
-                        String issuerName;
-                        if (null == certificateIssuer) {
-                                issuerName = crlIssuer.toString();
-                        } else {
-                                issuerName = certificateIssuer.toString();
-                        }
-                        BigInteger serialNumber = revokedCertificate.getSerialNumber();
-                        Date revocationDate = revokedCertificate.getRevocationDate();
+		LOG.debug("Update " + revokedCertificates.size()
+				+ " revoked certificates (crlNumber=" + crlNumber + ")");
+		for (X509CRLEntry revokedCertificate : revokedCertificates) {
+			X500Principal certificateIssuer = revokedCertificate
+					.getCertificateIssuer();
+			String issuerName;
+			if (null == certificateIssuer) {
+				issuerName = crlIssuer.toString();
+			} else {
+				issuerName = certificateIssuer.toString();
+			}
+			BigInteger serialNumber = revokedCertificate.getSerialNumber();
+			Date revocationDate = revokedCertificate.getRevocationDate();
 
-                        // lookup
-                        RevokedCertificateEntity revokedCertificateEntity =
-                                this.entityManager.find(RevokedCertificateEntity.class,
-                                        new RevokedCertificatePK(issuerName, serialNumber.toString()));
+			// lookup
+			RevokedCertificateEntity revokedCertificateEntity = this.entityManager
+					.find(RevokedCertificateEntity.class,
+							new RevokedCertificatePK(issuerName, serialNumber
+									.toString()));
 
-                        if (null != revokedCertificateEntity) {
-                                // already exists, update revocationDate and crl number
-                                revokedCertificateEntity.setRevocationDate(revocationDate);
-                                revokedCertificateEntity.setCrlNumber(crlNumber);
-                        } else {
-                                // don't exist yet, add
-                                this.entityManager.persist(new RevokedCertificateEntity(issuerName,
-                                        serialNumber, revocationDate, crlNumber));
-                        }
-                }
-        }
+			if (null != revokedCertificateEntity) {
+				// already exists, update revocationDate and crl number
+				revokedCertificateEntity.setRevocationDate(revocationDate);
+				revokedCertificateEntity.setCrlNumber(crlNumber);
+			} else {
+				// don't exist yet, add
+				this.entityManager.persist(new RevokedCertificateEntity(
+						issuerName, serialNumber, revocationDate, crlNumber));
+			}
+		}
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-        public int removeOldRevokedCertificates(BigInteger crlNumber,
-                                                String issuerName) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public int removeOldRevokedCertificates(BigInteger crlNumber,
+			String issuerName) {
 
-                LOG.debug("deleting revoked certificates (issuer=" + issuerName
-                        + " older then crl=" + crlNumber);
+		LOG.debug("deleting revoked certificates (issuer=" + issuerName
+				+ " older then crl=" + crlNumber);
 
-                Query query = this.entityManager
-                        .createNamedQuery(RevokedCertificateEntity.DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER);
-                query.setParameter("issuer", issuerName);
-                query.setParameter("crlNumber", crlNumber);
-                int deleteResult = query.executeUpdate();
-                LOG.debug("delete result: " + deleteResult);
-                this.entityManager.flush();
-                return deleteResult;
-        }
+		Query query = this.entityManager
+				.createNamedQuery(RevokedCertificateEntity.DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER);
+		query.setParameter("issuer", issuerName);
+		query.setParameter("crlNumber", crlNumber);
+		int deleteResult = query.executeUpdate();
+		LOG.debug("delete result: " + deleteResult);
+		this.entityManager.flush();
+		return deleteResult;
+	}
 
-        /**
-         * {@inheritDoc}
-         */
-        public int removeRevokedCertificates(String issuerName) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public int removeRevokedCertificates(String issuerName) {
 
-                LOG.debug("deleting revoked certificates (issuer=" + issuerName + ")");
+		LOG.debug("deleting revoked certificates (issuer=" + issuerName + ")");
 
-                Query query = this.entityManager
-                        .createNamedQuery(RevokedCertificateEntity.DELETE_WHERE_ISSUER);
-                query.setParameter("issuer", issuerName);
-                int deleteResult = query.executeUpdate();
-                LOG.debug("delete result: " + deleteResult);
-                return deleteResult;
-        }
+		Query query = this.entityManager
+				.createNamedQuery(RevokedCertificateEntity.DELETE_WHERE_ISSUER);
+		query.setParameter("issuer", issuerName);
+		int deleteResult = query.executeUpdate();
+		LOG.debug("delete result: " + deleteResult);
+		return deleteResult;
+	}
 
-        public BigInteger findCrlNumber(String issuerName) {
+	public BigInteger findCrlNumber(String issuerName) {
 
-                LOG.debug("get CRL number for " + issuerName);
-                Query query = this.entityManager
-                        .createNamedQuery(RevokedCertificateEntity.QUERY_CRL_NUMBER_WHERE_ISSUER);
-                query.setParameter("issuer", issuerName);
-                try {
-                        return (BigInteger) query.getSingleResult();
-                } catch (NoResultException e) {
-                        return null;
-                }
-        }
+		LOG.debug("get CRL number for " + issuerName);
+		Query query = this.entityManager
+				.createNamedQuery(RevokedCertificateEntity.QUERY_CRL_NUMBER_WHERE_ISSUER);
+		query.setParameter("issuer", issuerName);
+		try {
+			return (BigInteger) query.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
 }

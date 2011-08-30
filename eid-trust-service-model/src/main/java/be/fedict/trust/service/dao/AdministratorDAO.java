@@ -26,44 +26,49 @@ import java.util.List;
 
 /**
  * Administrator DAO.
- *
+ * 
  * @author wvdhaute
  */
 @Local
 public interface AdministratorDAO {
 
-    /**
-     * Returns list of registered administrators.
-     */
-    List<AdministratorEntity> listAdmins();
+	/**
+	 * Returns list of registered administrators.
+	 */
+	List<AdministratorEntity> listAdmins();
 
-    /**
-     * Returns {@link AdministratorEntity} matching the specified authentication
-     * {@link X509Certificate}, or <code>null</code> if not found.
-     *
-     * @param certificate admin's authentication certificate
-     */
-    AdministratorEntity findAdmin(X509Certificate certificate);
+	/**
+	 * Returns {@link AdministratorEntity} matching the specified authentication
+	 * {@link X509Certificate}, or <code>null</code> if not found.
+	 * 
+	 * @param certificate
+	 *            admin's authentication certificate
+	 */
+	AdministratorEntity findAdmin(X509Certificate certificate);
 
-    /**
-     * Add new {@link be.fedict.trust.service.entity.AdministratorEntity}
-     *
-     * @param authnCertificate
-     * @param pending          pending dministrator or not
-     */
-    AdministratorEntity addAdmin(X509Certificate authnCertificate, boolean pending);
+	/**
+	 * Add new {@link be.fedict.trust.service.entity.AdministratorEntity}
+	 * 
+	 * @param authnCertificate
+	 * @param pending
+	 *            pending dministrator or not
+	 */
+	AdministratorEntity addAdmin(X509Certificate authnCertificate,
+			boolean pending);
 
-    /**
-     * Remove the specified {@link be.fedict.trust.service.entity.AdministratorEntity}.
-     *
-     * @param admin
-     */
-    void removeAdmin(AdministratorEntity admin);
+	/**
+	 * Remove the specified
+	 * {@link be.fedict.trust.service.entity.AdministratorEntity}.
+	 * 
+	 * @param admin
+	 */
+	void removeAdmin(AdministratorEntity admin);
 
-    /**
-     * Return the attached {@link be.fedict.trust.service.entity.AdministratorEntity}.
-     *
-     * @param admin
-     */
-    AdministratorEntity attachAdmin(AdministratorEntity admin);
+	/**
+	 * Return the attached
+	 * {@link be.fedict.trust.service.entity.AdministratorEntity}.
+	 * 
+	 * @param admin
+	 */
+	AdministratorEntity attachAdmin(AdministratorEntity admin);
 }

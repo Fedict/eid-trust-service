@@ -75,7 +75,7 @@ public class AuditBean implements Audit {
 	 * {@inheritDoc}
 	 */
 	@Factory(AUDIT_LIST_NAME)
-    @Admin
+	@Admin
 	public void auditListFactory() {
 
 		this.log.debug("audit list factory");
@@ -85,7 +85,7 @@ public class AuditBean implements Audit {
 	/**
 	 * {@inheritDoc}
 	 */
-    @Admin
+	@Admin
 	public String clear() {
 
 		this.log.debug("clear audit logs");

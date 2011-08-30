@@ -64,242 +64,256 @@ import java.util.HashSet;
 import java.util.Set;
 
 @MessageDriven(activationConfig = {
-        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
-        @ActivationConfigProperty(propertyName = "maxSession", propertyValue = "1"),
-        @ActivationConfigProperty(propertyName = "destination", propertyValue = HarvesterMDB.HARVESTER_QUEUE_LOCATION)})
+		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+		@ActivationConfigProperty(propertyName = "maxSession", propertyValue = "1"),
+		@ActivationConfigProperty(propertyName = "destination", propertyValue = HarvesterMDB.HARVESTER_QUEUE_LOCATION) })
 @Interceptors(SNMPInterceptor.class)
 public class HarvesterMDB implements MessageListener {
 
-        private static final Log LOG = LogFactory.getLog(HarvesterMDB.class);
+	private static final Log LOG = LogFactory.getLog(HarvesterMDB.class);
 
-        public static final String HARVESTER_QUEUE_NAME = "TrustServiceHarvester";
-        public static final String HARVESTER_QUEUE_LOCATION = "queue/trust/harvester";
+	public static final String HARVESTER_QUEUE_NAME = "TrustServiceHarvester";
+	public static final String HARVESTER_QUEUE_LOCATION = "queue/trust/harvester";
 
-        private static final int BATCH_SIZE = 500;
+	private static final int BATCH_SIZE = 500;
 
-        @EJB
-        private ConfigurationDAO configurationDAO;
+	@EJB
+	private ConfigurationDAO configurationDAO;
 
-        @EJB
-        private CertificateAuthorityDAO certificateAuthorityDAO;
+	@EJB
+	private CertificateAuthorityDAO certificateAuthorityDAO;
 
-        @EJB
-        private AuditDAO auditDAO;
+	@EJB
+	private AuditDAO auditDAO;
 
-        @SNMP(oid = SnmpConstants.CRL_DOWNLOAD_FAILURES)
-        private Long failures = 0L;
+	@SNMP(oid = SnmpConstants.CRL_DOWNLOAD_FAILURES)
+	private Long failures = 0L;
 
-        @PostConstruct
-        public void postConstructCallback() {
-                LOG.debug("post construct");
-        }
+	@PostConstruct
+	public void postConstructCallback() {
+		LOG.debug("post construct");
+	}
 
-        @SNMP(oid = SnmpConstants.CACHE_REFRESH)
-        public void onMessage(Message message) {
-                LOG.debug("onMessage");
-                HarvestMessage harvestMessage;
-                try {
-                        harvestMessage = new HarvestMessage(message);
-                } catch (JMSException e) {
-                        LOG.error("JMS error: " + e.getMessage());
-                        return;
-                }
-                String caName = harvestMessage.getCaName();
-                boolean update = harvestMessage.isUpdate();
+	@SNMP(oid = SnmpConstants.CACHE_REFRESH)
+	public void onMessage(Message message) {
+		LOG.debug("onMessage");
+		HarvestMessage harvestMessage;
+		try {
+			harvestMessage = new HarvestMessage(message);
+		} catch (JMSException e) {
+			LOG.error("JMS error: " + e.getMessage());
+			return;
+		}
+		String caName = harvestMessage.getCaName();
+		boolean update = harvestMessage.isUpdate();
 
-                LOG.debug("issuer: " + caName);
-                CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
-                        .findCertificateAuthority(caName);
-                if (null == certificateAuthority) {
-                        LOG.warn("unknown certificate authority: " + caName);
-                        return;
-                }
-                if (!update && Status.PROCESSING != certificateAuthority.getStatus()) {
-                        /*
-                        * Possible that another harvester instance already activated or is
-                        * processing the CA cache in the meanwhile.
-                        */
-                        LOG.debug("CA status not marked for processing");
-                        return;
-                }
-                String crlUrl = certificateAuthority.getCrlUrl();
-                if (null == crlUrl) {
-                        LOG.warn("No CRL url for CA " + certificateAuthority.getName());
-                        certificateAuthority.setStatus(Status.NONE);
-                        return;
-                }
+		LOG.debug("issuer: " + caName);
+		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
+				.findCertificateAuthority(caName);
+		if (null == certificateAuthority) {
+			LOG.warn("unknown certificate authority: " + caName);
+			return;
+		}
+		if (!update && Status.PROCESSING != certificateAuthority.getStatus()) {
+			/*
+			 * Possible that another harvester instance already activated or is
+			 * processing the CA cache in the meanwhile.
+			 */
+			LOG.debug("CA status not marked for processing");
+			return;
+		}
+		String crlUrl = certificateAuthority.getCrlUrl();
+		if (null == crlUrl) {
+			LOG.warn("No CRL url for CA " + certificateAuthority.getName());
+			certificateAuthority.setStatus(Status.NONE);
+			return;
+		}
 
-                OnlineCrlRepository onlineCrlRepository = new OnlineCrlRepository(
-                        this.configurationDAO.getNetworkConfig());
-                URI crlUri;
-                try {
-                        crlUri = new URI(crlUrl);
-                } catch (URISyntaxException e) {
-                        LOG.error("CRL URI error: " + e.getMessage(), e);
-                        return;
-                }
-                Date validationDate = new Date();
-                X509CRL crl = onlineCrlRepository.findCrl(crlUri, certificateAuthority
-                        .getCertificate(), validationDate);
-                if (null == crl) {
-                        this.auditDAO.logAudit("Failed to download CRL for CA=" + caName
-                                + " @ " + crlUrl);
-                        this.failures++;
-                        throw new RuntimeException();
-                }
+		OnlineCrlRepository onlineCrlRepository = new OnlineCrlRepository(
+				this.configurationDAO.getNetworkConfig());
+		URI crlUri;
+		try {
+			crlUri = new URI(crlUrl);
+		} catch (URISyntaxException e) {
+			LOG.error("CRL URI error: " + e.getMessage(), e);
+			return;
+		}
+		Date validationDate = new Date();
+		X509CRL crl = onlineCrlRepository.findCrl(crlUri,
+				certificateAuthority.getCertificate(), validationDate);
+		if (null == crl) {
+			this.auditDAO.logAudit("Failed to download CRL for CA=" + caName
+					+ " @ " + crlUrl);
+			this.failures++;
+			throw new RuntimeException();
+		}
 
-                X509Certificate issuerCertificate = certificateAuthority
-                        .getCertificate();
+		X509Certificate issuerCertificate = certificateAuthority
+				.getCertificate();
 
-                LOG.debug("checking integrity CRL...");
-                boolean crlValid = CrlTrustLinker.checkCrlIntegrity(crl,
-                        issuerCertificate, validationDate);
-                if (!crlValid) {
-                        this.auditDAO.logAudit("Invalid CRL for CA=" + caName + " @ "
-                                + crlUrl);
-                        return;
-                }
-                BigInteger crlNumber = getCrlNumber(crl);
-                LOG.debug("CRL number: " + crlNumber);
+		LOG.debug("checking integrity CRL...");
+		boolean crlValid = CrlTrustLinker.checkCrlIntegrity(crl,
+				issuerCertificate, validationDate);
+		if (!crlValid) {
+			this.auditDAO.logAudit("Invalid CRL for CA=" + caName + " @ "
+					+ crlUrl);
+			return;
+		}
+		BigInteger crlNumber = getCrlNumber(crl);
+		LOG.debug("CRL number: " + crlNumber);
 
-                // TODO: check CRL number against existing cache entries, if same no need to update...
-                BigInteger currentCrlNumber = this.certificateAuthorityDAO.findCrlNumber(caName);
-                if (null != currentCrlNumber && currentCrlNumber.compareTo(crlNumber) >= 0
-                        && certificateAuthority.getStatus() == Status.ACTIVE) {
-                        // current CRL cache is higher or equal, no update needed
-                        LOG.debug("current CA cache is new enough.");
-                        return;
-                }
+		// TODO: check CRL number against existing cache entries, if same no
+		// need to update...
+		BigInteger currentCrlNumber = this.certificateAuthorityDAO
+				.findCrlNumber(caName);
+		if (null != currentCrlNumber
+				&& currentCrlNumber.compareTo(crlNumber) >= 0
+				&& certificateAuthority.getStatus() == Status.ACTIVE) {
+			// current CRL cache is higher or equal, no update needed
+			LOG.debug("current CA cache is new enough.");
+			return;
+		}
 
-                LOG.debug("processing CRL... " + caName);
-                boolean isIndirect;
-                Enumeration revokedCertificatesEnum;
-                try {
-                        isIndirect = isIndirectCRL(crl);
-                        revokedCertificatesEnum = getRevokedCertificatesEnum(crl);
-                } catch (Exception e) {
-                        this.auditDAO.logAudit("Failed to parse CRL for CA=" + caName);
-                        this.failures++;
-                        throw new RuntimeException(e);
-                }
+		LOG.debug("processing CRL... " + caName);
+		boolean isIndirect;
+		Enumeration revokedCertificatesEnum;
+		try {
+			isIndirect = isIndirectCRL(crl);
+			revokedCertificatesEnum = getRevokedCertificatesEnum(crl);
+		} catch (Exception e) {
+			this.auditDAO.logAudit("Failed to parse CRL for CA=" + caName);
+			this.failures++;
+			throw new RuntimeException(e);
+		}
 
-                int entries = 0;
-                if (revokedCertificatesEnum.hasMoreElements()) {
-                        /*
-                        * Split up persisting the crl entries to avoid memory issues.
-                        */
-                        Set<X509CRLEntry> revokedCertsBatch = new HashSet<X509CRLEntry>();
-                        X500Principal previousCertificateIssuer = crl.getIssuerX500Principal();
-                        int added = 0;
-                        while (revokedCertificatesEnum.hasMoreElements()) {
+		int entries = 0;
+		if (revokedCertificatesEnum.hasMoreElements()) {
+			/*
+			 * Split up persisting the crl entries to avoid memory issues.
+			 */
+			Set<X509CRLEntry> revokedCertsBatch = new HashSet<X509CRLEntry>();
+			X500Principal previousCertificateIssuer = crl
+					.getIssuerX500Principal();
+			int added = 0;
+			while (revokedCertificatesEnum.hasMoreElements()) {
 
-                                TBSCertList.CRLEntry entry =
-                                        (TBSCertList.CRLEntry) revokedCertificatesEnum.nextElement();
-                                X509CRLEntryObject revokedCertificate = new X509CRLEntryObject(entry, isIndirect, previousCertificateIssuer);
-                                previousCertificateIssuer = revokedCertificate.getCertificateIssuer();
+				TBSCertList.CRLEntry entry = (TBSCertList.CRLEntry) revokedCertificatesEnum
+						.nextElement();
+				X509CRLEntryObject revokedCertificate = new X509CRLEntryObject(
+						entry, isIndirect, previousCertificateIssuer);
+				previousCertificateIssuer = revokedCertificate
+						.getCertificateIssuer();
 
-                                revokedCertsBatch.add(revokedCertificate);
-                                added++;
-                                if (added == BATCH_SIZE) {
-                                        /*
-                                        * Persist batch
-                                        */
-                                        this.certificateAuthorityDAO.updateRevokedCertificates(
-                                                revokedCertsBatch, crlNumber, crl
-                                                .getIssuerX500Principal());
-                                        entries += revokedCertsBatch.size();
-                                        revokedCertsBatch.clear();
-                                        added = 0;
-                                }
-                        }
-                        /*
-                        * Persist final batch
-                        */
-                        this.certificateAuthorityDAO.updateRevokedCertificates(
-                                revokedCertsBatch, crlNumber, crl
-                                .getIssuerX500Principal());
-                        entries += revokedCertsBatch.size();
+				revokedCertsBatch.add(revokedCertificate);
+				added++;
+				if (added == BATCH_SIZE) {
+					/*
+					 * Persist batch
+					 */
+					this.certificateAuthorityDAO.updateRevokedCertificates(
+							revokedCertsBatch, crlNumber,
+							crl.getIssuerX500Principal());
+					entries += revokedCertsBatch.size();
+					revokedCertsBatch.clear();
+					added = 0;
+				}
+			}
+			/*
+			 * Persist final batch
+			 */
+			this.certificateAuthorityDAO.updateRevokedCertificates(
+					revokedCertsBatch, crlNumber, crl.getIssuerX500Principal());
+			entries += revokedCertsBatch.size();
 
-                        /*
-                        * Cleanup redundant CRL entries
-                        */
-                        if (null != crlNumber) {
-                                this.certificateAuthorityDAO.removeOldRevokedCertificates(
-                                        crlNumber, crl.getIssuerX500Principal().toString());
-                        }
-                        //}
-                }
+			/*
+			 * Cleanup redundant CRL entries
+			 */
+			if (null != crlNumber) {
+				this.certificateAuthorityDAO.removeOldRevokedCertificates(
+						crlNumber, crl.getIssuerX500Principal().toString());
+			}
+			// }
+		}
 
-                LOG.debug("CRL this update: " + crl.getThisUpdate());
-                LOG.debug("CRL next update: " + crl.getNextUpdate());
-                certificateAuthority.setStatus(Status.ACTIVE);
-                certificateAuthority.setThisUpdate(crl.getThisUpdate());
-                certificateAuthority.setNextUpdate(crl.getNextUpdate());
-                LOG.debug("cache activated for CA: " + crl.getIssuerX500Principal() + " (entries=" + entries + ")");
-        }
+		LOG.debug("CRL this update: " + crl.getThisUpdate());
+		LOG.debug("CRL next update: " + crl.getNextUpdate());
+		certificateAuthority.setStatus(Status.ACTIVE);
+		certificateAuthority.setThisUpdate(crl.getThisUpdate());
+		certificateAuthority.setNextUpdate(crl.getNextUpdate());
+		LOG.debug("cache activated for CA: " + crl.getIssuerX500Principal()
+				+ " (entries=" + entries + ")");
+	}
 
-        private BigInteger getCrlNumber(X509CRL crl) {
-                byte[] crlNumberExtensionValue = crl.getExtensionValue("2.5.29.20");
-                if (null == crlNumberExtensionValue) {
-                        return null;
-                }
-                try {
-                        DEROctetString octetString = (DEROctetString) (new ASN1InputStream(
-                                new ByteArrayInputStream(crlNumberExtensionValue))
-                                .readObject());
-                        byte[] octets = octetString.getOctets();
-                        DERInteger integer = (DERInteger) new ASN1InputStream(octets)
-                                .readObject();
-                        return integer.getPositiveValue();
-                } catch (IOException e) {
-                        throw new RuntimeException("IO error: " + e.getMessage(), e);
-                }
-        }
+	private BigInteger getCrlNumber(X509CRL crl) {
+		byte[] crlNumberExtensionValue = crl.getExtensionValue("2.5.29.20");
+		if (null == crlNumberExtensionValue) {
+			return null;
+		}
+		try {
+			DEROctetString octetString = (DEROctetString) (new ASN1InputStream(
+					new ByteArrayInputStream(crlNumberExtensionValue))
+					.readObject());
+			byte[] octets = octetString.getOctets();
+			DERInteger integer = (DERInteger) new ASN1InputStream(octets)
+					.readObject();
+			return integer.getPositiveValue();
+		} catch (IOException e) {
+			throw new RuntimeException("IO error: " + e.getMessage(), e);
+		}
+	}
 
-        /**
-         * Added for as {@link X509CRL#getRevokedCertificates()}
-         * is memory intensive because it is returning a complete set, for huge CRL's
-         * this can get kinda out of hand.
-         * So we return an enumeration of the DER {@link TBSCertList.CRLEntry} objects.
-         *
-         * @param crl the CRL
-         * @return {@link Enumeration} of {@link TBSCertList.CRLEntry}'s.
-         * @throws IOException  something went wrong parsing.
-         * @throws CRLException something went wrong parsing.
-         */
-        @SuppressWarnings("unchecked")
-        private Enumeration<TBSCertList.CRLEntry> getRevokedCertificatesEnum(X509CRL crl) throws IOException, CRLException {
+	/**
+	 * Added for as {@link X509CRL#getRevokedCertificates()} is memory intensive
+	 * because it is returning a complete set, for huge CRL's this can get kinda
+	 * out of hand. So we return an enumeration of the DER
+	 * {@link TBSCertList.CRLEntry} objects.
+	 * 
+	 * @param crl
+	 *            the CRL
+	 * @return {@link Enumeration} of {@link TBSCertList.CRLEntry}'s.
+	 * @throws IOException
+	 *             something went wrong parsing.
+	 * @throws CRLException
+	 *             something went wrong parsing.
+	 */
+	@SuppressWarnings("unchecked")
+	private Enumeration<TBSCertList.CRLEntry> getRevokedCertificatesEnum(
+			X509CRL crl) throws IOException, CRLException {
 
-                byte[] certList = crl.getTBSCertList();
-                ByteArrayInputStream bais = new ByteArrayInputStream(certList);
-                ASN1InputStream aIn = new ASN1InputStream(bais, Integer.MAX_VALUE, true);
-                ASN1Sequence seq = (ASN1Sequence) aIn.readObject();
-                TBSCertList cl = TBSCertList.getInstance(seq);
-                return cl.getRevokedCertificateEnumeration();
-        }
+		byte[] certList = crl.getTBSCertList();
+		ByteArrayInputStream bais = new ByteArrayInputStream(certList);
+		ASN1InputStream aIn = new ASN1InputStream(bais, Integer.MAX_VALUE, true);
+		ASN1Sequence seq = (ASN1Sequence) aIn.readObject();
+		TBSCertList cl = TBSCertList.getInstance(seq);
+		return cl.getRevokedCertificateEnumeration();
+	}
 
-        /**
-         * Returns if the specified CRL is indirect.
-         *
-         * @param crl the CRL
-         * @return true or false
-         * @throws CRLException something went wrong reading the
-         *                      {@link org.bouncycastle.asn1.x509.IssuingDistributionPoint}.
-         */
-        private boolean isIndirectCRL(X509CRL crl)
-                throws CRLException {
-                byte[] idp = crl.getExtensionValue(X509Extensions.IssuingDistributionPoint.getId());
-                boolean isIndirect = false;
-                try {
-                        if (idp != null) {
-                                isIndirect = IssuingDistributionPoint.getInstance(
-                                        X509ExtensionUtil.fromExtensionValue(idp))
-                                        .isIndirectCRL();
-                        }
-                } catch (Exception e) {
-                        throw new CRLException("Exception reading IssuingDistributionPoint", e);
-                }
+	/**
+	 * Returns if the specified CRL is indirect.
+	 * 
+	 * @param crl
+	 *            the CRL
+	 * @return true or false
+	 * @throws CRLException
+	 *             something went wrong reading the
+	 *             {@link org.bouncycastle.asn1.x509.IssuingDistributionPoint}.
+	 */
+	private boolean isIndirectCRL(X509CRL crl) throws CRLException {
+		byte[] idp = crl
+				.getExtensionValue(X509Extensions.IssuingDistributionPoint
+						.getId());
+		boolean isIndirect = false;
+		try {
+			if (idp != null) {
+				isIndirect = IssuingDistributionPoint.getInstance(
+						X509ExtensionUtil.fromExtensionValue(idp))
+						.isIndirectCRL();
+			}
+		} catch (Exception e) {
+			throw new CRLException(
+					"Exception reading IssuingDistributionPoint", e);
+		}
 
-                return isIndirect;
-        }
+		return isIndirect;
+	}
 }

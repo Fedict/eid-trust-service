@@ -23,43 +23,45 @@ import java.util.Date;
 
 public class PerformanceData implements Serializable {
 
-    private final Date date;
-    private int count;
-    private int revoked;
-    private int failures;
+	private static final long serialVersionUID = 1L;
 
-    public PerformanceData() {
-        this.date = new Date();
-        this.count = 0;
-        this.revoked = 0;
-        this.failures = 0;
-    }
+	private final Date date;
+	private int count;
+	private int revoked;
+	private int failures;
 
-    public void inc() {
-        this.count++;
-    }
+	public PerformanceData() {
+		this.date = new Date();
+		this.count = 0;
+		this.revoked = 0;
+		this.failures = 0;
+	}
 
-    public void incRevoked() {
-        this.revoked++;
-    }
+	public void inc() {
+		this.count++;
+	}
 
-    public void incFailures() {
-        this.failures++;
-    }
+	public void incRevoked() {
+		this.revoked++;
+	}
 
-    public Date getDate() {
-        return this.date;
-    }
+	public void incFailures() {
+		this.failures++;
+	}
 
-    public int getCount() {
-        return this.count;
-    }
+	public Date getDate() {
+		return this.date;
+	}
 
-    public int getRevoked() {
-        return this.revoked;
-    }
+	public int getCount() {
+		return this.count;
+	}
 
-    public int getFailures() {
-        return this.failures;
-    }
+	public int getRevoked() {
+		return this.revoked;
+	}
+
+	public int getFailures() {
+		return this.failures;
+	}
 }

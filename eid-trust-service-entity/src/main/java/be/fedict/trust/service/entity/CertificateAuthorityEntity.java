@@ -18,9 +18,6 @@
 
 package be.fedict.trust.service.entity;
 
-import org.hibernate.annotations.Type;
-
-import javax.persistence.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -29,6 +26,22 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "ts_cert_authorities")
@@ -112,7 +125,7 @@ public class CertificateAuthorityEntity implements Serializable {
 		this.status = status;
 	}
 
-    @Lob
+	@Lob
 	@Column(length = 4 * 1024)
 	@Basic(fetch = FetchType.LAZY)
 	public byte[] getEncodedCertificate() {

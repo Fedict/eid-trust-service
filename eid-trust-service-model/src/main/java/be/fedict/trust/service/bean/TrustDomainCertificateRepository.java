@@ -52,8 +52,8 @@ public class TrustDomainCertificateRepository implements CertificateRepository {
 	public boolean isTrustPoint(X509Certificate certificate) {
 
 		for (TrustPointEntity trustPoint : this.trustDomain.getTrustPoints()) {
-			if (trustPoint.getCertificateAuthority().getCertificate().equals(
-					certificate)) {
+			if (trustPoint.getCertificateAuthority().getCertificate()
+					.equals(certificate)) {
 				return true;
 			}
 		}

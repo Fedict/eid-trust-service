@@ -28,32 +28,34 @@ import javax.swing.*;
 import java.io.File;
 
 /**
- * Used for loading in performance test result data generated in non-interactive mode.
+ * Used for loading in performance test result data generated in non-interactive
+ * mode.
  */
 public class TestLoadResults {
 
-    private static final Log LOG = LogFactory.getLog(TestLoadResults.class);
+	private static final Log LOG = LogFactory.getLog(TestLoadResults.class);
 
-    @Test
-    public void testLoad() throws Exception {
+	@Test
+	public void testLoad() throws Exception {
 
-        File resultsFile = null;
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Select results file...");
-        int result = fileChooser.showOpenDialog(new JFrame());
-        if (JFileChooser.APPROVE_OPTION == result) {
-            resultsFile = fileChooser.getSelectedFile();
-        }
+		File resultsFile = null;
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Select results file...");
+		int result = fileChooser.showOpenDialog(new JFrame());
+		if (JFileChooser.APPROVE_OPTION == result) {
+			resultsFile = fileChooser.getSelectedFile();
+		}
 
-        if (null != resultsFile) {
+		if (null != resultsFile) {
 
-            PerformanceResultsData data = PerformanceResultDialog.readResults(resultsFile);
+			PerformanceResultsData data = PerformanceResultDialog
+					.readResults(resultsFile);
 
-            PerformanceResultDialog dialog = new PerformanceResultDialog(data);
-            while (dialog.isVisible()) {
-                Thread.sleep(1000);
-            }
-        }
+			PerformanceResultDialog dialog = new PerformanceResultDialog(data);
+			while (dialog.isVisible()) {
+				Thread.sleep(1000);
+			}
+		}
 
-    }
+	}
 }

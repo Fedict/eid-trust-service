@@ -20,14 +20,14 @@ package be.fedict.trust.client;
 
 /**
  * Some general constants.
- *
+ * 
  * @author wvdhaute
  */
 public abstract class TrustServiceDomains {
 
-    public static final String BELGIAN_EID_AUTH_TRUST_DOMAIN = "BE-AUTH";
-    public static final String BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN = "BE";
-    public static final String BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN = "BE-NAT-REG";
-    public static final String BELGIAN_TSA_TRUST_DOMAIN = "BE-TSA";
-    public static final String BELGIAN_EID_TEST_TRUST_DOMAIN = "BE-TEST";
+	public static final String BELGIAN_EID_AUTH_TRUST_DOMAIN = "BE-AUTH";
+	public static final String BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN = "BE";
+	public static final String BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN = "BE-NAT-REG";
+	public static final String BELGIAN_TSA_TRUST_DOMAIN = "BE-TSA";
+	public static final String BELGIAN_EID_TEST_TRUST_DOMAIN = "BE-TEST";
 }

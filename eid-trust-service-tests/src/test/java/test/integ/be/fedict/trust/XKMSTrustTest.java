@@ -46,137 +46,134 @@ import static org.junit.Assert.fail;
  * eID Trust Service XKMS2 Integration Tests.
  * <p/>
  * <p/>
- * !! Important !!
- * WS-Security needs to be setup on the eID Trust Service Host testing against for all tests to fail.
- *
+ * !! Important !! WS-Security needs to be setup on the eID Trust Service Host
+ * testing against for all tests to fail.
+ * 
  * @author wvdhaute
  */
 public class XKMSTrustTest {
 
-    private static final Log LOG = LogFactory.getLog(XKMSTrustTest.class);
+	private static final Log LOG = LogFactory.getLog(XKMSTrustTest.class);
 
-    private static final int port = 8443;
+	private static final int port = 8443;
 
-    @Before
-    public void setUp() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+	@Before
+	public void setUp() {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
-    @Test
-    public void testValidateUnilateralTLSTrustFail() throws Exception {
-        LOG.debug("validate using unilateral TLS Trust, should fail.");
+	@Test
+	public void testValidateUnilateralTLSTrustFail() throws Exception {
+		LOG.debug("validate using unilateral TLS Trust, should fail.");
 
-        // Setup
-        KeyPair keyPair = TestUtils.generateKeyPair();
+		// Setup
+		KeyPair keyPair = TestUtils.generateKeyPair();
 
-        /*
-           * Override default verification that CN of server SSL certificate has
-           * to be equal to the hostname.
-           */
-        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-            public boolean verify(String hostname, SSLSession session) {
-                if (TestUtils.XKMS_WS_HOST.equals(hostname)) {
-                    return true;
-                }
-                return false;
-            }
-        });
+		/*
+		 * Override default verification that CN of server SSL certificate has
+		 * to be equal to the hostname.
+		 */
+		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+			public boolean verify(String hostname, SSLSession session) {
+				if (TestUtils.XKMS_WS_HOST.equals(hostname)) {
+					return true;
+				}
+				return false;
+			}
+		});
 
-        // setup
-        List<X509Certificate> signCertificateChain = TestUtils
-                .getSignCertificateChain();
-        XKMS2Client client = new XKMS2Client("https://"
-                + TestUtils.XKMS_WS_HOST + ":" + port
-                + TestUtils.XKMS_WS_CONTEXT_PATH);
-        client.setServicePublicKey(keyPair.getPublic());
+		// setup
+		List<X509Certificate> signCertificateChain = TestUtils
+				.getSignCertificateChain();
+		XKMS2Client client = new XKMS2Client("https://"
+				+ TestUtils.XKMS_WS_HOST + ":" + port
+				+ TestUtils.XKMS_WS_CONTEXT_PATH);
+		client.setServicePublicKey(keyPair.getPublic());
 
-        /*
-           * Operate: validate non repudiation
-           */
-        try {
-            client
-                    .validate(
-                            TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
-                            signCertificateChain);
-            fail();
-        } catch (ClientTransportException e) {
-            // expected
-        }
-    }
+		/*
+		 * Operate: validate non repudiation
+		 */
+		try {
+			client.validate(
+					TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+					signCertificateChain);
+			fail();
+		} catch (ClientTransportException e) {
+			// expected
+		}
+	}
 
-    @Test
-    public void testValidateUnilateralTLSTrust() throws Exception {
-        LOG.debug("validate using unilateral TLS Trust.");
+	@Test
+	public void testValidateUnilateralTLSTrust() throws Exception {
+		LOG.debug("validate using unilateral TLS Trust.");
 
-        // Retrieve server public key
-        SSLTrustManager.initialize();
-        SSLSocketFactory factory = HttpsURLConnection
-                .getDefaultSSLSocketFactory();
-        SSLSocket socket = (SSLSocket) factory.createSocket(
-                TestUtils.XKMS_WS_HOST, port);
-        socket.startHandshake();
-        Certificate[] serverCerts = socket.getSession().getPeerCertificates();
-        PublicKey publicKey = serverCerts[0].getPublicKey();
-        LOG.debug("server public key: " + publicKey);
-        socket.close();
+		// Retrieve server public key
+		SSLTrustManager.initialize();
+		SSLSocketFactory factory = HttpsURLConnection
+				.getDefaultSSLSocketFactory();
+		SSLSocket socket = (SSLSocket) factory.createSocket(
+				TestUtils.XKMS_WS_HOST, port);
+		socket.startHandshake();
+		Certificate[] serverCerts = socket.getSession().getPeerCertificates();
+		PublicKey publicKey = serverCerts[0].getPublicKey();
+		LOG.debug("server public key: " + publicKey);
+		socket.close();
 
-        /*
-           * Override default verification that CN of server SSL certificate has
-           * to be equal to the hostname.
-           */
-        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-            public boolean verify(String hostname, SSLSession session) {
-                return hostname.equals(TestUtils.XKMS_WS_HOST);
-            }
-        });
+		/*
+		 * Override default verification that CN of server SSL certificate has
+		 * to be equal to the hostname.
+		 */
+		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+			public boolean verify(String hostname, SSLSession session) {
+				return hostname.equals(TestUtils.XKMS_WS_HOST);
+			}
+		});
 
-        // setup
-        List<X509Certificate> signCertificateChain = TestUtils
-                .getSignCertificateChain();
-        XKMS2Client client = new XKMS2Client("https://"
-                + TestUtils.XKMS_WS_HOST + ":" + port
-                + TestUtils.XKMS_WS_CONTEXT_PATH);
-        client.setServicePublicKey(publicKey);
+		// setup
+		List<X509Certificate> signCertificateChain = TestUtils
+				.getSignCertificateChain();
+		XKMS2Client client = new XKMS2Client("https://"
+				+ TestUtils.XKMS_WS_HOST + ":" + port
+				+ TestUtils.XKMS_WS_CONTEXT_PATH);
+		client.setServicePublicKey(publicKey);
 
-        /*
-           * Operate: validate non repudiation
-           */
-        client.validate(
-                TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
-                signCertificateChain);
-    }
+		/*
+		 * Operate: validate non repudiation
+		 */
+		client.validate(
+				TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+				signCertificateChain);
+	}
 
-    @Test
-    public void testValidateWSSecurityFails() throws Exception {
+	@Test
+	public void testValidateWSSecurityFails() throws Exception {
 
-        LOG
-                .debug("validate using WS-Security, fails due to certificate mismatch");
+		LOG.debug("validate using WS-Security, fails due to certificate mismatch");
 
-        // setup
-        KeyPair fooKeyPair = TestUtils.generateKeyPair();
-        X509Certificate fooCertificate = TestUtils
-                .generateSelfSignedCertificate(fooKeyPair, "CN=f00");
+		// setup
+		KeyPair fooKeyPair = TestUtils.generateKeyPair();
+		X509Certificate fooCertificate = TestUtils
+				.generateSelfSignedCertificate(fooKeyPair, "CN=f00");
 
-        List<X509Certificate> signCertificateChain = TestUtils
-                .getSignCertificateChain();
-        XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
-        client.setServerCertificate(fooCertificate);
+		List<X509Certificate> signCertificateChain = TestUtils
+				.getSignCertificateChain();
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+		client.setServerCertificate(fooCertificate);
 
-        /*
-           * Operate: validate non repudiation
-           */
-        try {
-            client
-                    .validate(
-                            TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
-                            signCertificateChain);
-            fail();
-        } catch (SOAPFaultException e) {
-            // expected
-            assertEquals(WSSecurityClientHandler.ERROR_CERTIFICATE_MISMATCH, e
-                    .getMessage());
-        }
+		/*
+		 * Operate: validate non repudiation
+		 */
+		try {
+			client.validate(
+					TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+					signCertificateChain);
+			fail();
+		} catch (SOAPFaultException e) {
+			// expected
+			assertEquals(WSSecurityClientHandler.ERROR_CERTIFICATE_MISMATCH,
+					e.getMessage());
+		}
 
-    }
+	}
 
 }

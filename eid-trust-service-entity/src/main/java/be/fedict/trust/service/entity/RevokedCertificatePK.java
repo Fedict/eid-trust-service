@@ -28,73 +28,74 @@ import java.io.Serializable;
 @Embeddable
 public class RevokedCertificatePK implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private String issuer;
-    private String serialNumber;
+	private String issuer;
+	private String serialNumber;
 
-    public RevokedCertificatePK() {
+	public RevokedCertificatePK() {
 
-        super();
-    }
+		super();
+	}
 
-    public RevokedCertificatePK(String issuer, String serialNumber) {
+	public RevokedCertificatePK(String issuer, String serialNumber) {
 
-        this.issuer = issuer;
-        this.serialNumber = serialNumber;
-    }
+		this.issuer = issuer;
+		this.serialNumber = serialNumber;
+	}
 
-    public String getIssuer() {
+	public String getIssuer() {
 
-        return this.issuer;
-    }
+		return this.issuer;
+	}
 
-    public void setIssuer(String issuer) {
+	public void setIssuer(String issuer) {
 
-        this.issuer = issuer;
-    }
+		this.issuer = issuer;
+	}
 
-    /**
-     * HSQLDB/Hibernate has problems with mapping a BigInteger correctly.
-     */
-    public String getSerialNumber() {
+	/**
+	 * HSQLDB/Hibernate has problems with mapping a BigInteger correctly.
+	 */
+	public String getSerialNumber() {
 
-        return this.serialNumber;
-    }
+		return this.serialNumber;
+	}
 
-    public void setSerialNumber(String serialNumber) {
+	public void setSerialNumber(String serialNumber) {
 
-        this.serialNumber = serialNumber;
-    }
+		this.serialNumber = serialNumber;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
+	@Override
+	public boolean equals(Object obj) {
 
-        if (null == obj) {
-            return false;
-        }
-        if (this == obj) {
-            return true;
-        }
-        if (false == obj instanceof RevokedCertificatePK) {
-            return false;
-        }
-        RevokedCertificatePK rhs = (RevokedCertificatePK) obj;
-        return new EqualsBuilder().append(this.serialNumber, rhs.serialNumber)
-                .append(this.issuer, rhs.issuer).isEquals();
-    }
+		if (null == obj) {
+			return false;
+		}
+		if (this == obj) {
+			return true;
+		}
+		if (false == obj instanceof RevokedCertificatePK) {
+			return false;
+		}
+		RevokedCertificatePK rhs = (RevokedCertificatePK) obj;
+		return new EqualsBuilder().append(this.serialNumber, rhs.serialNumber)
+				.append(this.issuer, rhs.issuer).isEquals();
+	}
 
-    @Override
-    public int hashCode() {
+	@Override
+	public int hashCode() {
 
-        return new HashCodeBuilder().append(this.serialNumber).append(
-                this.issuer).toHashCode();
-    }
+		return new HashCodeBuilder().append(this.serialNumber)
+				.append(this.issuer).toHashCode();
+	}
 
-    @Override
-    public String toString() {
+	@Override
+	public String toString() {
 
-        return new ToStringBuilder(this).append("serialNumber",
-                this.serialNumber).append("issuer", this.issuer).toString();
-    }
+		return new ToStringBuilder(this)
+				.append("serialNumber", this.serialNumber)
+				.append("issuer", this.issuer).toString();
+	}
 }

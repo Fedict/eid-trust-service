@@ -32,66 +32,67 @@ import java.util.Set;
 
 /**
  * Certificate Authority DAO.
- *
+ * 
  * @author wvdhaute
  */
 @Local
 public interface CertificateAuthorityDAO {
 
-        /**
-         * Return {@link CertificateAuthorityEntity} from specified name. Returns
-         * <code>null</code> if not found.
-         */
-        CertificateAuthorityEntity findCertificateAuthority(String name);
+	/**
+	 * Return {@link CertificateAuthorityEntity} from specified name. Returns
+	 * <code>null</code> if not found.
+	 */
+	CertificateAuthorityEntity findCertificateAuthority(String name);
 
-        /**
-         * Create a new {@link CertificateAuthorityEntity}.
-         */
-        CertificateAuthorityEntity addCertificateAuthority(
-                X509Certificate certificate, String crlUrl);
+	/**
+	 * Create a new {@link CertificateAuthorityEntity}.
+	 */
+	CertificateAuthorityEntity addCertificateAuthority(
+			X509Certificate certificate, String crlUrl);
 
-        /**
-         * Returns {@link CertificateAuthorityEntity} from the specified
-         * {@link X509Certificate}. Returns <code>null</code> if not found.
-         */
-        CertificateAuthorityEntity findCertificateAuthority(
-                X509Certificate certificate);
+	/**
+	 * Returns {@link CertificateAuthorityEntity} from the specified
+	 * {@link X509Certificate}. Returns <code>null</code> if not found.
+	 */
+	CertificateAuthorityEntity findCertificateAuthority(
+			X509Certificate certificate);
 
-        /**
-         * Remove {@link CertificateAuthorityEntity}'s related to the specified
-         * {@link TrustPointEntity}.
-         */
-        void removeCertificateAuthorities(TrustPointEntity trustPoint);
+	/**
+	 * Remove {@link CertificateAuthorityEntity}'s related to the specified
+	 * {@link TrustPointEntity}.
+	 */
+	void removeCertificateAuthorities(TrustPointEntity trustPoint);
 
-        /**
-         * Add a {@link RevokedCertificateEntity} entry.
-         */
-        RevokedCertificateEntity addRevokedCertificate(String issuerName,
-                                                       BigInteger serialNumber, Date revocationDate, BigInteger crlNumber);
+	/**
+	 * Add a {@link RevokedCertificateEntity} entry.
+	 */
+	RevokedCertificateEntity addRevokedCertificate(String issuerName,
+			BigInteger serialNumber, Date revocationDate, BigInteger crlNumber);
 
-        /**
-         * Remove {@link RevokedCertificateEntity}'s for the specified issuer that
-         * are older then the specified crl number.
-         *
-         * @return # of {@link RevokedCertificateEntity}'s removed.
-         */
-        int removeOldRevokedCertificates(BigInteger crlNumber, String issuerName);
+	/**
+	 * Remove {@link RevokedCertificateEntity}'s for the specified issuer that
+	 * are older then the specified crl number.
+	 * 
+	 * @return # of {@link RevokedCertificateEntity}'s removed.
+	 */
+	int removeOldRevokedCertificates(BigInteger crlNumber, String issuerName);
 
-        /**
-         * Persist batch of {@link X509CRLEntry} to the database.
-         */
-        void updateRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
-                                       BigInteger crlNumber, X500Principal crlIssuer);
+	/**
+	 * Persist batch of {@link X509CRLEntry} to the database.
+	 */
+	void updateRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
+			BigInteger crlNumber, X500Principal crlIssuer);
 
-        /**
-         * Remove all {@link RevokedCertificateEntity}'s for specified issuer.
-         */
-        int removeRevokedCertificates(String issuerName);
+	/**
+	 * Remove all {@link RevokedCertificateEntity}'s for specified issuer.
+	 */
+	int removeRevokedCertificates(String issuerName);
 
-        /**
-         * @param issuerName the issuer to search for.
-         * @return the highest CRL number available in the cache for specified
-         *         issuer or <code>null</code> if no cache entries exist.
-         */
-        BigInteger findCrlNumber(String issuerName);
+	/**
+	 * @param issuerName
+	 *            the issuer to search for.
+	 * @return the highest CRL number available in the cache for specified
+	 *         issuer or <code>null</code> if no cache entries exist.
+	 */
+	BigInteger findCrlNumber(String issuerName);
 }

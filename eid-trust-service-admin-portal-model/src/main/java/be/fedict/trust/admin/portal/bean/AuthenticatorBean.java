@@ -34,26 +34,28 @@ import java.security.cert.X509Certificate;
 
 @Stateless
 @Name(AdminConstants.ADMIN_SEAM_PREFIX + "authenticator")
-@LocalBinding(jndiBinding = AdminConstants.ADMIN_JNDI_CONTEXT + "AuthenticatorBean")
+@LocalBinding(jndiBinding = AdminConstants.ADMIN_JNDI_CONTEXT
+		+ "AuthenticatorBean")
 public class AuthenticatorBean implements Authenticator {
 
-    private static final org.apache.commons.logging.Log LOG = LogFactory.getLog(AuthenticatorBean.class);
+	private static final org.apache.commons.logging.Log LOG = LogFactory
+			.getLog(AuthenticatorBean.class);
 
-    @In
-    private Identity identity;
+	@In
+	private Identity identity;
 
-    @In(value = "eid.certs.authn", scope = ScopeType.SESSION)
-    private X509Certificate authenticatedCertificate;
+	@In(value = "eid.certs.authn", scope = ScopeType.SESSION)
+	private X509Certificate authenticatedCertificate;
 
-    @EJB
-    private AdminManager adminManager;
+	@EJB
+	private AdminManager adminManager;
 
-    public boolean authenticate() {
+	public boolean authenticate() {
 
-        LOG.debug("authenticate: ");
-        if (this.adminManager.isAdmin(this.authenticatedCertificate)) {
-            this.identity.addRole("admin");
-        }
-        return true;
-    }
+		LOG.debug("authenticate: ");
+		if (this.adminManager.isAdmin(this.authenticatedCertificate)) {
+			this.identity.addRole("admin");
+		}
+		return true;
+	}
 }

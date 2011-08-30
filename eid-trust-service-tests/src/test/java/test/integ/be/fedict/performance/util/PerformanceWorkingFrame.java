@@ -24,101 +24,101 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class PerformanceWorkingFrame extends JFrame implements ActionListener,
-        Runnable {
-    private static final long serialVersionUID = 1L;
+		Runnable {
+	private static final long serialVersionUID = 1L;
 
-    private final PerformanceTest performanceTest;
+	private final PerformanceTest performanceTest;
 
-    private final JLabel countLabel;
-    private final JLabel revokedLabel;
-    private final JLabel performanceCountLabel;
+	private final JLabel countLabel;
+	private final JLabel revokedLabel;
+	private final JLabel performanceCountLabel;
 
-    private final Thread updateThread;
+	private final Thread updateThread;
 
-    public PerformanceWorkingFrame(PerformanceTest performanceTest) {
-        super("Running performance tests");
+	public PerformanceWorkingFrame(PerformanceTest performanceTest) {
+		super("Running performance tests");
 
-        this.performanceTest = performanceTest;
+		this.performanceTest = performanceTest;
 
-        setSize(400, 150);
+		setSize(400, 150);
 
-        Container container = getContentPane();
+		Container container = getContentPane();
 
-        JPanel infoPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.anchor = GridBagConstraints.NORTHWEST;
-        c.ipadx = 15;
-        infoPanel.add(new JLabel("Request count:"), c);
+		JPanel infoPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.ipadx = 15;
+		infoPanel.add(new JLabel("Request count:"), c);
 
-        c.gridx++;
-        this.countLabel = new JLabel("0");
-        infoPanel.add(this.countLabel, c);
+		c.gridx++;
+		this.countLabel = new JLabel("0");
+		infoPanel.add(this.countLabel, c);
 
-        c.gridx = 0;
-        c.gridy++;
-        infoPanel.add(new JLabel("Revoked count:"), c);
+		c.gridx = 0;
+		c.gridy++;
+		infoPanel.add(new JLabel("Revoked count:"), c);
 
-        c.gridx++;
-        this.revokedLabel = new JLabel("0");
-        infoPanel.add(this.revokedLabel, c);
+		c.gridx++;
+		this.revokedLabel = new JLabel("0");
+		infoPanel.add(this.revokedLabel, c);
 
-        c.gridx = 0;
-        c.gridy++;
-        infoPanel.add(new JLabel("Interval count:"), c);
+		c.gridx = 0;
+		c.gridy++;
+		infoPanel.add(new JLabel("Interval count:"), c);
 
-        c.gridx++;
-        this.performanceCountLabel = new JLabel("0");
-        infoPanel.add(this.performanceCountLabel, c);
+		c.gridx++;
+		this.performanceCountLabel = new JLabel("0");
+		infoPanel.add(this.performanceCountLabel, c);
 
-        container.add(infoPanel, BorderLayout.CENTER);
+		container.add(infoPanel, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton quitButton = new JButton("End");
-        buttonPanel.add(quitButton);
-        container.add(buttonPanel, BorderLayout.SOUTH);
-        quitButton.addActionListener(this);
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		JButton quitButton = new JButton("End");
+		buttonPanel.add(quitButton);
+		container.add(buttonPanel, BorderLayout.SOUTH);
+		quitButton.addActionListener(this);
 
-        setVisible(true);
+		setVisible(true);
 
-        this.updateThread = new Thread(this);
-        this.updateThread.start();
-    }
+		this.updateThread = new Thread(this);
+		this.updateThread.start();
+	}
 
-    public void actionPerformed(ActionEvent event) {
+	public void actionPerformed(ActionEvent event) {
 
-        this.performanceTest.stop();
+		this.performanceTest.stop();
 
-        try {
-            this.updateThread.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException("thread joining error: "
-                    + e.getMessage(), e);
-        }
-        setVisible(false);
-        dispose();
-    }
+		try {
+			this.updateThread.join();
+		} catch (InterruptedException e) {
+			throw new RuntimeException("thread joining error: "
+					+ e.getMessage(), e);
+		}
+		setVisible(false);
+		dispose();
+	}
 
-    public void run() {
-        while (this.performanceTest.isRunning()) {
-            SwingUtilities.invokeLater(new Runnable() {
+	public void run() {
+		while (this.performanceTest.isRunning()) {
+			SwingUtilities.invokeLater(new Runnable() {
 
-                public void run() {
-                    PerformanceWorkingFrame.this.countLabel.setText(Integer
-                            .toString(performanceTest.getCount()));
-                    PerformanceWorkingFrame.this.revokedLabel.setText(Integer
-                            .toString(performanceTest.getRevokedCount()));
-                    PerformanceWorkingFrame.this.performanceCountLabel.setText(Integer
-                            .toString(performanceTest.getIntervalCount()));
-                }
-            });
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(
-                        "sleep error: " + e.getMessage(), e);
-            }
-        }
-    }
+				public void run() {
+					PerformanceWorkingFrame.this.countLabel.setText(Integer
+							.toString(performanceTest.getCount()));
+					PerformanceWorkingFrame.this.revokedLabel.setText(Integer
+							.toString(performanceTest.getRevokedCount()));
+					PerformanceWorkingFrame.this.performanceCountLabel
+							.setText(Integer.toString(performanceTest
+									.getIntervalCount()));
+				}
+			});
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				throw new RuntimeException("sleep error: " + e.getMessage(), e);
+			}
+		}
+	}
 }

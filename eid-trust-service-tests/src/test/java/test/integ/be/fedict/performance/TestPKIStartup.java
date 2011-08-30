@@ -26,43 +26,43 @@ import org.junit.Test;
 
 public class TestPKIStartup {
 
-    private static final Log LOG = LogFactory.getLog(TestPKIStartup.class);
+	private static final Log LOG = LogFactory.getLog(TestPKIStartup.class);
 
-    @BeforeClass
-    public static void oneTimeSetUp() throws Exception {
+	@BeforeClass
+	public static void oneTimeSetUp() throws Exception {
 
-        new TestPKI().start("sebeco-dev-10");
+		new TestPKI().start("sebeco-dev-10");
 
-        for (String servletPath : TestPKI.get().getServletPaths()) {
-            LOG.debug("Servlet: " + TestPKI.get().getPath() + servletPath);
-        }
-    }
+		for (String servletPath : TestPKI.get().getServletPaths()) {
+			LOG.debug("Servlet: " + TestPKI.get().getPath() + servletPath);
+		}
+	}
 
-    @AfterClass
-    public static void oneTimeTearDown() throws Exception {
+	@AfterClass
+	public static void oneTimeTearDown() throws Exception {
 
-        TestPKI.get().stop();
-    }
+		TestPKI.get().stop();
+	}
 
-    @Test
-    public void testCA() throws Exception {
+	@Test
+	public void testCA() throws Exception {
 
-        // some default PKI setup
-        TestPKI.get().addSaveCa("CN=root1", null, 0, 5);
-//        TestPKI.get().addSaveCa("CN=root2", null, 0, 0);
+		// some default PKI setup
+		TestPKI.get().addSaveCa("CN=root1", null, 0, 5);
+		// TestPKI.get().addSaveCa("CN=root2", null, 0, 0);
 
-        TestPKI.get().addSaveCa("CN=Citizen CA", "CN=root1", 50000, 5);
+		TestPKI.get().addSaveCa("CN=Citizen CA", "CN=root1", 50000, 5);
 
-//        TestPKI.get().addSaveCa("CN=CA1", "CN=root1", 50000, 10);
-//        TestPKI.get().addSaveCa("CN=CA2", "CN=root1", 30000, 10);
-//        TestPKI.get().addSaveCa("CN=CA3", "CN=root1", 25000, 10);
-//        TestPKI.get().addSaveCa("CN=CA4", "CN=root2", 20000, 10);
-//        TestPKI.get().addSaveCa("CN=CA5", "CN=root2", 15000, 10);
-//        TestPKI.get().addSaveCa("CN=CA6", "CN=root2", 10000, 10);
+		// TestPKI.get().addSaveCa("CN=CA1", "CN=root1", 50000, 10);
+		// TestPKI.get().addSaveCa("CN=CA2", "CN=root1", 30000, 10);
+		// TestPKI.get().addSaveCa("CN=CA3", "CN=root1", 25000, 10);
+		// TestPKI.get().addSaveCa("CN=CA4", "CN=root2", 20000, 10);
+		// TestPKI.get().addSaveCa("CN=CA5", "CN=root2", 15000, 10);
+		// TestPKI.get().addSaveCa("CN=CA6", "CN=root2", 10000, 10);
 
-        while (true) {
-            Thread.sleep(1000);
-        }
+		while (true) {
+			Thread.sleep(1000);
+		}
 
-    }
+	}
 }

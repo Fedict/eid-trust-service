@@ -36,7 +36,7 @@ import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
 
 @Entity
 @Table(name = "ts_trustdom")
-@NamedQueries( {
+@NamedQueries({
 		@NamedQuery(name = TrustDomainEntity.QUERY_LIST_ALL, query = "FROM TrustDomainEntity"),
 		@NamedQuery(name = TrustDomainEntity.QUERY_GET_DEFAULT, query = "SELECT td FROM TrustDomainEntity AS td "
 				+ "WHERE td.defaultDomain = true"),

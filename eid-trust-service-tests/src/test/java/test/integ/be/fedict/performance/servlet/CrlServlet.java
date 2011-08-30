@@ -35,39 +35,42 @@ import java.io.InputStream;
 
 public class CrlServlet extends HttpServlet {
 
-    private static final Log LOG = LogFactory.getLog(CrlServlet.class);
+	private static final long serialVersionUID = 1L;
 
-    public static final String PATH = "crl";
+	private static final Log LOG = LogFactory.getLog(CrlServlet.class);
 
-    public static final String CA_QUERY_PARAM = "ca";
+	public static final String PATH = "crl";
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	public static final String CA_QUERY_PARAM = "ca";
 
-        String caName = request.getParameter(CA_QUERY_PARAM);
-        if (null == caName) {
-            throw new ServletException("No CA name found.");
-        }
-        LOG.debug("get CRL for CA=" + caName);
+	@Override
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
-        CAConfiguration ca = TestPKI.get().findCa(caName);
-        if (null == ca) {
-            throw new ServletException("CA Config not found for " + caName);
-        }
+		String caName = request.getParameter(CA_QUERY_PARAM);
+		if (null == caName) {
+			throw new ServletException("No CA name found.");
+		}
+		LOG.debug("get CRL for CA=" + caName);
 
-        try {
-            response.setContentType("text/plain");
+		CAConfiguration ca = TestPKI.get().findCa(caName);
+		if (null == ca) {
+			throw new ServletException("CA Config not found for " + caName);
+		}
 
-            InputStream inputStream = new FileInputStream(ca.getCrl());
-            StreamUtils.copy(inputStream, response.getOutputStream());
-        } catch (Exception e) {
-            LOG.error("Exception: " + e.getMessage(), e);
-            throw new ServletException(e);
-        }
-    }
+		try {
+			response.setContentType("text/plain");
 
-    public static String getPath(String caName) throws Exception {
-        return new URI(TestPKI.get().getPath() + "/" + PATH + "?" + CA_QUERY_PARAM + "=" + caName, false).toString();
-    }
+			InputStream inputStream = new FileInputStream(ca.getCrl());
+			StreamUtils.copy(inputStream, response.getOutputStream());
+		} catch (Exception e) {
+			LOG.error("Exception: " + e.getMessage(), e);
+			throw new ServletException(e);
+		}
+	}
+
+	public static String getPath(String caName) throws Exception {
+		return new URI(TestPKI.get().getPath() + "/" + PATH + "?"
+				+ CA_QUERY_PARAM + "=" + caName, false).toString();
+	}
 }

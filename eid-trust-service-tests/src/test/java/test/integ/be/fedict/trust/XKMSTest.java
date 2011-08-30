@@ -40,154 +40,153 @@ import static org.junit.Assert.fail;
 
 /**
  * eID Trust Service XKMS2 Integration Tests.
- *
+ * 
  * @author fcorneli
  */
 public class XKMSTest {
 
-    private static final Log LOG = LogFactory.getLog(XKMSTest.class);
+	private static final Log LOG = LogFactory.getLog(XKMSTest.class);
 
-//    private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
-//            "proxy.yourict.net", 8080);
-    private static final NetworkConfig NETWORK_CONFIG = null;
+	// private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
+	// "proxy.yourict.net", 8080);
+	private static final NetworkConfig NETWORK_CONFIG = null;
 
-    @Before
-    public void setUp() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+	@Before
+	public void setUp() {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
-    @Test
-    public void testValidateEIDCertificate() throws Exception {
-        LOG.debug("validate eID authentication certificate.");
+	@Test
+	public void testValidateEIDCertificate() throws Exception {
+		LOG.debug("validate eID authentication certificate.");
 
-        List<X509Certificate> authnCertificateChain = TestUtils
-                .getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
-        XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
-        client.validate(authnCertificateChain);
-    }
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+		client.validate(authnCertificateChain);
+	}
 
-    @Test
-    public void testValidateNonRepudiationEIDCertificate() throws Exception {
-        LOG.debug("validate eID non repudiation certificate.");
+	@Test
+	public void testValidateNonRepudiationEIDCertificate() throws Exception {
+		LOG.debug("validate eID non repudiation certificate.");
 
-        List<X509Certificate> signCertificateChain = TestUtils
-                .getSignCertificateChain();
+		List<X509Certificate> signCertificateChain = TestUtils
+				.getSignCertificateChain();
 
-        XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
-        client.validate(
-                TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
-                signCertificateChain);
-    }
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+		client.validate(
+				TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+				signCertificateChain);
+	}
 
-    @Test
-    public void testValidateNationalRegistryEIDCertificate() throws Exception {
-        LOG.debug("validate eID national registry certificate.");
+	@Test
+	public void testValidateNationalRegistryEIDCertificate() throws Exception {
+		LOG.debug("validate eID national registry certificate.");
 
-        List<X509Certificate> nationalRegistryCertificateChain = TestUtils
-                .getNationalRegistryCertificateChain();
+		List<X509Certificate> nationalRegistryCertificateChain = TestUtils
+				.getNationalRegistryCertificateChain();
 
-        XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
-        client
-                .validate(
-                        TrustServiceDomains.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN,
-                        nationalRegistryCertificateChain);
-    }
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+		client.validate(
+				TrustServiceDomains.BELGIAN_EID_NATIONAL_REGISTRY_TRUST_DOMAIN,
+				nationalRegistryCertificateChain);
+	}
 
-    @Test
-    public void testValidateWrongTrustDomainEIDCertificate() throws Exception {
-        LOG.debug("validate eID certificate with wrong trust domain.");
+	@Test
+	public void testValidateWrongTrustDomainEIDCertificate() throws Exception {
+		LOG.debug("validate eID certificate with wrong trust domain.");
 
-        List<X509Certificate> authnCertificateChain = TestUtils
-                .getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
-        XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
-        try {
-            client.validate("f00", authnCertificateChain);
-        } catch (TrustDomainNotFoundException e) {
-            // expected
-            return;
-        }
-        fail();
-    }
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+		try {
+			client.validate("f00", authnCertificateChain);
+		} catch (TrustDomainNotFoundException e) {
+			// expected
+			return;
+		}
+		fail();
+	}
 
-    @Test
-    public void testValidateViaJTrust() throws Exception {
-        LOG.debug("validate eID certificate via jTrust.");
+	@Test
+	public void testValidateViaJTrust() throws Exception {
+		LOG.debug("validate eID certificate via jTrust.");
 
-        List<X509Certificate> authnCertificateChain = TestUtils
-                .getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
-        TrustValidator trustValidator = BelgianTrustValidatorFactory
-                .createTrustValidator(NETWORK_CONFIG);
+		TrustValidator trustValidator = BelgianTrustValidatorFactory
+				.createTrustValidator(NETWORK_CONFIG);
 
-        trustValidator.isTrusted(authnCertificateChain);
-        assertTrue(trustValidator.getResult().isValid());
-    }
+		trustValidator.isTrusted(authnCertificateChain);
+		assertTrue(trustValidator.getResult().isValid());
+	}
 
-    @Test
-    public void testValidateNonRepudiationViaJTrust() throws Exception {
-        LOG.debug("validate eID non repudiation certificate via jTrust.");
+	@Test
+	public void testValidateNonRepudiationViaJTrust() throws Exception {
+		LOG.debug("validate eID non repudiation certificate via jTrust.");
 
-        List<X509Certificate> signCertificateChain = TestUtils
-                .getSignCertificateChain();
+		List<X509Certificate> signCertificateChain = TestUtils
+				.getSignCertificateChain();
 
-        TrustValidator trustValidator = BelgianTrustValidatorFactory
-                .createNonRepudiationTrustValidator(NETWORK_CONFIG);
+		TrustValidator trustValidator = BelgianTrustValidatorFactory
+				.createNonRepudiationTrustValidator(NETWORK_CONFIG);
 
-        trustValidator.isTrusted(signCertificateChain);
-        assertTrue(trustValidator.getResult().isValid());
-    }
+		trustValidator.isTrusted(signCertificateChain);
+		assertTrue(trustValidator.getResult().isValid());
+	}
 
-    @Test
-    public void testValidateNationalRegistryViaJTrust() throws Exception {
-        LOG.debug("validate eID national registry certificate via jTrust.");
+	@Test
+	public void testValidateNationalRegistryViaJTrust() throws Exception {
+		LOG.debug("validate eID national registry certificate via jTrust.");
 
-        List<X509Certificate> nationalRegistryCertificateChain = TestUtils
-                .getNationalRegistryCertificateChain();
+		List<X509Certificate> nationalRegistryCertificateChain = TestUtils
+				.getNationalRegistryCertificateChain();
 
-        TrustValidator trustValidator = BelgianTrustValidatorFactory
-                .createNationalRegistryTrustValidator(NETWORK_CONFIG);
+		TrustValidator trustValidator = BelgianTrustValidatorFactory
+				.createNationalRegistryTrustValidator(NETWORK_CONFIG);
 
-        trustValidator.isTrusted(nationalRegistryCertificateChain);
-        assertTrue(trustValidator.getResult().isValid());
-    }
+		trustValidator.isTrusted(nationalRegistryCertificateChain);
+		assertTrue(trustValidator.getResult().isValid());
+	}
 
-    private static final int COUNT = 20;
+	private static final int COUNT = 20;
 
-    @Test
-    public void testValidatePerformanceViaPKI() throws Exception {
-        LOG.debug("validate eID certificate (performance) via jTrust.");
+	@Test
+	public void testValidatePerformanceViaPKI() throws Exception {
+		LOG.debug("validate eID certificate (performance) via jTrust.");
 
-        List<X509Certificate> authnCertificateChain = TestUtils
-                .getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
-        TrustValidator trustValidator = BelgianTrustValidatorFactory
-                .createTrustValidator(NETWORK_CONFIG);
+		TrustValidator trustValidator = BelgianTrustValidatorFactory
+				.createTrustValidator(NETWORK_CONFIG);
 
-        long t0 = System.currentTimeMillis();
-        for (int idx = 0; idx < COUNT; idx++) {
-            trustValidator.isTrusted(authnCertificateChain);
-        }
-        long t1 = System.currentTimeMillis();
-        LOG.debug("dt: " + ((double) (t1 - t0)) / 1000);
-    }
+		long t0 = System.currentTimeMillis();
+		for (int idx = 0; idx < COUNT; idx++) {
+			trustValidator.isTrusted(authnCertificateChain);
+		}
+		long t1 = System.currentTimeMillis();
+		LOG.debug("dt: " + ((double) (t1 - t0)) / 1000);
+	}
 
-    @Test
-    public void testValidatePerformanceViaTrustService() throws Exception {
-        LOG.debug("validate eID authentication certificate (performance).");
+	@Test
+	public void testValidatePerformanceViaTrustService() throws Exception {
+		LOG.debug("validate eID authentication certificate (performance).");
 
-        List<X509Certificate> authnCertificateChain = TestUtils
-                .getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
-        XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
 
-        long t0 = System.currentTimeMillis();
-        for (int idx = 0; idx < COUNT; idx++) {
-            client.validate(authnCertificateChain);
-        }
-        long t1 = System.currentTimeMillis();
-        LOG.debug("dt: " + ((double) (t1 - t0)) / 1000);
-    }
+		long t0 = System.currentTimeMillis();
+		for (int idx = 0; idx < COUNT; idx++) {
+			client.validate(authnCertificateChain);
+		}
+		long t1 = System.currentTimeMillis();
+		LOG.debug("dt: " + ((double) (t1 - t0)) / 1000);
+	}
 
 }

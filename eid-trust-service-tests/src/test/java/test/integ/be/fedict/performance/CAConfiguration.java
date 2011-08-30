@@ -40,166 +40,164 @@ import java.util.List;
 
 public class CAConfiguration implements Serializable {
 
-    private static final Log LOG = LogFactory.getLog(CAConfiguration.class);
+	private static final long serialVersionUID = 1L;
 
-    private final String name;
-    private long crlRecords;
-    private int crlRefresh; // in minutes
+	private static final Log LOG = LogFactory.getLog(CAConfiguration.class);
 
-    private CAConfiguration root;
-    private List<CAConfiguration> childs;
-    private KeyPair keyPair;
-    private X509Certificate certificate;
-    private File crlFile;
+	private final String name;
+	private long crlRecords;
+	private int crlRefresh; // in minutes
 
-    // CRL config data
-    private DateTime crlNextUpdate;
-    private DateTime crllGenerateNext;
-    private int crlNumber = 1;
+	private CAConfiguration root;
+	private List<CAConfiguration> childs;
+	private KeyPair keyPair;
+	private X509Certificate certificate;
+	private File crlFile;
 
-    public CAConfiguration(String name, long crlRecords, int crlRefresh) {
+	// CRL config data
+	private DateTime crlNextUpdate;
+	private DateTime crllGenerateNext;
+	private int crlNumber = 1;
 
-        this.name = name;
-        this.crlRecords = crlRecords;
-        this.crlRefresh = crlRefresh;
-        this.childs = new LinkedList<CAConfiguration>();
-    }
+	public CAConfiguration(String name, long crlRecords, int crlRefresh) {
 
-    public String getName() {
-        return name;
-    }
+		this.name = name;
+		this.crlRecords = crlRecords;
+		this.crlRefresh = crlRefresh;
+		this.childs = new LinkedList<CAConfiguration>();
+	}
 
-    public long getCrlRecords() {
-        return crlRecords;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setCrlRecords(long crlRecords) {
-        this.crlRecords = crlRecords;
-    }
+	public long getCrlRecords() {
+		return crlRecords;
+	}
 
-    public int getCrlRefresh() {
-        return crlRefresh;
-    }
+	public void setCrlRecords(long crlRecords) {
+		this.crlRecords = crlRecords;
+	}
 
-    public void setCrlRefresh(int crlRefresh) {
-        this.crlRefresh = crlRefresh;
-    }
+	public int getCrlRefresh() {
+		return crlRefresh;
+	}
 
-    public CAConfiguration getRoot() {
-        return root;
-    }
+	public void setCrlRefresh(int crlRefresh) {
+		this.crlRefresh = crlRefresh;
+	}
 
-    public void setRoot(CAConfiguration root) {
-        this.root = root;
-    }
+	public CAConfiguration getRoot() {
+		return root;
+	}
 
-    public KeyPair getKeyPair() {
-        return keyPair;
-    }
+	public void setRoot(CAConfiguration root) {
+		this.root = root;
+	}
 
-    public void setKeyPair(KeyPair keyPair) {
-        this.keyPair = keyPair;
-    }
+	public KeyPair getKeyPair() {
+		return keyPair;
+	}
 
-    public X509Certificate getCertificate() {
-        return certificate;
-    }
+	public void setKeyPair(KeyPair keyPair) {
+		this.keyPair = keyPair;
+	}
 
-    public void setCertificate(X509Certificate certificate) {
-        this.certificate = certificate;
-    }
+	public X509Certificate getCertificate() {
+		return certificate;
+	}
 
-    public File getCrl() throws Exception {
+	public void setCertificate(X509Certificate certificate) {
+		this.certificate = certificate;
+	}
 
-        if (this.crlRefresh > 0) {
-            DateTime now = new DateTime();
-            if (now.isAfter(this.crllGenerateNext)) {
-                // time's up, generate me a new one!
-                this.crlNumber++;
-                LOG.debug("generate new CRL for CA=" + this.name + " (nextUpdate="
-                        + this.crlNextUpdate.toString() + " crlNumber=" + this.crlNumber + ")");
-                generateCrl();
-            }
-        }
+	public File getCrl() throws Exception {
 
-        return crlFile;
-    }
+		if (this.crlRefresh > 0) {
+			DateTime now = new DateTime();
+			if (now.isAfter(this.crllGenerateNext)) {
+				// time's up, generate me a new one!
+				this.crlNumber++;
+				LOG.debug("generate new CRL for CA=" + this.name
+						+ " (nextUpdate=" + this.crlNextUpdate.toString()
+						+ " crlNumber=" + this.crlNumber + ")");
+				generateCrl();
+			}
+		}
 
-    public List<CAConfiguration> getChilds() {
-        return childs;
-    }
+		return crlFile;
+	}
 
-    public void generate() throws Exception {
+	public List<CAConfiguration> getChilds() {
+		return childs;
+	}
 
-        keyPair = TestUtils.generateKeyPair();
+	public void generate() throws Exception {
 
-        if (null == this.root) {
-            LOG.debug("generate CA " + this.name + " (root)");
-            this.certificate = generateCertificate(this.keyPair.getPublic(),
-                    name, this.keyPair.getPrivate(), null, crlRecords);
-        } else {
-            LOG.debug("generate CA " + this.name + " (intermediate)");
-            this.certificate = generateCertificate(this.keyPair.getPublic(),
-                    this.root.getCertificate().getSubjectDN().getName(),
-                    this.root.getKeyPair().getPrivate(),
-                    this.root.getCertificate(),
-                    this.root.getCrlRecords());
-        }
+		keyPair = TestUtils.generateKeyPair();
 
-        // crl
-        generateCrl();
+		if (null == this.root) {
+			LOG.debug("generate CA " + this.name + " (root)");
+			this.certificate = generateCertificate(this.keyPair.getPublic(),
+					name, this.keyPair.getPrivate(), null, crlRecords);
+		} else {
+			LOG.debug("generate CA " + this.name + " (intermediate)");
+			this.certificate = generateCertificate(this.keyPair.getPublic(),
+					this.root.getCertificate().getSubjectDN().getName(),
+					this.root.getKeyPair().getPrivate(),
+					this.root.getCertificate(), this.root.getCrlRecords());
+		}
 
-        // generate childs
-        for (CAConfiguration child : childs) {
-            child.generate();
-        }
-    }
+		// crl
+		generateCrl();
 
-    private X509Certificate generateCertificate(PublicKey publicKey,
-                                                String issuerName,
-                                                PrivateKey issuerPrivateKey,
-                                                X509Certificate issuerCertificate,
-                                                long maxRevokedSn)
-            throws Exception {
+		// generate childs
+		for (CAConfiguration child : childs) {
+			child.generate();
+		}
+	}
 
-        DateTime now = new DateTime();
-        DateTime notBefore = now.minusYears(10);
-        DateTime notAfter = now.plusYears(10);
+	private X509Certificate generateCertificate(PublicKey publicKey,
+			String issuerName, PrivateKey issuerPrivateKey,
+			X509Certificate issuerCertificate, long maxRevokedSn)
+			throws Exception {
 
-        return TestUtils.generateCertificate(
-                publicKey, name,
-                issuerPrivateKey, issuerCertificate,
-                notBefore, notAfter, "SHA512WithRSAEncryption",
-                true, true, false,
-                OcspServlet.getPath(issuerName),
-                CrlServlet.getPath(issuerName),
-                new KeyUsage(KeyUsage.cRLSign),
-                new BigInteger(Long.toString(maxRevokedSn + 1)));
-    }
+		DateTime now = new DateTime();
+		DateTime notBefore = now.minusYears(10);
+		DateTime notAfter = now.plusYears(10);
 
-    private void generateCrl() throws Exception {
+		return TestUtils.generateCertificate(publicKey, name, issuerPrivateKey,
+				issuerCertificate, notBefore, notAfter,
+				"SHA512WithRSAEncryption", true, true, false,
+				OcspServlet.getPath(issuerName),
+				CrlServlet.getPath(issuerName), new KeyUsage(KeyUsage.cRLSign),
+				new BigInteger(Long.toString(maxRevokedSn + 1)));
+	}
 
-        DateTime now = new DateTime();
-        if (this.crlRefresh > 0) {
-            crllGenerateNext = now.plusMinutes(this.crlRefresh);
-        } else {
-            crllGenerateNext = now.plusHours(3);
-        }
-        crlNextUpdate = now.plusDays(7);
+	private void generateCrl() throws Exception {
 
-        List<BigInteger> revokedSerialNumbers = new LinkedList<BigInteger>();
-        for (long i = 0; i < this.crlRecords; i++) {
-            revokedSerialNumbers.add(new BigInteger(Long.toString(i)));
-        }
+		DateTime now = new DateTime();
+		if (this.crlRefresh > 0) {
+			crllGenerateNext = now.plusMinutes(this.crlRefresh);
+		} else {
+			crllGenerateNext = now.plusHours(3);
+		}
+		crlNextUpdate = now.plusDays(7);
 
-        X509CRL crl = TestUtils.generateCrl(crlNumber, this.keyPair.getPrivate(),
-                certificate, now, crlNextUpdate, revokedSerialNumbers);
+		List<BigInteger> revokedSerialNumbers = new LinkedList<BigInteger>();
+		for (long i = 0; i < this.crlRecords; i++) {
+			revokedSerialNumbers.add(new BigInteger(Long.toString(i)));
+		}
 
-        this.crlFile = File.createTempFile("crl_" + name + "_", ".crl");
-        this.crlFile.deleteOnExit();
+		X509CRL crl = TestUtils.generateCrl(crlNumber,
+				this.keyPair.getPrivate(), certificate, now, crlNextUpdate,
+				revokedSerialNumbers);
 
-        FileOutputStream fos = new FileOutputStream(this.crlFile);
-        fos.write(crl.getEncoded());
-        fos.close();
-    }
+		this.crlFile = File.createTempFile("crl_" + name + "_", ".crl");
+		this.crlFile.deleteOnExit();
+
+		FileOutputStream fos = new FileOutputStream(this.crlFile);
+		fos.write(crl.getEncoded());
+		fos.close();
+	}
 }

@@ -21,33 +21,35 @@ package test.integ.be.fedict.performance.util;
 import java.io.Serializable;
 import java.util.Date;
 
-public class MemoryData implements Serializable{
+public class MemoryData implements Serializable {
 
-    private final Date date;
-    private final long freeMemory;
-    private final long maxMemory;
-    private final long totalMemory;
+	private static final long serialVersionUID = 1L;
 
-    public MemoryData(long freeMemory, long maxMemory, long totalMemory) {
-        this.date = new Date();
-        this.freeMemory = freeMemory;
-        this.maxMemory = maxMemory;
-        this.totalMemory = totalMemory;
-    }
+	private final Date date;
+	private final long freeMemory;
+	private final long maxMemory;
+	private final long totalMemory;
 
-    public Date getDate() {
-        return date;
-    }
+	public MemoryData(long freeMemory, long maxMemory, long totalMemory) {
+		this.date = new Date();
+		this.freeMemory = freeMemory;
+		this.maxMemory = maxMemory;
+		this.totalMemory = totalMemory;
+	}
 
-    public long getFreeMemory() {
-        return freeMemory;
-    }
+	public Date getDate() {
+		return date;
+	}
 
-    public long getMaxMemory() {
-        return maxMemory;
-    }
+	public long getFreeMemory() {
+		return freeMemory;
+	}
 
-    public long getTotalMemory() {
-        return totalMemory;
-    }
+	public long getMaxMemory() {
+		return maxMemory;
+	}
+
+	public long getTotalMemory() {
+		return totalMemory;
+	}
 }

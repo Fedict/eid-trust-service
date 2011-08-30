@@ -34,31 +34,33 @@ import java.util.List;
 
 /**
  * eID Trust Service HA XKMS2 client test.
- *
+ * 
  * @author wvdhaute
  */
 public class HAXKMSTest {
 
-    private static final Log LOG = LogFactory.getLog(HAXKMSTest.class);
+	private static final Log LOG = LogFactory.getLog(HAXKMSTest.class);
 
-//    private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
-//            "proxy.yourict.net", 8080);
-    private static final NetworkConfig NETWORK_CONFIG = null;
+	// private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
+	// "proxy.yourict.net", 8080);
+	private static final NetworkConfig NETWORK_CONFIG = null;
 
-    @Before
-    public void setUp() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+	@Before
+	public void setUp() {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
-    @Test
-    public void testValidateEIDCertificate() throws Exception {
-        LOG.debug("validate eID authentication certificate.");
+	@Test
+	public void testValidateEIDCertificate() throws Exception {
+		LOG.debug("validate eID authentication certificate.");
 
-        List<X509Certificate> authnCertificateChain = TestUtils
-                .getAuthnCertificateChain();
+		List<X509Certificate> authnCertificateChain = TestUtils
+				.getAuthnCertificateChain();
 
-        HAXKMS2Client client = new HAXKMS2Client(TestUtils.XKMS_WS_LOCATION + "/foo",
-                BelgianTrustValidatorFactory.createTrustValidator(NETWORK_CONFIG));
-        client.validate(authnCertificateChain);
-    }
+		HAXKMS2Client client = new HAXKMS2Client(TestUtils.XKMS_WS_LOCATION
+				+ "/foo",
+				BelgianTrustValidatorFactory
+						.createTrustValidator(NETWORK_CONFIG));
+		client.validate(authnCertificateChain);
+	}
 }

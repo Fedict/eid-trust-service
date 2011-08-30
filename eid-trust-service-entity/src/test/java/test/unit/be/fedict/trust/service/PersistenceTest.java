@@ -42,85 +42,86 @@ import static org.junit.Assert.assertNotNull;
 
 public class PersistenceTest {
 
-    private static final Log LOG = LogFactory.getLog(PersistenceTest.class);
+	private static final Log LOG = LogFactory.getLog(PersistenceTest.class);
 
-    private EntityManager entityManager;
+	private EntityManager entityManager;
 
-    @Before
-    public void setUp() throws Exception {
-        Class.forName("org.hsqldb.jdbcDriver");
-        Ejb3Configuration configuration = new Ejb3Configuration();
-        configuration.setProperty("hibernate.dialect",
-                "org.hibernate.dialect.HSQLDialect");
-        configuration.setProperty("hibernate.connection.driver_class",
-                "org.hsqldb.jdbcDriver");
-        configuration.setProperty("hibernate.connection.url",
-                "jdbc:hsqldb:mem:beta");
-        configuration.setProperty("hibernate.hbm2ddl.auto", "create");
-        configuration.addAnnotatedClass(CertificateAuthorityEntity.class);
-        configuration.addAnnotatedClass(RevokedCertificateEntity.class);
-        configuration.addAnnotatedClass(TrustDomainEntity.class);
-        configuration.addAnnotatedClass(CertificateConstraintEntity.class);
-        configuration.addAnnotatedClass(PolicyConstraintEntity.class);
-        configuration.addAnnotatedClass(DNConstraintEntity.class);
-        configuration.addAnnotatedClass(EndEntityConstraintEntity.class);
-        configuration.addAnnotatedClass(KeyUsageConstraintEntity.class);
-        configuration.addAnnotatedClass(QCStatementsConstraintEntity.class);
-        configuration.addAnnotatedClass(TrustPointEntity.class);
-        EntityManagerFactory entityManagerFactory = configuration
-                .buildEntityManagerFactory();
+	@Before
+	public void setUp() throws Exception {
+		Class.forName("org.hsqldb.jdbcDriver");
+		Ejb3Configuration configuration = new Ejb3Configuration();
+		configuration.setProperty("hibernate.dialect",
+				"org.hibernate.dialect.HSQLDialect");
+		configuration.setProperty("hibernate.connection.driver_class",
+				"org.hsqldb.jdbcDriver");
+		configuration.setProperty("hibernate.connection.url",
+				"jdbc:hsqldb:mem:beta");
+		configuration.setProperty("hibernate.hbm2ddl.auto", "create");
+		configuration.addAnnotatedClass(CertificateAuthorityEntity.class);
+		configuration.addAnnotatedClass(RevokedCertificateEntity.class);
+		configuration.addAnnotatedClass(TrustDomainEntity.class);
+		configuration.addAnnotatedClass(CertificateConstraintEntity.class);
+		configuration.addAnnotatedClass(PolicyConstraintEntity.class);
+		configuration.addAnnotatedClass(DNConstraintEntity.class);
+		configuration.addAnnotatedClass(EndEntityConstraintEntity.class);
+		configuration.addAnnotatedClass(KeyUsageConstraintEntity.class);
+		configuration.addAnnotatedClass(QCStatementsConstraintEntity.class);
+		configuration.addAnnotatedClass(TrustPointEntity.class);
+		EntityManagerFactory entityManagerFactory = configuration
+				.buildEntityManagerFactory();
 
-        this.entityManager = entityManagerFactory.createEntityManager();
-        this.entityManager.getTransaction().begin();
-    }
+		this.entityManager = entityManagerFactory.createEntityManager();
+		this.entityManager.getTransaction().begin();
+	}
 
-    @After
-    public void tearDown() throws Exception {
-        EntityTransaction entityTransaction = this.entityManager
-                .getTransaction();
-        LOG.debug("entity manager open: " + this.entityManager.isOpen());
-        LOG.debug("entity transaction active: " + entityTransaction.isActive());
-        if (entityTransaction.isActive()) {
-            if (entityTransaction.getRollbackOnly()) {
-                entityTransaction.rollback();
-            } else {
-                entityTransaction.commit();
-            }
-        }
-        this.entityManager.close();
-    }
+	@After
+	public void tearDown() throws Exception {
+		EntityTransaction entityTransaction = this.entityManager
+				.getTransaction();
+		LOG.debug("entity manager open: " + this.entityManager.isOpen());
+		LOG.debug("entity transaction active: " + entityTransaction.isActive());
+		if (entityTransaction.isActive()) {
+			if (entityTransaction.getRollbackOnly()) {
+				entityTransaction.rollback();
+			} else {
+				entityTransaction.commit();
+			}
+		}
+		this.entityManager.close();
+	}
 
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testFindRevokedCertificate() throws Exception {
-        // setup
-        String issuerName = "CN=Test CA";
-        BigInteger serialNumber = new BigInteger(
-                "21267647932558966653497436382356969621");
-        BigInteger crlNumber = new BigInteger("123465789");
-        RevokedCertificateEntity revokedCertificateEntity = new RevokedCertificateEntity(
-                issuerName, serialNumber, new Date(), crlNumber);
-        this.entityManager.persist(revokedCertificateEntity);
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testFindRevokedCertificate() throws Exception {
+		// setup
+		String issuerName = "CN=Test CA";
+		BigInteger serialNumber = new BigInteger(
+				"21267647932558966653497436382356969621");
+		BigInteger crlNumber = new BigInteger("123465789");
+		RevokedCertificateEntity revokedCertificateEntity = new RevokedCertificateEntity(
+				issuerName, serialNumber, new Date(), crlNumber);
+		this.entityManager.persist(revokedCertificateEntity);
 
-        // we clear the hibernate cache
-        EntityTransaction entityTransaction = this.entityManager
-                .getTransaction();
-        entityTransaction.commit();
-        this.entityManager.clear();
-        entityTransaction.begin();
+		// we clear the hibernate cache
+		EntityTransaction entityTransaction = this.entityManager
+				.getTransaction();
+		entityTransaction.commit();
+		this.entityManager.clear();
+		entityTransaction.begin();
 
-        // operate
-        Query query = this.entityManager
-                .createNamedQuery(RevokedCertificateEntity.QUERY_WHERE_ISSUER_SERIAL);
-        query.setParameter("issuer", issuerName);
-        query.setParameter("serialNumber", serialNumber.toString());
-        RevokedCertificateEntity resultRevokedCertificate = (RevokedCertificateEntity) query
-                .getSingleResult();
+		// operate
+		Query query = this.entityManager
+				.createNamedQuery(RevokedCertificateEntity.QUERY_WHERE_ISSUER_SERIAL);
+		query.setParameter("issuer", issuerName);
+		query.setParameter("serialNumber", serialNumber.toString());
+		RevokedCertificateEntity resultRevokedCertificate = (RevokedCertificateEntity) query
+				.getSingleResult();
 
-        // verify
-        assertNotNull(resultRevokedCertificate);
-        assertEquals(resultRevokedCertificate.getPk().getIssuer(), issuerName);
-        assertEquals(resultRevokedCertificate.getPk().getSerialNumber(), serialNumber.toString());
-        assertEquals(resultRevokedCertificate.getCrlNumber(), crlNumber);
-    }
+		// verify
+		assertNotNull(resultRevokedCertificate);
+		assertEquals(resultRevokedCertificate.getPk().getIssuer(), issuerName);
+		assertEquals(resultRevokedCertificate.getPk().getSerialNumber(),
+				serialNumber.toString());
+		assertEquals(resultRevokedCertificate.getCrlNumber(), crlNumber);
+	}
 }

@@ -25,44 +25,47 @@ import org.apache.commons.logging.LogFactory;
 import javax.ejb.Singleton;
 
 /**
- * Singleton Crl Repository cache bean used if no persistent CRL cache is available.
- *
+ * Singleton Crl Repository cache bean used if no persistent CRL cache is
+ * available.
+ * 
  * @author wvdhaute
  */
 @Singleton
 public class CrlRepositoryServiceBean {
 
-    private Log LOG = LogFactory.getLog(CrlRepositoryServiceBean.class);
+	private Log LOG = LogFactory.getLog(CrlRepositoryServiceBean.class);
 
-    private CachedCrlRepository cachedCrlRepository;
+	private CachedCrlRepository cachedCrlRepository;
 
-    /**
-     * Returns the {@link CachedCrlRepository} or <code>null</code> if not yet set.
-     */
-    public CachedCrlRepository getCachedCrlRepository() {
+	/**
+	 * Returns the {@link CachedCrlRepository} or <code>null</code> if not yet
+	 * set.
+	 */
+	public CachedCrlRepository getCachedCrlRepository() {
 
-        LOG.debug("get cached CRL repository");
-        return this.cachedCrlRepository;
-    }
+		LOG.debug("get cached CRL repository");
+		return this.cachedCrlRepository;
+	}
 
-    /**
-     * Sets the {@link CachedCrlRepository}.
-     *
-     * @param cachedCrlRepository the cached CRL repository
-     */
-    public void setCachedCrlRepository(CachedCrlRepository cachedCrlRepository) {
+	/**
+	 * Sets the {@link CachedCrlRepository}.
+	 * 
+	 * @param cachedCrlRepository
+	 *            the cached CRL repository
+	 */
+	public void setCachedCrlRepository(CachedCrlRepository cachedCrlRepository) {
 
-        LOG.debug("set cached CRL repository");
-        this.cachedCrlRepository = cachedCrlRepository;
-    }
+		LOG.debug("set cached CRL repository");
+		this.cachedCrlRepository = cachedCrlRepository;
+	}
 
-    /**
-     * Resets the {@link CachedCrlRepository}.
-     */
-    public void resetCachedCrlRepository() {
+	/**
+	 * Resets the {@link CachedCrlRepository}.
+	 */
+	public void resetCachedCrlRepository() {
 
-        LOG.debug("reset cached CRL repository");
-        this.cachedCrlRepository = null;
-    }
+		LOG.debug("reset cached CRL repository");
+		this.cachedCrlRepository = null;
+	}
 
 }

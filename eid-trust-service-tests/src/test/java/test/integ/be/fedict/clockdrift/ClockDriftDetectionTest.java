@@ -38,58 +38,64 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * eID Trust Service Clock Drift detection integration Tests.
- *
+ * 
  * @author wvdhaute
  */
 public class ClockDriftDetectionTest {
 
-    private static final Log LOG = LogFactory.getLog(ClockDriftDetectionTest.class);
+	private static final Log LOG = LogFactory
+			.getLog(ClockDriftDetectionTest.class);
 
-//    private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
-//            "proxy.yourict.net", 8080);
-//    private static final NetworkConfig NETWORK_CONFIG = null;
-    private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
-            "127.0.0.1", 8080);
+	// private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
+	// "proxy.yourict.net", 8080);
+	// private static final NetworkConfig NETWORK_CONFIG = null;
+	private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
+			"127.0.0.1", 8080);
 
-    @Before
-    public void setUp() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+	@Before
+	public void setUp() {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
-    @Test
-    public void testClockDriftNTP() throws Exception {
+	@Test
+	public void testClockDriftNTP() throws Exception {
 
-        // Setup data
-        ClockDriftConfigEntity clockDriftConfig = new ClockDriftConfigEntity("test", TimeProtocol.NTP,
-                TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER, TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
-                TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET, null);
+		// Setup data
+		ClockDriftConfigEntity clockDriftConfig = new ClockDriftConfigEntity(
+				"test", TimeProtocol.NTP,
+				TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER,
+				TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
+				TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET, null);
 
-        // Operate
-        TimeInfo timeInfo = ClockDriftUtil.executeNTP(clockDriftConfig, NETWORK_CONFIG);
+		// Operate
+		TimeInfo timeInfo = ClockDriftUtil.executeNTP(clockDriftConfig,
+				NETWORK_CONFIG);
 
-        // Verify
-        assertNotNull(timeInfo);
-        LOG.debug("offset=" + timeInfo.getOffset());
+		// Verify
+		assertNotNull(timeInfo);
+		LOG.debug("offset=" + timeInfo.getOffset());
 
-        assertFalse(Math.abs(timeInfo.getOffset()) > clockDriftConfig.getMaxClockOffset());
-    }
+		assertFalse(Math.abs(timeInfo.getOffset()) > clockDriftConfig
+				.getMaxClockOffset());
+	}
 
-    @Test
-    public void testClockDriftTSP() throws Exception {
+	@Test
+	public void testClockDriftTSP() throws Exception {
 
-        // Setup data
-        ClockDriftConfigEntity clockDriftConfig = new ClockDriftConfigEntity("test", TimeProtocol.TSP,
-                "http://www.cryptopro.ru/tsp/tsp.srf", TrustServiceConstants.CLOCK_DRIFT_TIMEOUT, 1000 * 60 * 5
-                , null);
-        Date now = new Date();
+		// Setup data
+		ClockDriftConfigEntity clockDriftConfig = new ClockDriftConfigEntity(
+				"test", TimeProtocol.TSP,
+				"http://www.cryptopro.ru/tsp/tsp.srf",
+				TrustServiceConstants.CLOCK_DRIFT_TIMEOUT, 1000 * 60 * 5, null);
+		Date now = new Date();
 
-        // Operate
-        Date date = ClockDriftUtil.executeTSP(clockDriftConfig, NETWORK_CONFIG);
+		// Operate
+		Date date = ClockDriftUtil.executeTSP(clockDriftConfig, NETWORK_CONFIG);
 
-        // Verify
-        assertNotNull(date);
-        LOG.debug("now: " + now.toString() + " date=" + date.toString());
-        long offset = date.getTime() - now.getTime();
-        assertFalse(Math.abs(offset) > clockDriftConfig.getMaxClockOffset());
-    }
+		// Verify
+		assertNotNull(date);
+		LOG.debug("now: " + now.toString() + " date=" + date.toString());
+		long offset = date.getTime() - now.getTime();
+		assertFalse(Math.abs(offset) > clockDriftConfig.getMaxClockOffset());
+	}
 }

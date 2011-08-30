@@ -30,32 +30,32 @@ import java.util.List;
 
 /**
  * Administrator Service Bean implementation.
- *
+ * 
  * @author wvdhaute
  */
 @Stateless
 public class AuditServiceBean implements AuditService {
 
-    private static final Log LOG = LogFactory.getLog(AuditServiceBean.class);
+	private static final Log LOG = LogFactory.getLog(AuditServiceBean.class);
 
-    @EJB
-    private AuditDAO auditDAO;
+	@EJB
+	private AuditDAO auditDAO;
 
-    /**
-     * {@inheritDoc}
-     */
-    public List<AuditEntity> listAudits() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<AuditEntity> listAudits() {
 
-        LOG.debug("list audit entries");
-        return this.auditDAO.listAudits();
-    }
+		LOG.debug("list audit entries");
+		return this.auditDAO.listAudits();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void clearAudits() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void clearAudits() {
 
-        LOG.debug("clear audit entries");
-        this.auditDAO.clearAudits();
-    }
+		LOG.debug("clear audit entries");
+		this.auditDAO.clearAudits();
+	}
 }

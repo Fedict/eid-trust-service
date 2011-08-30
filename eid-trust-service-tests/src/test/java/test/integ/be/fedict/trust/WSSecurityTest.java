@@ -180,14 +180,15 @@ public class WSSecurityTest {
 
 		assertNotNull(
 				"missing WS-Security timestamp",
-				XPathAPI
-						.selectSingleNode(
-								resultSoapPart,
-								"/soap:Envelope/soap:Header/wsse:Security/wsu:Timestamp/wsu:Created",
-								nsElement));
+				XPathAPI.selectSingleNode(
+						resultSoapPart,
+						"/soap:Envelope/soap:Header/wsse:Security/wsu:Timestamp/wsu:Created",
+						nsElement));
 
-		assertEquals(2.0, XPathAPI.eval(resultSoapPart,
-				"count(//ds:Reference)", nsElement).num());
+		assertEquals(
+				2.0,
+				XPathAPI.eval(resultSoapPart, "count(//ds:Reference)",
+						nsElement).num());
 
 		// Setup
 		soapMessageContext.put(MessageContext.MESSAGE_OUTBOUND_PROPERTY, false);

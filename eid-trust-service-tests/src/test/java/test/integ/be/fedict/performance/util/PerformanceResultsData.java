@@ -5,35 +5,36 @@ import java.util.List;
 
 public class PerformanceResultsData implements Serializable {
 
-    private int intervalSize;
+	private static final long serialVersionUID = 1L;
 
-    private int expectedRevokedCount;
-    private List<PerformanceData> performance;
-    private List<MemoryData> memory;
+	private int intervalSize;
 
-    public PerformanceResultsData(int intervalSize,
-                                  List<PerformanceData> performance,
-                                  int expectedRevoked,
-                                  List<MemoryData> memory) {
-        this.intervalSize = intervalSize;
-        this.performance = performance;
-        this.expectedRevokedCount = expectedRevoked;
-        this.memory = memory;
-    }
+	private int expectedRevokedCount;
+	private List<PerformanceData> performance;
+	private List<MemoryData> memory;
 
-    public int getIntervalSize() {
-        return intervalSize;
-    }
+	public PerformanceResultsData(int intervalSize,
+			List<PerformanceData> performance, int expectedRevoked,
+			List<MemoryData> memory) {
+		this.intervalSize = intervalSize;
+		this.performance = performance;
+		this.expectedRevokedCount = expectedRevoked;
+		this.memory = memory;
+	}
 
-    public int getExpectedRevokedCount() {
-        return expectedRevokedCount;
-    }
+	public int getIntervalSize() {
+		return intervalSize;
+	}
 
-    public List<PerformanceData> getPerformance() {
-        return performance;
-    }
+	public int getExpectedRevokedCount() {
+		return expectedRevokedCount;
+	}
 
-    public List<MemoryData> getMemory() {
-        return memory;
-    }
+	public List<PerformanceData> getPerformance() {
+		return performance;
+	}
+
+	public List<MemoryData> getMemory() {
+		return memory;
+	}
 }

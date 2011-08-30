@@ -34,75 +34,76 @@ import java.util.List;
 
 /**
  * Administrator DAO Bean implementation.
- *
+ * 
  * @author wvdhaute
  */
 @Stateless
 public class AdministratorDAOBean implements AdministratorDAO {
 
-    private static final Log LOG = LogFactory
-            .getLog(AdministratorDAOBean.class);
+	private static final Log LOG = LogFactory
+			.getLog(AdministratorDAOBean.class);
 
-    @PersistenceContext
-    private EntityManager entityManager;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public List<AdministratorEntity> listAdmins() {
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<AdministratorEntity> listAdmins() {
 
-        LOG.debug("list admins");
-        Query query = this.entityManager
-                .createNamedQuery(AdministratorEntity.QUERY_LIST_ALL);
-        return (List<AdministratorEntity>) query.getResultList();
-    }
+		LOG.debug("list admins");
+		Query query = this.entityManager
+				.createNamedQuery(AdministratorEntity.QUERY_LIST_ALL);
+		return (List<AdministratorEntity>) query.getResultList();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public AdministratorEntity findAdmin(X509Certificate certificate) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public AdministratorEntity findAdmin(X509Certificate certificate) {
 
-        LOG.debug("find admin");
-        String id = getId(certificate);
-        return this.entityManager.find(AdministratorEntity.class, id);
-    }
+		LOG.debug("find admin");
+		String id = getId(certificate);
+		return this.entityManager.find(AdministratorEntity.class, id);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public AdministratorEntity addAdmin(X509Certificate authnCertificate,
-                                        boolean pending) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public AdministratorEntity addAdmin(X509Certificate authnCertificate,
+			boolean pending) {
 
-        LOG.debug("add admin pending=" + pending);
-        String name = authnCertificate.getSubjectX500Principal().toString();
-        AdministratorEntity admin = new AdministratorEntity(
-                getId(authnCertificate), name, pending);
-        this.entityManager.persist(admin);
-        return admin;
-    }
+		LOG.debug("add admin pending=" + pending);
+		String name = authnCertificate.getSubjectX500Principal().toString();
+		AdministratorEntity admin = new AdministratorEntity(
+				getId(authnCertificate), name, pending);
+		this.entityManager.persist(admin);
+		return admin;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void removeAdmin(AdministratorEntity admin) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeAdmin(AdministratorEntity admin) {
 
-        LOG.debug("remove admin: " + admin.getName());
-        AdministratorEntity attachedAdmin = this.entityManager.find(
-                AdministratorEntity.class, admin.getId());
-        this.entityManager.remove(attachedAdmin);
-    }
+		LOG.debug("remove admin: " + admin.getName());
+		AdministratorEntity attachedAdmin = this.entityManager.find(
+				AdministratorEntity.class, admin.getId());
+		this.entityManager.remove(attachedAdmin);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public AdministratorEntity attachAdmin(AdministratorEntity admin) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public AdministratorEntity attachAdmin(AdministratorEntity admin) {
 
-        return this.entityManager.find(AdministratorEntity.class, admin.getId());
-    }
+		return this.entityManager
+				.find(AdministratorEntity.class, admin.getId());
+	}
 
-    private String getId(X509Certificate certificate) {
-        PublicKey publicKey = certificate.getPublicKey();
-        return DigestUtils.shaHex(publicKey.getEncoded());
-    }
+	private String getId(X509Certificate certificate) {
+		PublicKey publicKey = certificate.getPublicKey();
+		return DigestUtils.shaHex(publicKey.getEncoded());
+	}
 }

@@ -20,13 +20,13 @@ package test.integ.be.fedict.performance.util;
 
 public interface PerformanceTest {
 
-    int getIntervalCount();
+	int getIntervalCount();
 
-    int getCount();
+	int getCount();
 
-    int getRevokedCount();
-    
-    boolean isRunning();
+	int getRevokedCount();
 
-    void stop();
+	boolean isRunning();
+
+	void stop();
 }

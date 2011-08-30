@@ -53,282 +53,291 @@ import java.util.Random;
  * The performance test can run in interactive or non-interactive mode.
  * <p/>
  * In interactive mode, the base URL of the {@link TestPKI} will be asked first
- * and you have the ability to manually end the test and start generating the graphs.
+ * and you have the ability to manually end the test and start generating the
+ * graphs.
  * <p/>
- * In non-interactive mode you will have to specify the {@link TestPKI} in the code and also specify the # minutes to run.
- * When the test has finished, it will dump the performanc result data in a file name <code>performance_results_xxx.data</code>.
- * Use the {@link TestLoadResults} unit test to load this file in to get the graphs.
+ * In non-interactive mode you will have to specify the {@link TestPKI} in the
+ * code and also specify the # minutes to run. When the test has finished, it
+ * will dump the performanc result data in a file name
+ * <code>performance_results_xxx.data</code>. Use the {@link TestLoadResults}
+ * unit test to load this file in to get the graphs.
  * <p/>
- * <u>How to start the {@link TestPKI} ?</u>
- * Have a look at {@link TestPKIStartup} and {@link TestBeIdPKIStartup} for examples.
- * <p>/>
- * <u>How to configure the {@link TestPKI} ?</u>
- * You can view its configuration @ e.g. localhost:13456/configuration.
- * There you will be able to generate the {@link TestPKI} infrastructure.
- * After this is done, all certificates and initial CRLs will be generated and you are set to start your performance test.
+ * <u>How to start the {@link TestPKI} ?</u> Have a look at
+ * {@link TestPKIStartup} and {@link TestBeIdPKIStartup} for examples.
+ * <p>
+ * /> <u>How to configure the {@link TestPKI} ?</u> You can view its
+ * configuration @ e.g. localhost:13456/configuration. There you will be able to
+ * generate the {@link TestPKI} infrastructure. After this is done, all
+ * certificates and initial CRLs will be generated and you are set to start your
+ * performance test.
  */
 public class TestPKIPerformanceTest implements PerformanceTest {
 
-    private static final Log LOG = LogFactory.getLog(TestPKIPerformanceTest.class);
+	private static final Log LOG = LogFactory
+			.getLog(TestPKIPerformanceTest.class);
 
-    private static final String HOST = "sebeco-dev-12";
-    private static final String XKMS_LOCATION = "http://" + HOST + ":8080/eid-trust-service-ws/xkms2";
+	private static final String HOST = "sebeco-dev-12";
+	private static final String XKMS_LOCATION = "http://" + HOST
+			+ ":8080/eid-trust-service-ws/xkms2";
 
-    private static final int INTERVAL_SIZE = 1000 * 60 * 30; // ms
+	private static final int INTERVAL_SIZE = 1000 * 60 * 30; // ms
 
-    private static boolean interactive = false;
-    private static String PKI_PATH = "http://sebeco-dev-11:50292";
-    private static int minutes = 60 * 48;
+	private static boolean interactive = false;
+	private static String PKI_PATH = "http://sebeco-dev-11:50292";
+	private static int minutes = 60 * 48;
 
-    @Before
-    public void setUp() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+	@Before
+	public void setUp() {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
-    private boolean run = true;
-    private int count = 0;
-    private int intervalCount = 0;
+	private boolean run = true;
+	private int count = 0;
+	private int intervalCount = 0;
 
-    private DateTime startTime;
+	private DateTime startTime;
 
-    // test configuration
-    private int revokedPercentage = 10;
-    private int expectedRevokedCount = 0;
-    private int revokedCount = 0;
+	// test configuration
+	private int revokedPercentage = 10;
+	private int expectedRevokedCount = 0;
+	private int revokedCount = 0;
 
-    private TestPKI testPKI;
-    private String testPkiPath;
+	private TestPKI testPKI;
+	private String testPkiPath;
 
-    private MBeanServerConnection rmi;
+	private MBeanServerConnection rmi;
 
-    /**
-     * {@inheritDoc}
-     */
-    public int getIntervalCount() {
-        return this.intervalCount;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getIntervalCount() {
+		return this.intervalCount;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public int getCount() {
-        return this.count;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getCount() {
+		return this.count;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public int getRevokedCount() {
-        return this.revokedCount;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getRevokedCount() {
+		return this.revokedCount;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isRunning() {
-        return this.run;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isRunning() {
+		return this.run;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void stop() {
-        this.run = false;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public void stop() {
+		this.run = false;
+	}
 
-    @Test
-    public void testPki() throws Exception {
+	@Test
+	public void testPki() throws Exception {
 
-        LOG.debug("performance test using test PKI");
+		LOG.debug("performance test using test PKI");
 
-        // get test PKI information
-        if (interactive) {
-            testPkiPath = JOptionPane.showInputDialog("Please give the test PKI base URL");
-        } else {
-            testPkiPath = PKI_PATH;
-        }
-        testPKI = TestPKI.load(testPkiPath);
+		// get test PKI information
+		if (interactive) {
+			testPkiPath = JOptionPane
+					.showInputDialog("Please give the test PKI base URL");
+		} else {
+			testPkiPath = PKI_PATH;
+		}
+		testPKI = TestPKI.load(testPkiPath);
 
-        // initialize test framework
-        List<PerformanceData> performance = new LinkedList<PerformanceData>();
-        List<MemoryData> memory = new LinkedList<MemoryData>();
-        PerformanceData currentPerformance = new PerformanceData();
-        performance.add(currentPerformance);
-        long nextIntervalT = System.currentTimeMillis() + INTERVAL_SIZE;
+		// initialize test framework
+		List<PerformanceData> performance = new LinkedList<PerformanceData>();
+		List<MemoryData> memory = new LinkedList<MemoryData>();
+		PerformanceData currentPerformance = new PerformanceData();
+		performance.add(currentPerformance);
+		long nextIntervalT = System.currentTimeMillis() + INTERVAL_SIZE;
 
-        // initialize JBoss monitoring for memory usage
-        String jnpLocation = "jnp://" + HOST + ":1099";
-        Hashtable<String, String> environment = new Hashtable<String, String>();
-        environment.put(Context.INITIAL_CONTEXT_FACTORY, "org.jnp.interfaces.NamingContextFactory");
-        environment.put(Context.PROVIDER_URL, jnpLocation);
-        rmi = (MBeanServerConnection) new InitialContext(environment).lookup("jmx/invoker/RMIAdaptor");
+		// initialize JBoss monitoring for memory usage
+		String jnpLocation = "jnp://" + HOST + ":1099";
+		Hashtable<String, String> environment = new Hashtable<String, String>();
+		environment.put(Context.INITIAL_CONTEXT_FACTORY,
+				"org.jnp.interfaces.NamingContextFactory");
+		environment.put(Context.PROVIDER_URL, jnpLocation);
+		rmi = (MBeanServerConnection) new InitialContext(environment)
+				.lookup("jmx/invoker/RMIAdaptor");
 
-        if (interactive) {
-            new PerformanceWorkingFrame(this);
-        }
+		if (interactive) {
+			new PerformanceWorkingFrame(this);
+		}
 
-        // used to generate our certificates
-        DateTime notBefore = new DateTime().minusYears(10);
-        DateTime notAfter = new DateTime().plusYears(10);
-        KeyPair testKeyPair = TestUtils.generateKeyPair();
-        List<CAConfiguration> leaves = testPKI.getLeaves();
-        Random random = new Random();
+		// used to generate our certificates
+		DateTime notBefore = new DateTime().minusYears(10);
+		DateTime notAfter = new DateTime().plusYears(10);
+		KeyPair testKeyPair = TestUtils.generateKeyPair();
+		List<CAConfiguration> leaves = testPKI.getLeaves();
+		Random random = new Random();
 
-        // operate
-        this.startTime = new DateTime();
-        while (this.run) {
+		// operate
+		this.startTime = new DateTime();
+		while (this.run) {
 
-            try {
-                List<X509Certificate> certificateChain = getCertificateChain(testKeyPair,
-                        leaves, random, notBefore, notAfter);
+			try {
+				List<X509Certificate> certificateChain = getCertificateChain(
+						testKeyPair, leaves, random, notBefore, notAfter);
 
-                // initialize XKMS2 client
-                XKMS2Client client = new XKMS2Client(XKMS_LOCATION);
-                client.validate("performance", certificateChain);
-                currentPerformance.inc();
-                this.count++;
+				// initialize XKMS2 client
+				XKMS2Client client = new XKMS2Client(XKMS_LOCATION);
+				client.validate("performance", certificateChain);
+				currentPerformance.inc();
+				this.count++;
 
-            } catch (ValidationFailedException e) {
+			} catch (ValidationFailedException e) {
 
-                if (e.getReasons().get(0).equals(XKMSConstants.KEY_BINDING_REASON_REVOCATION_STATUS_URI)) {
-                    LOG.debug("revoked");
-                    currentPerformance.incRevoked();
-                    this.revokedCount++;
-                } else {
-                    LOG.error("Validation failed: " + e.getReasons().get(0));
-                    currentPerformance.incFailures();
-                }
+				if (e.getReasons()
+						.get(0)
+						.equals(XKMSConstants.KEY_BINDING_REASON_REVOCATION_STATUS_URI)) {
+					LOG.debug("revoked");
+					currentPerformance.incRevoked();
+					this.revokedCount++;
+				} else {
+					LOG.error("Validation failed: " + e.getReasons().get(0));
+					currentPerformance.incFailures();
+				}
 
-            } catch (Exception e) {
-                LOG.error("error: " + e.getMessage(), e);
-                currentPerformance.incFailures();
-            } finally {
+			} catch (Exception e) {
+				LOG.error("error: " + e.getMessage(), e);
+				currentPerformance.incFailures();
+			} finally {
 
-                if (System.currentTimeMillis() > nextIntervalT) {
+				if (System.currentTimeMillis() > nextIntervalT) {
 
-                    memory.add(new MemoryData(getFreeMemory(), getMaxMemory(), getTotalMemory()));
+					memory.add(new MemoryData(getFreeMemory(), getMaxMemory(),
+							getTotalMemory()));
 
-                    currentPerformance = new PerformanceData();
-                    nextIntervalT = System.currentTimeMillis() + INTERVAL_SIZE;
-                    performance.add(currentPerformance);
-                    this.intervalCount++;
+					currentPerformance = new PerformanceData();
+					nextIntervalT = System.currentTimeMillis() + INTERVAL_SIZE;
+					performance.add(currentPerformance);
+					this.intervalCount++;
 
-                    if (!interactive) {
-                        DateTime now = new DateTime();
-                        if (now.isAfter(startTime.plusMinutes(minutes))) {
-                            this.run = false;
-                        }
-                    }
+					if (!interactive) {
+						DateTime now = new DateTime();
+						if (now.isAfter(startTime.plusMinutes(minutes))) {
+							this.run = false;
+						}
+					}
 
-                }
-            }
-        }
+				}
+			}
+		}
 
-        // add last performance
-        performance.add(currentPerformance);
+		// add last performance
+		performance.add(currentPerformance);
 
-        if (interactive) {
-            // show result
-            PerformanceResultDialog dialog = new PerformanceResultDialog(
-                    new PerformanceResultsData(INTERVAL_SIZE, performance, this.expectedRevokedCount, memory));
-            while (dialog.isVisible()) {
-                Thread.sleep(1000);
-            }
-        } else {
-            // write results to file for later
-            PerformanceResultDialog.writeResults(new PerformanceResultsData(INTERVAL_SIZE,
-                    performance, expectedRevokedCount, memory));
-        }
-    }
+		if (interactive) {
+			// show result
+			PerformanceResultDialog dialog = new PerformanceResultDialog(
+					new PerformanceResultsData(INTERVAL_SIZE, performance,
+							this.expectedRevokedCount, memory));
+			while (dialog.isVisible()) {
+				Thread.sleep(1000);
+			}
+		} else {
+			// write results to file for later
+			PerformanceResultDialog.writeResults(new PerformanceResultsData(
+					INTERVAL_SIZE, performance, expectedRevokedCount, memory));
+		}
+	}
 
-    private long getFreeMemory() {
+	private long getFreeMemory() {
 
-        try {
-            return (Long) rmi.getAttribute(new ObjectName("jboss.system:type=ServerInfo"), "FreeMemory");
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+		try {
+			return (Long) rmi.getAttribute(new ObjectName(
+					"jboss.system:type=ServerInfo"), "FreeMemory");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        return -1;
-    }
+		return -1;
+	}
 
-    private long getMaxMemory() {
+	private long getMaxMemory() {
 
-        try {
-            return (Long) rmi.getAttribute(new ObjectName("jboss.system:type=ServerInfo"), "MaxMemory");
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+		try {
+			return (Long) rmi.getAttribute(new ObjectName(
+					"jboss.system:type=ServerInfo"), "MaxMemory");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        return -1;
-    }
+		return -1;
+	}
 
-    private long getTotalMemory() {
+	private long getTotalMemory() {
 
-        try {
-            return (Long) rmi.getAttribute(new ObjectName("jboss.system:type=ServerInfo"), "TotalMemory");
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+		try {
+			return (Long) rmi.getAttribute(new ObjectName(
+					"jboss.system:type=ServerInfo"), "TotalMemory");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        return -1;
-    }
+		return -1;
+	}
 
+	private List<X509Certificate> getCertificateChain(KeyPair testKeyPair,
+			List<CAConfiguration> leaves, Random random, DateTime notBefore,
+			DateTime notAfter) throws Exception {
 
-    private List<X509Certificate> getCertificateChain(KeyPair testKeyPair,
-                                                      List<CAConfiguration> leaves,
-                                                      Random random,
-                                                      DateTime notBefore,
-                                                      DateTime notAfter)
-            throws Exception {
+		int leafIndex = random.nextInt(leaves.size());
+		CAConfiguration ca = leaves.get(leafIndex);
+		boolean revoked = random.nextInt(100) < revokedPercentage;
+		long t = Math.abs(random.nextLong())
+				% (0 != ca.getCrlRecords() ? ca.getCrlRecords() : 2);
+		if (0 == t) {
+			t = 1;
+		}
+		BigInteger serialNumber;
+		if (revoked) {
+			serialNumber = new BigInteger(Long.toString(t));
+			expectedRevokedCount++;
+		} else {
+			serialNumber = new BigInteger(Long.toString(t + ca.getCrlRecords()));
+		}
 
-        int leafIndex = random.nextInt(leaves.size());
-        CAConfiguration ca = leaves.get(leafIndex);
-        boolean revoked = random.nextInt(100) < revokedPercentage;
-        long t = Math.abs(random.nextLong()) % (0 != ca.getCrlRecords() ? ca.getCrlRecords() : 2);
-        if (0 == t) {
-            t = 1;
-        }
-        BigInteger serialNumber;
-        if (revoked) {
-            serialNumber = new BigInteger(Long.toString(t));
-            expectedRevokedCount++;
-        } else {
-            serialNumber = new BigInteger(Long.toString(t + ca.getCrlRecords()));
-        }
+		String crlPath = new URI(testPkiPath + "/" + CrlServlet.PATH + "?"
+				+ CrlServlet.CA_QUERY_PARAM + "=" + ca.getName(), false)
+				.toString();
+		String ocspPath = new URI(testPkiPath + "/" + OcspServlet.PATH + "?"
+				+ OcspServlet.CA_QUERY_PARAM + "=" + ca.getName(), false)
+				.toString();
 
-        String crlPath = new URI(testPkiPath
-                + "/" + CrlServlet.PATH + "?"
-                + CrlServlet.CA_QUERY_PARAM + "=" + ca.getName(), false).toString();
-        String ocspPath = new URI(testPkiPath
-                + "/" + OcspServlet.PATH + "?" + OcspServlet.CA_QUERY_PARAM + "=" + ca.getName(), false).toString();
+		LOG.debug("generate for CA=" + ca.getName() + " revoked=" + revoked
+				+ " sn=" + serialNumber);
 
-        LOG.debug("generate for CA=" + ca.getName() + " revoked=" + revoked
-                + " sn=" + serialNumber);
+		X509Certificate certificate = TestUtils.generateCertificate(testKeyPair
+				.getPublic(), "CN=Test", ca.getKeyPair().getPrivate(), ca
+				.getCertificate(), notBefore, notAfter,
+				"SHA512WithRSAEncryption", true, false, false, ocspPath,
+				crlPath, null, serialNumber);
 
-        X509Certificate certificate = TestUtils.generateCertificate(
-                testKeyPair.getPublic(), "CN=Test",
-                ca.getKeyPair().getPrivate(), ca.getCertificate(),
-                notBefore, notAfter,
-                "SHA512WithRSAEncryption", true, false, false,
-                ocspPath, crlPath,
-                null, serialNumber);
+		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
+		certificateChain.add(certificate);
+		certificateChain.add(ca.getCertificate());
 
-        List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
-        certificateChain.add(certificate);
-        certificateChain.add(ca.getCertificate());
-
-        if (null != ca.getRoot()) {
-            CAConfiguration parent = ca.getRoot();
-            while (null != parent.getRoot()) {
-                certificateChain.add(parent.getCertificate());
-                parent = parent.getRoot();
-            }
-            certificateChain.add(parent.getCertificate());
-        }
-        return certificateChain;
-    }
+		if (null != ca.getRoot()) {
+			CAConfiguration parent = ca.getRoot();
+			while (null != parent.getRoot()) {
+				certificateChain.add(parent.getCertificate());
+				parent = parent.getRoot();
+			}
+			certificateChain.add(parent.getCertificate());
+		}
+		return certificateChain;
+	}
 }

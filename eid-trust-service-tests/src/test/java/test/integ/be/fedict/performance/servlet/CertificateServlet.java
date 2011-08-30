@@ -33,36 +33,39 @@ import java.io.PrintWriter;
 
 public class CertificateServlet extends HttpServlet {
 
-    private static final Log LOG = LogFactory.getLog(CertificateServlet.class);
+	private static final long serialVersionUID = 1L;
 
-    public static final String PATH = "certificate";
+	private static final Log LOG = LogFactory.getLog(CertificateServlet.class);
 
-    public static final String CA_QUERY_PARAM = "ca";
+	public static final String PATH = "certificate";
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	public static final String CA_QUERY_PARAM = "ca";
 
-        String caName = request.getParameter(CA_QUERY_PARAM);
-        if (null == caName) {
-            throw new ServletException("No CA name found.");
-        }
-        LOG.debug("get certificate for CA=" + caName);
+	@Override
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
-        CAConfiguration ca = TestPKI.get().findCa(caName);
-        if (null == ca) {
-            throw new ServletException("CA Config not found for " + caName);
-        }
+		String caName = request.getParameter(CA_QUERY_PARAM);
+		if (null == caName) {
+			throw new ServletException("No CA name found.");
+		}
+		LOG.debug("get certificate for CA=" + caName);
 
-        String pemCertificate = TestUtils.toPem(ca.getCertificate());
+		CAConfiguration ca = TestPKI.get().findCa(caName);
+		if (null == ca) {
+			throw new ServletException("CA Config not found for " + caName);
+		}
 
-        response.setContentType("text/plain");
-        PrintWriter out = response.getWriter();
-        out.print(pemCertificate);
-        out.close();
-    }
+		String pemCertificate = TestUtils.toPem(ca.getCertificate());
 
-    public static String getPath(String caName) {
-        return TestPKI.get().getPath() + "/" + PATH + "?" + CA_QUERY_PARAM + "=" + caName;
-    }
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
+		out.print(pemCertificate);
+		out.close();
+	}
+
+	public static String getPath(String caName) {
+		return TestPKI.get().getPath() + "/" + PATH + "?" + CA_QUERY_PARAM
+				+ "=" + caName;
+	}
 }

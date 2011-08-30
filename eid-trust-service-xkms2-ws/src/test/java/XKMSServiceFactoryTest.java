@@ -24,12 +24,12 @@ import static org.junit.Assert.assertNotNull;
 
 public class XKMSServiceFactoryTest {
 
-    @Test
-    public void testGetInstance() throws Exception {
-        // operate
-        XKMSService service = XKMSServiceFactory.getInstance();
+	@Test
+	public void testGetInstance() throws Exception {
+		// operate
+		XKMSService service = XKMSServiceFactory.getInstance();
 
-        // verify
-        assertNotNull(service);
-    }
+		// verify
+		assertNotNull(service);
+	}
 }

@@ -32,7 +32,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "ts_v_trustdom")
-@NamedQueries( {
+@NamedQueries({
 		@NamedQuery(name = VirtualTrustDomainEntity.QUERY_LIST_ALL, query = "FROM VirtualTrustDomainEntity"),
 		@NamedQuery(name = VirtualTrustDomainEntity.QUERY_LIST_TRUST_DOMAINS, query = "SELECT vtd.trustDomains "
 				+ "FROM VirtualTrustDomainEntity AS vtd WHERE vtd.name = :name") })

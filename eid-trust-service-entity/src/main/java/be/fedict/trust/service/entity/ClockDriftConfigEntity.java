@@ -28,129 +28,130 @@ import java.util.Date;
 @Table(name = "ts_clock_drift")
 public class ClockDriftConfigEntity implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private String name;
+	private String name;
 
-    private TimeProtocol timeProtocol;
-    private String server;
-    private int timeout;
-    private int maxClockOffset;
+	private TimeProtocol timeProtocol;
+	private String server;
+	private int timeout;
+	private int maxClockOffset;
 
-    private boolean enabled = false;
+	private boolean enabled = false;
 
-    private String cronSchedule;
-    private Date fireDate;
+	private String cronSchedule;
+	private Date fireDate;
 
-    /**
-     * Default constructor.
-     */
-    public ClockDriftConfigEntity() {
+	/**
+	 * Default constructor.
+	 */
+	public ClockDriftConfigEntity() {
 
-        super();
-    }
+		super();
+	}
 
-    /**
-     * Main constructor.
-     */
-    public ClockDriftConfigEntity(String name, TimeProtocol timeProtocol,
-                                  String server, int timeout, int maxClockOffset, String cronSchedule) {
+	/**
+	 * Main constructor.
+	 */
+	public ClockDriftConfigEntity(String name, TimeProtocol timeProtocol,
+			String server, int timeout, int maxClockOffset, String cronSchedule) {
 
-        this.name = name;
-        this.timeProtocol = timeProtocol;
-        this.server = server;
-        this.timeout = timeout;
-        this.maxClockOffset = maxClockOffset;
-        this.cronSchedule = cronSchedule;
-    }
+		this.name = name;
+		this.timeProtocol = timeProtocol;
+		this.server = server;
+		this.timeout = timeout;
+		this.maxClockOffset = maxClockOffset;
+		this.cronSchedule = cronSchedule;
+	}
 
-    @Id
-    public String getName() {
+	@Id
+	public String getName() {
 
-        return this.name;
-    }
+		return this.name;
+	}
 
-    public void setName(String name) {
+	public void setName(String name) {
 
-        this.name = name;
-    }
+		this.name = name;
+	}
 
-    @Enumerated(EnumType.STRING)
-    public TimeProtocol getTimeProtocol() {
+	@Enumerated(EnumType.STRING)
+	public TimeProtocol getTimeProtocol() {
 
-        return this.timeProtocol;
-    }
+		return this.timeProtocol;
+	}
 
-    public void setTimeProtocol(TimeProtocol timeProtocol) {
+	public void setTimeProtocol(TimeProtocol timeProtocol) {
 
-        this.timeProtocol = timeProtocol;
-    }
+		this.timeProtocol = timeProtocol;
+	}
 
-    public String getServer() {
+	public String getServer() {
 
-        return this.server;
-    }
+		return this.server;
+	}
 
-    public void setServer(String server) {
+	public void setServer(String server) {
 
-        this.server = server;
-    }
+		this.server = server;
+	}
 
-    public int getTimeout() {
+	public int getTimeout() {
 
-        return this.timeout;
-    }
+		return this.timeout;
+	}
 
-    public void setTimeout(int timeout) {
+	public void setTimeout(int timeout) {
 
-        this.timeout = timeout;
-    }
+		this.timeout = timeout;
+	}
 
-    public int getMaxClockOffset() {
+	public int getMaxClockOffset() {
 
-        return this.maxClockOffset;
-    }
+		return this.maxClockOffset;
+	}
 
-    public void setMaxClockOffset(int maxClockOffset) {
+	public void setMaxClockOffset(int maxClockOffset) {
 
-        this.maxClockOffset = maxClockOffset;
-    }
+		this.maxClockOffset = maxClockOffset;
+	}
 
-    public String getCronSchedule() {
+	public String getCronSchedule() {
 
-        return this.cronSchedule;
-    }
+		return this.cronSchedule;
+	}
 
-    public void setCronSchedule(String cronSchedule) {
+	public void setCronSchedule(String cronSchedule) {
 
-        this.cronSchedule = cronSchedule;
-    }
+		this.cronSchedule = cronSchedule;
+	}
 
-    public boolean isEnabled() {
-        return this.enabled;
-    }
+	public boolean isEnabled() {
+		return this.enabled;
+	}
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 
-    public Date getFireDate() {
+	public Date getFireDate() {
 
-        return this.fireDate;
-    }
+		return this.fireDate;
+	}
 
-    public void setFireDate(Date fireDate) {
+	public void setFireDate(Date fireDate) {
 
-        this.fireDate = fireDate;
-    }
+		this.fireDate = fireDate;
+	}
 
-    @Override
-    public String toString() {
+	@Override
+	public String toString() {
 
-        return new ToStringBuilder(this).append("protocol",
-                this.timeProtocol.name()).append("server", this.server).append(
-                "timeout", this.timeout).append("maxClockOffset",
-                this.maxClockOffset).append("cronSchedule", this.cronSchedule).toString();
-    }
+		return new ToStringBuilder(this)
+				.append("protocol", this.timeProtocol.name())
+				.append("server", this.server).append("timeout", this.timeout)
+				.append("maxClockOffset", this.maxClockOffset)
+				.append("cronSchedule", this.cronSchedule).toString();
+	}
 
 }

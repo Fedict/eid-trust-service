@@ -76,10 +76,9 @@ public class WSSecurityServerHandler implements SOAPHandler<SOAPMessageContext> 
 	@PostConstruct
 	public void postConstructCallback() {
 
-		System
-				.setProperty(
-						"com.sun.xml.ws.fault.SOAPFaultBuilder.disableCaptureStackTrace",
-						"true");
+		System.setProperty(
+				"com.sun.xml.ws.fault.SOAPFaultBuilder.disableCaptureStackTrace",
+				"true");
 	}
 
 	/**
@@ -88,10 +87,9 @@ public class WSSecurityServerHandler implements SOAPHandler<SOAPMessageContext> 
 	public Set<QName> getHeaders() {
 
 		Set<QName> headers = new HashSet<QName>();
-		headers
-				.add(new QName(
-						"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-						"Security"));
+		headers.add(new QName(
+				"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+				"Security"));
 		return headers;
 	}
 
@@ -208,9 +206,7 @@ public class WSSecurityServerHandler implements SOAPHandler<SOAPMessageContext> 
 				- nowInstant.getMillis());
 		if (offset > maxWsSecurityTimestampOffset) {
 			LOG.debug("timestamp offset: " + offset);
-			LOG
-					.debug("maximum allowed offset: "
-							+ maxWsSecurityTimestampOffset);
+			LOG.debug("maximum allowed offset: " + maxWsSecurityTimestampOffset);
 			throw createSOAPFaultException(
 					"WS-Security Created Timestamp offset exceeded",
 					"FailedCheck");

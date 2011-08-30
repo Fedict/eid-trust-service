@@ -41,93 +41,92 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Integration test that does an XKMS request for each leaf CA in the {@link TestPKI}.
- * So to trigger the trust service loading all CRLs.
+ * Integration test that does an XKMS request for each leaf CA in the
+ * {@link TestPKI}. So to trigger the trust service loading all CRLs.
  */
 public class TestPKILoadCRLsTest {
 
-    private static final Log LOG = LogFactory.getLog(TestPKILoadCRLsTest.class);
+	private static final Log LOG = LogFactory.getLog(TestPKILoadCRLsTest.class);
 
-    private static final String XKMS_LOCATION = "http://sebeco-dev-11:8080/eid-trust-service-ws/xkms2";
+	private static final String XKMS_LOCATION = "http://sebeco-dev-11:8080/eid-trust-service-ws/xkms2";
 
-    @Before
-    public void setUp() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+	@Before
+	public void setUp() {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
-    private TestPKI testPKI;
-    private String testPkiPath;
+	private TestPKI testPKI;
+	private String testPkiPath;
 
-    private MBeanServerConnection rmi;
+	private MBeanServerConnection rmi;
 
-    @Test
-    public void testLoadCRLs() throws Exception {
+	@Test
+	public void testLoadCRLs() throws Exception {
 
-        LOG.debug("load all test PKI CRLs");
+		LOG.debug("load all test PKI CRLs");
 
-        testPkiPath = JOptionPane.showInputDialog("Please give the test PKI base URL");
-        testPKI = TestPKI.load(testPkiPath);
+		testPkiPath = JOptionPane
+				.showInputDialog("Please give the test PKI base URL");
+		testPKI = TestPKI.load(testPkiPath);
 
-        // initialize XKMS2 client
-        XKMS2Client client = new XKMS2Client(XKMS_LOCATION);
+		// initialize XKMS2 client
+		XKMS2Client client = new XKMS2Client(XKMS_LOCATION);
 
-        // used to generate our certificates
-        DateTime notBefore = new DateTime().minusYears(10);
-        DateTime notAfter = new DateTime().plusYears(10);
-        KeyPair testKeyPair = TestUtils.generateKeyPair();
-        List<CAConfiguration> leaves = testPKI.getLeaves();
-        Random random = new Random();
+		// used to generate our certificates
+		DateTime notBefore = new DateTime().minusYears(10);
+		DateTime notAfter = new DateTime().plusYears(10);
+		KeyPair testKeyPair = TestUtils.generateKeyPair();
+		List<CAConfiguration> leaves = testPKI.getLeaves();
+		Random random = new Random();
 
-        // operate
-        for (CAConfiguration ca : leaves) {
+		// operate
+		for (CAConfiguration ca : leaves) {
 
-            List<X509Certificate> certificateChain = getCertificateChain(testKeyPair,
-                    ca, random, notBefore, notAfter);
-            client.validate("performance", certificateChain);
-        }
-    }
+			List<X509Certificate> certificateChain = getCertificateChain(
+					testKeyPair, ca, random, notBefore, notAfter);
+			client.validate("performance", certificateChain);
+		}
+	}
 
-    private List<X509Certificate> getCertificateChain(KeyPair testKeyPair,
-                                                      CAConfiguration ca,
-                                                      Random random,
-                                                      DateTime notBefore,
-                                                      DateTime notAfter)
-            throws Exception {
+	private List<X509Certificate> getCertificateChain(KeyPair testKeyPair,
+			CAConfiguration ca, Random random, DateTime notBefore,
+			DateTime notAfter) throws Exception {
 
-        long t = Math.abs(random.nextLong()) % (0 != ca.getCrlRecords() ? ca.getCrlRecords() : 2);
-        if (0 == t) {
-            t = 1;
-        }
-        BigInteger serialNumber = new BigInteger(Long.toString(t + ca.getCrlRecords()));
+		long t = Math.abs(random.nextLong())
+				% (0 != ca.getCrlRecords() ? ca.getCrlRecords() : 2);
+		if (0 == t) {
+			t = 1;
+		}
+		BigInteger serialNumber = new BigInteger(Long.toString(t
+				+ ca.getCrlRecords()));
 
-        String crlPath = new URI(testPkiPath
-                + "/" + CrlServlet.PATH + "?"
-                + CrlServlet.CA_QUERY_PARAM + "=" + ca.getName(), false).toString();
-        String ocspPath = new URI(testPkiPath
-                + "/" + OcspServlet.PATH + "?" + OcspServlet.CA_QUERY_PARAM + "=" + ca.getName(), false).toString();
+		String crlPath = new URI(testPkiPath + "/" + CrlServlet.PATH + "?"
+				+ CrlServlet.CA_QUERY_PARAM + "=" + ca.getName(), false)
+				.toString();
+		String ocspPath = new URI(testPkiPath + "/" + OcspServlet.PATH + "?"
+				+ OcspServlet.CA_QUERY_PARAM + "=" + ca.getName(), false)
+				.toString();
 
-        LOG.debug("generate for CA=" + ca.getName() + " sn=" + serialNumber);
+		LOG.debug("generate for CA=" + ca.getName() + " sn=" + serialNumber);
 
-        X509Certificate certificate = TestUtils.generateCertificate(
-                testKeyPair.getPublic(), "CN=Test",
-                ca.getKeyPair().getPrivate(), ca.getCertificate(),
-                notBefore, notAfter,
-                "SHA512WithRSAEncryption", true, false, false,
-                ocspPath, crlPath,
-                null, serialNumber);
+		X509Certificate certificate = TestUtils.generateCertificate(testKeyPair
+				.getPublic(), "CN=Test", ca.getKeyPair().getPrivate(), ca
+				.getCertificate(), notBefore, notAfter,
+				"SHA512WithRSAEncryption", true, false, false, ocspPath,
+				crlPath, null, serialNumber);
 
-        List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
-        certificateChain.add(certificate);
-        certificateChain.add(ca.getCertificate());
+		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
+		certificateChain.add(certificate);
+		certificateChain.add(ca.getCertificate());
 
-        if (null != ca.getRoot()) {
-            CAConfiguration parent = ca.getRoot();
-            while (null != parent.getRoot()) {
-                certificateChain.add(parent.getCertificate());
-                parent = parent.getRoot();
-            }
-            certificateChain.add(parent.getCertificate());
-        }
-        return certificateChain;
-    }
+		if (null != ca.getRoot()) {
+			CAConfiguration parent = ca.getRoot();
+			while (null != parent.getRoot()) {
+				certificateChain.add(parent.getCertificate());
+				parent = parent.getRoot();
+			}
+			certificateChain.add(parent.getCertificate());
+		}
+		return certificateChain;
+	}
 }

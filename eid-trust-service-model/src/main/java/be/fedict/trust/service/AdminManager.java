@@ -23,16 +23,17 @@ import java.security.cert.X509Certificate;
 
 /**
  * Administrator manager.
- *
+ * 
  * @author wvdhaute
  */
 @Local
 public interface AdminManager {
 
-    /**
-     * @param certificate certificate
-     * @return whether the (already authenticated) admin identifier indeed belongs
-     *         to an admin.
-     */
-    boolean isAdmin(X509Certificate certificate);
+	/**
+	 * @param certificate
+	 *            certificate
+	 * @return whether the (already authenticated) admin identifier indeed
+	 *         belongs to an admin.
+	 */
+	boolean isAdmin(X509Certificate certificate);
 }

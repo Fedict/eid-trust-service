@@ -27,41 +27,47 @@ import java.util.List;
 
 /**
  * Administrator service.
- *
+ * 
  * @author wvdhaute
  */
 @Local
 public interface AdministratorService {
 
-    /**
-     * List all {@link be.fedict.trust.service.entity.AdministratorEntity}'s.
-     *
-     * @return list of all administrators
-     */
-    List<AdministratorEntity> listAdmins();
+	/**
+	 * List all {@link be.fedict.trust.service.entity.AdministratorEntity}'s.
+	 * 
+	 * @return list of all administrators
+	 */
+	List<AdministratorEntity> listAdmins();
 
-    /**
-     * Register the specified authentication certificate chain as administrator.
-     * Does a basic public key verification.
-     *
-     * @param authnCert authentication certificate
-     * @return the created {@link be.fedict.trust.service.entity.AdministratorEntity}
-     */
-    AdministratorEntity register(X509Certificate authnCert);
+	/**
+	 * Register the specified authentication certificate chain as administrator.
+	 * Does a basic public key verification.
+	 * 
+	 * @param authnCert
+	 *            authentication certificate
+	 * @return the created
+	 *         {@link be.fedict.trust.service.entity.AdministratorEntity}
+	 */
+	AdministratorEntity register(X509Certificate authnCert);
 
-    /**
-     * Register the pending {@link be.fedict.trust.service.entity.AdministratorEntity}
-     *
-     * @param admin the pending admin to register
-     */
-    void register(AdministratorEntity admin);
+	/**
+	 * Register the pending
+	 * {@link be.fedict.trust.service.entity.AdministratorEntity}
+	 * 
+	 * @param admin
+	 *            the pending admin to register
+	 */
+	void register(AdministratorEntity admin);
 
-    /**
-     * Removes the selected administrator. If only 1 administrator remains,
-     * throws {@link RemoveLastAdminException}.
-     *
-     * @param admin the admin to remove
-     * @throws RemoveLastAdminException cannot remove last admin
-     */
-    void remove(AdministratorEntity admin) throws RemoveLastAdminException;
+	/**
+	 * Removes the selected administrator. If only 1 administrator remains,
+	 * throws {@link RemoveLastAdminException}.
+	 * 
+	 * @param admin
+	 *            the admin to remove
+	 * @throws RemoveLastAdminException
+	 *             cannot remove last admin
+	 */
+	void remove(AdministratorEntity admin) throws RemoveLastAdminException;
 }

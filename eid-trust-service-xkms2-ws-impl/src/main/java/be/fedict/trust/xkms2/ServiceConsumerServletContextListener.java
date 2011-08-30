@@ -70,7 +70,7 @@ public class ServiceConsumerServletContextListener implements
 	}
 
 	public static TrustService getTrustService(ServletContext context) {
-        return (TrustService) context
-                .getAttribute(TrustService.class.getName());
+		return (TrustService) context
+				.getAttribute(TrustService.class.getName());
 	}
 }

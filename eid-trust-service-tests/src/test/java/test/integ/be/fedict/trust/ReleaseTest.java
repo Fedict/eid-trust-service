@@ -18,8 +18,6 @@
 
 package test.integ.be.fedict.trust;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -98,8 +96,8 @@ public class ReleaseTest {
 							"/:project[:groupId[contains(text(), 'be.fedict.eid-trust-service')]]/:version/text()",
 							pomDocument.getDocumentElement());
 			if (null != projectVersionTextNode) {
-				//assertEquals(CURRENT_VERSION,
-				//		projectVersionTextNode.getNodeValue());
+				// assertEquals(CURRENT_VERSION,
+				// projectVersionTextNode.getNodeValue());
 				projectVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 
@@ -110,19 +108,18 @@ public class ReleaseTest {
 							"/:project/:parent[:groupId[text() = 'be.fedict'] and :artifactId[contains(text(), 'eid-trust-service')]]/:version/text()",
 							pomDocument.getDocumentElement());
 			if (null != projectVersionTextNode) {
-				//assertEquals(CURRENT_VERSION,
-				//		projectVersionTextNode.getNodeValue());
+				// assertEquals(CURRENT_VERSION,
+				// projectVersionTextNode.getNodeValue());
 				projectVersionTextNode.setNodeValue(NEW_VERSION);
 			}
-			
-			projectVersionTextNode = XPathAPI
-					.selectSingleNode(
-							pomDocument.getDocumentElement(),
-							"/:project/:version/text()",
-							pomDocument.getDocumentElement());
+
+			projectVersionTextNode = XPathAPI.selectSingleNode(
+					pomDocument.getDocumentElement(),
+					"/:project/:version/text()",
+					pomDocument.getDocumentElement());
 			if (null != projectVersionTextNode) {
-				//assertEquals(CURRENT_VERSION,
-				//		projectVersionTextNode.getNodeValue());
+				// assertEquals(CURRENT_VERSION,
+				// projectVersionTextNode.getNodeValue());
 				projectVersionTextNode.setNodeValue(NEW_VERSION);
 			}
 

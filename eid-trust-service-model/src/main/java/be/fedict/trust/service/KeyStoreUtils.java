@@ -56,9 +56,10 @@ public final class KeyStoreUtils {
 			throws KeyStoreLoadException {
 
 		return loadPrivateKeyEntry(wsSecurityConfig.getKeyStoreType(),
-				wsSecurityConfig.getKeyStorePath(), wsSecurityConfig
-						.getKeyStorePassword(), wsSecurityConfig
-						.getKeyEntryPassword(), wsSecurityConfig.getAlias());
+				wsSecurityConfig.getKeyStorePath(),
+				wsSecurityConfig.getKeyStorePassword(),
+				wsSecurityConfig.getKeyEntryPassword(),
+				wsSecurityConfig.getAlias());
 	}
 
 	public static PrivateKeyEntry loadPrivateKeyEntry(KeyStoreType type,

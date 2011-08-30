@@ -45,106 +45,109 @@ import java.util.List;
 @Stateful
 @Name(PortalConstants.PORTAL_SEAM_PREFIX + "certificateValidator")
 @LocalBinding(jndiBinding = PortalConstants.PORTAL_JNDI_CONTEXT
-        + "CertificateValidatorBean")
+		+ "CertificateValidatorBean")
 public class CertificateValidatorBean implements CertificateValidator {
 
-    @Logger
-    private Log log;
+	@Logger
+	private Log log;
 
-    @In
-    private SessionContext sessionContext;
+	@In
+	private SessionContext sessionContext;
 
-    @In
-    FacesMessages facesMessages;
+	@In
+	FacesMessages facesMessages;
 
-    @EJB
-    private TrustService trustService;
+	@EJB
+	private TrustService trustService;
 
-    private ValidationResult authnResult;
-    private ValidationResult signResult;
+	private ValidationResult authnResult;
+	private ValidationResult signResult;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Remove
-    public String validateCertificates() {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Remove
+	public String validateCertificates() {
 
-        this.authnResult = null;
-        this.signResult = null;
-        return "validate";
-    }
+		this.authnResult = null;
+		this.signResult = null;
+		return "validate";
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void validate() {
-        this.log.debug("validate");
+	/**
+	 * {@inheritDoc}
+	 */
+	public void validate() {
+		this.log.debug("validate");
 
-        X509Certificate authnCert = (X509Certificate) this.sessionContext
-                .get(IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE);
-        X509Certificate signCert = (X509Certificate) this.sessionContext
-                .get(IdentityDataMessageHandler.SIGN_CERT_SESSION_ATTRIBUTE);
-        X509Certificate caCert = (X509Certificate) this.sessionContext
-                .get(IdentityDataMessageHandler.CA_CERT_SESSION_ATTRIBUTE);
-        X509Certificate rootCert = (X509Certificate) this.sessionContext
-                .get(IdentityDataMessageHandler.ROOT_CERT_SESSION_ATTRIBTUE);
+		X509Certificate authnCert = (X509Certificate) this.sessionContext
+				.get(IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE);
+		X509Certificate signCert = (X509Certificate) this.sessionContext
+				.get(IdentityDataMessageHandler.SIGN_CERT_SESSION_ATTRIBUTE);
+		X509Certificate caCert = (X509Certificate) this.sessionContext
+				.get(IdentityDataMessageHandler.CA_CERT_SESSION_ATTRIBUTE);
+		X509Certificate rootCert = (X509Certificate) this.sessionContext
+				.get(IdentityDataMessageHandler.ROOT_CERT_SESSION_ATTRIBTUE);
 
-        /*
-           * Validate authentication certificate chain
-           */
-        List<X509Certificate> authnCertChain = new LinkedList<X509Certificate>();
-        authnCertChain.add(authnCert);
-        authnCertChain.add(caCert);
-        authnCertChain.add(rootCert);
+		/*
+		 * Validate authentication certificate chain
+		 */
+		List<X509Certificate> authnCertChain = new LinkedList<X509Certificate>();
+		authnCertChain.add(authnCert);
+		authnCertChain.add(caCert);
+		authnCertChain.add(rootCert);
 
-        /*
-           * Validate signing certificate chain
-           */
-        List<X509Certificate> signCertChain = new LinkedList<X509Certificate>();
-        signCertChain.add(signCert);
-        signCertChain.add(caCert);
-        signCertChain.add(rootCert);
+		/*
+		 * Validate signing certificate chain
+		 */
+		List<X509Certificate> signCertChain = new LinkedList<X509Certificate>();
+		signCertChain.add(signCert);
+		signCertChain.add(caCert);
+		signCertChain.add(rootCert);
 
-        try {
-            this.authnResult = this.trustService.validate(
-                    TrustServiceDomains.BELGIAN_EID_AUTH_TRUST_DOMAIN,
-                    authnCertChain, false);
-            this.signResult = this.trustService
-                    .validate(
-                            TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
-                            signCertChain, false);
-        } catch (TrustDomainNotFoundException e) {
-        	this.log.error("error validating eID certificates: " + e.getMessage(), e);
-            this.facesMessages.addFromResourceBundle(
-                    StatusMessage.Severity.ERROR, "errorTrustDomainNotFound");
-            this.authnResult = new ValidationResult(new TrustLinkerResult(false), null);
-            this.signResult = new ValidationResult(new TrustLinkerResult(false), null);
-        }
-    }
+		try {
+			this.authnResult = this.trustService.validate(
+					TrustServiceDomains.BELGIAN_EID_AUTH_TRUST_DOMAIN,
+					authnCertChain, false);
+			this.signResult = this.trustService
+					.validate(
+							TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+							signCertChain, false);
+		} catch (TrustDomainNotFoundException e) {
+			this.log.error(
+					"error validating eID certificates: " + e.getMessage(), e);
+			this.facesMessages.addFromResourceBundle(
+					StatusMessage.Severity.ERROR, "errorTrustDomainNotFound");
+			this.authnResult = new ValidationResult(
+					new TrustLinkerResult(false), null);
+			this.signResult = new ValidationResult(
+					new TrustLinkerResult(false), null);
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isAuthnValid() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isAuthnValid() {
 
-        return this.authnResult.isValid();
-    }
+		return this.authnResult.isValid();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isSigningValid() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isSigningValid() {
 
-        return this.signResult.isValid();
-    }
+		return this.signResult.isValid();
+	}
 
-    public TrustLinkerResult getAuthnResult() {
+	public TrustLinkerResult getAuthnResult() {
 
-        return this.authnResult.getResult();
-    }
+		return this.authnResult.getResult();
+	}
 
-    public TrustLinkerResult getSigningResult() {
+	public TrustLinkerResult getSigningResult() {
 
-        return this.signResult.getResult();
-    }
+		return this.signResult.getResult();
+	}
 }

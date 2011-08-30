@@ -36,66 +36,72 @@ import java.util.Date;
 
 /**
  * Clock drift detection service bean implementation.
- *
+ * 
  * @author wvdhaute
  */
 @Stateless
 public class ClockDriftDetectorServiceBean implements ClockDriftService {
 
-    private static final Log LOG = LogFactory
-            .getLog(ClockDriftDetectorServiceBean.class);
+	private static final Log LOG = LogFactory
+			.getLog(ClockDriftDetectorServiceBean.class);
 
-    @EJB
-    private ConfigurationDAO configurationDAO;
+	@EJB
+	private ConfigurationDAO configurationDAO;
 
-    @EJB
-    private AuditDAO auditDAO;
+	@EJB
+	private AuditDAO auditDAO;
 
-    /**
-     * {@inheritDoc}
-     */
-    public void execute() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void execute() {
 
-        ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
-                .getClockDriftConfig();
-        NetworkConfig networkConfig = this.configurationDAO.getNetworkConfig();
+		ClockDriftConfigEntity clockDriftConfig = this.configurationDAO
+				.getClockDriftConfig();
+		NetworkConfig networkConfig = this.configurationDAO.getNetworkConfig();
 
-        LOG.debug("clock drift detection: " + clockDriftConfig.toString());
+		LOG.debug("clock drift detection: " + clockDriftConfig.toString());
 
-        long offset = 0;
-        switch (clockDriftConfig.getTimeProtocol()) {
-            case NTP: {
+		long offset = 0;
+		switch (clockDriftConfig.getTimeProtocol()) {
+		case NTP: {
 
-                try {
-                    TimeInfo timeInfo = ClockDriftUtil.executeNTP(clockDriftConfig, networkConfig);
-                    offset = timeInfo.getOffset();
-                } catch (IOException e) {
-                    this.auditDAO.logAudit("Error contacting NTP server "
-                            + clockDriftConfig.getServer() + " (msg=" + e.getMessage() + ")");
-                }
-                break;
-            }
-            case TSP: {
+			try {
+				TimeInfo timeInfo = ClockDriftUtil.executeNTP(clockDriftConfig,
+						networkConfig);
+				offset = timeInfo.getOffset();
+			} catch (IOException e) {
+				this.auditDAO.logAudit("Error contacting NTP server "
+						+ clockDriftConfig.getServer() + " (msg="
+						+ e.getMessage() + ")");
+			}
+			break;
+		}
+		case TSP: {
 
-                try {
-                    Date now = new Date();
-                    offset = ClockDriftUtil.executeTSP(clockDriftConfig, networkConfig).getTime() - now.getTime();
-                } catch (IOException e) {
-                    this.auditDAO.logAudit("Error contacting NTP server "
-                            + clockDriftConfig.getServer() + " (msg=" + e.getMessage() + ")");
-                } catch (TSPException e) {
-                    this.auditDAO.logAudit("Error contacting NTP server "
-                            + clockDriftConfig.getServer() + " (msg=" + e.getMessage() + ")");
-                }
-                break;
-            }
-        }
+			try {
+				Date now = new Date();
+				offset = ClockDriftUtil.executeTSP(clockDriftConfig,
+						networkConfig).getTime()
+						- now.getTime();
+			} catch (IOException e) {
+				this.auditDAO.logAudit("Error contacting NTP server "
+						+ clockDriftConfig.getServer() + " (msg="
+						+ e.getMessage() + ")");
+			} catch (TSPException e) {
+				this.auditDAO.logAudit("Error contacting NTP server "
+						+ clockDriftConfig.getServer() + " (msg="
+						+ e.getMessage() + ")");
+			}
+			break;
+		}
+		}
 
-        LOG.debug("clock offset (ms): " + offset);
-        if (Math.abs(offset) > clockDriftConfig.getMaxClockOffset()) {
-            this.auditDAO.logAudit("Maximum clock offset reached: "
-                    + Math.abs(offset) + " > "
-                    + clockDriftConfig.getMaxClockOffset());
-        }
-    }
+		LOG.debug("clock offset (ms): " + offset);
+		if (Math.abs(offset) > clockDriftConfig.getMaxClockOffset()) {
+			this.auditDAO.logAudit("Maximum clock offset reached: "
+					+ Math.abs(offset) + " > "
+					+ clockDriftConfig.getMaxClockOffset());
+		}
+	}
 }

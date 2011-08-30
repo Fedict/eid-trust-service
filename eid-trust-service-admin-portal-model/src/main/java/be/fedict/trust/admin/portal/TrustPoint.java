@@ -26,46 +26,46 @@ import java.io.IOException;
 @Local
 public interface TrustPoint {
 
-    /*
-      * Factories
-      */
-    void trustPointListFactory();
+	/*
+	 * Factories
+	 */
+	void trustPointListFactory();
 
-    void trustPointCAListFactory();
+	void trustPointCAListFactory();
 
-    /*
-      * Lifecycle.
-      */
-    void destroyCallback();
+	/*
+	 * Lifecycle.
+	 */
+	void destroyCallback();
 
-    /*
-      * Accessors
-      */
-    String getCrlRefreshCronSchedule();
+	/*
+	 * Accessors
+	 */
+	String getCrlRefreshCronSchedule();
 
-    void setCrlRefreshCronSchedule(String crlRefreshCronSchedule);
+	void setCrlRefreshCronSchedule(String crlRefreshCronSchedule);
 
-    /*
-      * Actions
-      */
-    String modify();
+	/*
+	 * Actions
+	 */
+	String modify();
 
-    String save();
+	String save();
 
-    void select();
+	void select();
 
-    String remove();
+	String remove();
 
-    String add();
+	String add();
 
-    String back();
+	String back();
 
-    String refresh();
+	String refresh();
 
-    String refreshCA();
+	String refreshCA();
 
-    /*
-      * Richfaces component callbacks
-      */
-    void uploadListener(UploadEvent event) throws IOException;
+	/*
+	 * Richfaces component callbacks
+	 */
+	void uploadListener(UploadEvent event) throws IOException;
 }

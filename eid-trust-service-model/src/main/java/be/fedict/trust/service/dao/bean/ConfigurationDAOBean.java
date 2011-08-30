@@ -31,179 +31,179 @@ import javax.persistence.PersistenceContext;
 
 /**
  * Configuration DAO Bean implementation.
- *
+ * 
  * @author wvdhaute
  */
 @Stateless
 public class ConfigurationDAOBean implements ConfigurationDAO {
 
-    private static final Log LOG = LogFactory
-            .getLog(ConfigurationDAOBean.class);
+	private static final Log LOG = LogFactory
+			.getLog(ConfigurationDAOBean.class);
 
-    @PersistenceContext
-    private EntityManager entityManager;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-    /**
-     * {@inheritDoc}
-     */
-    public NetworkConfigEntity findNetworkConfigEntity() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public NetworkConfigEntity findNetworkConfigEntity() {
 
-        LOG.debug("find network config entity");
-        return this.entityManager.find(NetworkConfigEntity.class,
-                TrustServiceConstants.NETWORK_CONFIG);
-    }
+		LOG.debug("find network config entity");
+		return this.entityManager.find(NetworkConfigEntity.class,
+				TrustServiceConstants.NETWORK_CONFIG);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public NetworkConfigEntity getNetworkConfigEntity() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public NetworkConfigEntity getNetworkConfigEntity() {
 
-        NetworkConfigEntity networkConfig = findNetworkConfigEntity();
-        if (null == networkConfig) {
-            networkConfig = new NetworkConfigEntity(
-                    TrustServiceConstants.NETWORK_CONFIG, null, 0);
-            this.entityManager.persist(networkConfig);
-        }
-        return networkConfig;
-    }
+		NetworkConfigEntity networkConfig = findNetworkConfigEntity();
+		if (null == networkConfig) {
+			networkConfig = new NetworkConfigEntity(
+					TrustServiceConstants.NETWORK_CONFIG, null, 0);
+			this.entityManager.persist(networkConfig);
+		}
+		return networkConfig;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public NetworkConfig getNetworkConfig() {
-        LOG.debug("get network config entity");
-        NetworkConfigEntity networkConfig = getNetworkConfigEntity();
-        if (networkConfig.isEnabled()) {
-            return new NetworkConfig(networkConfig.getProxyHost(),
-                    networkConfig.getProxyPort());
-        } else {
-            return null;
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public NetworkConfig getNetworkConfig() {
+		LOG.debug("get network config entity");
+		NetworkConfigEntity networkConfig = getNetworkConfigEntity();
+		if (networkConfig.isEnabled()) {
+			return new NetworkConfig(networkConfig.getProxyHost(),
+					networkConfig.getProxyPort());
+		} else {
+			return null;
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setNetworkConfigEnabled(boolean enabled) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setNetworkConfigEnabled(boolean enabled) {
 
-        LOG.debug("set network config enabled: " + enabled);
-        NetworkConfigEntity networkConfig = getNetworkConfigEntity();
-        networkConfig.setEnabled(enabled);
-    }
+		LOG.debug("set network config enabled: " + enabled);
+		NetworkConfigEntity networkConfig = getNetworkConfigEntity();
+		networkConfig.setEnabled(enabled);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public NetworkConfigEntity setNetworkConfig(String proxyHost, int proxyPort) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public NetworkConfigEntity setNetworkConfig(String proxyHost, int proxyPort) {
 
-        LOG.debug("set network config: proxyHost=" + proxyHost + " proxyPort="
-                + proxyPort);
-        NetworkConfigEntity networkConfigEntity = getNetworkConfigEntity();
-        networkConfigEntity.setProxyHost(proxyHost);
-        networkConfigEntity.setProxyPort(proxyPort);
-        return networkConfigEntity;
-    }
+		LOG.debug("set network config: proxyHost=" + proxyHost + " proxyPort="
+				+ proxyPort);
+		NetworkConfigEntity networkConfigEntity = getNetworkConfigEntity();
+		networkConfigEntity.setProxyHost(proxyHost);
+		networkConfigEntity.setProxyPort(proxyPort);
+		return networkConfigEntity;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public ClockDriftConfigEntity findClockDriftConfig() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public ClockDriftConfigEntity findClockDriftConfig() {
 
-        LOG.debug("find clock drift configuration");
-        return this.entityManager.find(ClockDriftConfigEntity.class,
-                TrustServiceConstants.CLOCK_DRIFT_CONFIG);
-    }
+		LOG.debug("find clock drift configuration");
+		return this.entityManager.find(ClockDriftConfigEntity.class,
+				TrustServiceConstants.CLOCK_DRIFT_CONFIG);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public ClockDriftConfigEntity getClockDriftConfig() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public ClockDriftConfigEntity getClockDriftConfig() {
 
-        ClockDriftConfigEntity clockDriftConfig = findClockDriftConfig();
-        if (null == clockDriftConfig) {
-            clockDriftConfig = new ClockDriftConfigEntity(
-                    TrustServiceConstants.CLOCK_DRIFT_CONFIG, TimeProtocol.NTP,
-                    TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER,
-                    TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
-                    TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET,
-                    TrustServiceConstants.DEFAULT_CRON_EXPRESSION);
-            this.entityManager.persist(clockDriftConfig);
-        }
-        return clockDriftConfig;
-    }
+		ClockDriftConfigEntity clockDriftConfig = findClockDriftConfig();
+		if (null == clockDriftConfig) {
+			clockDriftConfig = new ClockDriftConfigEntity(
+					TrustServiceConstants.CLOCK_DRIFT_CONFIG, TimeProtocol.NTP,
+					TrustServiceConstants.CLOCK_DRIFT_NTP_SERVER,
+					TrustServiceConstants.CLOCK_DRIFT_TIMEOUT,
+					TrustServiceConstants.CLOCK_DRIFT_MAX_CLOCK_OFFSET,
+					TrustServiceConstants.DEFAULT_CRON_EXPRESSION);
+			this.entityManager.persist(clockDriftConfig);
+		}
+		return clockDriftConfig;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public ClockDriftConfigEntity setClockDriftConfig(
-            TimeProtocol timeProtocol, String server, int timeout,
-            int maxClockOffset, String cronSchedule) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public ClockDriftConfigEntity setClockDriftConfig(
+			TimeProtocol timeProtocol, String server, int timeout,
+			int maxClockOffset, String cronSchedule) {
 
-        LOG.debug("set clock drift detection config: protocol="
-                + timeProtocol.name() + " server=" + server + " timeout="
-                + timeout + " maxClockOffset=" + maxClockOffset);
-        ClockDriftConfigEntity clockDriftConfig = getClockDriftConfig();
-        clockDriftConfig.setTimeProtocol(timeProtocol);
-        clockDriftConfig.setServer(server);
-        clockDriftConfig.setTimeout(timeout);
-        clockDriftConfig.setMaxClockOffset(maxClockOffset);
-        clockDriftConfig.setCronSchedule(cronSchedule);
-        return clockDriftConfig;
-    }
+		LOG.debug("set clock drift detection config: protocol="
+				+ timeProtocol.name() + " server=" + server + " timeout="
+				+ timeout + " maxClockOffset=" + maxClockOffset);
+		ClockDriftConfigEntity clockDriftConfig = getClockDriftConfig();
+		clockDriftConfig.setTimeProtocol(timeProtocol);
+		clockDriftConfig.setServer(server);
+		clockDriftConfig.setTimeout(timeout);
+		clockDriftConfig.setMaxClockOffset(maxClockOffset);
+		clockDriftConfig.setCronSchedule(cronSchedule);
+		return clockDriftConfig;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setClockDriftConfigEnabled(boolean enabled) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setClockDriftConfigEnabled(boolean enabled) {
 
-        LOG.debug("set clock drift enabled: " + enabled);
-        ClockDriftConfigEntity clockDriftConfig = getClockDriftConfig();
-        clockDriftConfig.setEnabled(enabled);
-    }
+		LOG.debug("set clock drift enabled: " + enabled);
+		ClockDriftConfigEntity clockDriftConfig = getClockDriftConfig();
+		clockDriftConfig.setEnabled(enabled);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public WSSecurityConfigEntity findWSSecurityConfig() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public WSSecurityConfigEntity findWSSecurityConfig() {
 
-        LOG.debug("find ws security config");
-        return this.entityManager.find(WSSecurityConfigEntity.class,
-                TrustServiceConstants.WS_SECURITY_CONFIG);
-    }
+		LOG.debug("find ws security config");
+		return this.entityManager.find(WSSecurityConfigEntity.class,
+				TrustServiceConstants.WS_SECURITY_CONFIG);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public WSSecurityConfigEntity getWSSecurityConfig() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public WSSecurityConfigEntity getWSSecurityConfig() {
 
-        WSSecurityConfigEntity wsSecurityConfig = findWSSecurityConfig();
-        if (null == wsSecurityConfig) {
-            wsSecurityConfig = new WSSecurityConfigEntity(
-                    TrustServiceConstants.WS_SECURITY_CONFIG, false, null,
-                    null, null, null, null);
-            this.entityManager.persist(wsSecurityConfig);
-        }
-        return wsSecurityConfig;
-    }
+		WSSecurityConfigEntity wsSecurityConfig = findWSSecurityConfig();
+		if (null == wsSecurityConfig) {
+			wsSecurityConfig = new WSSecurityConfigEntity(
+					TrustServiceConstants.WS_SECURITY_CONFIG, false, null,
+					null, null, null, null);
+			this.entityManager.persist(wsSecurityConfig);
+		}
+		return wsSecurityConfig;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public WSSecurityConfigEntity setWSSecurityConfig(boolean signing,
-                                                      KeyStoreType keyStoreType, String keyStorePath,
-                                                      String keyStorePassword, String keyEntryPassword, String alias) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public WSSecurityConfigEntity setWSSecurityConfig(boolean signing,
+			KeyStoreType keyStoreType, String keyStorePath,
+			String keyStorePassword, String keyEntryPassword, String alias) {
 
-        LOG.debug("set WS Security config: signing=" + signing
-                + " keyStoreType=" + keyStoreType + " keyStorePath="
-                + keyStorePath + " keyStorePassword=" + keyStorePassword
-                + " keyEntryPassword=" + keyEntryPassword + " alias=" + alias);
-        WSSecurityConfigEntity wsSecurityConfig = getWSSecurityConfig();
-        wsSecurityConfig.setSigning(signing);
-        wsSecurityConfig.setKeyStoreType(keyStoreType);
-        wsSecurityConfig.setKeyStorePath(keyStorePath);
-        wsSecurityConfig.setKeyStorePassword(keyStorePassword);
-        wsSecurityConfig.setKeyEntryPassword(keyEntryPassword);
-        wsSecurityConfig.setAlias(alias);
-        return wsSecurityConfig;
-    }
+		LOG.debug("set WS Security config: signing=" + signing
+				+ " keyStoreType=" + keyStoreType + " keyStorePath="
+				+ keyStorePath + " keyStorePassword=" + keyStorePassword
+				+ " keyEntryPassword=" + keyEntryPassword + " alias=" + alias);
+		WSSecurityConfigEntity wsSecurityConfig = getWSSecurityConfig();
+		wsSecurityConfig.setSigning(signing);
+		wsSecurityConfig.setKeyStoreType(keyStoreType);
+		wsSecurityConfig.setKeyStorePath(keyStorePath);
+		wsSecurityConfig.setKeyStorePassword(keyStorePassword);
+		wsSecurityConfig.setKeyEntryPassword(keyEntryPassword);
+		wsSecurityConfig.setAlias(alias);
+		return wsSecurityConfig;
+	}
 }

@@ -102,7 +102,7 @@ public class AdministratorBean implements Administrator {
 	/**
 	 * {@inheritDoc}
 	 */
-    @Admin
+	@Admin
 	public void register() {
 
 		this.log.debug("register");
@@ -116,7 +116,7 @@ public class AdministratorBean implements Administrator {
 	/**
 	 * {@inheritDoc}
 	 */
-    @Admin
+	@Admin
 	public String registerPending() {
 
 		this.log.debug("register pending admin");
@@ -136,7 +136,7 @@ public class AdministratorBean implements Administrator {
 	/**
 	 * {@inheritDoc}
 	 */
-    @Admin
+	@Admin
 	public String remove() {
 
 		this.log.debug("remove administrator");
