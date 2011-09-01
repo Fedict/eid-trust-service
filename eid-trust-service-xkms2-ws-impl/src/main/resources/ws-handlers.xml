@@ -3,7 +3,8 @@
 	<jws:handler-chain>
 		<jws:handler>
 			<jws:handler-class>
-				be.fedict.trust.xkms2.WSSecurityServerHandler </jws:handler-class>
+				be.fedict.trust.xkms2.WSSecurityServerHandler
+			</jws:handler-class>
 		</jws:handler>
 		<jws:handler>
 			<jws:handler-class>

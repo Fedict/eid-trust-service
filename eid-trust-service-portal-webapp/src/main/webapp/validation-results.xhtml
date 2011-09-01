@@ -1,49 +1,50 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html" xmlns:c="http://java.sun.com/jstl/core">
-	<body>
-		<ui:composition template="/WEB-INF/template.xhtml">
-			<ui:param name="activeMenu" value="validate" />
-			<ui:define name="body">
-				<h2>#{messages.validateResult}</h2>
-				<h:panelGroup>
-					<h:panelGrid columns="2">
-						<h:outputText value="#{messages.authnCertificate}" />
-						<c:choose>
-							<c:when test="#{ts_certificateValidator.authnValid}">
-								<h:graphicImage id="authn-ok" alt="OK"
-									url="/images/ok.png" />
-							</c:when>
-							<c:otherwise>
-								<h:panelGrid columns="2">
-									<h:graphicImage id="authn-error" alt="ERROR"
-										url="/images/error.png" />
-									<h:outputText
-										value="#{ts_certificateValidator.authnResult.reason} : #{ts_certificateValidator.authnResult.message}" />
-								</h:panelGrid>
-							</c:otherwise>
-						</c:choose>
-						<h:outputText value="#{messages.signingCertificate}" />
-						<c:choose>
-							<c:when test="#{ts_certificateValidator.signingValid}">
-								<h:graphicImage id="sign-ok" alt="OK" url="/images/ok.png" />
-							</c:when>
-							<c:otherwise>
-								<h:panelGrid columns="2">
-									<h:graphicImage id="sign-error" alt="ERROR"
-										url="/images/error.png" />
-									<h:outputText
-										value="#{ts_certificateValidator.signingResult.reason} : #{ts_certificateValidator.signingResult.message}" />
-								</h:panelGrid>
-							</c:otherwise>
-						</c:choose>
-					</h:panelGrid>
-				</h:panelGroup>
-				<p>
-					<a
-						href="#{facesContext.externalContext.requestContextPath}/validate">#{messages.validateAgainMsg}</a>
-				</p>
-			</ui:define>
-		</ui:composition>
-	</body>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core">
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:param name="activeMenu" value="validate" />
+		<ui:define name="body">
+			<h2>#{messages.validateResult}</h2>
+			<h:panelGroup>
+				<h:panelGrid columns="2">
+					<h:outputText value="#{messages.authnCertificate}" />
+					<c:choose>
+						<c:when test="#{ts_certificateValidator.authnValid}">
+							<h:graphicImage id="authn-ok" alt="OK" url="/images/ok.png" />
+						</c:when>
+						<c:otherwise>
+							<h:panelGrid columns="2">
+								<h:graphicImage id="authn-error" alt="ERROR"
+									url="/images/error.png" />
+								<h:outputText
+									value="#{ts_certificateValidator.authnResult.reason} : #{ts_certificateValidator.authnResult.message}" />
+							</h:panelGrid>
+						</c:otherwise>
+					</c:choose>
+					<h:outputText value="#{messages.signingCertificate}" />
+					<c:choose>
+						<c:when test="#{ts_certificateValidator.signingValid}">
+							<h:graphicImage id="sign-ok" alt="OK" url="/images/ok.png" />
+						</c:when>
+						<c:otherwise>
+							<h:panelGrid columns="2">
+								<h:graphicImage id="sign-error" alt="ERROR"
+									url="/images/error.png" />
+								<h:outputText
+									value="#{ts_certificateValidator.signingResult.reason} : #{ts_certificateValidator.signingResult.message}" />
+							</h:panelGrid>
+						</c:otherwise>
+					</c:choose>
+				</h:panelGrid>
+			</h:panelGroup>
+			<p>
+				<a
+					href="#{facesContext.externalContext.requestContextPath}/validate">#{messages.validateAgainMsg}</a>
+			</p>
+		</ui:define>
+	</ui:composition>
+</body>
 </html>

@@ -1,73 +1,74 @@
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:c="http://java.sun.com/jstl/core" xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html" xmlns:a4j="http://richfaces.org/a4j">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-		<meta http-equiv="Content-Script-Type" content="text/javascript" />
-		<meta http-equiv="Content-Style-Type" content="text/css" />
-        <meta http-equiv="Expires" content="-1"/>
-        <meta http-equiv="Pragma" content="no-cache"/>
-		<title>#{messages.title}</title>
-		<a4j:loadStyle src="/style.css" />
 
-		<script type="text/javascript">
-			function setClass(id, className) {
-			obj =
-			document.getElementById(id);
-			if (null != obj) {
-			obj.className =
-			className;
-			}
-			}		
-        </script>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Expires" content="-1" />
+<meta http-equiv="Pragma" content="no-cache" />
+<title>#{messages.title}</title>
+<a4j:loadStyle src="/style.css" />
 
-	</head>
+<script type="text/javascript">
+	function setClass(id, className) {
+		obj = document.getElementById(id);
+		if (null != obj) {
+			obj.className = className;
+		}
+	}
+</script>
+
+</head>
 
 
-	<body onload="setClass('menu_item_#{activeMenu}', 'selected');">
-		<div id="header">
+<body onload="setClass('menu_item_#{activeMenu}', 'selected');">
+	<div id="header">
 
-			<div id="language">
-				<h:form>
-					<h:selectOneMenu id="language"
-						value="#{ts_localization.localeString}" onchange="submit();">
-						<f:selectItems value="#{ts_localization.supportedLocales}" />
-					</h:selectOneMenu>
-				</h:form>
-			</div>
-
-			<div id="logo">
-				<h:graphicImage id="logo" alt="Fedict Logo" height="45"
-					url="/images/fedict.png" />
-			</div>
-
-			<h1>#{messages.title}</h1>
+		<div id="language">
+			<h:form>
+				<h:selectOneMenu id="language"
+					value="#{ts_localization.localeString}" onchange="submit();">
+					<f:selectItems value="#{ts_localization.supportedLocales}" />
+				</h:selectOneMenu>
+			</h:form>
 		</div>
 
-        <!-- Seems to resolve deployJava.js/Chrome issue ... -->
-        <f:view contentType="text/html">
-			<h:form>
-				<div id="menu">
-					<ul>
-						<li id="menu_item_main">
-							<a href="#{facesContext.externalContext.requestContextPath}/main">#{messages.home}</a>
-						</li>
-						<li id="menu_item_validate">
-							<a
-								href="#{facesContext.externalContext.requestContextPath}/validate">#{messages.validate}</a>
-						</li>
-					</ul>
-				</div>
-			</h:form>
+		<div id="logo">
+			<h:graphicImage id="logo" alt="Fedict Logo" height="45"
+				url="/images/fedict.png" />
+		</div>
 
-			<div id="content">
-				<ui:insert name="body">
-					<p>Default Body</p>
-				</ui:insert>
+		<h1>#{messages.title}</h1>
+	</div>
+
+	<!-- Seems to resolve deployJava.js/Chrome issue ... -->
+	<f:view contentType="text/html">
+		<h:form>
+			<div id="menu">
+				<ul>
+					<li id="menu_item_main"><a
+						href="#{facesContext.externalContext.requestContextPath}/main">#{messages.home}</a>
+					</li>
+					<li id="menu_item_validate"><a
+						href="#{facesContext.externalContext.requestContextPath}/validate">#{messages.validate}</a>
+					</li>
+				</ul>
 			</div>
-		</f:view>
+		</h:form>
 
-	</body>
+		<div id="content">
+			<ui:insert name="body">
+				<p>Default Body</p>
+			</ui:insert>
+		</div>
+	</f:view>
+
+</body>
 
 </html>

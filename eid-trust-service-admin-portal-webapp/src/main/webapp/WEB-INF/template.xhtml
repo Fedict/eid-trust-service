@@ -1,111 +1,100 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:c="http://java.sun.com/jstl/core"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:a4j="http://richfaces.org/a4j"
-      xmlns:s="http://jboss.com/products/seam/taglib">
-    <head>
-        <meta http-equiv="Content-Type"
-              content="text/html; charset=iso-8859-1"/>
-        <meta http-equiv="Content-Script-Type" content="text/javascript"/>
-        <meta http-equiv="Content-Style-Type" content="text/css"/>
-        <meta http-equiv="Expires" content="-1"/>
-        <meta http-equiv="Pragma" content="no-cache"/>
-        <title>#{messages.title}</title>
-        <a4j:loadStyle src="/style.css"/>
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:s="http://jboss.com/products/seam/taglib">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Expires" content="-1" />
+<meta http-equiv="Pragma" content="no-cache" />
+<title>#{messages.title}</title>
+<a4j:loadStyle src="/style.css" />
 
-        <script type="text/javascript">
-            function setClass(id, className) {
-            obj =
-            document.getElementById(id);
-            if (null != obj) {
-            obj.className =
-            className;
-            }
-            }
-        </script>
-    </head>
+<script type="text/javascript">
+	function setClass(id, className) {
+		obj = document.getElementById(id);
+		if (null != obj) {
+			obj.className = className;
+		}
+	}
+</script>
+</head>
 
-    <body onload="setClass('menu_item_#{activeMenu}', 'selected');">
-        <div id="header">
+<body onload="setClass('menu_item_#{activeMenu}', 'selected');">
+	<div id="header">
 
-            <div id="logo">
-                <h:graphicImage id="logo" alt="Fedict Logo" height="45"
-                                url="/images/fedict.png"/>
-            </div>
+		<div id="logo">
+			<h:graphicImage id="logo" alt="Fedict Logo" height="45"
+				url="/images/fedict.png" />
+		</div>
 
-            <h1>#{messages.title}</h1>
+		<h1>#{messages.title}</h1>
 
-        </div>
+	</div>
 
-        <!-- Seems to resolve deployJava.js/Chrome issue ... -->
-        <f:view contentType="text/html">
-            <h:form>
-                <div id="menu">
-                    <ul>
-                        <s:div rendered="#{!identity.isLoggedIn()}">
-                            <li id="menu_item_main"><a
-                                    href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
-                            </li>
-                        </s:div>
-                        <s:div rendered="#{!identity.isLoggedIn()}">
-                            <li id="menu_item_login"><a
-                                    href="#{facesContext.externalContext.requestContextPath}/admin/configuration.seam">#{messages.login}</a>
-                            </li>
-                        </s:div>
-                        <s:div rendered="#{s:hasRole('admin')}">
-                            <li id="menu_item_config"><a
-                                    href="#{facesContext.externalContext.requestContextPath}/admin/configuration.seam">
-                                #{messages.configuration}</a>
-                            </li>
-                        </s:div>
-                        <s:div rendered="#{s:hasRole('admin')}">
-                            <li id="menu_item_virtual_domain"><a
-                                    href="#{facesContext.externalContext.requestContextPath}/admin/virtual-trust-domain.seam">
-                                #{messages.virtualTrustDomains}</a>
-                            </li>
-                        </s:div>
+	<!-- Seems to resolve deployJava.js/Chrome issue ... -->
+	<f:view contentType="text/html">
+		<h:form>
+			<div id="menu">
+				<ul>
+					<s:div rendered="#{!identity.isLoggedIn()}">
+						<li id="menu_item_main"><a
+							href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
+						</li>
+					</s:div>
+					<s:div rendered="#{!identity.isLoggedIn()}">
+						<li id="menu_item_login"><a
+							href="#{facesContext.externalContext.requestContextPath}/admin/configuration.seam">#{messages.login}</a>
+						</li>
+					</s:div>
+					<s:div rendered="#{s:hasRole('admin')}">
+						<li id="menu_item_config"><a
+							href="#{facesContext.externalContext.requestContextPath}/admin/configuration.seam">
+								#{messages.configuration}</a></li>
+					</s:div>
+					<s:div rendered="#{s:hasRole('admin')}">
+						<li id="menu_item_virtual_domain"><a
+							href="#{facesContext.externalContext.requestContextPath}/admin/virtual-trust-domain.seam">
+								#{messages.virtualTrustDomains}</a></li>
+					</s:div>
 
-                        <s:div rendered="#{s:hasRole('admin')}">
-                            <li id="menu_item_domain"><a
-                                    href="#{facesContext.externalContext.requestContextPath}/admin/trust-domain.seam">
-                                #{messages.trustDomains}</a>
-                            </li>
-                        </s:div>
-                        <s:div rendered="#{s:hasRole('admin')}">
-                            <li id="menu_item_trustpoint"><a
-                                    href="#{facesContext.externalContext.requestContextPath}/admin/trust-point.seam">
-                                #{messages.trustPoints}</a>
-                            </li>
-                        </s:div>
-                        <s:div rendered="#{s:hasRole('admin')}">
-                            <li id="menu_item_audit"><a
-                                    href="#{facesContext.externalContext.requestContextPath}/admin/audit.seam">
-                                #{messages.audit}</a>
-                            </li>
-                        </s:div>
+					<s:div rendered="#{s:hasRole('admin')}">
+						<li id="menu_item_domain"><a
+							href="#{facesContext.externalContext.requestContextPath}/admin/trust-domain.seam">
+								#{messages.trustDomains}</a></li>
+					</s:div>
+					<s:div rendered="#{s:hasRole('admin')}">
+						<li id="menu_item_trustpoint"><a
+							href="#{facesContext.externalContext.requestContextPath}/admin/trust-point.seam">
+								#{messages.trustPoints}</a></li>
+					</s:div>
+					<s:div rendered="#{s:hasRole('admin')}">
+						<li id="menu_item_audit"><a
+							href="#{facesContext.externalContext.requestContextPath}/admin/audit.seam">
+								#{messages.audit}</a></li>
+					</s:div>
 
-                        <s:div rendered="#{identity.isLoggedIn()}">
-                            <li>
-                                <s:link value="#{messages.logout}"
-                                        view="/main.xhtml"
-                                        action="#{identity.logout}"/>
-                            </li>
-                        </s:div>
-                    </ul>
-                </div>
-            </h:form>
+					<s:div rendered="#{identity.isLoggedIn()}">
+						<li><s:link value="#{messages.logout}" view="/main.xhtml"
+								action="#{identity.logout}" /></li>
+					</s:div>
+				</ul>
+			</div>
+		</h:form>
 
-            <div id="content">
-                <ui:insert name="body">
-                    <p>Default Body</p>
-                </ui:insert>
-            </div>
-        </f:view>
+		<div id="content">
+			<ui:insert name="body">
+				<p>Default Body</p>
+			</ui:insert>
+		</div>
+	</f:view>
 
-    </body>
+</body>
 
 </html>

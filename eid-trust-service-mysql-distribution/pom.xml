@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -46,11 +48,8 @@
 				</artifactId>
 				<executions>
 
-					<!--
-						Unpack the eid-applet JBoss AS distribution and our SQL DDL
-						scripts into /files. maven-assembly-plugin will merge them all
-						together into /jboss.
-					-->
+					<!-- Unpack the eid-applet JBoss AS distribution and our SQL DDL scripts 
+						into /files. maven-assembly-plugin will merge them all together into /jboss. -->
 					<execution>
 						<id>unpack</id>
 						<phase>package</phase>
@@ -80,10 +79,8 @@
 						</configuration>
 					</execution>
 
-					<!--
-						Copy EAR dependencies into /deploy. maven-assembly-plugin will
-						move them to /jboss/server/all/deploy.
-					-->
+					<!-- Copy EAR dependencies into /deploy. maven-assembly-plugin will 
+						move them to /jboss/server/all/deploy. -->
 					<execution>
 						<id>copy-ear</id>
 						<phase>package</phase>
@@ -98,10 +95,8 @@
 						</configuration>
 					</execution>
 
-					<!--
-						Copy MySQL connector dependencies into /dependency.
-						maven-assembly-plugin will move them to /jboss/common/lib.
-					-->
+					<!-- Copy MySQL connector dependencies into /dependency. maven-assembly-plugin 
+						will move them to /jboss/common/lib. -->
 					<execution>
 						<id>copy</id>
 						<phase>package</phase>

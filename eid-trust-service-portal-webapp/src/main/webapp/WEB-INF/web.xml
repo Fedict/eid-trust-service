@@ -4,87 +4,87 @@
 
 <web-app>
 
-    <!-- JBoss Richfaces -->
-    <context-param>
-        <param-name>org.richfaces.SKIN</param-name>
-        <param-value>DEFAULT</param-value>
-    </context-param>
-    <context-param>
-        <param-name>org.ajax4jsf.VIEW_HANDLERS</param-name>
-        <param-value>com.sun.facelets.FaceletViewHandler</param-value>
-    </context-param>
+	<!-- JBoss Richfaces -->
+	<context-param>
+		<param-name>org.richfaces.SKIN</param-name>
+		<param-value>DEFAULT</param-value>
+	</context-param>
+	<context-param>
+		<param-name>org.ajax4jsf.VIEW_HANDLERS</param-name>
+		<param-value>com.sun.facelets.FaceletViewHandler</param-value>
+	</context-param>
 
-    <!-- Facelets -->
-    <context-param>
-        <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
-        <param-value>.xhtml</param-value>
-    </context-param>
-    <context-param>
-        <param-name>facelets.DEVELOPMENT</param-name>
-        <param-value>true</param-value>
-    </context-param>
+	<!-- Facelets -->
+	<context-param>
+		<param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+		<param-value>.xhtml</param-value>
+	</context-param>
+	<context-param>
+		<param-name>facelets.DEVELOPMENT</param-name>
+		<param-value>true</param-value>
+	</context-param>
 
-    <!-- Seam Filter -->
-    <filter>
-        <filter-name>Seam Filter</filter-name>
-        <filter-class>org.jboss.seam.servlet.SeamFilter</filter-class>
-    </filter>
+	<!-- Seam Filter -->
+	<filter>
+		<filter-name>Seam Filter</filter-name>
+		<filter-class>org.jboss.seam.servlet.SeamFilter</filter-class>
+	</filter>
 
-    <!-- Filter mappings -->
-    <filter-mapping>
-        <filter-name>Seam Filter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+	<!-- Filter mappings -->
+	<filter-mapping>
+		<filter-name>Seam Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
-    <!-- JSF -->
-    <listener>
-        <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
-    </listener>
+	<!-- JSF -->
+	<listener>
+		<listener-class>com.sun.faces.config.ConfigureListener</listener-class>
+	</listener>
 
-    <!-- JBoss Seam -->
-    <listener>
-        <listener-class>org.jboss.seam.servlet.SeamListener</listener-class>
-    </listener>
-    
-    <!-- Seam Resource servlet -->
-    <servlet>
-        <servlet-name>Seam Resource Servlet</servlet-name>
-        <servlet-class>org.jboss.seam.servlet.SeamResourceServlet</servlet-class>
-    </servlet>
+	<!-- JBoss Seam -->
+	<listener>
+		<listener-class>org.jboss.seam.servlet.SeamListener</listener-class>
+	</listener>
 
-    <!-- JSF -->
-    <servlet>
-        <servlet-name>Faces Servlet</servlet-name>
-        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
+	<!-- Seam Resource servlet -->
+	<servlet>
+		<servlet-name>Seam Resource Servlet</servlet-name>
+		<servlet-class>org.jboss.seam.servlet.SeamResourceServlet</servlet-class>
+	</servlet>
 
-    <!-- eID Applet -->
-    <servlet>
-        <servlet-name>AppletServiceServlet</servlet-name>
-        <servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
-        <init-param>
-            <param-name>IncludeCertificates</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <init-param>
-            <param-name>SkipSecureConnectionCheck</param-name>
-            <param-value>${eid-applet.SkipSecureConnectionCheck}</param-value>
-        </init-param>
-    </servlet>
+	<!-- JSF -->
+	<servlet>
+		<servlet-name>Faces Servlet</servlet-name>
+		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 
-    <!-- Servlet mappings -->
-    <servlet-mapping>
-        <servlet-name>Seam Resource Servlet</servlet-name>
-        <url-pattern>/seam/resource/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Faces Servlet</servlet-name>
-        <url-pattern>*.seam</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AppletServiceServlet</servlet-name>
-        <url-pattern>/applet-service</url-pattern>
-    </servlet-mapping>
+	<!-- eID Applet -->
+	<servlet>
+		<servlet-name>AppletServiceServlet</servlet-name>
+		<servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+		<init-param>
+			<param-name>IncludeCertificates</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>SkipSecureConnectionCheck</param-name>
+			<param-value>${eid-applet.SkipSecureConnectionCheck}</param-value>
+		</init-param>
+	</servlet>
+
+	<!-- Servlet mappings -->
+	<servlet-mapping>
+		<servlet-name>Seam Resource Servlet</servlet-name>
+		<url-pattern>/seam/resource/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>*.seam</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AppletServiceServlet</servlet-name>
+		<url-pattern>/applet-service</url-pattern>
+	</servlet-mapping>
 
 </web-app>

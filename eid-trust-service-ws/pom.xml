@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -19,10 +21,10 @@
 			<artifactId>eid-trust-service-xkms2-ws-impl</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
-                <exclusion>
-                    <groupId>be.fedict.eid-trust-service</groupId>
-                    <artifactId>eid-trust-service-xkms2-ws</artifactId>
-                </exclusion>
+				<exclusion>
+					<groupId>be.fedict.eid-trust-service</groupId>
+					<artifactId>eid-trust-service-xkms2-ws</artifactId>
+				</exclusion>
 				<exclusion>
 					<groupId>joda-time</groupId>
 					<artifactId>joda-time</artifactId>

@@ -19,7 +19,7 @@
 		<description>
 			Increments the SNMP counter specified by the given OID.
 			Registers it to the SNMP agent if not yet done so.
-        </description>
+		</description>
 		<name>increment</name>
 		<parameter>
 			<description>The SNMP OID of this counter</description>

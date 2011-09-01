@@ -103,7 +103,7 @@
 				EJB3-technology. This module manages trust domains, service
 				configuration, certificate revocation cache and more. The jTrust
 				module makes use of this certificate revocation cache during
-				validation of the certificate path.  
+				validation of the certificate path.
 			</para>
 		</section>
 		<section>
@@ -116,7 +116,7 @@
 				configurable by an administrator ) an application can use this web
 				service without service authentication, with unilateral
 				TSL-authentication or authentication on message level using signed
-				XKMS2 responses. 
+				XKMS2 responses.
 			</para>
 		</section>
 		<section>
@@ -130,7 +130,8 @@
 						A Java-based XKMS2 client reference implementation
 					</listitem>
 					<listitem>
-						A .NET (C#) 2.0 implementation available for both the Microsoft
+						A .NET (C#) 2.0 implementation available for both the
+						Microsoft
 						platform as the Mono platform.
 					</listitem>
 				</itemizedlist>
@@ -270,7 +271,7 @@
 		<para>
 			In this section we provide a high-level overview of the eID
 			Trust Service design. The design of the eID Trust Service Model is
-			inspired on that of ECPV [HM2003]. 
+			inspired on that of ECPV [HM2003].
 		</para>
 		<section>
 			<title>Domain entities</title>
@@ -384,7 +385,7 @@
 					administrator
 					can have a pending status if he yet has to be
 					approved by an
-					approved administrator. 
+					approved administrator.
 				</para>
 			</section>
 			<section>
@@ -434,8 +435,8 @@
 					The OCSP responder is
 					consulted. If none exists for this CA or the request
 					failed
-					fall-back is done using the CRL of the CA. 
-					</para>
+					fall-back is done using the CRL of the CA.
+				</para>
 				<para>
 					At the same time, a harvester-component is being informed of
 					the missing certificate
@@ -473,14 +474,14 @@
 				</para>
 				<para>
 					Besides harvesting CRLs for revocation data, the harvester MDB
-					also handles the clock drift detection task. 
+					also handles the clock drift detection task.
 				</para>
 			</section>
 			<section>
 				<title>Scheduler</title>
 				<para>
 					The scheduler is responsible for the frequent updating of the
-					certificate revocation cache and clock drift detection. 
+					certificate revocation cache and clock drift detection.
 				</para>
 				<para>
 					It is driven by the Java EE Timer Service. The benefit of this
@@ -505,14 +506,14 @@
 					data (in case something went wrong with the scheduler). As both the
 					harvester as the scheduler are managed by a container transaction
 					manager, consistency between cache entries en the validity interval
-					is guaranteed. 
+					is guaranteed.
 				</para>
 				<para>
 					Besides scheduling certificate revocation cache refreshes, the
 					scheduler also handles the clock drift detection task in the same
 					manner. When the corresponding Java EE Timer is fired, the clock
 					drift configuration is fetched from database and an NTP or TSP
-					request is performed. 
+					request is performed.
 				</para>
 			</section>
 			<section>
@@ -777,7 +778,7 @@ xkms2:ValidateRequest/xkms2:QueryKeyBinding/xkms2:UseKeyWith@Application=urn:be:
 							Service authentication using signed XKMS2 responses. This
 							option has to be explicitly configured within the eID Trust
 							Service Admin Portal as adding the WS-Security signature adds a
-							significant performance impact. 
+							significant performance impact.
 						</para>
 					</listitem>
 				</orderedlist>
@@ -878,7 +879,7 @@ xkms2:ValidateRequest/xkms2:QueryKeyBinding/xkms2:UseKeyWith@Application=urn:be:
 			<title>Attribute certificates</title>
 			<para>
 				It is possible to validate Attribute certificates using the eID
-				Trust Service XKMS2 web service. 
+				Trust Service XKMS2 web service.
 			</para>
 		</section>
 	</section>

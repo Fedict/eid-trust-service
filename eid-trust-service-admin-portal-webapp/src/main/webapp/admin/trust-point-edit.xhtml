@@ -1,93 +1,96 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j"
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:s="http://jboss.com/products/seam/taglib">
-	<body>
-		<ui:composition template="/WEB-INF/template.xhtml">
-			<ui:param name="activeMenu" value="trustpoint" />
-			<ui:define name="body">
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:param name="activeMenu" value="trustpoint" />
+		<ui:define name="body">
 
-				<h2>#{messages.trustPoint} : #{selectedTrustPoint.name}</h2>
+			<h2>#{messages.trustPoint} : #{selectedTrustPoint.name}</h2>
 
-				<h:form>
+			<h:form>
 
-					<h:panelGrid id="panel" columns="3" border="0">
-						<h:outputLabel for="cronSchedule" value="#{messages.crlRefresh}" />
-						<s:decorate>
-							<h:inputText id="cronSchedule" value="#{ts_trustPoint.crlRefreshCronSchedule}" />
-							<h:message for="cronSchedule" styleClass="error" />
-						</s:decorate>
-						<h:commandButton action="#{ts_trustPoint.save}"
-							id="save" value="#{messages.save}" />
-					</h:panelGrid>
+				<h:panelGrid id="panel" columns="3" border="0">
+					<h:outputLabel for="cronSchedule" value="#{messages.crlRefresh}" />
+					<s:decorate>
+						<h:inputText id="cronSchedule"
+							value="#{ts_trustPoint.crlRefreshCronSchedule}" />
+						<h:message for="cronSchedule" styleClass="error" />
+					</s:decorate>
+					<h:commandButton action="#{ts_trustPoint.save}" id="save"
+						value="#{messages.save}" />
+				</h:panelGrid>
 
-					<h:panelGrid id="panel2" columns="2" border="0">
-						<a4j:commandButton id="remove" value="#{messages.remove}"
-							onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
-						<h:commandButton action="#{ts_trustPoint.back}"
-							id="back" value="#{messages.back}" immediate="true" />
-					</h:panelGrid>
+				<h:panelGrid id="panel2" columns="2" border="0">
+					<a4j:commandButton id="remove" value="#{messages.remove}"
+						onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
+					<h:commandButton action="#{ts_trustPoint.back}" id="back"
+						value="#{messages.back}" immediate="true" />
+				</h:panelGrid>
 
-					<rich:modalPanel id="removeConfirm">
-						<div class="center">
-							<h:outputText value="#{messages.removeTrustPointConfirmation}" />
-							<p>
-								<h:panelGrid id="confirmPanel" columns="2" border="0"
-									styleClass="center">
-									<a4j:commandButton id="remove2" value="#{messages.remove}"
-										action="#{ts_trustPoint.remove}" immediate="true"
-										oncomplete="Richfaces.hideModalPanel('removeConfirm');" />
-									<a4j:commandButton id="cancel" value="#{messages.cancel}"
-										onclick="Richfaces.hideModalPanel('removeConfirm');" />
-								</h:panelGrid>
-							</p>
-						</div>
-					</rich:modalPanel>
+				<rich:modalPanel id="removeConfirm">
+					<div class="center">
+						<h:outputText value="#{messages.removeTrustPointConfirmation}" />
+						<p>
+							<h:panelGrid id="confirmPanel" columns="2" border="0"
+								styleClass="center">
+								<a4j:commandButton id="remove2" value="#{messages.remove}"
+									action="#{ts_trustPoint.remove}" immediate="true"
+									oncomplete="Richfaces.hideModalPanel('removeConfirm');" />
+								<a4j:commandButton id="cancel" value="#{messages.cancel}"
+									onclick="Richfaces.hideModalPanel('removeConfirm');" />
+							</h:panelGrid>
+						</p>
+					</div>
+				</rich:modalPanel>
 
-					<h:messages globalOnly="true" styleClass="error" />
+				<h:messages globalOnly="true" styleClass="error" />
 
-				</h:form>
+			</h:form>
 
-				<h3>#{messages.certificateAuthorities}</h3>
+			<h3>#{messages.certificateAuthorities}</h3>
 
-				<h:form id="ca_form">
-					<rich:dataTable id="data" var="item"
-						value="#{ts_trustPointCAList}" rows="10"
-						rowClasses="listingTable_Row1,listingTable_Row2">
+			<h:form id="ca_form">
+				<rich:dataTable id="data" var="item" value="#{ts_trustPointCAList}"
+					rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
 
-						<h:column>
-							<f:facet name="header">#{messages.certificateAuthority}</f:facet>
-							<h:outputText value="#{item.name}" />
-						</h:column>
-						<h:column>
-							<f:facet name="header">#{messages.cache}</f:facet>
-							<h:outputText value="#{item.status}" />
-						</h:column>
-						<h:column>
-							<h:commandLink id="refresh" value="#{messages.refreshNow}"
-								action="#{ts_trustPoint.refreshCA}" />
-						</h:column>
-						<f:facet name="footer">
-							<rich:datascroller for="data" pageIndexVar="pageIndex"
-								pagesVar="pages" fastControls="hide">
-							</rich:datascroller>
-						</f:facet>
-					</rich:dataTable>
+					<h:column>
+						<f:facet name="header">#{messages.certificateAuthority}</f:facet>
+						<h:outputText value="#{item.name}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">#{messages.cache}</f:facet>
+						<h:outputText value="#{item.status}" />
+					</h:column>
+					<h:column>
+						<h:commandLink id="refresh" value="#{messages.refreshNow}"
+							action="#{ts_trustPoint.refreshCA}" />
+					</h:column>
+					<f:facet name="footer">
+						<rich:datascroller for="data" pageIndexVar="pageIndex"
+							pagesVar="pages" fastControls="hide">
+						</rich:datascroller>
+					</f:facet>
+				</rich:dataTable>
 
-					<h:messages globalOnly="true" styleClass="error" />
+				<h:messages globalOnly="true" styleClass="error" />
 
-				</h:form>
+			</h:form>
 
-				<p>
-					<rich:simpleTogglePanel switchType="client"
-						opened="false" label="#{messages.certificate}">
-						<h:outputText id="certificate" styleClass="text block"
-							value="#{selectedTrustPoint.certificateAuthority.certificate}" />
-					</rich:simpleTogglePanel>
-				</p>
+			<p>
+				<rich:simpleTogglePanel switchType="client" opened="false"
+					label="#{messages.certificate}">
+					<h:outputText id="certificate" styleClass="text block"
+						value="#{selectedTrustPoint.certificateAuthority.certificate}" />
+				</rich:simpleTogglePanel>
+			</p>
 
-			</ui:define>
-		</ui:composition>
-	</body>
+		</ui:define>
+	</ui:composition>
+</body>
 </html>

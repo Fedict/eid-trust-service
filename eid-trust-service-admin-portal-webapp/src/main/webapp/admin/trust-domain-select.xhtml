@@ -1,36 +1,40 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j"
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:s="http://jboss.com/products/seam/taglib">
-	<body>
-		<ui:composition template="/WEB-INF/template.xhtml">
-			<ui:param name="activeMenu" value="virtual_domain" />
-			<ui:define name="body">
-				<h2>#{messages.virtualTrustDomain} #{selectedVirtualTrustDomain.name}:
-					#{messages.selectTrustDomains}</h2>
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:param name="activeMenu" value="virtual_domain" />
+		<ui:define name="body">
+			<h2>#{messages.virtualTrustDomain}
+				#{selectedVirtualTrustDomain.name}: #{messages.selectTrustDomains}</h2>
 
-				<h:form id="form">
+			<h:form id="form">
 
-					<rich:listShuttle sourceValue="#{ts_trustDomain.sourceTrustDomains}"
-						targetValue="#{ts_trustDomain.selectedTrustDomains}" var="item"
-						sourceCaptionLabel="#{messages.trustDomains}" targetCaptionLabel="#{messages.selectedTrustDomains}">
+				<rich:listShuttle sourceValue="#{ts_trustDomain.sourceTrustDomains}"
+					targetValue="#{ts_trustDomain.selectedTrustDomains}" var="item"
+					sourceCaptionLabel="#{messages.trustDomains}"
+					targetCaptionLabel="#{messages.selectedTrustDomains}">
 
-						<rich:column>
-							<h:outputText value="#{item}" />
-						</rich:column>
-					</rich:listShuttle>
+					<rich:column>
+						<h:outputText value="#{item}" />
+					</rich:column>
+				</rich:listShuttle>
 
-					<h:commandButton action="#{ts_trustDomain.saveSelectVirtual}"
-						id="save" value="#{messages.save}" />
-					<h:commandButton action="back" id="back"
-						value="#{messages.back}" immediate="true" styleClass="submit" />
+				<h:commandButton action="#{ts_trustDomain.saveSelectVirtual}"
+					id="save" value="#{messages.save}" />
+				<h:commandButton action="back" id="back" value="#{messages.back}"
+					immediate="true" styleClass="submit" />
 
-					<h:messages globalOnly="true" styleClass="error" />
+				<h:messages globalOnly="true" styleClass="error" />
 
-				</h:form>
+			</h:form>
 
-			</ui:define>
-		</ui:composition>
-	</body>
+		</ui:define>
+	</ui:composition>
+</body>
 </html>

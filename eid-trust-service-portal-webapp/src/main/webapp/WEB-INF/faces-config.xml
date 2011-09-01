@@ -8,8 +8,8 @@
 		<view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
 	</application>
 
-    <lifecycle>
-        <phase-listener>be.fedict.trust.listener.CacheControlPhaseListener</phase-listener>
-    </lifecycle>
+	<lifecycle>
+		<phase-listener>be.fedict.trust.listener.CacheControlPhaseListener</phase-listener>
+	</lifecycle>
 
 </faces-config>
