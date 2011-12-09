@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.0.GA</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service WS Runtime</name>
 	<description>JAX-WS Runtime for the eID Trust Service web
@@ -11,7 +11,7 @@
 	</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-ws</artifactId>
-	<version>1.0.0.GA</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<dependencies>
 		<dependency>

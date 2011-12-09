@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.0.GA</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service EAR</name>
 	<description>Java EE 5 EAR for eID Trust Service</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-deploy</artifactId>
-	<version>1.0.0.GA</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>ear</packaging>
 	<build>
 		<plugins>
