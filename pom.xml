@@ -1,330 +1,207 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<name>FedICT eID Trust Service Project</name>
-	<parent>
-		<!-- We want to limit duplicate work, so we reuse the eID Applet parent 
-			POM. The eID Applet project also holds our JBoss AS runtime configuration 
-			anyway. -->
-		<groupId>be.fedict</groupId>
-		<artifactId>eid-applet</artifactId>
-		<version>1.0.4.GA</version>
-	</parent>
+	<name>FedICT OCSP Performance Test Project</name>
 	<groupId>be.fedict</groupId>
-	<artifactId>eid-trust-service</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<inceptionYear>2009</inceptionYear>
+	<artifactId>ocsp-perf-test</artifactId>
+	<version>0.1.0</version>
+	<packaging>jar</packaging>
+	<inceptionYear>2012</inceptionYear>
+	<licenses>
+		<license>
+			<name>GNU LESSER GENERAL PUBLIC LICENSE, Version 3</name>
+			<url>LICENSE.txt</url>
+		</license>
+	</licenses>
+	<organization>
+		<name>FedICT</name>
+		<url>http://www.fedict.belgium.be/</url>
+	</organization>
 	<scm>
-		<developerConnection>
-            scm:svn:https://eid-trust-service.googlecode.com/svn/trunk
-        </developerConnection>
+		<developerConnection>scm:svn:https://eid-trust-service.googlecode.com/svn/tags/ocsp-perf-test-0.1.0</developerConnection>
 	</scm>
-	<modules>
-		<module>eid-trust-service-service</module>
-		<module>eid-trust-service-xkms2-ws</module>
-		<module>eid-trust-service-xkms2-ws-impl</module>
-		<module>eid-trust-service-ws</module>
-		<module>eid-trust-service-entity</module>
-		<module>eid-trust-service-sql-ddl</module>
-		<module>eid-trust-service-model</module>
-		<module>eid-trust-service-portal-model</module>
-		<module>eid-trust-service-portal-webapp</module>
-		<module>eid-trust-service-admin-portal-model</module>
-		<module>eid-trust-service-admin-portal-webapp</module>
-		<module>eid-trust-service-deploy</module>
-		<module>eid-trust-service-client</module>
-		<module>eid-trust-service-startup-runtime</module>
-		<module>eid-trust-service-snmp</module>
-	</modules>
-	<profiles>
-		<profile>
-			<id>tests</id>
-			<activation>
-				<property>
-					<name>env</name>
-					<value>tests</value>
-				</property>
-			</activation>
-			<modules>
-				<module>eid-trust-service-tests</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>mysql</id>
-			<activation>
-				<property>
-					<name>env</name>
-					<value>prod-mysql</value>
-				</property>
-			</activation>
-			<properties>
-				<hibernate.dialect>org.hibernate.dialect.MySQLDialect
-				</hibernate.dialect>
-				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
-				<eid-applet.SkipSecureConnectionCheck>true
-				</eid-applet.SkipSecureConnectionCheck>
-			</properties>
-			<modules>
-				<module>eid-trust-service-mysql-distribution</module>
-				<module>eid-trust-service-admin-manual</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>oracle</id>
-			<activation>
-				<property>
-					<name>env</name>
-					<value>prod-oracle</value>
-				</property>
-			</activation>
-			<properties>
-				<hibernate.dialect>org.hibernate.dialect.Oracle10gDialect
-				</hibernate.dialect>
-				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
-				<eid-applet.SkipSecureConnectionCheck>true
-				</eid-applet.SkipSecureConnectionCheck>
-			</properties>
-			<modules>
-				<module>eid-trust-service-oracle-distribution</module>
-				<module>eid-trust-service-admin-manual</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>postgresql</id>
-			<activation>
-				<property>
-					<name>env</name>
-					<value>prod-postgresql</value>
-				</property>
-			</activation>
-			<properties>
-				<hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect
-				</hibernate.dialect>
-				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
-				<eid-applet.SkipSecureConnectionCheck>true
-				</eid-applet.SkipSecureConnectionCheck>
-				<hibernate.jdbc.use_streams_for_binary>false
-				</hibernate.jdbc.use_streams_for_binary>
-			</properties>
-			<modules>
-				<module>eid-trust-service-postgresql-distribution</module>
-				<module>eid-trust-service-admin-manual</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>sdk</id>
-			<activation>
-				<property>
-					<name>env</name>
-					<value>sdk</value>
-				</property>
-			</activation>
-			<modules>
-				<module>eid-trust-service-devel-guide</module>
-				<module>eid-trust-service-architecture-guide</module>
-				<module>eid-trust-service-sdk</module>
-				<module>eid-trust-service-sdk-dotnet</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>all</id>
-			<activation>
-				<property>
-					<name>env</name>
-					<value>all</value>
-				</property>
-			</activation>
-			<modules>
-				<module>eid-trust-service-tests</module>
-				<module>eid-trust-service-mysql-distribution</module>
-				<module>eid-trust-service-postgresql-distribution</module>
-				<module>eid-trust-service-oracle-distribution</module>
-				<module>eid-trust-service-admin-manual</module>
-				<module>eid-trust-service-architecture-guide</module>
-				<module>eid-trust-service-devel-guide</module>
-				<module>eid-trust-service-sdk</module>
-				<module>eid-trust-service-sdk-dotnet</module>
-			</modules>
-		</profile>
-	</profiles>
+	<dependencies>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.pircbotx</groupId>
+			<artifactId>pircbotx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>be.fedict</groupId>
-				<artifactId>jtrust</artifactId>
-				<version>${jtrust.version}</version>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<scope>test</scope>
+				<version>4.10</version>
 			</dependency>
 			<dependency>
-				<groupId>be.fedict.eid-applet</groupId>
-				<artifactId>eid-applet-package</artifactId>
-				<version>${eid-applet.version}</version>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>1.1.1</version>
 			</dependency>
 			<dependency>
-				<groupId>be.fedict.eid-applet</groupId>
-				<artifactId>eid-applet-js</artifactId>
-				<version>${eid-applet.version}</version>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging-api</artifactId>
+				<version>1.1</version>
 			</dependency>
 			<dependency>
-				<groupId>be.fedict.eid-applet</groupId>
-				<artifactId>eid-applet-service</artifactId>
-				<version>${eid-applet.version}</version>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>1.2.16</version>
 			</dependency>
 			<dependency>
-				<groupId>be.fedict.eid-applet</groupId>
-				<artifactId>eid-applet-shared</artifactId>
-				<version>${eid-applet.version}</version>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.2</version>
 			</dependency>
 			<dependency>
-				<groupId>be.fedict.eid-applet</groupId>
-				<artifactId>eid-applet-service-spi</artifactId>
-				<version>${eid-applet.version}</version>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.4</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.spec.javax.ejb</groupId>
-				<artifactId>jboss-ejb-api_3.1_spec</artifactId>
-				<version>1.0.0.Beta2</version>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk16</artifactId>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.spec.javax.interceptor</groupId>
-				<artifactId>jboss-interceptors-api_1.1_spec</artifactId>
-				<version>1.0.0.Beta1</version>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk15</artifactId>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.richfaces.framework</groupId>
-				<artifactId>richfaces-api</artifactId>
-				<version>3.3.3.Final</version>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcmail-jdk16</artifactId>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>commons-net</groupId>
-				<artifactId>commons-net</artifactId>
-				<version>1.4.1</version>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bctsp-jdk16</artifactId>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-tools</artifactId>
-				<version>3.2.4.GA</version>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.1.3</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-simple</artifactId>
-				<version>1.5.8</version>
-			</dependency>
-			<dependency>
-				<groupId>mysql</groupId>
-				<artifactId>mysql-connector-java</artifactId>
-				<version>5.1.13</version>
-			</dependency>
-			<dependency>
-				<groupId>com.oracle</groupId>
-				<artifactId>ojdbc6</artifactId>
-				<version>11.1.0.7.0</version>
-			</dependency>
-			<dependency>
-				<groupId>postgresql</groupId>
-				<artifactId>postgresql</artifactId>
-				<version>8.4-701.jdbc4</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.jbossas</groupId>
-				<artifactId>jboss-as-system</artifactId>
-				<version>6.0.0.20100216-M2</version>
-			</dependency>
-			<dependency>
-				<groupId>org.snmp4j</groupId>
-				<artifactId>snmp4j</artifactId>
-				<version>1.10.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.snmp4j</groupId>
-				<artifactId>snmp4j-agent</artifactId>
-				<version>1.3.1</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.el</groupId>
-				<artifactId>el-api</artifactId>
-				<version>1.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.ws.security</groupId>
-				<artifactId>wss4j</artifactId>
-				<version>1.5.8</version>
-				<exclusions>
-					<exclusion>
-						<groupId>xalan</groupId>
-						<artifactId>xalan</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>xerces</groupId>
-						<artifactId>xercesImpl</artifactId>
-					</exclusion>
-				</exclusions>
+				<groupId>org.pircbotx</groupId>
+				<artifactId>pircbotx</artifactId>
+				<version>1.6</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<repositories>
-		<repository>
-			<!-- required for jTrust, eID Applet -->
-			<id>e-contract.be</id>
-			<url>http://www.e-contract.be/maven2/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>jahia-maven</id>
-			<url>http://maven.jahia.org/maven2/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<!-- required for eID Applet SQL DDL Plugin -->
-			<id>e-contract.be</id>
-			<url>http://www.e-contract.be/maven2/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>codehaus-nexus</id>
-			<url>https://nexus.codehaus.org/content/repositories/releases/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
-
-	<!-- Default properties -->
-	<properties>
-		<eid-applet.version>1.0.4.GA</eid-applet.version>
-		<jtrust.version>1.1.2</jtrust.version>
-		<trust-service.data.source.user>trust</trust-service.data.source.user>
-		<trust-service.data.source.pass>trust</trust-service.data.source.pass>
-		<hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
-		<hibernate.hbm2ddl.auto>create-drop</hibernate.hbm2ddl.auto>
-		<hibernate.jdbc.use_streams_for_binary>true
-		</hibernate.jdbc.use_streams_for_binary>
-		<eid-applet.SkipSecureConnectionCheck>false
-		</eid-applet.SkipSecureConnectionCheck>
-	</properties>
-
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifest>
+							<mainClass>be.fedict.perf.ocsp.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.dstovall</groupId>
+				<artifactId>onejar-maven-plugin</artifactId>
+				<version>1.4.4</version>
+				<executions>
+					<execution>
+						<configuration>
+							<onejarVersion>0.97</onejarVersion>
+							<attachToBuild>true</attachToBuild>
+						</configuration>
+						<goals>
+							<goal>one-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<tagBase>https://eid-trust-service.googlecode.com/svn/tags/</tagBase>
+				</configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.3.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.4</version>
+				</plugin>
+				<plugin>
+					<groupId>org.dstovall</groupId>
+					<artifactId>onejar-maven-plugin</artifactId>
+					<version>1.4.4</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.2.2</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.2</version>
+			</extension>
+		</extensions>
+	</build>
 	<distributionManagement>
 		<repository>
 			<id>e-contract-deploy</id>
@@ -332,4 +209,14 @@
 			<uniqueVersion>false</uniqueVersion>
 		</repository>
 	</distributionManagement>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>onejar-maven-plugin.googlecode.com</id>
+			<url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+		</pluginRepository>
+	</pluginRepositories>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<bouncycastle.version>1.46</bouncycastle.version>
+	</properties>
 </project>
