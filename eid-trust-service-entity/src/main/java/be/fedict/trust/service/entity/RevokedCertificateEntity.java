@@ -46,7 +46,8 @@ import org.apache.commons.lang.builder.ToStringStyle;
 		@NamedQuery(name = RevokedCertificateEntity.DELETE_WHERE_ISSUER, query = "DELETE FROM RevokedCertificateEntity "
 				+ "WHERE pk.issuer = :issuer"),
 		@NamedQuery(name = RevokedCertificateEntity.DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER, query = "DELETE FROM RevokedCertificateEntity "
-				+ "WHERE crlNumber < :crlNumber AND issuer = :issuer") })
+				+ "WHERE crlNumber < :crlNumber AND issuer = :issuer"),
+		@NamedQuery(name = RevokedCertificateEntity.QUERY_COUNT_ALL, query = "SELECT COUNT(*) FROM RevokedCertificateEntity") })
 public class RevokedCertificateEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -55,6 +56,7 @@ public class RevokedCertificateEntity implements Serializable {
 	public static final String QUERY_CRL_NUMBER_WHERE_ISSUER = "ts_rc.q.c";
 	public static final String DELETE_WHERE_ISSUER = "ts_rc.d.i";
 	public static final String DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER = "ts_rc.d.i.old.c";
+	public static final String QUERY_COUNT_ALL = "ts_rc.q.count.all";
 
 	private RevokedCertificatePK pk;
 	private Date revocationDate;

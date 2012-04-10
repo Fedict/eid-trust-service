@@ -23,6 +23,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.ejb.Stateless;
@@ -210,5 +211,24 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 		} catch (NoResultException e) {
 			return null;
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<CertificateAuthorityEntity> listCertificateAuthorities() {
+		Query query = this.entityManager
+				.createNamedQuery(CertificateAuthorityEntity.QUERY_ALL);
+		return (List<CertificateAuthorityEntity>) query.getResultList();
+	}
+
+	public long getTotalCachedCertificates() {
+		Query query = this.entityManager
+				.createNamedQuery(RevokedCertificateEntity.QUERY_COUNT_ALL);
+		return (Long) query.getSingleResult();
+	}
+
+	public long getTotalActiveCachedCAs() {
+		Query query = this.entityManager
+				.createNamedQuery(CertificateAuthorityEntity.QUERY_COUNT_ACTIVE);
+		return (Long) query.getSingleResult();
 	}
 }

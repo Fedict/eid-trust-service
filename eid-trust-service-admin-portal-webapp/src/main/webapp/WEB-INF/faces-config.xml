@@ -193,6 +193,15 @@
     </navigation-rule>
     <!--  END Trust Domain navigation rules -->
 
+	<!-- CRL Cache navigation rules -->
+	<navigation-rule>
+		<from-view-id>/admin/crl-cache.xhtml</from-view-id>
+		<navigation-case>
+			<from-outcome>success</from-outcome>
+			<to-view-id>/admin/crl-cache.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
     <!-- Audit page navigation rules -->
     <navigation-rule>
         <from-view-id>/admin/audit.xhtml</from-view-id>

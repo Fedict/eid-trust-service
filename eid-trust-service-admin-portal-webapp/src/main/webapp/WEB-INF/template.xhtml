@@ -54,6 +54,8 @@
 						<rich:panelMenuItem label="#{messages.trustPoints}"
 							action="/admin/trust-point.xhtml"
 							rendered="#{s:hasRole('admin')}" />
+						<rich:panelMenuItem label="#{messages.crlCache}"
+							action="/admin/crl-cache.xhtml" rendered="#{s:hasRole('admin')}" />
 						<rich:panelMenuItem label="#{messages.audit}"
 							action="/admin/audit.xhtml" rendered="#{s:hasRole('admin')}" />
 					</rich:panelMenu>

@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.ejb.Local;
@@ -96,4 +97,10 @@ public interface CertificateAuthorityDAO {
 	 *         issuer or <code>null</code> if no cache entries exist.
 	 */
 	BigInteger findCrlNumber(String issuerName);
+	
+	List<CertificateAuthorityEntity> listCertificateAuthorities();
+	
+	long getTotalCachedCertificates();
+
+	long getTotalActiveCachedCAs();
 }

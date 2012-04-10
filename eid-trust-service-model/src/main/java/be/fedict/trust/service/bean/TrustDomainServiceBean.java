@@ -470,4 +470,15 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		this.schedulingService.refreshCA(ca);
 	}
 
+	public List<CertificateAuthorityEntity> listCAs() {
+		return this.certificateAuthorityDAO.listCertificateAuthorities();
+	}
+
+	public long getTotalCachedCertificates() {
+		return this.certificateAuthorityDAO.getTotalCachedCertificates();
+	}
+
+	public long getTotalActiveCachedCAs() {
+		return this.certificateAuthorityDAO.getTotalActiveCachedCAs();
+	}
 }

@@ -77,6 +77,13 @@ public interface TrustDomainService {
 			TrustPointEntity trustPoint);
 
 	/**
+	 * List all {@link CertificateAuthorityEntity}'s.
+	 * 
+	 * @return a list of all CA's.
+	 */
+	List<CertificateAuthorityEntity> listCAs();
+
+	/**
 	 * List all {@link TrustPointEntity}'s for the specified
 	 * {@link TrustDomainEntity}.
 	 * 
@@ -286,4 +293,8 @@ public interface TrustDomainService {
 	 * @throws JMSException
 	 */
 	void refreshCACache(CertificateAuthorityEntity ca) throws JMSException;
+
+	long getTotalCachedCertificates();
+
+	long getTotalActiveCachedCAs();
 }
