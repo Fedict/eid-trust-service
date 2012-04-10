@@ -6,7 +6,8 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:a4j="http://richfaces.org/a4j"
-	xmlns:s="http://jboss.com/products/seam/taglib">
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:rich="http://richfaces.org/rich">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
@@ -15,15 +16,6 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <title>#{messages.title}</title>
 <a4j:loadStyle src="/style.css" />
-
-<script type="text/javascript">
-	function setClass(id, className) {
-		obj = document.getElementById(id);
-		if (null != obj) {
-			obj.className = className;
-		}
-	}
-</script>
 </head>
 
 <body onload="setClass('menu_item_#{activeMenu}', 'selected');">
@@ -40,53 +32,55 @@
 
 	<!-- Seems to resolve deployJava.js/Chrome issue ... -->
 	<f:view contentType="text/html">
-		<h:form>
-			<div id="menu">
-				<ul>
-					<s:div rendered="#{!identity.isLoggedIn()}">
-						<li id="menu_item_main"><a
-							href="#{facesContext.externalContext.requestContextPath}/main.seam">#{messages.home}</a>
-						</li>
-					</s:div>
-					<s:div rendered="#{!identity.isLoggedIn()}">
-						<li id="menu_item_login"><a
-							href="#{facesContext.externalContext.requestContextPath}/admin/configuration.seam">#{messages.login}</a>
-						</li>
-					</s:div>
-					<s:div rendered="#{s:hasRole('admin')}">
-						<li id="menu_item_config"><a
-							href="#{facesContext.externalContext.requestContextPath}/admin/configuration.seam">
-								#{messages.configuration}</a></li>
-					</s:div>
-					<s:div rendered="#{s:hasRole('admin')}">
-						<li id="menu_item_virtual_domain"><a
-							href="#{facesContext.externalContext.requestContextPath}/admin/virtual-trust-domain.seam">
-								#{messages.virtualTrustDomains}</a></li>
-					</s:div>
 
-					<s:div rendered="#{s:hasRole('admin')}">
-						<li id="menu_item_domain"><a
-							href="#{facesContext.externalContext.requestContextPath}/admin/trust-domain.seam">
-								#{messages.trustDomains}</a></li>
-					</s:div>
-					<s:div rendered="#{s:hasRole('admin')}">
-						<li id="menu_item_trustpoint"><a
-							href="#{facesContext.externalContext.requestContextPath}/admin/trust-point.seam">
-								#{messages.trustPoints}</a></li>
-					</s:div>
-					<s:div rendered="#{s:hasRole('admin')}">
-						<li id="menu_item_audit"><a
-							href="#{facesContext.externalContext.requestContextPath}/admin/audit.seam">
-								#{messages.audit}</a></li>
-					</s:div>
-
-					<s:div rendered="#{identity.isLoggedIn()}">
-						<li><s:link value="#{messages.logout}" view="/main.xhtml"
-								action="#{identity.logout}" /></li>
-					</s:div>
-				</ul>
+		<div id="menu">
+			<div id="menuPanel">
+				<h:form>
+					<rich:panelMenu value="#{ts_menuController.selectedChild}">
+						<rich:panelMenuItem label="#{messages.home}" action="/main.xhtml"
+							rendered="#{!identity.isLoggedIn()}" />
+						<rich:panelMenuItem label="#{messages.login}"
+							action="/admin/configuration.xhtml"
+							rendered="#{!identity.isLoggedIn()}" />
+						<rich:panelMenuItem label="#{messages.configuration}"
+							action="/admin/configuration.xhtml"
+							rendered="#{s:hasRole('admin')}" />
+						<rich:panelMenuItem label="#{messages.virtualTrustDomains}"
+							action="/admin/virtual-trust-domain.xhtml"
+							rendered="#{s:hasRole('admin')}" />
+						<rich:panelMenuItem label="#{messages.trustDomains}"
+							action="/admin/trust-domain.xhtml"
+							rendered="#{s:hasRole('admin')}" />
+						<rich:panelMenuItem label="#{messages.trustPoints}"
+							action="/admin/trust-point.xhtml"
+							rendered="#{s:hasRole('admin')}" />
+						<rich:panelMenuItem label="#{messages.audit}"
+							action="/admin/audit.xhtml" rendered="#{s:hasRole('admin')}" />
+					</rich:panelMenu>
+				</h:form>
 			</div>
-		</h:form>
+		</div>
+
+		<div id="login">
+			<s:div rendered="#{identity.isLoggedIn()}" id="loginPanel">
+				<h:panelGrid columns="2">
+					<s:graphicImage value="#{eid.photo}" />
+					<h:panelGroup>
+						<h:panelGrid columns="1">
+							<h:outputText
+								value="#{eid.identity.firstName} #{eid.identity.name}" />
+							<h:outputText value="#{eid.identity.dateOfBirth.time}">
+								<f:convertDateTime timeZone="Europe/Paris" dateStyle="default"
+									type="date" />
+							</h:outputText>
+						</h:panelGrid>
+					</h:panelGroup>
+				</h:panelGrid>
+				<h:form>
+					<h:commandButton value="Logout" action="#{identity.logout()}" />
+				</h:form>
+			</s:div>
+		</div>
 
 		<div id="content">
 			<ui:insert name="body">

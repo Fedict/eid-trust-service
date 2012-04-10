@@ -95,16 +95,20 @@
             <param-value>true</param-value>
         </init-param>
         <init-param>
+            <param-name>IncludeIdentity</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>IncludePhoto</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
             <param-name>PreLogoff</param-name>
             <param-value>true</param-value>
         </init-param>
         <init-param>
             <param-name>SkipSecureConnectionCheck</param-name>
             <param-value>${eid-applet.SkipSecureConnectionCheck}</param-value>
-        </init-param>
-        <init-param>
-        	<param-name>NoPKCS11</param-name>
-        	<param-value>true</param-value>
         </init-param>
     </servlet>
 
