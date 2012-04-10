@@ -18,20 +18,22 @@
 
 package test.integ.be.fedict.performance.servlet;
 
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.lf5.util.StreamUtils;
-import test.integ.be.fedict.performance.CAConfiguration;
-import test.integ.be.fedict.performance.TestPKI;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.lf5.util.StreamUtils;
+
+import test.integ.be.fedict.performance.CAConfiguration;
+import test.integ.be.fedict.performance.TestPKI;
 
 public class CrlServlet extends HttpServlet {
 

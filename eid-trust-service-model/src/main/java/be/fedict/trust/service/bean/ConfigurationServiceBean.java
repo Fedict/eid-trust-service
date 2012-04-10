@@ -18,24 +18,32 @@
 
 package be.fedict.trust.service.bean;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import be.fedict.trust.service.ConfigurationService;
 import be.fedict.trust.service.KeyStoreUtils;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.LocalizationDAO;
-import be.fedict.trust.service.entity.*;
+import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
+import be.fedict.trust.service.entity.LocalizationKeyEntity;
+import be.fedict.trust.service.entity.LocalizationTextEntity;
+import be.fedict.trust.service.entity.NetworkConfigEntity;
+import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
 import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Configuration Service Bean implementation.

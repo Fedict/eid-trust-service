@@ -18,6 +18,23 @@
 
 package be.fedict.trust.client;
 
+import java.security.cert.X509Certificate;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
+import javax.xml.soap.SOAPFault;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.SOAPPart;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+import javax.xml.ws.soap.SOAPFaultException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
@@ -27,18 +44,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.Timestamp;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
-
-import javax.xml.namespace.QName;
-import javax.xml.soap.*;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
-import java.security.cert.X509Certificate;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
 
 /**
  * WS-Security client SOAP handler that will validate the WS-Security header if

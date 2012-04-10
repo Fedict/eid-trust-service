@@ -26,13 +26,10 @@ public class KeyStoreLoadException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	public KeyStoreLoadException(String message) {
-
 		super(message);
 	}
 
 	public KeyStoreLoadException(String message, Throwable cause) {
-
 		super(message, cause);
 	}
-
 }

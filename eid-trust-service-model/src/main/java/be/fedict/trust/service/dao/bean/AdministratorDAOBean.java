@@ -18,19 +18,21 @@
 
 package be.fedict.trust.service.dao.bean;
 
-import be.fedict.trust.service.dao.AdministratorDAO;
-import be.fedict.trust.service.entity.AdministratorEntity;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.List;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import be.fedict.trust.service.dao.AdministratorDAO;
+import be.fedict.trust.service.entity.AdministratorEntity;
 
 /**
  * Administrator DAO Bean implementation.

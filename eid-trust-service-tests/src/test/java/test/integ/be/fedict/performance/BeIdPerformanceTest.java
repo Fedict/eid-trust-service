@@ -18,20 +18,26 @@
 
 package test.integ.be.fedict.performance;
 
-import be.fedict.trust.client.XKMS2Client;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;
-import test.integ.be.fedict.performance.util.*;
-import test.integ.be.fedict.trust.util.TestUtils;
 
-import javax.swing.*;
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-import java.util.List;
+import test.integ.be.fedict.performance.util.PerformanceData;
+import test.integ.be.fedict.performance.util.PerformanceResultDialog;
+import test.integ.be.fedict.performance.util.PerformanceResultsData;
+import test.integ.be.fedict.performance.util.PerformanceTest;
+import test.integ.be.fedict.performance.util.PerformanceWorkingFrame;
+import test.integ.be.fedict.trust.util.TestUtils;
+import be.fedict.trust.client.XKMS2Client;
 
 public class BeIdPerformanceTest implements PerformanceTest {
 

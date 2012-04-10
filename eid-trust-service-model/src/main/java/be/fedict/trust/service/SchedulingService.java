@@ -18,15 +18,15 @@
 
 package be.fedict.trust.service;
 
+import javax.ejb.Local;
+import javax.ejb.Timer;
+import javax.jms.JMSException;
+
 import be.fedict.trust.service.bean.HarvesterMDB;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
-
-import javax.ejb.Local;
-import javax.ejb.Timer;
-import javax.jms.JMSException;
 
 /**
  * Scheduler service.

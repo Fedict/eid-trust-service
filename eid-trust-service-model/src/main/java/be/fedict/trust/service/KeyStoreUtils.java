@@ -22,9 +22,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.Security;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Enumeration;
 
 import org.apache.commons.logging.Log;

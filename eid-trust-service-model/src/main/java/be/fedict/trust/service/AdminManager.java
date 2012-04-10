@@ -18,8 +18,9 @@
 
 package be.fedict.trust.service;
 
-import javax.ejb.Local;
 import java.security.cert.X509Certificate;
+
+import javax.ejb.Local;
 
 /**
  * Administrator manager.

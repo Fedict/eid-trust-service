@@ -18,12 +18,13 @@
 
 package be.fedict.trust.service.entity;
 
+import java.io.Serializable;
+
+import javax.persistence.Embeddable;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-
-import javax.persistence.Embeddable;
-import java.io.Serializable;
 
 @Embeddable
 public class RevokedCertificatePK implements Serializable {

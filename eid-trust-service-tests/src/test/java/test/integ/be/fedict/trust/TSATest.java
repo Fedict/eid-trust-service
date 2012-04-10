@@ -18,8 +18,12 @@
 
 package test.integ.be.fedict.trust;
 
-import be.fedict.trust.client.TrustServiceDomains;
-import be.fedict.trust.client.XKMS2Client;
+import java.math.BigInteger;
+import java.security.Security;
+import java.security.cert.CertStore;
+import java.security.cert.Certificate;
+import java.util.Collection;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
@@ -33,13 +37,10 @@ import org.bouncycastle.tsp.TimeStampRequestGenerator;
 import org.bouncycastle.tsp.TimeStampResponse;
 import org.junit.Before;
 import org.junit.Test;
-import test.integ.be.fedict.trust.util.TestUtils;
 
-import java.math.BigInteger;
-import java.security.Security;
-import java.security.cert.CertStore;
-import java.security.cert.Certificate;
-import java.util.Collection;
+import test.integ.be.fedict.trust.util.TestUtils;
+import be.fedict.trust.client.TrustServiceDomains;
+import be.fedict.trust.client.XKMS2Client;
 
 /**
  * TSA Test.

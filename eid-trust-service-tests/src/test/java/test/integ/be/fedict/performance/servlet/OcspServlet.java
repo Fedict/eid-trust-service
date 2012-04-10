@@ -18,23 +18,31 @@
 
 package test.integ.be.fedict.performance.servlet;
 
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.ocsp.RevokedInfo;
-import org.bouncycastle.ocsp.*;
-import test.integ.be.fedict.performance.CAConfiguration;
-import test.integ.be.fedict.performance.TestPKI;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.Date;
+
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.DERGeneralizedTime;
+import org.bouncycastle.asn1.ocsp.RevokedInfo;
+import org.bouncycastle.ocsp.BasicOCSPResp;
+import org.bouncycastle.ocsp.BasicOCSPRespGenerator;
+import org.bouncycastle.ocsp.CertificateStatus;
+import org.bouncycastle.ocsp.OCSPReq;
+import org.bouncycastle.ocsp.OCSPRespGenerator;
+import org.bouncycastle.ocsp.Req;
+import org.bouncycastle.ocsp.RevokedStatus;
+
+import test.integ.be.fedict.performance.CAConfiguration;
+import test.integ.be.fedict.performance.TestPKI;
 
 public class OcspServlet extends HttpServlet {
 

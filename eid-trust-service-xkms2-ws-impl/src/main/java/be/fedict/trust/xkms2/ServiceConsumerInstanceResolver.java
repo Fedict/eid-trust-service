@@ -36,7 +36,7 @@ import com.sun.xml.ws.server.AbstractMultiInstanceResolver;
  * JAX-WS RI Instance Resolver implementation to inject services into JAX-WS
  * endpoints.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  * @param <T>
  */

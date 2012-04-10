@@ -18,25 +18,26 @@
 
 package test.integ.be.fedict.trust;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.Before;
+import org.junit.Test;
+
+import test.integ.be.fedict.trust.util.TestUtils;
 import be.fedict.trust.BelgianTrustValidatorFactory;
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.TrustValidator;
 import be.fedict.trust.client.TrustServiceDomains;
 import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Before;
-import org.junit.Test;
-import test.integ.be.fedict.trust.util.TestUtils;
-
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.util.List;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * eID Trust Service XKMS2 Integration Tests.

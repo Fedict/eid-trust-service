@@ -35,7 +35,7 @@ import be.fedict.trust.service.TrustService;
  * way to retrieve the EJB session bean references in JAX-WS RI under JBoss AS
  * 5.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 public class ServiceConsumerServletContextListener implements

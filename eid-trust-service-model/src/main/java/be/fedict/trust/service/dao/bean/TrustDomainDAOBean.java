@@ -18,24 +18,33 @@
 
 package be.fedict.trust.service.dao.bean;
 
-import be.fedict.trust.service.dao.TrustDomainDAO;
-import be.fedict.trust.service.entity.CertificateAuthorityEntity;
-import be.fedict.trust.service.entity.TrustDomainEntity;
-import be.fedict.trust.service.entity.TrustPointEntity;
-import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
-import be.fedict.trust.service.entity.constraints.*;
-import be.fedict.trust.service.exception.TrustDomainNotFoundException;
-import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.math.BigInteger;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.math.BigInteger;
-import java.security.cert.X509Certificate;
-import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import be.fedict.trust.service.dao.TrustDomainDAO;
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
+import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
+import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
+import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageType;
+import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
+import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
+import be.fedict.trust.service.entity.constraints.TSAConstraintEntity;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
 /**
  * Trust Domain DAO Bean implementation.

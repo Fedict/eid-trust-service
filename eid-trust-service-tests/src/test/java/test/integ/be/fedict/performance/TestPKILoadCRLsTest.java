@@ -18,20 +18,6 @@
 
 package test.integ.be.fedict.performance;
 
-import be.fedict.trust.client.XKMS2Client;
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
-import test.integ.be.fedict.performance.servlet.CrlServlet;
-import test.integ.be.fedict.performance.servlet.OcspServlet;
-import test.integ.be.fedict.trust.util.TestUtils;
-
-import javax.management.MBeanServerConnection;
-import javax.swing.*;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.Security;
@@ -39,6 +25,22 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import javax.management.MBeanServerConnection;
+import javax.swing.JOptionPane;
+
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.joda.time.DateTime;
+import org.junit.Before;
+import org.junit.Test;
+
+import test.integ.be.fedict.performance.servlet.CrlServlet;
+import test.integ.be.fedict.performance.servlet.OcspServlet;
+import test.integ.be.fedict.trust.util.TestUtils;
+import be.fedict.trust.client.XKMS2Client;
 
 /**
  * Integration test that does an XKMS request for each leaf CA in the

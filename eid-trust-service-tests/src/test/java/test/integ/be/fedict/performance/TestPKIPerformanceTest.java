@@ -18,26 +18,6 @@
 
 package test.integ.be.fedict.performance;
 
-import be.fedict.trust.client.XKMS2Client;
-import be.fedict.trust.client.exception.ValidationFailedException;
-import be.fedict.trust.xkms2.XKMSConstants;
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
-import test.integ.be.fedict.performance.servlet.CrlServlet;
-import test.integ.be.fedict.performance.servlet.OcspServlet;
-import test.integ.be.fedict.performance.util.*;
-import test.integ.be.fedict.trust.util.TestUtils;
-
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.swing.*;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.Security;
@@ -46,6 +26,33 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.swing.JOptionPane;
+
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.joda.time.DateTime;
+import org.junit.Before;
+import org.junit.Test;
+
+import test.integ.be.fedict.performance.servlet.CrlServlet;
+import test.integ.be.fedict.performance.servlet.OcspServlet;
+import test.integ.be.fedict.performance.util.MemoryData;
+import test.integ.be.fedict.performance.util.PerformanceData;
+import test.integ.be.fedict.performance.util.PerformanceResultDialog;
+import test.integ.be.fedict.performance.util.PerformanceResultsData;
+import test.integ.be.fedict.performance.util.PerformanceTest;
+import test.integ.be.fedict.performance.util.PerformanceWorkingFrame;
+import test.integ.be.fedict.trust.util.TestUtils;
+import be.fedict.trust.client.XKMS2Client;
+import be.fedict.trust.client.exception.ValidationFailedException;
+import be.fedict.trust.xkms2.XKMSConstants;
 
 /**
  * Performance test using a configurable {@link TestPKI}.

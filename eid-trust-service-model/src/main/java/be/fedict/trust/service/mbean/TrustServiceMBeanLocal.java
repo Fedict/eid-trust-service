@@ -23,7 +23,7 @@ import javax.ejb.Local;
 /**
  * For somehow reason we really need to define an EJB3 interface on the MBean.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Local

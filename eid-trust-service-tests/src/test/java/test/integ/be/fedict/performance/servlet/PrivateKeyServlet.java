@@ -18,18 +18,20 @@
 
 package test.integ.be.fedict.performance.servlet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import test.integ.be.fedict.performance.CAConfiguration;
-import test.integ.be.fedict.performance.TestPKI;
-import test.integ.be.fedict.trust.util.TestUtils;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import test.integ.be.fedict.performance.CAConfiguration;
+import test.integ.be.fedict.performance.TestPKI;
+import test.integ.be.fedict.trust.util.TestUtils;
 
 public class PrivateKeyServlet extends HttpServlet {
 

@@ -18,10 +18,11 @@
 
 package be.fedict.trust.admin.portal;
 
-import org.richfaces.event.UploadEvent;
+import java.io.IOException;
 
 import javax.ejb.Local;
-import java.io.IOException;
+
+import org.richfaces.event.UploadEvent;
 
 @Local
 public interface TrustPoint {

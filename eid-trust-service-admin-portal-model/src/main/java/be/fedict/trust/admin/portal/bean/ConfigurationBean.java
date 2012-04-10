@@ -18,31 +18,44 @@
 
 package be.fedict.trust.admin.portal.bean;
 
-import be.fedict.trust.admin.portal.AdminConstants;
-import be.fedict.trust.admin.portal.Configuration;
-import be.fedict.trust.service.ConfigurationService;
-import be.fedict.trust.service.TrustServiceConstants;
-import be.fedict.trust.service.entity.*;
-import be.fedict.trust.service.exception.InvalidCronExpressionException;
-import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
-import be.fedict.trust.service.exception.InvalidTimeoutException;
-import be.fedict.trust.service.exception.KeyStoreLoadException;
-import org.jboss.ejb3.annotation.LocalBinding;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.*;
-import org.jboss.seam.annotations.security.Admin;
-import org.jboss.seam.faces.FacesMessages;
-import org.jboss.seam.international.StatusMessage;
-import org.jboss.seam.log.Log;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Remove;
 import javax.ejb.Stateful;
 import javax.faces.model.SelectItem;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+
+import org.jboss.ejb3.annotation.LocalBinding;
+import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Begin;
+import org.jboss.seam.annotations.Destroy;
+import org.jboss.seam.annotations.End;
+import org.jboss.seam.annotations.Factory;
+import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Logger;
+import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Out;
+import org.jboss.seam.annotations.security.Admin;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
+import org.jboss.seam.log.Log;
+
+import be.fedict.trust.admin.portal.AdminConstants;
+import be.fedict.trust.admin.portal.Configuration;
+import be.fedict.trust.service.ConfigurationService;
+import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
+import be.fedict.trust.service.entity.NetworkConfigEntity;
+import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
+import be.fedict.trust.service.exception.InvalidTimeoutException;
+import be.fedict.trust.service.exception.KeyStoreLoadException;
 
 @Stateful
 @Name(AdminConstants.ADMIN_SEAM_PREFIX + "config")

@@ -18,14 +18,14 @@
 
 package be.fedict.trust.portal.bean;
 
-import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
-import be.fedict.trust.TrustLinkerResult;
-import be.fedict.trust.client.TrustServiceDomains;
-import be.fedict.trust.portal.CertificateValidator;
-import be.fedict.trust.portal.PortalConstants;
-import be.fedict.trust.service.TrustService;
-import be.fedict.trust.service.ValidationResult;
-import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Remove;
+import javax.ejb.Stateful;
+
 import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
@@ -35,12 +35,14 @@ import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
 
-import javax.ejb.EJB;
-import javax.ejb.Remove;
-import javax.ejb.Stateful;
-import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-import java.util.List;
+import be.fedict.eid.applet.service.impl.handler.IdentityDataMessageHandler;
+import be.fedict.trust.TrustLinkerResult;
+import be.fedict.trust.client.TrustServiceDomains;
+import be.fedict.trust.portal.CertificateValidator;
+import be.fedict.trust.portal.PortalConstants;
+import be.fedict.trust.service.TrustService;
+import be.fedict.trust.service.ValidationResult;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 
 @Stateful
 @Name(PortalConstants.PORTAL_SEAM_PREFIX + "certificateValidator")

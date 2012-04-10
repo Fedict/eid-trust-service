@@ -18,6 +18,32 @@
 
 package be.fedict.trust.xkms2;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CRLException;
+import java.security.cert.CertStoreException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.jws.HandlerChain;
+import javax.jws.WebService;
+import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.tsp.TSPException;
+
 import be.fedict.trust.CRLRevocationData;
 import be.fedict.trust.OCSPRevocationData;
 import be.fedict.trust.RevocationData;
@@ -25,7 +51,14 @@ import be.fedict.trust.client.jaxb.xades132.CRLValuesType;
 import be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType;
 import be.fedict.trust.client.jaxb.xades132.OCSPValuesType;
 import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
-import be.fedict.trust.client.jaxb.xkms.*;
+import be.fedict.trust.client.jaxb.xkms.KeyBindingType;
+import be.fedict.trust.client.jaxb.xkms.MessageExtensionAbstractType;
+import be.fedict.trust.client.jaxb.xkms.ObjectFactory;
+import be.fedict.trust.client.jaxb.xkms.QueryKeyBindingType;
+import be.fedict.trust.client.jaxb.xkms.StatusType;
+import be.fedict.trust.client.jaxb.xkms.UseKeyWithType;
+import be.fedict.trust.client.jaxb.xkms.ValidateRequestType;
+import be.fedict.trust.client.jaxb.xkms.ValidateResultType;
 import be.fedict.trust.client.jaxb.xmldsig.KeyInfoType;
 import be.fedict.trust.client.jaxb.xmldsig.X509DataType;
 import be.fedict.trust.client.jaxws.xkms.XKMSPortType;
@@ -35,31 +68,11 @@ import be.fedict.trust.service.exception.TrustDomainNotFoundException;
 import be.fedict.trust.xkms.extensions.AttributeCertificateMessageExtensionType;
 import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
 import be.fedict.trust.xkms.extensions.TSAMessageExtensionType;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.tsp.TSPException;
-
-import javax.ejb.EJB;
-import javax.jws.HandlerChain;
-import javax.jws.WebService;
-import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.*;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Implementation of XKMS2 Web Service JAX-WS Port.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  */
 @WebService(endpointInterface = "be.fedict.trust.client.jaxws.xkms.XKMSPortType")
 @ServiceConsumer

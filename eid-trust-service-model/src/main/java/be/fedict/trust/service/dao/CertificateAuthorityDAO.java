@@ -18,17 +18,18 @@
 
 package be.fedict.trust.service.dao;
 
-import be.fedict.trust.service.entity.CertificateAuthorityEntity;
-import be.fedict.trust.service.entity.RevokedCertificateEntity;
-import be.fedict.trust.service.entity.TrustPointEntity;
-
-import javax.ejb.Local;
-import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Set;
+
+import javax.ejb.Local;
+import javax.security.auth.x500.X500Principal;
+
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.RevokedCertificateEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
 
 /**
  * Certificate Authority DAO.

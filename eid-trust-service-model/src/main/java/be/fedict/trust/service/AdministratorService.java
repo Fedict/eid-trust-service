@@ -18,12 +18,13 @@
 
 package be.fedict.trust.service;
 
-import be.fedict.trust.service.entity.AdministratorEntity;
-import be.fedict.trust.service.exception.RemoveLastAdminException;
-
-import javax.ejb.Local;
 import java.security.cert.X509Certificate;
 import java.util.List;
+
+import javax.ejb.Local;
+
+import be.fedict.trust.service.entity.AdministratorEntity;
+import be.fedict.trust.service.exception.RemoveLastAdminException;
 
 /**
  * Administrator service.

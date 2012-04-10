@@ -18,14 +18,6 @@
 
 package test.integ.be.fedict.performance;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
-import test.integ.be.fedict.performance.servlet.CrlServlet;
-import test.integ.be.fedict.performance.servlet.OcspServlet;
-import test.integ.be.fedict.trust.util.TestUtils;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serializable;
@@ -37,6 +29,15 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.joda.time.DateTime;
+
+import test.integ.be.fedict.performance.servlet.CrlServlet;
+import test.integ.be.fedict.performance.servlet.OcspServlet;
+import test.integ.be.fedict.trust.util.TestUtils;
 
 public class CAConfiguration implements Serializable {
 

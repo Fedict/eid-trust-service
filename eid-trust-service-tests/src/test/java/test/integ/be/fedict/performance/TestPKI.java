@@ -18,6 +18,20 @@
 
 package test.integ.be.fedict.performance;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.KeyPair;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServlet;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -29,17 +43,17 @@ import org.mortbay.jetty.LocalConnector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.security.SecurityHandler;
-import org.mortbay.jetty.servlet.*;
-import test.integ.be.fedict.performance.servlet.*;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.jetty.servlet.ServletMapping;
+import org.mortbay.jetty.servlet.SessionHandler;
 
-import javax.servlet.http.HttpServlet;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.security.KeyPair;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.*;
+import test.integ.be.fedict.performance.servlet.CertificateServlet;
+import test.integ.be.fedict.performance.servlet.ConfigurationServlet;
+import test.integ.be.fedict.performance.servlet.CrlServlet;
+import test.integ.be.fedict.performance.servlet.OcspServlet;
+import test.integ.be.fedict.performance.servlet.PrivateKeyServlet;
 
 /**
  * Test PKI which can be used by the trust service.

@@ -18,6 +18,22 @@
 
 package be.fedict.trust.service.bean;
 
+import java.io.InputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import be.fedict.trust.client.TrustServiceDomains;
 import be.fedict.trust.service.InitializationService;
 import be.fedict.trust.service.SchedulingService;
@@ -27,20 +43,15 @@ import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.dao.LocalizationDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
-import be.fedict.trust.service.entity.*;
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
+import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.entity.constraints.KeyUsageType;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.snmp.SNMPInterceptor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import java.io.InputStream;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.*;
 
 /**
  * Initialization Service Bean implementation.

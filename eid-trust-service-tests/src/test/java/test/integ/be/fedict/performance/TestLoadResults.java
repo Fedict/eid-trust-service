@@ -18,14 +18,17 @@
 
 package test.integ.be.fedict.performance;
 
+import java.io.File;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+
 import test.integ.be.fedict.performance.util.PerformanceResultDialog;
 import test.integ.be.fedict.performance.util.PerformanceResultsData;
-
-import javax.swing.*;
-import java.io.File;
 
 /**
  * Used for loading in performance test result data generated in non-interactive

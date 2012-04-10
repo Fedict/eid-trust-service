@@ -18,16 +18,21 @@
 
 package be.fedict.trust.service.dao.bean;
 
-import be.fedict.trust.NetworkConfig;
-import be.fedict.trust.service.TrustServiceConstants;
-import be.fedict.trust.service.dao.ConfigurationDAO;
-import be.fedict.trust.service.entity.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import be.fedict.trust.NetworkConfig;
+import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.dao.ConfigurationDAO;
+import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
+import be.fedict.trust.service.entity.NetworkConfigEntity;
+import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 
 /**
  * Configuration DAO Bean implementation.

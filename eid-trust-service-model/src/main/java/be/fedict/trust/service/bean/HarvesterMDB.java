@@ -18,37 +18,6 @@
 
 package be.fedict.trust.service.bean;
 
-import be.fedict.trust.crl.CrlTrustLinker;
-import be.fedict.trust.crl.OnlineCrlRepository;
-import be.fedict.trust.service.SnmpConstants;
-import be.fedict.trust.service.dao.AuditDAO;
-import be.fedict.trust.service.dao.CertificateAuthorityDAO;
-import be.fedict.trust.service.dao.ConfigurationDAO;
-import be.fedict.trust.service.entity.CertificateAuthorityEntity;
-import be.fedict.trust.service.entity.Status;
-import be.fedict.trust.service.snmp.SNMP;
-import be.fedict.trust.service.snmp.SNMPInterceptor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
-import org.bouncycastle.asn1.x509.TBSCertList;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.jce.provider.X509CRLEntryObject;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
-
-import javax.annotation.PostConstruct;
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.EJB;
-import javax.ejb.MessageDriven;
-import javax.interceptor.Interceptors;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -62,6 +31,39 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.ActivationConfigProperty;
+import javax.ejb.EJB;
+import javax.ejb.MessageDriven;
+import javax.interceptor.Interceptors;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.security.auth.x500.X500Principal;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
+import org.bouncycastle.asn1.x509.TBSCertList;
+import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.jce.provider.X509CRLEntryObject;
+import org.bouncycastle.x509.extension.X509ExtensionUtil;
+
+import be.fedict.trust.crl.CrlTrustLinker;
+import be.fedict.trust.crl.OnlineCrlRepository;
+import be.fedict.trust.service.SnmpConstants;
+import be.fedict.trust.service.dao.AuditDAO;
+import be.fedict.trust.service.dao.CertificateAuthorityDAO;
+import be.fedict.trust.service.dao.ConfigurationDAO;
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.Status;
+import be.fedict.trust.service.snmp.SNMP;
+import be.fedict.trust.service.snmp.SNMPInterceptor;
 
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),

@@ -52,7 +52,6 @@ import org.w3c.dom.Node;
 
 import test.integ.be.fedict.trust.util.TestSOAPMessageContext;
 import test.integ.be.fedict.trust.util.TestUtils;
-
 import be.fedict.trust.client.WSSecurityClientHandler;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.entity.KeyStoreType;

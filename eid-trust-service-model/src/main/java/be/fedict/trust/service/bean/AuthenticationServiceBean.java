@@ -18,16 +18,18 @@
 
 package be.fedict.trust.service.bean;
 
-import be.fedict.eid.applet.service.spi.AuthenticationService;
-import be.fedict.trust.service.TrustServiceConstants;
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import javax.ejb.Local;
+import javax.ejb.Stateless;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.ejb3.annotation.LocalBinding;
 
-import javax.ejb.Local;
-import javax.ejb.Stateless;
-import java.security.cert.X509Certificate;
-import java.util.List;
+import be.fedict.eid.applet.service.spi.AuthenticationService;
+import be.fedict.trust.service.TrustServiceConstants;
 
 /**
  * Administrator Authorization Service Bean implementation.

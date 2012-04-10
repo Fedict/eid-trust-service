@@ -18,20 +18,9 @@
 
 package test.integ.be.fedict.trust;
 
-import be.fedict.trust.client.TrustServiceDomains;
-import be.fedict.trust.client.WSSecurityClientHandler;
-import be.fedict.trust.client.XKMS2Client;
-import com.sun.xml.ws.client.ClientTransportException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Before;
-import org.junit.Test;
-import test.integ.be.fedict.trust.util.SSLTrustManager;
-import test.integ.be.fedict.trust.util.TestUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-import javax.net.ssl.*;
-import javax.xml.ws.soap.SOAPFaultException;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.Security;
@@ -39,8 +28,26 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.xml.ws.soap.SOAPFaultException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.Before;
+import org.junit.Test;
+
+import test.integ.be.fedict.trust.util.SSLTrustManager;
+import test.integ.be.fedict.trust.util.TestUtils;
+import be.fedict.trust.client.TrustServiceDomains;
+import be.fedict.trust.client.WSSecurityClientHandler;
+import be.fedict.trust.client.XKMS2Client;
+
+import com.sun.xml.ws.client.ClientTransportException;
 
 /**
  * eID Trust Service XKMS2 Integration Tests.

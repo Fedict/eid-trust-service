@@ -26,8 +26,6 @@ public class InvalidMaxClockOffsetException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	public InvalidMaxClockOffsetException() {
-
 		super();
 	}
-
 }

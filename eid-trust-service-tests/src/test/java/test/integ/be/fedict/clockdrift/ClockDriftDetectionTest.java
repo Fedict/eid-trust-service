@@ -18,11 +18,12 @@
 
 package test.integ.be.fedict.clockdrift;
 
-import be.fedict.trust.NetworkConfig;
-import be.fedict.trust.service.TrustServiceConstants;
-import be.fedict.trust.service.entity.ClockDriftConfigEntity;
-import be.fedict.trust.service.entity.TimeProtocol;
-import be.fedict.trust.service.util.ClockDriftUtil;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import java.security.Security;
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.ntp.TimeInfo;
@@ -30,11 +31,11 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.security.Security;
-import java.util.Date;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import be.fedict.trust.NetworkConfig;
+import be.fedict.trust.service.TrustServiceConstants;
+import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.util.ClockDriftUtil;
 
 /**
  * eID Trust Service Clock Drift detection integration Tests.

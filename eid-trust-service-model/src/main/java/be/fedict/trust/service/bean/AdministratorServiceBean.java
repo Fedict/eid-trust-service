@@ -18,17 +18,19 @@
 
 package be.fedict.trust.service.bean;
 
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import be.fedict.trust.service.AdministratorService;
 import be.fedict.trust.service.dao.AdministratorDAO;
 import be.fedict.trust.service.entity.AdministratorEntity;
 import be.fedict.trust.service.exception.RemoveLastAdminException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import java.security.cert.X509Certificate;
-import java.util.List;
 
 /**
  * Administrator Service Bean implementation.

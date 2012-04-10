@@ -18,21 +18,27 @@
 
 package be.fedict.trust.admin.portal.bean;
 
-import be.fedict.trust.admin.portal.AdminConstants;
-import be.fedict.trust.admin.portal.TrustDomain;
-import be.fedict.trust.service.TrustDomainService;
-import be.fedict.trust.service.entity.TrustDomainEntity;
-import be.fedict.trust.service.entity.TrustPointEntity;
-import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
-import be.fedict.trust.service.entity.constraints.*;
-import be.fedict.trust.service.exception.TrustDomainAlreadyExistsException;
-import be.fedict.trust.service.exception.TrustDomainNotFoundException;
-import be.fedict.trust.service.exception.VirtualTrustDomainAlreadyExistsException;
-import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
+import java.io.IOException;
+import java.security.cert.CertificateException;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Remove;
+import javax.ejb.Stateful;
+import javax.faces.model.SelectItem;
+
 import org.apache.commons.io.FileUtils;
 import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.*;
+import org.jboss.seam.annotations.Begin;
+import org.jboss.seam.annotations.Destroy;
+import org.jboss.seam.annotations.End;
+import org.jboss.seam.annotations.Factory;
+import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Logger;
+import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.datamodel.DataModel;
 import org.jboss.seam.annotations.datamodel.DataModelSelection;
 import org.jboss.seam.annotations.security.Admin;
@@ -46,14 +52,24 @@ import org.richfaces.model.TreeNode;
 import org.richfaces.model.TreeNodeImpl;
 import org.richfaces.model.UploadItem;
 
-import javax.ejb.EJB;
-import javax.ejb.Remove;
-import javax.ejb.Stateful;
-import javax.faces.model.SelectItem;
-import java.io.IOException;
-import java.security.cert.CertificateException;
-import java.util.LinkedList;
-import java.util.List;
+import be.fedict.trust.admin.portal.AdminConstants;
+import be.fedict.trust.admin.portal.TrustDomain;
+import be.fedict.trust.service.TrustDomainService;
+import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
+import be.fedict.trust.service.entity.constraints.CertificateConstraintEntity;
+import be.fedict.trust.service.entity.constraints.DNConstraintEntity;
+import be.fedict.trust.service.entity.constraints.EndEntityConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
+import be.fedict.trust.service.entity.constraints.KeyUsageType;
+import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
+import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
+import be.fedict.trust.service.entity.constraints.TSAConstraintEntity;
+import be.fedict.trust.service.exception.TrustDomainAlreadyExistsException;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+import be.fedict.trust.service.exception.VirtualTrustDomainAlreadyExistsException;
+import be.fedict.trust.service.exception.VirtualTrustDomainNotFoundException;
 
 @Stateful
 @Name(AdminConstants.ADMIN_SEAM_PREFIX + "trustDomain")

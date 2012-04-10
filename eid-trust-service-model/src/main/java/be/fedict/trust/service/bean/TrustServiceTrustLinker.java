@@ -18,6 +18,20 @@
 
 package be.fedict.trust.service.bean;
 
+import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.persistence.EntityManager;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import be.fedict.trust.RevocationData;
 import be.fedict.trust.TrustLinker;
 import be.fedict.trust.TrustLinkerResult;
@@ -30,18 +44,6 @@ import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.RevokedCertificatePK;
 import be.fedict.trust.service.entity.Status;
 import be.fedict.trust.service.snmp.SNMPInterceptor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.persistence.EntityManager;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.Date;
 
 /**
  * Implementation of a trust linker based on the trust service infrastructure.

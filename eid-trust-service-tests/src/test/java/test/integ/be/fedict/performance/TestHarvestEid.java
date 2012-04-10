@@ -18,13 +18,6 @@
 
 package test.integ.be.fedict.performance;
 
-import be.fedict.trust.crl.OnlineCrlRepository;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
-
 import java.net.URI;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
@@ -32,6 +25,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import be.fedict.trust.crl.OnlineCrlRepository;
 
 /**
  * Unit test that harvests all BeId published CRLs and dumps the # entries they

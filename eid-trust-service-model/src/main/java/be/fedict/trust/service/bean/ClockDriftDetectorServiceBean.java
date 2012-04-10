@@ -18,21 +18,23 @@
 
 package be.fedict.trust.service.bean;
 
+import java.io.IOException;
+import java.util.Date;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.net.ntp.TimeInfo;
+import org.bouncycastle.tsp.TSPException;
+
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.service.ClockDriftService;
 import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.entity.ClockDriftConfigEntity;
 import be.fedict.trust.service.util.ClockDriftUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.net.ntp.TimeInfo;
-import org.bouncycastle.tsp.TSPException;
-
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import java.io.IOException;
-import java.util.Date;
 
 /**
  * Clock drift detection service bean implementation.

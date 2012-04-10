@@ -18,11 +18,12 @@
 
 package be.fedict.trust.service.bean;
 
-import be.fedict.trust.crl.CachedCrlRepository;
+import javax.ejb.Singleton;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.ejb.Singleton;
+import be.fedict.trust.crl.CachedCrlRepository;
 
 /**
  * Singleton Crl Repository cache bean used if no persistent CRL cache is

@@ -18,19 +18,20 @@
 
 package test.integ.be.fedict.trust;
 
-import be.fedict.trust.BelgianTrustValidatorFactory;
-import be.fedict.trust.NetworkConfig;
-import be.fedict.trust.client.HAXKMS2Client;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;
-import test.integ.be.fedict.trust.util.TestUtils;
 
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.util.List;
+import test.integ.be.fedict.trust.util.TestUtils;
+import be.fedict.trust.BelgianTrustValidatorFactory;
+import be.fedict.trust.NetworkConfig;
+import be.fedict.trust.client.HAXKMS2Client;
 
 /**
  * eID Trust Service HA XKMS2 client test.

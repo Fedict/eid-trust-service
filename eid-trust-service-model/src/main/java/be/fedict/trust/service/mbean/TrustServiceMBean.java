@@ -29,7 +29,7 @@ import org.jboss.ejb3.annotation.Service;
 /**
  * MBean to manage some runtime aspects like registering security providers.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  * 
  */
 @Service

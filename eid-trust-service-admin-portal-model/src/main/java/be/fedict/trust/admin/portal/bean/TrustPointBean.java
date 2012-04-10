@@ -18,18 +18,26 @@
 
 package be.fedict.trust.admin.portal.bean;
 
-import be.fedict.trust.admin.portal.AdminConstants;
-import be.fedict.trust.admin.portal.TrustPoint;
-import be.fedict.trust.service.TrustDomainService;
-import be.fedict.trust.service.entity.CertificateAuthorityEntity;
-import be.fedict.trust.service.entity.TrustDomainEntity;
-import be.fedict.trust.service.entity.TrustPointEntity;
-import be.fedict.trust.service.exception.InvalidCronExpressionException;
-import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
+import java.io.IOException;
+import java.security.cert.CertificateException;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Remove;
+import javax.ejb.Stateful;
+import javax.jms.JMSException;
+
 import org.apache.commons.io.FileUtils;
 import org.jboss.ejb3.annotation.LocalBinding;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.*;
+import org.jboss.seam.annotations.Begin;
+import org.jboss.seam.annotations.Destroy;
+import org.jboss.seam.annotations.End;
+import org.jboss.seam.annotations.Factory;
+import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Logger;
+import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.datamodel.DataModel;
 import org.jboss.seam.annotations.datamodel.DataModelSelection;
 import org.jboss.seam.annotations.security.Admin;
@@ -39,13 +47,14 @@ import org.jboss.seam.log.Log;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 
-import javax.ejb.EJB;
-import javax.ejb.Remove;
-import javax.ejb.Stateful;
-import javax.jms.JMSException;
-import java.io.IOException;
-import java.security.cert.CertificateException;
-import java.util.List;
+import be.fedict.trust.admin.portal.AdminConstants;
+import be.fedict.trust.admin.portal.TrustPoint;
+import be.fedict.trust.service.TrustDomainService;
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.TrustDomainEntity;
+import be.fedict.trust.service.entity.TrustPointEntity;
+import be.fedict.trust.service.exception.InvalidCronExpressionException;
+import be.fedict.trust.service.exception.TrustPointAlreadyExistsException;
 
 @Stateful
 @Name(AdminConstants.ADMIN_SEAM_PREFIX + "trustPoint")

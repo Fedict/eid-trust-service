@@ -18,15 +18,6 @@
 
 package be.fedict.trust.service;
 
-import be.fedict.trust.service.entity.AuditEntity;
-import be.fedict.trust.service.entity.WSSecurityConfigEntity;
-import be.fedict.trust.service.exception.TrustDomainNotFoundException;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.tsp.TSPException;
-import org.bouncycastle.tsp.TimeStampToken;
-import org.bouncycastle.x509.X509V2AttributeCertificate;
-
-import javax.ejb.Local;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -37,10 +28,21 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
+import javax.ejb.Local;
+
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.tsp.TSPException;
+import org.bouncycastle.tsp.TimeStampToken;
+import org.bouncycastle.x509.X509V2AttributeCertificate;
+
+import be.fedict.trust.service.entity.AuditEntity;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
+import be.fedict.trust.service.exception.TrustDomainNotFoundException;
+
 /**
  * Trust Service interface.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  */
 @Local
 public interface TrustService {

@@ -18,13 +18,12 @@
 
 package be.fedict.trust.service.dao.bean;
 
-import be.fedict.trust.service.dao.CertificateAuthorityDAO;
-import be.fedict.trust.service.entity.CertificateAuthorityEntity;
-import be.fedict.trust.service.entity.RevokedCertificateEntity;
-import be.fedict.trust.service.entity.RevokedCertificatePK;
-import be.fedict.trust.service.entity.TrustPointEntity;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.math.BigInteger;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509CRLEntry;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import java.util.Set;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -34,12 +33,15 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.security.auth.x500.X500Principal;
-import java.math.BigInteger;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509CRLEntry;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import be.fedict.trust.service.dao.CertificateAuthorityDAO;
+import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.RevokedCertificateEntity;
+import be.fedict.trust.service.entity.RevokedCertificatePK;
+import be.fedict.trust.service.entity.TrustPointEntity;
 
 /**
  * Certificate Authority DAO Bean implementation.

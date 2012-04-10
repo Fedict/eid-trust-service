@@ -18,15 +18,20 @@
 
 package be.fedict.trust.service;
 
-import be.fedict.trust.service.entity.*;
+import java.util.List;
+import java.util.Locale;
+
+import javax.ejb.Local;
+
+import be.fedict.trust.service.entity.ClockDriftConfigEntity;
+import be.fedict.trust.service.entity.KeyStoreType;
+import be.fedict.trust.service.entity.NetworkConfigEntity;
+import be.fedict.trust.service.entity.TimeProtocol;
+import be.fedict.trust.service.entity.WSSecurityConfigEntity;
 import be.fedict.trust.service.exception.InvalidCronExpressionException;
 import be.fedict.trust.service.exception.InvalidMaxClockOffsetException;
 import be.fedict.trust.service.exception.InvalidTimeoutException;
 import be.fedict.trust.service.exception.KeyStoreLoadException;
-
-import javax.ejb.Local;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Configuration service.

@@ -18,14 +18,22 @@
 
 package test.integ.be.fedict.trust;
 
-import be.fedict.trust.TrustLinkerResultReason;
-import be.fedict.trust.client.TrustServiceDomains;
-import be.fedict.trust.client.XKMS2Client;
-import be.fedict.trust.client.exception.RevocationDataCorruptException;
-import be.fedict.trust.client.exception.RevocationDataNotFoundException;
-import be.fedict.trust.client.exception.ValidationFailedException;
-import be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType;
-import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+import java.io.ByteArrayInputStream;
+import java.security.Security;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ocsp.OCSPResponseStatus;
@@ -35,16 +43,16 @@ import org.bouncycastle.ocsp.OCSPResp;
 import org.bouncycastle.ocsp.SingleResp;
 import org.junit.Before;
 import org.junit.Test;
+
 import test.integ.be.fedict.trust.util.TestUtils;
-
-import java.io.ByteArrayInputStream;
-import java.security.Security;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
-import java.util.*;
-
-import static org.junit.Assert.*;
+import be.fedict.trust.TrustLinkerResultReason;
+import be.fedict.trust.client.TrustServiceDomains;
+import be.fedict.trust.client.XKMS2Client;
+import be.fedict.trust.client.exception.RevocationDataCorruptException;
+import be.fedict.trust.client.exception.RevocationDataNotFoundException;
+import be.fedict.trust.client.exception.ValidationFailedException;
+import be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType;
+import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
 
 /**
  * eID Trust Service XKMS2 Integration Tests.
