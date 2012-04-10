@@ -10,11 +10,11 @@
 	<ui:composition template="/WEB-INF/template.xhtml">
 		<ui:param name="activeMenu" value="virtual_domain" />
 		<ui:define name="body">
-			<h2>#{messages.manageVirtualTrustDomains}</h2>
+			<h2>#{messages.virtualTrustDomains}</h2>
 
 			<rich:tabPanel switchType="client">
 
-				<rich:tab label="#{messages.manage}">
+				<rich:tab label="#{messages.list}">
 
 					<h:form id="virt_form">
 						<rich:dataTable id="data" var="item"
@@ -62,7 +62,7 @@
 					</h:form>
 
 				</rich:tab>
-				<rich:tab label="#{messages.addVirtualTrustDomain}">
+				<rich:tab label="#{messages.add}">
 
 					<a4j:form id="add_form" ajaxSubmit="true" reRender="panel">
 

@@ -10,11 +10,11 @@
 	<ui:composition template="/WEB-INF/template.xhtml">
 		<ui:param name="activeMenu" value="domain" />
 		<ui:define name="body">
-			<h2>#{messages.manageTrustDomains}</h2>
+			<h2>#{messages.trustDomains}</h2>
 
 			<rich:tabPanel switchType="client">
 
-				<rich:tab label="#{messages.manage}">
+				<rich:tab label="#{messages.list}">
 
 					<h:form id="form1">
 						<rich:dataTable id="data" var="item" value="#{ts_trustDomainList}"
@@ -71,7 +71,7 @@
 
 				</rich:tab>
 
-				<rich:tab label="#{messages.addTrustDomain}">
+				<rich:tab label="#{messages.add}">
 
 					<a4j:form id="add_form" ajaxSubmit="true" reRender="panel">
 

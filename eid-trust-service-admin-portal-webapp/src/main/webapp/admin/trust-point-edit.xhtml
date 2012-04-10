@@ -27,27 +27,9 @@
 				</h:panelGrid>
 
 				<h:panelGrid id="panel2" columns="2" border="0">
-					<a4j:commandButton id="remove" value="#{messages.remove}"
-						onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
 					<h:commandButton action="#{ts_trustPoint.back}" id="back"
 						value="#{messages.back}" immediate="true" />
 				</h:panelGrid>
-
-				<rich:modalPanel id="removeConfirm">
-					<div class="center">
-						<h:outputText value="#{messages.removeTrustPointConfirmation}" />
-						<p>
-							<h:panelGrid id="confirmPanel" columns="2" border="0"
-								styleClass="center">
-								<a4j:commandButton id="remove2" value="#{messages.remove}"
-									action="#{ts_trustPoint.remove}" immediate="true"
-									oncomplete="Richfaces.hideModalPanel('removeConfirm');" />
-								<a4j:commandButton id="cancel" value="#{messages.cancel}"
-									onclick="Richfaces.hideModalPanel('removeConfirm');" />
-							</h:panelGrid>
-						</p>
-					</div>
-				</rich:modalPanel>
 
 				<h:messages globalOnly="true" styleClass="error" />
 

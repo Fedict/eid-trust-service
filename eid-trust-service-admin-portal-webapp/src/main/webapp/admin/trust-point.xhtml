@@ -10,18 +10,18 @@
 	<ui:composition template="/WEB-INF/template.xhtml">
 		<ui:param name="activeMenu" value="trustpoint" />
 		<ui:define name="body">
-			<h2>#{messages.manageTrustPoints}</h2>
+			<h2>#{messages.trustPoints}</h2>
 
 			<rich:tabPanel switchType="client">
 
-				<rich:tab label="#{messages.manage}">
+				<rich:tab label="#{messages.list}">
 
 					<h:form id="form">
 						<rich:dataTable id="data" var="item" value="#{ts_trustPointList}"
 							rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
 
 							<h:column>
-								<f:facet name="header">#{messages.trustPoint}</f:facet>
+								<f:facet name="header">#{messages.name}</f:facet>
 								<h:outputText value="#{item.name}" />
 							</h:column>
 							<h:column>
@@ -69,7 +69,8 @@
 					</h:form>
 
 				</rich:tab>
-				<rich:tab label="#{messages.addTrustPoint}">
+				
+				<rich:tab label="#{messages.add}">
 
 					<a4j:form id="add_form" ajaxSubmit="true" reRender="panel"
 						enctype="multipart/form-data">
