@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2009-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,27 +18,28 @@
 
 package be.fedict.trust.client;
 
-import be.fedict.trust.client.exception.RevocationDataCorruptException;
-import be.fedict.trust.client.exception.RevocationDataNotFoundException;
-import be.fedict.trust.client.exception.TrustDomainNotFoundException;
-import be.fedict.trust.client.exception.ValidationFailedException;
-import be.fedict.trust.client.jaxb.xades132.*;
-import be.fedict.trust.client.jaxb.xkms.*;
-import be.fedict.trust.client.jaxb.xmldsig.KeyInfoType;
-import be.fedict.trust.client.jaxb.xmldsig.X509DataType;
-import be.fedict.trust.xkms.extensions.AttributeCertificateMessageExtensionType;
-import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
-import be.fedict.trust.xkms.extensions.TSAMessageExtensionType;
-import be.fedict.trust.xkms2.*;
-import com.sun.xml.ws.developer.JAXWSProperties;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.ocsp.OCSPResp;
-import org.bouncycastle.tsp.TimeStampToken;
-import org.bouncycastle.x509.X509V2AttributeCertificate;
-import org.w3._2002._03.xkms.XKMSPortType;
-import org.w3._2002._03.xkms.XKMSService;
-import sun.security.timestamp.TimestampToken;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.ProxySelector;
+import java.security.InvalidKeyException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.SignatureException;
+import java.security.cert.CRLException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -49,17 +50,50 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.ProxySelector;
-import java.security.*;
-import java.security.cert.*;
-import java.util.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.ocsp.OCSPResp;
+import org.bouncycastle.tsp.TimeStampToken;
+import org.bouncycastle.x509.X509V2AttributeCertificate;
+
+import sun.security.timestamp.TimestampToken;
+import be.fedict.trust.client.exception.RevocationDataCorruptException;
+import be.fedict.trust.client.exception.RevocationDataNotFoundException;
+import be.fedict.trust.client.exception.TrustDomainNotFoundException;
+import be.fedict.trust.client.exception.ValidationFailedException;
+import be.fedict.trust.client.jaxb.xades132.CRLValuesType;
+import be.fedict.trust.client.jaxb.xades132.CertifiedRolesListType;
+import be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType;
+import be.fedict.trust.client.jaxb.xades132.OCSPValuesType;
+import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
+import be.fedict.trust.client.jaxb.xkms.KeyBindingType;
+import be.fedict.trust.client.jaxb.xkms.MessageExtensionAbstractType;
+import be.fedict.trust.client.jaxb.xkms.QueryKeyBindingType;
+import be.fedict.trust.client.jaxb.xkms.StatusType;
+import be.fedict.trust.client.jaxb.xkms.TimeInstantType;
+import be.fedict.trust.client.jaxb.xkms.UseKeyWithType;
+import be.fedict.trust.client.jaxb.xkms.ValidateRequestType;
+import be.fedict.trust.client.jaxb.xkms.ValidateResultType;
+import be.fedict.trust.client.jaxb.xmldsig.KeyInfoType;
+import be.fedict.trust.client.jaxb.xmldsig.X509DataType;
+import be.fedict.trust.client.jaxws.xkms.XKMSPortType;
+import be.fedict.trust.client.jaxws.xkms.XKMSService;
+import be.fedict.trust.xkms.extensions.AttributeCertificateMessageExtensionType;
+import be.fedict.trust.xkms.extensions.RevocationDataMessageExtensionType;
+import be.fedict.trust.xkms.extensions.TSAMessageExtensionType;
+import be.fedict.trust.xkms2.LoggingSoapHandler;
+import be.fedict.trust.xkms2.ResultMajorCode;
+import be.fedict.trust.xkms2.ResultMinorCode;
+import be.fedict.trust.xkms2.XKMSConstants;
+import be.fedict.trust.xkms2.XKMSServiceFactory;
+
+import com.sun.xml.ws.developer.JAXWSProperties;
 
 /**
  * Client component for the eID Trust Service XKMS2 web service.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  */
 public class XKMS2Client {
 

@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009-2011 FedICT.
+ * Copyright (C) 2009-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -35,6 +35,12 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * HTTP Proxy selector implementation.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public class XKMS2ProxySelector extends ProxySelector {
 
 	private static final Log LOG = LogFactory.getLog(XKMS2ProxySelector.class);

@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -13,32 +15,35 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
+				<groupId>org.jvnet.jax-ws-commons</groupId>
 				<artifactId>jaxws-maven-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>wsimport</id>
 						<goals>
 							<goal>wsimport</goal>
 						</goals>
+						<configuration>
+							<sei />
+							<verbose>true</verbose>
+							<xdebug>true</xdebug>
+							<catalog>${basedir}/src/wsdl/catalog.cat</catalog>
+							<bindingDirectory>${basedir}/src/wsdl</bindingDirectory>
+							<bindingFiles>
+								<bindingFile>jaxws-bindings.xml</bindingFile>
+								<bindingFile>bindings.xml</bindingFile>
+							</bindingFiles>
+							<target>2.1</target>
+							<xnoAddressingDataBinding>true</xnoAddressingDataBinding>
+							<xnocompile>true</xnocompile>
+						</configuration>
 					</execution>
 				</executions>
-				<configuration>
-					<sei/>
-					<verbose>true</verbose>
-					<xdebug>true</xdebug>
-					<catalog>${basedir}/src/wsdl/catalog.cat</catalog>
-					<bindingDirectory>${basedir}/src/wsdl</bindingDirectory>
-					<bindingFiles>
-						<bindingFile>bindings.xml</bindingFile>
-					</bindingFiles>
-				</configuration>
 				<dependencies>
 					<dependency>
 						<groupId>com.sun.xml.ws</groupId>
 						<artifactId>jaxws-tools</artifactId>
-						<!-- cannot use 2.2.1 yet because of method required() on XmlElementRef 
-							being JAXB 2.2, and Java6 still comes with 2.1 -->
-						<version>2.1.7</version>
+						<version>2.2.6</version>
 					</dependency>
 				</dependencies>
 			</plugin>

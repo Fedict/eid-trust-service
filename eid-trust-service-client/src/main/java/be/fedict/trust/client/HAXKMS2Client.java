@@ -18,6 +18,27 @@
 
 package be.fedict.trust.client;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertStore;
+import java.security.cert.CertStoreException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.ws.WebServiceException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.tsp.TimeStampToken;
+
 import be.fedict.trust.CRLRevocationData;
 import be.fedict.trust.OCSPRevocationData;
 import be.fedict.trust.RevocationData;
@@ -25,18 +46,12 @@ import be.fedict.trust.TrustValidator;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.client.exception.ValidationFailedException;
-import be.fedict.trust.client.jaxb.xades132.*;
+import be.fedict.trust.client.jaxb.xades132.CRLValuesType;
+import be.fedict.trust.client.jaxb.xades132.CertifiedRolesListType;
+import be.fedict.trust.client.jaxb.xades132.EncapsulatedPKIDataType;
+import be.fedict.trust.client.jaxb.xades132.OCSPValuesType;
+import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
 import be.fedict.trust.xkms2.XKMSConstants;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.tsp.TimeStampToken;
-
-import javax.xml.ws.WebServiceException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.*;
-import java.util.*;
 
 /**
  * High Availability client component for the eID Trust Service XKMS2 web

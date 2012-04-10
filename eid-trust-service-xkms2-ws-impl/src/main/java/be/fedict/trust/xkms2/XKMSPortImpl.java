@@ -28,6 +28,7 @@ import be.fedict.trust.client.jaxb.xades132.RevocationValuesType;
 import be.fedict.trust.client.jaxb.xkms.*;
 import be.fedict.trust.client.jaxb.xmldsig.KeyInfoType;
 import be.fedict.trust.client.jaxb.xmldsig.X509DataType;
+import be.fedict.trust.client.jaxws.xkms.XKMSPortType;
 import be.fedict.trust.service.TrustService;
 import be.fedict.trust.service.ValidationResult;
 import be.fedict.trust.service.exception.TrustDomainNotFoundException;
@@ -38,7 +39,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.tsp.TSPException;
-import org.w3._2002._03.xkms.XKMSPortType;
 
 import javax.ejb.EJB;
 import javax.jws.HandlerChain;
@@ -61,7 +61,7 @@ import java.util.List;
  * 
  * @author fcorneli
  */
-@WebService(endpointInterface = "org.w3._2002._03.xkms.XKMSPortType")
+@WebService(endpointInterface = "be.fedict.trust.client.jaxws.xkms.XKMSPortType")
 @ServiceConsumer
 @HandlerChain(file = "ws-handlers.xml")
 public class XKMSPortImpl implements XKMSPortType {

@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2009-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,10 +18,11 @@
 
 package be.fedict.trust.xkms2;
 
-import org.w3._2002._03.xkms.XKMSService;
+import java.net.URL;
 
 import javax.xml.namespace.QName;
-import java.net.URL;
+
+import be.fedict.trust.client.jaxws.xkms.XKMSService;
 
 /**
  * Factory for the JAX-WS based XKMS2 Service.
