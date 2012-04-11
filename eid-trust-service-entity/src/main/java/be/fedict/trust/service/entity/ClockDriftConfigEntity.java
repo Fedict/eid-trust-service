@@ -51,7 +51,6 @@ public class ClockDriftConfigEntity implements Serializable {
 	 * Default constructor.
 	 */
 	public ClockDriftConfigEntity() {
-
 		super();
 	}
 
@@ -60,7 +59,6 @@ public class ClockDriftConfigEntity implements Serializable {
 	 */
 	public ClockDriftConfigEntity(String name, TimeProtocol timeProtocol,
 			String server, int timeout, int maxClockOffset, String cronSchedule) {
-
 		this.name = name;
 		this.timeProtocol = timeProtocol;
 		this.server = server;
@@ -71,63 +69,51 @@ public class ClockDriftConfigEntity implements Serializable {
 
 	@Id
 	public String getName() {
-
 		return this.name;
 	}
 
 	public void setName(String name) {
-
 		this.name = name;
 	}
 
 	@Enumerated(EnumType.STRING)
 	public TimeProtocol getTimeProtocol() {
-
 		return this.timeProtocol;
 	}
 
 	public void setTimeProtocol(TimeProtocol timeProtocol) {
-
 		this.timeProtocol = timeProtocol;
 	}
 
 	public String getServer() {
-
 		return this.server;
 	}
 
 	public void setServer(String server) {
-
 		this.server = server;
 	}
 
 	public int getTimeout() {
-
 		return this.timeout;
 	}
 
 	public void setTimeout(int timeout) {
-
 		this.timeout = timeout;
 	}
 
 	public int getMaxClockOffset() {
-
 		return this.maxClockOffset;
 	}
 
 	public void setMaxClockOffset(int maxClockOffset) {
-
 		this.maxClockOffset = maxClockOffset;
 	}
 
 	public String getCronSchedule() {
-
 		return this.cronSchedule;
 	}
 
 	public void setCronSchedule(String cronSchedule) {
-
 		this.cronSchedule = cronSchedule;
 	}
 
@@ -140,23 +126,19 @@ public class ClockDriftConfigEntity implements Serializable {
 	}
 
 	public Date getFireDate() {
-
 		return this.fireDate;
 	}
 
 	public void setFireDate(Date fireDate) {
-
 		this.fireDate = fireDate;
 	}
 
 	@Override
 	public String toString() {
-
 		return new ToStringBuilder(this)
 				.append("protocol", this.timeProtocol.name())
 				.append("server", this.server).append("timeout", this.timeout)
 				.append("maxClockOffset", this.maxClockOffset)
 				.append("cronSchedule", this.cronSchedule).toString();
 	}
-
 }

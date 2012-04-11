@@ -29,6 +29,8 @@ import javax.ejb.Local;
 @Local
 public interface InitializationService {
 
+	/**
+	 * Initialize the eID Trust Service system.
+	 */
 	void initialize();
-
 }

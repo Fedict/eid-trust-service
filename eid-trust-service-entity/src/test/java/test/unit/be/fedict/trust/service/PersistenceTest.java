@@ -47,6 +47,12 @@ import be.fedict.trust.service.entity.constraints.KeyUsageConstraintEntity;
 import be.fedict.trust.service.entity.constraints.PolicyConstraintEntity;
 import be.fedict.trust.service.entity.constraints.QCStatementsConstraintEntity;
 
+/**
+ * JPA entity unit test. Tests the relationships and queries.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public class PersistenceTest {
 
 	private static final Log LOG = LogFactory.getLog(PersistenceTest.class);
@@ -97,7 +103,15 @@ public class PersistenceTest {
 		this.entityManager.close();
 	}
 
-	@SuppressWarnings("unchecked")
+	private void refresh() {
+		// we clear the hibernate cache
+		EntityTransaction entityTransaction = this.entityManager
+				.getTransaction();
+		entityTransaction.commit();
+		this.entityManager.clear();
+		entityTransaction.begin();
+	}
+
 	@Test
 	public void testFindRevokedCertificate() throws Exception {
 		// setup
@@ -109,12 +123,7 @@ public class PersistenceTest {
 				issuerName, serialNumber, new Date(), crlNumber);
 		this.entityManager.persist(revokedCertificateEntity);
 
-		// we clear the hibernate cache
-		EntityTransaction entityTransaction = this.entityManager
-				.getTransaction();
-		entityTransaction.commit();
-		this.entityManager.clear();
-		entityTransaction.begin();
+		refresh();
 
 		// operate
 		Query query = this.entityManager
@@ -130,5 +139,21 @@ public class PersistenceTest {
 		assertEquals(resultRevokedCertificate.getPk().getSerialNumber(),
 				serialNumber.toString());
 		assertEquals(resultRevokedCertificate.getCrlNumber(), crlNumber);
+
+		refresh();
+
+		Query deleteQuery = this.entityManager
+				.createNamedQuery(RevokedCertificateEntity.DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER);
+		deleteQuery.setParameter("issuer", issuerName);
+		deleteQuery.setParameter("crlNumber", crlNumber);
+		int zeroDeleteResult = deleteQuery.executeUpdate();
+		assertEquals(0, zeroDeleteResult);
+
+		refresh();
+
+		deleteQuery.setParameter("crlNumber",
+				crlNumber.add(new BigInteger("1")));
+		int deleteResult = deleteQuery.executeUpdate();
+		assertEquals(1, deleteResult);
 	}
 }

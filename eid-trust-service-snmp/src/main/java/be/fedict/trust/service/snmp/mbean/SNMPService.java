@@ -56,7 +56,7 @@ public class SNMPService implements SNMPServiceMBean {
 			try {
 				addSNMPCounter(oid);
 			} catch (DuplicateRegistrationException e) {
-				LOG.error("Counter with oid=" + oid + " already registered.");
+				LOG.warn("Counter with oid=" + oid + " already registered.");
 			}
 		}
 
@@ -75,7 +75,7 @@ public class SNMPService implements SNMPServiceMBean {
 			try {
 				addSNMPCounter(oid);
 			} catch (DuplicateRegistrationException e) {
-				LOG.error("Counter with oid=" + oid + " already registered.");
+				LOG.warn("Counter with oid=" + oid + " already registered.");
 			}
 		}
 		this.snmpValues.put(oid, value);
@@ -96,7 +96,7 @@ public class SNMPService implements SNMPServiceMBean {
 			try {
 				addSNMPCounter(oid);
 			} catch (DuplicateRegistrationException e) {
-				LOG.error("Counter with oid=" + oid + " already registered.");
+				LOG.warn("Counter with oid=" + oid + " already registered.");
 			}
 		} else {
 			this.snmpValues.put(oid, value + increment);

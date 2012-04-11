@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2009-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,10 +18,11 @@
 
 package be.fedict.trust.service.dao.bean;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -37,6 +38,7 @@ import be.fedict.trust.service.entity.AuditEntity;
  * Audit DAO Bean implementation.
  * 
  * @author wvdhaute
+ * @author Frank Cornelis
  * 
  */
 @Stateless
@@ -48,38 +50,25 @@ public class AuditDAOBean implements AuditDAO {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@SuppressWarnings("unchecked")
 	public List<AuditEntity> listAudits() {
-
-		LOG.debug("list audits");
 		Query query = this.entityManager
 				.createNamedQuery(AuditEntity.QUERY_LIST_ALL);
 		return (List<AuditEntity>) query.getResultList();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void clearAudits() {
-
-		LOG.debug("clear audits");
 		Query query = this.entityManager
 				.createNamedQuery(AuditEntity.REMOVE_ALL);
 		int removed = query.executeUpdate();
-		LOG.debug("# removed: " + removed);
+		LOG.debug("# removed audit records: " + removed);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public AuditEntity logAudit(String message) {
-
-		AuditEntity audit = new AuditEntity(new Date(), message);
+		AuditEntity audit = new AuditEntity(message);
 		this.entityManager.persist(audit);
-		LOG.error("audit: date=" + audit.getAuditDate().toString()
+		LOG.debug("audit: date=" + audit.getAuditDate().toString()
 				+ " message=" + audit.getMessage());
 		return audit;
 	}

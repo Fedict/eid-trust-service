@@ -81,7 +81,6 @@ public class TrustDomainEntity implements Serializable {
 	 * @param name
 	 */
 	public TrustDomainEntity(String name) {
-
 		this.name = name;
 		this.certificateConstraints = new LinkedList<CertificateConstraintEntity>();
 		this.trustPoints = new LinkedList<TrustPointEntity>();
@@ -98,45 +97,37 @@ public class TrustDomainEntity implements Serializable {
 	}
 
 	public boolean isDefaultDomain() {
-
 		return this.defaultDomain;
 	}
 
 	public void setDefaultDomain(boolean defaultDomain) {
-
 		this.defaultDomain = defaultDomain;
 	}
 
 	public boolean isUseCaching() {
-
 		return this.useCaching;
 	}
 
 	public void setUseCaching(boolean useCaching) {
-
 		this.useCaching = useCaching;
 	}
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
 	public List<CertificateConstraintEntity> getCertificateConstraints() {
-
 		return this.certificateConstraints;
 	}
 
 	public void setCertificateConstraints(
 			List<CertificateConstraintEntity> certificateConstraints) {
-
 		this.certificateConstraints = certificateConstraints;
 	}
 
 	@ManyToMany
 	public List<TrustPointEntity> getTrustPoints() {
-
 		return this.trustPoints;
 	}
 
 	public void setTrustPoints(List<TrustPointEntity> trustPoints) {
-
 		this.trustPoints = trustPoints;
 	}
 }

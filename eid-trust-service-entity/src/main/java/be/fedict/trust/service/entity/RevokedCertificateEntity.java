@@ -63,13 +63,11 @@ public class RevokedCertificateEntity implements Serializable {
 	private BigInteger crlNumber;
 
 	public RevokedCertificateEntity() {
-
 		super();
 	}
 
 	public RevokedCertificateEntity(String issuer, BigInteger serialNumber,
 			Date revocationDate, BigInteger crlNumber) {
-
 		this.pk = new RevokedCertificatePK(issuer, serialNumber.toString());
 		this.revocationDate = revocationDate;
 		this.crlNumber = crlNumber;
@@ -104,7 +102,6 @@ public class RevokedCertificateEntity implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (this == obj) {
 			return true;
 		}
@@ -120,13 +117,11 @@ public class RevokedCertificateEntity implements Serializable {
 
 	@Override
 	public int hashCode() {
-
 		return new HashCodeBuilder().append(this.pk).toHashCode();
 	}
 
 	@Override
 	public String toString() {
-
 		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
 				.append("pk", this.pk).append("crlNumber", this.crlNumber)
 				.append("revocationDate", this.revocationDate).toString();

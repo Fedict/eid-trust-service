@@ -65,6 +65,12 @@ import be.fedict.trust.service.entity.Status;
 import be.fedict.trust.service.snmp.SNMP;
 import be.fedict.trust.service.snmp.SNMPInterceptor;
 
+/**
+ * Harvester Message Driven Bean.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
 		@ActivationConfigProperty(propertyName = "maxSession", propertyValue = "1"),
@@ -103,7 +109,7 @@ public class HarvesterMDB implements MessageListener {
 		try {
 			harvestMessage = new HarvestMessage(message);
 		} catch (JMSException e) {
-			LOG.error("JMS error: " + e.getMessage());
+			LOG.error("JMS error: " + e.getMessage(), e);
 			return;
 		}
 		String caName = harvestMessage.getCaName();
@@ -113,7 +119,7 @@ public class HarvesterMDB implements MessageListener {
 		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
 				.findCertificateAuthority(caName);
 		if (null == certificateAuthority) {
-			LOG.warn("unknown certificate authority: " + caName);
+			LOG.error("unknown certificate authority: " + caName);
 			return;
 		}
 		if (!update && Status.PROCESSING != certificateAuthority.getStatus()) {
@@ -164,8 +170,6 @@ public class HarvesterMDB implements MessageListener {
 		BigInteger crlNumber = getCrlNumber(crl);
 		LOG.debug("CRL number: " + crlNumber);
 
-		// TODO: check CRL number against existing cache entries, if same no
-		// need to update...
 		BigInteger currentCrlNumber = this.certificateAuthorityDAO
 				.findCrlNumber(caName);
 		if (null != currentCrlNumber
@@ -234,7 +238,6 @@ public class HarvesterMDB implements MessageListener {
 				this.certificateAuthorityDAO.removeOldRevokedCertificates(
 						crlNumber, crl.getIssuerX500Principal().toString());
 			}
-			// }
 		}
 
 		LOG.debug("CRL this update: " + crl.getThisUpdate());
@@ -281,7 +284,6 @@ public class HarvesterMDB implements MessageListener {
 	@SuppressWarnings("unchecked")
 	private Enumeration<TBSCertList.CRLEntry> getRevokedCertificatesEnum(
 			X509CRL crl) throws IOException, CRLException {
-
 		byte[] certList = crl.getTBSCertList();
 		ByteArrayInputStream bais = new ByteArrayInputStream(certList);
 		ASN1InputStream aIn = new ASN1InputStream(bais, Integer.MAX_VALUE, true);

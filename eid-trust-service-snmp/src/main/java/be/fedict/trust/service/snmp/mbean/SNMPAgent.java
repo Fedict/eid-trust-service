@@ -128,7 +128,6 @@ public class SNMPAgent extends BaseAgent {
 
 	@Override
 	protected void addUsmUser(USM usm) {
-
 		// User-based security model :
 		// http://www.apps.ietf.org/rfc/rfc2574.html
 

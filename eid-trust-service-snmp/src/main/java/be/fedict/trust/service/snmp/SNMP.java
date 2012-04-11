@@ -18,8 +18,11 @@
 
 package be.fedict.trust.service.snmp;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Annotation to be set on fields or methods.
@@ -28,7 +31,9 @@ import java.lang.annotation.RetentionPolicy;
  * 
  * @author wvdhaute
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.FIELD, ElementType.METHOD })
 public @interface SNMP {
 
 	String oid();

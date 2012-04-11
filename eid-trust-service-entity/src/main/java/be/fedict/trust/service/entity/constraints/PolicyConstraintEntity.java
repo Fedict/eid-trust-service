@@ -33,7 +33,6 @@ public class PolicyConstraintEntity extends CertificateConstraintEntity {
 	 * Default constructor.
 	 */
 	public PolicyConstraintEntity() {
-
 		super();
 	}
 
@@ -41,18 +40,15 @@ public class PolicyConstraintEntity extends CertificateConstraintEntity {
 	 * Main constructor.
 	 */
 	public PolicyConstraintEntity(TrustDomainEntity trustDomain, String policy) {
-
 		super(trustDomain);
 		this.policy = policy;
 	}
 
 	public String getPolicy() {
-
 		return this.policy;
 	}
 
 	public void setPolicy(String policy) {
-
 		this.policy = policy;
 	}
 }

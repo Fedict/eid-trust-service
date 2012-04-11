@@ -33,7 +33,6 @@ public class DNConstraintEntity extends CertificateConstraintEntity {
 	 * Default constructor.
 	 */
 	public DNConstraintEntity() {
-
 		super();
 	}
 
@@ -41,18 +40,15 @@ public class DNConstraintEntity extends CertificateConstraintEntity {
 	 * Main constructor.
 	 */
 	public DNConstraintEntity(TrustDomainEntity trustDomain, String dn) {
-
 		super(trustDomain);
 		this.dn = dn;
 	}
 
 	public String getDn() {
-
 		return this.dn;
 	}
 
 	public void setDn(String dn) {
-
 		this.dn = dn;
 	}
 }

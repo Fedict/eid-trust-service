@@ -20,5 +20,5 @@ package be.fedict.trust.service.entity;
 
 public enum TimeProtocol {
 
-	NTP, TSP;
+	NTP, TSP
 }

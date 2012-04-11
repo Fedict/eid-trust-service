@@ -31,7 +31,6 @@ public class TSAConstraintEntity extends CertificateConstraintEntity {
 	 * Default constructor.
 	 */
 	public TSAConstraintEntity() {
-
 		super();
 	}
 
@@ -39,7 +38,6 @@ public class TSAConstraintEntity extends CertificateConstraintEntity {
 	 * Main constructor.
 	 */
 	public TSAConstraintEntity(TrustDomainEntity trustDomain) {
-
 		super(trustDomain);
 	}
 }

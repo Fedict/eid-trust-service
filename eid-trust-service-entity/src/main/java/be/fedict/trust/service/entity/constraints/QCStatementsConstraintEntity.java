@@ -33,7 +33,6 @@ public class QCStatementsConstraintEntity extends CertificateConstraintEntity {
 	 * Default constructor.
 	 */
 	public QCStatementsConstraintEntity() {
-
 		super();
 	}
 
@@ -42,18 +41,15 @@ public class QCStatementsConstraintEntity extends CertificateConstraintEntity {
 	 */
 	public QCStatementsConstraintEntity(TrustDomainEntity trustDomain,
 			boolean qcComplianceFilter) {
-
 		super(trustDomain);
 		this.qcComplianceFilter = qcComplianceFilter;
 	}
 
 	public boolean getQcComplianceFilter() {
-
 		return this.qcComplianceFilter;
 	}
 
 	public void setQcComplianceFilter(boolean qcComplianceFilter) {
-
 		this.qcComplianceFilter = qcComplianceFilter;
 	}
 }

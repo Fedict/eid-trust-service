@@ -35,7 +35,6 @@ public class KeyUsageConstraintEntity extends CertificateConstraintEntity {
 	 * Default constructor.
 	 */
 	public KeyUsageConstraintEntity() {
-
 		super();
 	}
 
@@ -44,29 +43,24 @@ public class KeyUsageConstraintEntity extends CertificateConstraintEntity {
 	 */
 	public KeyUsageConstraintEntity(TrustDomainEntity trustDomain,
 			KeyUsageType keyUsage, boolean allowed) {
-
 		super(trustDomain);
 		this.keyUsage = keyUsage;
 		this.allowed = allowed;
 	}
 
 	public KeyUsageType getKeyUsage() {
-
 		return this.keyUsage;
 	}
 
 	public void setKeyUsage(KeyUsageType keyUsage) {
-
 		this.keyUsage = keyUsage;
 	}
 
 	public boolean isAllowed() {
-
 		return this.allowed;
 	}
 
 	public void setAllowed(boolean allowed) {
-
 		this.allowed = allowed;
 	}
 }

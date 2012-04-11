@@ -26,20 +26,14 @@ import org.snmp4j.smi.Variable;
 public abstract class Counter extends MOScalar {
 
 	public Counter(OID id, MOAccess access) {
-
 		super(id, access, null);
 		setVolatile(true);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public Variable getValue() {
-
 		return getCounterValue();
 	}
 
 	protected abstract Variable getCounterValue();
-
 }

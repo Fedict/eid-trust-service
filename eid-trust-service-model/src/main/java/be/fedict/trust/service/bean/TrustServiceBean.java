@@ -106,7 +106,7 @@ import be.fedict.trust.service.snmp.SNMPInterceptor;
 /**
  * Trust Service Bean implementation.
  * 
- * @author fcorneli
+ * @author Frank Cornelis
  */
 @Stateless
 @Interceptors(SNMPInterceptor.class)
@@ -152,22 +152,6 @@ public class TrustServiceBean implements TrustService {
 	@SNMP(oid = SnmpConstants.CACHE_HIT_PERCENTAGE, derived = true)
 	private Long cacheHitPercentage;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public ValidationResult validate(List<X509Certificate> certificateChain) {
-
-		try {
-			return validate(null, certificateChain, false);
-		} catch (TrustDomainNotFoundException e) {
-			this.auditDAO.logAudit("Default trust domain not set");
-			return new ValidationResult(new TrustLinkerResult(false), null);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE)
 	public ValidationResult validate(String trustDomainName,
@@ -186,6 +170,9 @@ public class TrustServiceBean implements TrustService {
 			try {
 				trustValidator.isTrusted(certificateChain);
 			} catch (CertPathValidatorException ignored) {
+				LOG.error(
+						"cert path validation error: " + ignored.getMessage(),
+						ignored);
 			}
 
 			if (trustValidator.getResult().isValid()) {
@@ -202,9 +189,6 @@ public class TrustServiceBean implements TrustService {
 		return new ValidationResult(lastResult, lastRevocationData);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE)
 	public ValidationResult validate(String trustDomainName,
@@ -241,9 +225,6 @@ public class TrustServiceBean implements TrustService {
 		return new ValidationResult(lastResult, lastRevocationData);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE_TSA)
 	public ValidationResult validateTimestamp(String trustDomainName,
@@ -301,9 +282,6 @@ public class TrustServiceBean implements TrustService {
 		return new ValidationResult(lastResult, lastRevocationData);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE_ATTRIBUTE_CERT)
 	public ValidationResult validateAttributeCertificates(
@@ -345,25 +323,21 @@ public class TrustServiceBean implements TrustService {
 	 */
 	private Set<TrustDomainEntity> getTrustDomains(String name)
 			throws TrustDomainNotFoundException {
-
 		if (null == name) {
 			return Collections.singleton(this.trustDomainDAO
 					.getDefaultTrustDomain());
-		} else {
-			TrustDomainEntity trustDomain = this.trustDomainDAO
-					.findTrustDomain(name);
-			if (null != trustDomain) {
-				return Collections.singleton(trustDomain);
-			} else {
-				// maybe a virtual trust domain?
-				VirtualTrustDomainEntity virtualTrustDomain = this.trustDomainDAO
-						.findVirtualTrustDomain(name);
-				if (null != virtualTrustDomain) {
-					return virtualTrustDomain.getTrustDomains();
-				}
-			}
 		}
-
+		TrustDomainEntity trustDomain = this.trustDomainDAO
+				.findTrustDomain(name);
+		if (null != trustDomain) {
+			return Collections.singleton(trustDomain);
+		}
+		// maybe a virtual trust domain?
+		VirtualTrustDomainEntity virtualTrustDomain = this.trustDomainDAO
+				.findVirtualTrustDomain(name);
+		if (null != virtualTrustDomain) {
+			return virtualTrustDomain.getTrustDomains();
+		}
 		throw new TrustDomainNotFoundException();
 	}
 
@@ -401,7 +375,7 @@ public class TrustServiceBean implements TrustService {
 	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain,
 			TrustLinker trustLinker, boolean returnRevocationData) {
 
-		NetworkConfig networkConfig = configurationDAO.getNetworkConfig();
+		NetworkConfig networkConfig = this.configurationDAO.getNetworkConfig();
 
 		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(
 				trustDomain);
@@ -418,13 +392,14 @@ public class TrustServiceBean implements TrustService {
 		OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
 				networkConfig);
 
-		CachedCrlRepository cachedCrlRepository = crlRepositoryService
+		CachedCrlRepository cachedCrlRepository = this.crlRepositoryService
 				.getCachedCrlRepository();
 		if (null == cachedCrlRepository) {
 			OnlineCrlRepository crlRepository = new OnlineCrlRepository(
 					networkConfig);
 			cachedCrlRepository = new CachedCrlRepository(crlRepository);
-			crlRepositoryService.setCachedCrlRepository(cachedCrlRepository);
+			this.crlRepositoryService
+					.setCachedCrlRepository(cachedCrlRepository);
 		}
 
 		FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
@@ -476,11 +451,10 @@ public class TrustServiceBean implements TrustService {
 		return trustValidator;
 	}
 
-	/*
+	/**
 	 * Add certificate constraints to the specified {@link TrustValidator} using
 	 * the specified {@link TrustDomainEntity}'s configuration.
 	 */
-
 	private void addConstraints(TrustValidator trustValidator,
 			TrustDomainEntity trustDomain) {
 
@@ -624,11 +598,10 @@ public class TrustServiceBean implements TrustService {
 		this.auditDAO.logAudit(message);
 	}
 
-	/*
+	/**
 	 * Harvest the CRLs for specified certificate chain if caching is set for
 	 * the trust domain and no cache is yet active.
 	 */
-
 	private void harvest(TrustDomainEntity trustDomain,
 			List<X509Certificate> certificateChain) {
 
@@ -695,5 +668,4 @@ public class TrustServiceBean implements TrustService {
 			queueConnection.close();
 		}
 	}
-
 }

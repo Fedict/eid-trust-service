@@ -18,17 +18,22 @@
 
 package be.fedict.trust.service.snmp;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Annotation to be set on methods.
+ * Annotation to be set on methods. Should be a no-args method returning void.
  * 
  * @see SNMPInterceptor
  * 
  * @author wvdhaute
  */
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Target({ ElementType.METHOD })
 public @interface SNMPCounter {
 
 }

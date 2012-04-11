@@ -24,9 +24,19 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+/**
+ * Harvest JMS message marshaller/unmarshaller.
+ * 
+ * @author Frank Cornelis
+ * 
+ */
 public class HarvestMessage implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final String CA_NAME_PROPERTY = "caName";
+
+	private static final String UPDATE_PROPERTY = "update";
 
 	private String caName;
 
@@ -49,23 +59,19 @@ public class HarvestMessage implements Serializable {
 	}
 
 	public HarvestMessage(String caName, boolean update) {
-
 		this.caName = caName;
 		this.update = update;
 	}
 
 	public HarvestMessage(Message message) throws JMSException {
-
-		this.caName = message.getStringProperty("caName");
-		this.update = message.getBooleanProperty("update");
+		this.caName = message.getStringProperty(CA_NAME_PROPERTY);
+		this.update = message.getBooleanProperty(UPDATE_PROPERTY);
 	}
 
 	public Message getJMSMessage(Session session) throws JMSException {
-
 		Message message = session.createMessage();
-		message.setStringProperty("caName", this.caName);
-		message.setBooleanProperty("update", this.update);
+		message.setStringProperty(CA_NAME_PROPERTY, this.caName);
+		message.setBooleanProperty(UPDATE_PROPERTY, this.update);
 		return message;
 	}
-
 }

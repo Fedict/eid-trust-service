@@ -50,15 +50,6 @@ public interface TrustService {
 	/**
 	 * Checks whether the given certificate chain is valid.
 	 * 
-	 * @param certificateChain
-	 *            cert. chain to validate
-	 * @return validation result
-	 */
-	ValidationResult validate(List<X509Certificate> certificateChain);
-
-	/**
-	 * Checks whether the given certificate chain is valid.
-	 * 
 	 * @param trustDomain
 	 *            optional, can be null. If so default trust domain is taken.
 	 * @param certificateChain

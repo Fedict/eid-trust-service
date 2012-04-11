@@ -37,7 +37,6 @@ public class EndEntityConstraintEntity extends CertificateConstraintEntity {
 	 * Default constructor.
 	 */
 	public EndEntityConstraintEntity() {
-
 		super();
 	}
 
@@ -46,30 +45,25 @@ public class EndEntityConstraintEntity extends CertificateConstraintEntity {
 	 */
 	public EndEntityConstraintEntity(TrustDomainEntity trustDomain,
 			String issuerName, BigInteger serialNumber) {
-
 		super(trustDomain);
 		this.issuerName = issuerName;
 		this.serialNumber = serialNumber;
 	}
 
 	public String getIssuerName() {
-
 		return this.issuerName;
 	}
 
 	public void setIssuerName(String issuerName) {
-
 		this.issuerName = issuerName;
 	}
 
 	@Column(precision = 38)
 	public BigInteger getSerialNumber() {
-
 		return this.serialNumber;
 	}
 
 	public void setSerialNumber(BigInteger serialNumber) {
-
 		this.serialNumber = serialNumber;
 	}
 }

@@ -55,7 +55,6 @@ public class WSSecurityConfigEntity implements Serializable {
 	public WSSecurityConfigEntity(String name, boolean signing,
 			KeyStoreType keyStoreType, String keyStorePath,
 			String keyStorePassword, String keyEntryPassword, String alias) {
-
 		this.name = name;
 		this.signing = signing;
 		this.keyStoreType = keyStoreType;
@@ -67,73 +66,59 @@ public class WSSecurityConfigEntity implements Serializable {
 
 	@Id
 	public String getName() {
-
 		return this.name;
 	}
 
 	public void setName(String name) {
-
 		this.name = name;
 	}
 
 	public boolean isSigning() {
-
 		return signing;
 	}
 
 	public void setSigning(boolean signing) {
-
 		this.signing = signing;
 	}
 
 	@Enumerated(EnumType.STRING)
 	public KeyStoreType getKeyStoreType() {
-
 		return this.keyStoreType;
 	}
 
 	public void setKeyStoreType(KeyStoreType keyStoreType) {
-
 		this.keyStoreType = keyStoreType;
 	}
 
 	public String getKeyStorePath() {
-
 		return this.keyStorePath;
 	}
 
 	public void setKeyStorePath(String keyStorePath) {
-
 		this.keyStorePath = keyStorePath;
 	}
 
 	public String getKeyStorePassword() {
-
 		return this.keyStorePassword;
 	}
 
 	public void setKeyStorePassword(String keyStorePassword) {
-
 		this.keyStorePassword = keyStorePassword;
 	}
 
 	public String getKeyEntryPassword() {
-
 		return this.keyEntryPassword;
 	}
 
 	public void setKeyEntryPassword(String keyEntryPassword) {
-
 		this.keyEntryPassword = keyEntryPassword;
 	}
 
 	public String getAlias() {
-
 		return this.alias;
 	}
 
 	public void setAlias(String alias) {
-
 		this.alias = alias;
 	}
 }

@@ -23,9 +23,6 @@ import java.security.cert.X509Certificate;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import be.fedict.trust.service.AdminManager;
 import be.fedict.trust.service.dao.AdministratorDAO;
 import be.fedict.trust.service.entity.AdministratorEntity;
@@ -38,8 +35,6 @@ import be.fedict.trust.service.entity.AdministratorEntity;
 @Stateless
 public class AdminManagerBean implements AdminManager {
 
-	private static final Log LOG = LogFactory.getLog(AdminManagerBean.class);
-
 	@EJB
 	private AdministratorDAO administratorDAO;
 
@@ -47,24 +42,25 @@ public class AdminManagerBean implements AdminManager {
 
 		AdministratorEntity adminEntity = this.administratorDAO
 				.findAdmin(certificate);
-		if (null != adminEntity && !adminEntity.isPending()) {
+		if (null != adminEntity) {
+			if (adminEntity.isPending()) {
+				// still awaiting approval.
+				return false;
+			}
 			return true;
-		} else if (null != adminEntity) {
-			// admin exist but is not yet approvied
-			return false;
 		}
 
-		if (!administratorDAO.listAdmins().isEmpty()) {
+		if (!this.administratorDAO.listAdmins().isEmpty()) {
 			/*
 			 * We register a 'pending' admin.
 			 */
 			this.administratorDAO.addAdmin(certificate, true);
 			return false;
 		}
+
 		/*
 		 * Else we bootstrap the admin.
 		 */
-
 		this.administratorDAO.addAdmin(certificate, false);
 		return true;
 	}

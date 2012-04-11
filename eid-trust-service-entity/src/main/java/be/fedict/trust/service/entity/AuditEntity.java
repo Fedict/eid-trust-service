@@ -46,6 +46,7 @@ public class AuditEntity implements Serializable {
 	private long id;
 
 	private Date auditDate;
+
 	private String message;
 
 	/**
@@ -58,42 +59,35 @@ public class AuditEntity implements Serializable {
 	/**
 	 * Main constructor.
 	 */
-	public AuditEntity(Date auditDate, String message) {
-
-		this.auditDate = auditDate;
+	public AuditEntity(String message) {
+		this.auditDate = new Date();
 		this.message = message;
 	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public long getId() {
-
 		return this.id;
 	}
 
 	public void setId(long id) {
-
 		this.id = id;
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date getAuditDate() {
-
 		return this.auditDate;
 	}
 
 	public void setAuditDate(Date auditDate) {
-
 		this.auditDate = auditDate;
 	}
 
 	public String getMessage() {
-
 		return this.message;
 	}
 
 	public void setMessage(String message) {
-
 		this.message = message;
 	}
 }

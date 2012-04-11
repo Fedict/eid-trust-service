@@ -55,7 +55,6 @@ public class LocalizationTextEntity implements Serializable {
 	 */
 	public LocalizationTextEntity(LocalizationKeyEntity keyName,
 			String language, String text) {
-
 		this.keyName = keyName;
 		this.language = language;
 		this.text = text;
@@ -64,44 +63,36 @@ public class LocalizationTextEntity implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public long getId() {
-
 		return this.id;
 	}
 
 	public void setId(long id) {
-
 		this.id = id;
 	}
 
 	@ManyToOne(optional = false)
 	public LocalizationKeyEntity getKeyName() {
-
 		return this.keyName;
 	}
 
 	public void setKeyName(LocalizationKeyEntity keyName) {
-
 		this.keyName = keyName;
 	}
 
 	public String getLanguage() {
-
 		return this.language;
 	}
 
 	public void setLanguage(String language) {
-
 		this.language = language;
 	}
 
 	@Column(length = 1024 * 1024)
 	public String getText() {
-
 		return this.text;
 	}
 
 	public void setText(String text) {
-
 		this.text = text;
 	}
 }

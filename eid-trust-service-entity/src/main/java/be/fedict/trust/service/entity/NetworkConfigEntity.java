@@ -48,7 +48,6 @@ public class NetworkConfigEntity implements Serializable {
 	 * Main constructor.
 	 */
 	public NetworkConfigEntity(String name, String proxyHost, int proxyPort) {
-
 		this.name = name;
 		this.proxyHost = proxyHost;
 		this.proxyPort = proxyPort;
@@ -56,12 +55,10 @@ public class NetworkConfigEntity implements Serializable {
 
 	@Id
 	public String getName() {
-
 		return this.name;
 	}
 
 	public void setName(String name) {
-
 		this.name = name;
 	}
 

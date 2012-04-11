@@ -63,7 +63,6 @@ public class VirtualTrustDomainEntity implements Serializable {
 	 * @param crlRefreshCron
 	 */
 	public VirtualTrustDomainEntity(String name) {
-
 		this.name = name;
 		this.trustDomains = new HashSet<TrustDomainEntity>();
 	}
@@ -79,12 +78,10 @@ public class VirtualTrustDomainEntity implements Serializable {
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	public Set<TrustDomainEntity> getTrustDomains() {
-
 		return this.trustDomains;
 	}
 
 	public void setTrustDomains(Set<TrustDomainEntity> trustDomains) {
-
 		this.trustDomains = trustDomains;
 	}
 }

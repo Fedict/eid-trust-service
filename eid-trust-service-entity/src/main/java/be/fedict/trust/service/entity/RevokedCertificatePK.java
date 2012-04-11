@@ -35,42 +35,36 @@ public class RevokedCertificatePK implements Serializable {
 	private String serialNumber;
 
 	public RevokedCertificatePK() {
-
 		super();
 	}
 
 	public RevokedCertificatePK(String issuer, String serialNumber) {
-
 		this.issuer = issuer;
 		this.serialNumber = serialNumber;
 	}
 
 	public String getIssuer() {
-
 		return this.issuer;
 	}
 
 	public void setIssuer(String issuer) {
-
 		this.issuer = issuer;
 	}
 
 	/**
-	 * HSQLDB/Hibernate has problems with mapping a BigInteger correctly.
+	 * HSQLDB/Hibernate has problems with mapping a BigInteger correctly. So we
+	 * use a String instead of BigInteger here.
 	 */
 	public String getSerialNumber() {
-
 		return this.serialNumber;
 	}
 
 	public void setSerialNumber(String serialNumber) {
-
 		this.serialNumber = serialNumber;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (null == obj) {
 			return false;
 		}
@@ -87,14 +81,12 @@ public class RevokedCertificatePK implements Serializable {
 
 	@Override
 	public int hashCode() {
-
 		return new HashCodeBuilder().append(this.serialNumber)
 				.append(this.issuer).toHashCode();
 	}
 
 	@Override
 	public String toString() {
-
 		return new ToStringBuilder(this)
 				.append("serialNumber", this.serialNumber)
 				.append("issuer", this.issuer).toString();

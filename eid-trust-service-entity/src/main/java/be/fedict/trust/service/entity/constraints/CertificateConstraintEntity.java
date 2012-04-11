@@ -61,36 +61,30 @@ public class CertificateConstraintEntity implements Serializable {
 	 * Main constructor.
 	 */
 	public CertificateConstraintEntity(TrustDomainEntity trustDomain) {
-
 		this.trustDomain = trustDomain;
 	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public long getId() {
-
 		return this.id;
 	}
 
 	public void setId(long id) {
-
 		this.id = id;
 	}
 
 	@ManyToOne
 	public TrustDomainEntity getTrustDomain() {
-
 		return this.trustDomain;
 	}
 
 	public void setTrustDomain(TrustDomainEntity trustDomain) {
-
 		this.trustDomain = trustDomain;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (null == obj)
 			return false;
 		if (this == obj)
@@ -103,8 +97,6 @@ public class CertificateConstraintEntity implements Serializable {
 
 	@Override
 	public int hashCode() {
-
 		return new HashCodeBuilder().append(this.id).hashCode();
 	}
-
 }

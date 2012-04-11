@@ -80,39 +80,32 @@ public class TrustPointEntity implements Serializable {
 
 	@OneToOne(optional = false, cascade = CascadeType.REMOVE)
 	public CertificateAuthorityEntity getCertificateAuthority() {
-
 		return this.certificateAuthority;
 	}
 
 	public void setCertificateAuthority(
 			CertificateAuthorityEntity certificateAuthority) {
-
 		this.certificateAuthority = certificateAuthority;
 	}
 
 	public String getCrlRefreshCronSchedule() {
-
 		return this.crlRefreshCronSchedule;
 	}
 
 	public void setCrlRefreshCronSchedule(String crlRefreshCronSchedule) {
-
 		this.crlRefreshCronSchedule = crlRefreshCronSchedule;
 	}
 
 	public Date getFireDate() {
-
 		return this.fireDate;
 	}
 
 	public void setFireDate(Date fireDate) {
-
 		this.fireDate = fireDate;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (this == obj) {
 			return true;
 		}
@@ -129,16 +122,13 @@ public class TrustPointEntity implements Serializable {
 
 	@Override
 	public int hashCode() {
-
 		return new HashCodeBuilder().append(this.name).toHashCode();
 	}
 
 	@Override
 	public String toString() {
-
 		return new ToStringBuilder(this).append("name", this.name)
 				.append("crlRefreshCronSchedule", this.crlRefreshCronSchedule)
 				.toString();
 	}
-
 }

@@ -35,7 +35,7 @@ import be.fedict.trust.service.exception.RemoveLastAdminException;
 public interface AdministratorService {
 
 	/**
-	 * List all {@link be.fedict.trust.service.entity.AdministratorEntity}'s.
+	 * List all {@link AdministratorEntity}'s.
 	 * 
 	 * @return list of all administrators
 	 */
@@ -47,14 +47,12 @@ public interface AdministratorService {
 	 * 
 	 * @param authnCert
 	 *            authentication certificate
-	 * @return the created
-	 *         {@link be.fedict.trust.service.entity.AdministratorEntity}
+	 * @return the created {@link AdministratorEntity}
 	 */
 	AdministratorEntity register(X509Certificate authnCert);
 
 	/**
-	 * Register the pending
-	 * {@link be.fedict.trust.service.entity.AdministratorEntity}
+	 * Register the pending {@link AdministratorEntity}
 	 * 
 	 * @param admin
 	 *            the pending admin to register

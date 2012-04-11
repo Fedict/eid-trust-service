@@ -21,9 +21,7 @@ import org.hibernate.dialect.Oracle10gDialect;
 public class Oracle11Dialect extends Oracle10gDialect {
 
 	public Oracle11Dialect() {
-
 		super();
 		registerColumnType(Types.DOUBLE, "binary_double");
 	}
-
 }

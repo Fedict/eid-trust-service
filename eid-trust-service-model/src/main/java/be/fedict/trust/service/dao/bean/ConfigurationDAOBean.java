@@ -48,21 +48,13 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public NetworkConfigEntity findNetworkConfigEntity() {
-
 		LOG.debug("find network config entity");
 		return this.entityManager.find(NetworkConfigEntity.class,
 				TrustServiceConstants.NETWORK_CONFIG);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public NetworkConfigEntity getNetworkConfigEntity() {
-
 		NetworkConfigEntity networkConfig = findNetworkConfigEntity();
 		if (null == networkConfig) {
 			networkConfig = new NetworkConfigEntity(
@@ -72,9 +64,6 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 		return networkConfig;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public NetworkConfig getNetworkConfig() {
 		LOG.debug("get network config entity");
 		NetworkConfigEntity networkConfig = getNetworkConfigEntity();
@@ -86,21 +75,13 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void setNetworkConfigEnabled(boolean enabled) {
-
 		LOG.debug("set network config enabled: " + enabled);
 		NetworkConfigEntity networkConfig = getNetworkConfigEntity();
 		networkConfig.setEnabled(enabled);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public NetworkConfigEntity setNetworkConfig(String proxyHost, int proxyPort) {
-
 		LOG.debug("set network config: proxyHost=" + proxyHost + " proxyPort="
 				+ proxyPort);
 		NetworkConfigEntity networkConfigEntity = getNetworkConfigEntity();
@@ -109,21 +90,13 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 		return networkConfigEntity;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public ClockDriftConfigEntity findClockDriftConfig() {
-
 		LOG.debug("find clock drift configuration");
 		return this.entityManager.find(ClockDriftConfigEntity.class,
 				TrustServiceConstants.CLOCK_DRIFT_CONFIG);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public ClockDriftConfigEntity getClockDriftConfig() {
-
 		ClockDriftConfigEntity clockDriftConfig = findClockDriftConfig();
 		if (null == clockDriftConfig) {
 			clockDriftConfig = new ClockDriftConfigEntity(
@@ -137,13 +110,9 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 		return clockDriftConfig;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public ClockDriftConfigEntity setClockDriftConfig(
 			TimeProtocol timeProtocol, String server, int timeout,
 			int maxClockOffset, String cronSchedule) {
-
 		LOG.debug("set clock drift detection config: protocol="
 				+ timeProtocol.name() + " server=" + server + " timeout="
 				+ timeout + " maxClockOffset=" + maxClockOffset);
@@ -156,31 +125,19 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 		return clockDriftConfig;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void setClockDriftConfigEnabled(boolean enabled) {
-
 		LOG.debug("set clock drift enabled: " + enabled);
 		ClockDriftConfigEntity clockDriftConfig = getClockDriftConfig();
 		clockDriftConfig.setEnabled(enabled);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public WSSecurityConfigEntity findWSSecurityConfig() {
-
 		LOG.debug("find ws security config");
 		return this.entityManager.find(WSSecurityConfigEntity.class,
 				TrustServiceConstants.WS_SECURITY_CONFIG);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public WSSecurityConfigEntity getWSSecurityConfig() {
-
 		WSSecurityConfigEntity wsSecurityConfig = findWSSecurityConfig();
 		if (null == wsSecurityConfig) {
 			wsSecurityConfig = new WSSecurityConfigEntity(
@@ -191,13 +148,9 @@ public class ConfigurationDAOBean implements ConfigurationDAO {
 		return wsSecurityConfig;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public WSSecurityConfigEntity setWSSecurityConfig(boolean signing,
 			KeyStoreType keyStoreType, String keyStorePath,
 			String keyStorePassword, String keyEntryPassword, String alias) {
-
 		LOG.debug("set WS Security config: signing=" + signing
 				+ " keyStoreType=" + keyStoreType + " keyStorePath="
 				+ keyStorePath + " keyStorePassword=" + keyStorePassword

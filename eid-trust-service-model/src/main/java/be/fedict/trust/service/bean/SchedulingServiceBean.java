@@ -279,9 +279,7 @@ public class SchedulingServiceBean implements SchedulingService {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	public void cancelTimers(String timerInfo) {
-
 		Collection<Timer> timers = this.timerService.getTimers();
 		for (Timer timer : timers) {
 			if (timer.getInfo() != null) {
@@ -290,7 +288,6 @@ public class SchedulingServiceBean implements SchedulingService {
 					LOG.debug("cancel timer: " + timerInfo);
 				}
 			}
-
 		}
 	}
 

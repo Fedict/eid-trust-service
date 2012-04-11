@@ -33,7 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * SNMP intercepter.
+ * SNMP interceptor.
  * 
  * In case an {@link SNMP} annotation is put on the method, each invocation will
  * trigger an increment of 1 on the value associated with the configured SNMP
@@ -42,13 +42,13 @@ import org.apache.commons.logging.LogFactory;
  * In case an {@link SNMP} annotation is put on a field, before an invocation in
  * one of the classes methods, the current value associated with the SNMP OID
  * will be fetched and injected in the field. After completion of the method,
- * the updated value will be checked and if changed the delta will be
+ * the updated value will be checked and, if changed the, delta will be
  * incremented in the SNMP value. In case the field is derived, nothing will be
  * updated here, the update happens in a method annotated with
  * {@link SNMPCounter}.
  * 
  * In case an {@link SNMPCounter} annotation is put on a field, after every
- * invocation of other methods, the intercepter will execute this method. This
+ * invocation of other methods, the interceptor will execute this method. This
  * is helpful for derived {@link SNMP} fields, dependent on other {@link SNMP}
  * fields to limit faults due to changes while invoking.
  * 
@@ -63,7 +63,6 @@ public class SNMPInterceptor {
 
 	@AroundInvoke
 	public Object invoke(InvocationContext invocationContext) throws Exception {
-
 		return process(invocationContext);
 	}
 

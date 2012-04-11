@@ -55,7 +55,6 @@ public class LocalizationKeyEntity implements Serializable {
 	 * @param keyName
 	 */
 	public LocalizationKeyEntity(String keyName) {
-
 		this.keyName = keyName;
 		this.texts = new HashSet<LocalizationTextEntity>();
 	}
@@ -72,12 +71,10 @@ public class LocalizationKeyEntity implements Serializable {
 	@Column(name = "texts")
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
 	public Set<LocalizationTextEntity> getTexts() {
-
 		return this.texts;
 	}
 
 	public void setTexts(Set<LocalizationTextEntity> texts) {
-
 		this.texts = texts;
 	}
 }

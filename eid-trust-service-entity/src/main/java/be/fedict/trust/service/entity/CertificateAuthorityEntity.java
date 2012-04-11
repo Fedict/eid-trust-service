@@ -161,18 +161,15 @@ public class CertificateAuthorityEntity implements Serializable {
 
 	@ManyToOne(optional = true)
 	public TrustPointEntity getTrustPoint() {
-
 		return this.trustPoint;
 	}
 
 	public void setTrustPoint(TrustPointEntity trustPoint) {
-
 		this.trustPoint = trustPoint;
 	}
 
 	@Transient
 	public X509Certificate getCertificate() {
-
 		try {
 			CertificateFactory certificateFactory = CertificateFactory
 					.getInstance("X.509");
