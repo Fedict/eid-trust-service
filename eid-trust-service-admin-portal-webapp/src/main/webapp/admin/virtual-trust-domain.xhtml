@@ -19,7 +19,8 @@
 					<h:form id="virt_form">
 						<rich:dataTable id="data" var="item"
 							value="#{ts_virtualTrustDomainList}" rows="10"
-							rowClasses="listingTable_Row1,listingTable_Row2">
+							rowClasses="listingTable_Row1,listingTable_Row2"
+							rendered="#{ts_virtualTrustDomainList.rowCount > 0}">
 
 							<h:column>
 								<f:facet name="header">#{messages.name}</f:facet>
@@ -42,6 +43,8 @@
 								</rich:datascroller>
 							</f:facet>
 						</rich:dataTable>
+						<h:outputText value="#{messages.noVirtualTrustDomains}"
+							rendered="#{ts_virtualTrustDomainList.rowCount == 0}" />
 
 						<rich:modalPanel id="removeConfirmVirtual">
 							<div class="center">

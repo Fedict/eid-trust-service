@@ -14,7 +14,8 @@
 
 			<h:form id="admin_form">
 				<rich:dataTable id="data" var="item" value="#{ts_auditList}"
-					rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
+					rows="10" rowClasses="listingTable_Row1,listingTable_Row2"
+					rendered="#{ts_auditList.rowCount > 0}">
 
 					<rich:column sortBy="#{item.auditDate}">
 						<f:facet name="header">#{messages.date}</f:facet>
@@ -32,6 +33,8 @@
 						</rich:datascroller>
 					</f:facet>
 				</rich:dataTable>
+				<h:outputText value="#{messages.noAudit}"
+					rendered="#{ts_auditList.rowCount == 0}" />
 
 				<rich:modalPanel id="removeConfirm">
 					<div class="center">

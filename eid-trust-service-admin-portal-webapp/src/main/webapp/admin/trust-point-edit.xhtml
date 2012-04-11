@@ -11,7 +11,7 @@
 		<ui:param name="activeMenu" value="trustpoint" />
 		<ui:define name="body">
 
-			<h2>#{messages.trustPoint} : #{selectedTrustPoint.name}</h2>
+			<h2>#{messages.trustPoint}: #{selectedTrustPoint.name}</h2>
 
 			<h:form>
 
@@ -41,18 +41,18 @@
 				<rich:dataTable id="data" var="item" value="#{ts_trustPointCAList}"
 					rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
 
-					<h:column>
+					<rich:column sortBy="#{item.name}">
 						<f:facet name="header">#{messages.certificateAuthority}</f:facet>
 						<h:outputText value="#{item.name}" />
-					</h:column>
-					<h:column>
+					</rich:column>
+					<rich:column sortBy="#{item.status}">
 						<f:facet name="header">#{messages.cache}</f:facet>
 						<h:outputText value="#{item.status}" />
-					</h:column>
-					<h:column>
+					</rich:column>
+					<rich:column>
 						<h:commandLink id="refresh" value="#{messages.refreshNow}"
 							action="#{ts_trustPoint.refreshCA}" />
-					</h:column>
+					</rich:column>
 					<f:facet name="footer">
 						<rich:datascroller for="data" pageIndexVar="pageIndex"
 							pagesVar="pages" fastControls="hide">
