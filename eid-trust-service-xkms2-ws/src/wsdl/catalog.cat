@@ -1,5 +1,0 @@
-SYSTEM "http://uri.etsi.org/01903/v1.3.2/XAdES.xsd" "xades.xsd"
-SYSTEM "http://www.w3.org/TR/xkms2/Schemas/xkms.xsd" "xkms.xsd"
-SYSTEM "http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd" "xmldsig-core-schema.xsd"
-SYSTEM "http://www.w3.org/TR/xmlenc-core/xenc-schema.xsd" "xenc-schema.xsd"
-SYSTEM "xkms-extensions.xsd" "xkms-extensions.xsd"

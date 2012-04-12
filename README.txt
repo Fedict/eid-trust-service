@@ -1,48 +1,39 @@
-README for FedICT eID Trust Service Project
-===========================================
+OCSP Performance Test Project
+=============================
 
-=== 1. Introduction
-
-This project contains the source code tree of the FedICT eID Trust Service.
-The source code is hosted at: http://code.google.com/p/eid-trust-service/
+Use tee to log while running a test:
+java -jar ocsp-perf-test-1.0.0-SNAPSHOT.one-jar.jar 1 1 10 false | tee ocsp-perf.txt
 
 
-=== 2. Requirements
+=== Scenario 12/04/2012
 
-The following is required for compiling the eID Trust Service software:
-* Sun Java 1.6.0_31
-* Apache Maven 3.0.4
+Bots:
+	e-contract.be
+	isolde.eid.belgium.be
+	eridu.apsu.be
 
+Control:
+	Frank Cornelis
 
-=== 3. Build
-
-The project can be build via:
-	mvn clean install
-
-The deployable Java EE application can be found under:
-	eid-trust-service-deploy
-
-You can speed up the development build cycle by skipping the unit tests via:
-	mvn -Dmaven.test.skip=true clean install
+TIME	REQ/SEC		DURATION(SECS)	REQ/SEC/BOT	THREADS/BOT
+21h00	30		300		10		5
+	45		300		15		5
+21h15	75		600		25		6
+21h30	90		600		30		7
 
 
-=== 4. Eclipse IDE
+=== Cheat sheet
 
-The Eclipse project files can be created via:
-	mvn -Denv=all clean eclipse:eclipse
+scp target/ocsp-perf-test-0.2.0-SNAPSHOT.one-jar.jar e-contract.be:.
+scp target/ocsp-perf-test-0.2.0-SNAPSHOT.one-jar.jar isolde.eid.belgium.be:.
+scp target/ocsp-perf-test-0.2.0-SNAPSHOT.one-jar.jar eridu.apsu.be:.
 
-Afterwards simply import the projects in Eclipse via:
-	File -> Import... -> General:Existing Projects into Workspace
+ssh e-contract.be
+screen
+java -jar ocsp-perf-test-0.2.0-SNAPSHOT.one-jar.jar bot
+Ctrl-A d
 
-First time you use an Eclipse workspace you might need to add the maven 
-repository location. Do this via:
-    mvn eclipse:add-maven-repo -Declipse.workspace=<location of your workspace>
+screen -ls
+screen -r <screen process>
 
-Before committing a patch, make sure to properly format the source code
-so we have clean diffs within the subversion.
-
-
-=== 5. License
-
-The license conditions can be found in the file: LICENSE.txt
-
+sudo modprobe nf_conntrack_irc
