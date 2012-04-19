@@ -2,6 +2,9 @@
 <configuration xmlns="urn:hornetq"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:hornetq hornetq-jms.xsd">
+	<queue name="TrustServiceDownloader">
+		<entry name="/queue/trust/downloader" />
+	</queue>
 	<queue name="TrustServiceHarvester">
 		<entry name="/queue/trust/harvester" />
 	</queue>

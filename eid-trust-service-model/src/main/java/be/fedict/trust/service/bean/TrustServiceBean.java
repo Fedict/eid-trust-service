@@ -35,19 +35,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.interceptor.Interceptors;
 import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
-import javax.jms.Session;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -57,7 +50,6 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.tsp.TimeStampToken;
-import org.jboss.ejb3.annotation.Depends;
 
 import be.fedict.trust.FallbackTrustLinker;
 import be.fedict.trust.NetworkConfig;
@@ -78,6 +70,7 @@ import be.fedict.trust.crl.OnlineCrlRepository;
 import be.fedict.trust.ocsp.OcspTrustLinker;
 import be.fedict.trust.ocsp.OfflineOcspRepository;
 import be.fedict.trust.ocsp.OnlineOcspRepository;
+import be.fedict.trust.service.NotificationService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.SnmpConstants;
 import be.fedict.trust.service.TrustService;
@@ -110,8 +103,6 @@ import be.fedict.trust.service.snmp.SNMPInterceptor;
  */
 @Stateless
 @Interceptors(SNMPInterceptor.class)
-@Depends("org.hornetq:module=JMS,name=\"" + HarvesterMDB.HARVESTER_QUEUE_NAME
-		+ "\",type=Queue")
 public class TrustServiceBean implements TrustService {
 
 	private static final Log LOG = LogFactory.getLog(TrustServiceBean.class);
@@ -122,11 +113,8 @@ public class TrustServiceBean implements TrustService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@Resource(mappedName = "java:JmsXA")
-	private QueueConnectionFactory queueConnectionFactory;
-
-	@Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_LOCATION)
-	private Queue queue;
+	@EJB
+	private NotificationService notificationService;
 
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
@@ -618,11 +606,12 @@ public class TrustServiceBean implements TrustService {
 					if (null != certificateAuthority.getCrlUrl()) {
 						certificateAuthority.setStatus(Status.PROCESSING);
 						try {
-							notifyHarvester(certificateAuthority.getName());
+							this.notificationService.notifyDownloader(
+									certificateAuthority.getName(), false);
 							if (null != certificateAuthority.getTrustPoint()
 									&& null == certificateAuthority
 											.getTrustPoint().getFireDate()) {
-								schedulingService
+								this.schedulingService
 										.startTimer(certificateAuthority
 												.getTrustPoint());
 							}
@@ -641,31 +630,6 @@ public class TrustServiceBean implements TrustService {
 					}
 				}
 			}
-		}
-	}
-
-	private void notifyHarvester(String issuerName) throws JMSException {
-		LOG.debug("notify harvester: " + issuerName);
-		QueueConnection queueConnection = this.queueConnectionFactory
-				.createQueueConnection();
-		try {
-			QueueSession queueSession = queueConnection.createQueueSession(
-					true, Session.AUTO_ACKNOWLEDGE);
-			try {
-				HarvestMessage harvestMessage = new HarvestMessage(issuerName,
-						false);
-				QueueSender queueSender = queueSession.createSender(this.queue);
-				try {
-					queueSender
-							.send(harvestMessage.getJMSMessage(queueSession));
-				} finally {
-					queueSender.close();
-				}
-			} finally {
-				queueSession.close();
-			}
-		} finally {
-			queueConnection.close();
 		}
 	}
 }

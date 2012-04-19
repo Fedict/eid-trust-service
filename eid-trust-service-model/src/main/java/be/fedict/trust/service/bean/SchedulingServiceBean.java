@@ -29,20 +29,14 @@ import javax.ejb.Timer;
 import javax.ejb.TimerConfig;
 import javax.ejb.TimerService;
 import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
-import javax.jms.Session;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.ejb3.annotation.Depends;
 
 import be.fedict.trust.service.ClockDriftService;
+import be.fedict.trust.service.NotificationService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustServiceConstants;
 import be.fedict.trust.service.dao.AuditDAO;
@@ -59,8 +53,6 @@ import be.fedict.trust.service.exception.InvalidCronExpressionException;
  * @author wvdhaute
  */
 @Stateless
-@Depends("org.hornetq:module=JMS,name=\"" + HarvesterMDB.HARVESTER_QUEUE_NAME
-		+ "\",type=Queue")
 public class SchedulingServiceBean implements SchedulingService {
 
 	private static final Log LOG = LogFactory
@@ -69,11 +61,8 @@ public class SchedulingServiceBean implements SchedulingService {
 	@Resource
 	private TimerService timerService;
 
-	@Resource(mappedName = "java:JmsXA")
-	private QueueConnectionFactory queueConnectionFactory;
-
-	@Resource(mappedName = HarvesterMDB.HARVESTER_QUEUE_LOCATION)
-	private Queue queue;
+	@EJB
+	private NotificationService notificationService;
 
 	@EJB
 	private TrustDomainDAO trustDomainDAO;
@@ -128,7 +117,8 @@ public class SchedulingServiceBean implements SchedulingService {
 				.listCertificateAuthorities(trustPoint)) {
 			try {
 				if (!certificateAuthority.getStatus().equals(Status.PROCESSING)) {
-					notifyHarvester(certificateAuthority.getName());
+					this.notificationService.notifyDownloader(
+							certificateAuthority.getName(), true);
 					LOG.debug("harvester notified for "
 							+ certificateAuthority.getName());
 				}
@@ -291,36 +281,8 @@ public class SchedulingServiceBean implements SchedulingService {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void refreshCA(CertificateAuthorityEntity ca) throws JMSException {
-
-		notifyHarvester(ca.getName());
+		String issuerName = ca.getName();
+		this.notificationService.notifyDownloader(issuerName, true);
 	}
-
-	private void notifyHarvester(String issuerName) throws JMSException {
-		QueueConnection queueConnection = this.queueConnectionFactory
-				.createQueueConnection();
-		try {
-			QueueSession queueSession = queueConnection.createQueueSession(
-					true, Session.AUTO_ACKNOWLEDGE);
-			try {
-				HarvestMessage harvestMessage = new HarvestMessage(issuerName,
-						true);
-				QueueSender queueSender = queueSession.createSender(this.queue);
-				try {
-					queueSender
-							.send(harvestMessage.getJMSMessage(queueSession));
-				} finally {
-					queueSender.close();
-				}
-			} finally {
-				queueSession.close();
-			}
-		} finally {
-			queueConnection.close();
-		}
-	}
-
 }

@@ -23,12 +23,12 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 /**
- * Harvest JMS message marshaller/unmarshaller.
+ * Download JMS message marshaller/unmarshaller.
  * 
  * @author Frank Cornelis
  * 
  */
-public class HarvestMessage implements JMSMessage {
+public class DownloadMessage implements JMSMessage {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,13 +36,9 @@ public class HarvestMessage implements JMSMessage {
 
 	private static final String UPDATE_PROPERTY = "update";
 
-	private static final String CRL_FILE_PROPERTY = "crlFile";
-
 	private String caName;
 
 	private boolean update;
-
-	private String crlFile;
 
 	public String getCaName() {
 		return this.caName;
@@ -52,26 +48,19 @@ public class HarvestMessage implements JMSMessage {
 		return this.update;
 	}
 
-	public String getCrlFile() {
-		return this.crlFile;
-	}
-
-	public HarvestMessage(String caName, String crlFile, boolean update) {
+	public DownloadMessage(String caName, boolean update) {
 		this.caName = caName;
-		this.crlFile = crlFile;
 		this.update = update;
 	}
 
-	public HarvestMessage(Message message) throws JMSException {
+	public DownloadMessage(Message message) throws JMSException {
 		this.caName = message.getStringProperty(CA_NAME_PROPERTY);
-		this.crlFile = message.getStringProperty(CRL_FILE_PROPERTY);
 		this.update = message.getBooleanProperty(UPDATE_PROPERTY);
 	}
 
 	public Message getJMSMessage(Session session) throws JMSException {
 		Message message = session.createMessage();
 		message.setStringProperty(CA_NAME_PROPERTY, this.caName);
-		message.setStringProperty(CRL_FILE_PROPERTY, this.crlFile);
 		message.setBooleanProperty(UPDATE_PROPERTY, this.update);
 		return message;
 	}

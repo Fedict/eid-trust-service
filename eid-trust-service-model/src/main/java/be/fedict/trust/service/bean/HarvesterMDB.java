@@ -19,11 +19,13 @@
 package be.fedict.trust.service.bean;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.cert.CRLException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
@@ -55,11 +57,9 @@ import org.bouncycastle.jce.provider.X509CRLEntryObject;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 import be.fedict.trust.crl.CrlTrustLinker;
-import be.fedict.trust.crl.OnlineCrlRepository;
 import be.fedict.trust.service.SnmpConstants;
 import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
-import be.fedict.trust.service.dao.ConfigurationDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.Status;
 import be.fedict.trust.service.snmp.SNMP;
@@ -84,9 +84,6 @@ public class HarvesterMDB implements MessageListener {
 	public static final String HARVESTER_QUEUE_LOCATION = "queue/trust/harvester";
 
 	private static final int BATCH_SIZE = 500;
-
-	@EJB
-	private ConfigurationDAO configurationDAO;
 
 	@EJB
 	private CertificateAuthorityDAO certificateAuthorityDAO;
@@ -114,6 +111,7 @@ public class HarvesterMDB implements MessageListener {
 		}
 		String caName = harvestMessage.getCaName();
 		boolean update = harvestMessage.isUpdate();
+		String crlFilePath = harvestMessage.getCrlFile();
 
 		LOG.debug("issuer: " + caName);
 		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
@@ -130,31 +128,27 @@ public class HarvesterMDB implements MessageListener {
 			LOG.debug("CA status not marked for processing");
 			return;
 		}
-		String crlUrl = certificateAuthority.getCrlUrl();
-		if (null == crlUrl) {
-			LOG.warn("No CRL url for CA " + certificateAuthority.getName());
-			certificateAuthority.setStatus(Status.NONE);
+
+		File crlFile;
+		FileInputStream crlInputStream;
+		try {
+			crlFile = new File(crlFilePath);
+			crlInputStream = new FileInputStream(crlFile);
+		} catch (FileNotFoundException e) {
+			LOG.error("CRL file does not exist: " + crlFilePath);
+			return;
+		}
+		X509CRL crl;
+		try {
+			CertificateFactory certificateFactory = CertificateFactory
+					.getInstance("X.509", "BC");
+			crl = (X509CRL) certificateFactory.generateCRL(crlInputStream);
+		} catch (Exception e) {
+			LOG.error("BC error: " + e.getMessage(), e);
 			return;
 		}
 
-		OnlineCrlRepository onlineCrlRepository = new OnlineCrlRepository(
-				this.configurationDAO.getNetworkConfig());
-		URI crlUri;
-		try {
-			crlUri = new URI(crlUrl);
-		} catch (URISyntaxException e) {
-			LOG.error("CRL URI error: " + e.getMessage(), e);
-			return;
-		}
 		Date validationDate = new Date();
-		X509CRL crl = onlineCrlRepository.findCrl(crlUri,
-				certificateAuthority.getCertificate(), validationDate);
-		if (null == crl) {
-			this.auditDAO.logAudit("Failed to download CRL for CA=" + caName
-					+ " @ " + crlUrl);
-			this.failures++;
-			throw new RuntimeException();
-		}
 
 		X509Certificate issuerCertificate = certificateAuthority
 				.getCertificate();
@@ -163,8 +157,7 @@ public class HarvesterMDB implements MessageListener {
 		boolean crlValid = CrlTrustLinker.checkCrlIntegrity(crl,
 				issuerCertificate, validationDate);
 		if (!crlValid) {
-			this.auditDAO.logAudit("Invalid CRL for CA=" + caName + " @ "
-					+ crlUrl);
+			this.auditDAO.logAudit("Invalid CRL for CA=" + caName);
 			return;
 		}
 		BigInteger crlNumber = getCrlNumber(crl);
@@ -238,6 +231,11 @@ public class HarvesterMDB implements MessageListener {
 				this.certificateAuthorityDAO.removeOldRevokedCertificates(
 						crlNumber, crl.getIssuerX500Principal().toString());
 			}
+		}
+
+		boolean deletedCrlFile = crlFile.delete();
+		if (!deletedCrlFile) {
+			LOG.warn("could not delete temp CRL file: " + crlFilePath);
 		}
 
 		LOG.debug("CRL this update: " + crl.getThisUpdate());
