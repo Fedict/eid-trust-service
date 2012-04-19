@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>FedICT eID Trust Service Project</name>
 	<parent>
@@ -327,14 +328,13 @@
 	<properties>
 		<eid-applet.version>1.0.5.Beta2</eid-applet.version>
 		<jtrust.version>1.1.2</jtrust.version>
+		<eid-as.version>1.0.0.Beta1</eid-as.version>
 		<trust-service.data.source.user>trust</trust-service.data.source.user>
 		<trust-service.data.source.pass>trust</trust-service.data.source.pass>
 		<hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
 		<hibernate.hbm2ddl.auto>create-drop</hibernate.hbm2ddl.auto>
-		<hibernate.jdbc.use_streams_for_binary>true
-		</hibernate.jdbc.use_streams_for_binary>
-		<eid-applet.SkipSecureConnectionCheck>false
-		</eid-applet.SkipSecureConnectionCheck>
+		<hibernate.jdbc.use_streams_for_binary>true</hibernate.jdbc.use_streams_for_binary>
+		<eid-applet.SkipSecureConnectionCheck>false</eid-applet.SkipSecureConnectionCheck>
 	</properties>
 
 

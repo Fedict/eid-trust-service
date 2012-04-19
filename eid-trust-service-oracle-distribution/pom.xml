@@ -57,9 +57,9 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>be.fedict.eid-applet</groupId>
-									<artifactId>eid-applet-jboss-as</artifactId>
-									<version>${eid-applet.version}</version>
+									<groupId>be.fedict.eid-as</groupId>
+									<artifactId>eid-as-jboss-as-6</artifactId>
+									<version>${eid-as.version}</version>
 									<type>zip</type>
 								</artifactItem>
 								<artifactItem>
@@ -165,9 +165,9 @@
 
 		<!-- Specific Dependencies: Distribution -->
 		<dependency>
-			<groupId>be.fedict.eid-applet</groupId>
-			<artifactId>eid-applet-jboss-as</artifactId>
-			<version>${eid-applet.version}</version>
+			<groupId>be.fedict.eid-as</groupId>
+			<artifactId>eid-as-jboss-as-6</artifactId>
+			<version>${eid-as.version}</version>
 			<scope>provided</scope>
 			<type>zip</type>
 		</dependency>

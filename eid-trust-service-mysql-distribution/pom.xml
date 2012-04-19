@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>be.fedict</groupId>
@@ -57,9 +59,9 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>be.fedict.eid-applet</groupId>
-									<artifactId>eid-applet-jboss-as</artifactId>
-									<version>${eid-applet.version}</version>
+									<groupId>be.fedict.eid-as</groupId>
+									<artifactId>eid-as-jboss-as-6</artifactId>
+									<version>${eid-as.version}</version>
 									<type>zip</type>
 								</artifactItem>
 								<artifactItem>
@@ -165,9 +167,9 @@
 
 		<!-- Specific Dependencies: Distribution -->
 		<dependency>
-			<groupId>be.fedict.eid-applet</groupId>
-			<artifactId>eid-applet-jboss-as</artifactId>
-			<version>${eid-applet.version}</version>
+			<groupId>be.fedict.eid-as</groupId>
+			<artifactId>eid-as-jboss-as-6</artifactId>
+			<version>${eid-as.version}</version>
 			<scope>provided</scope>
 			<type>zip</type>
 		</dependency>
