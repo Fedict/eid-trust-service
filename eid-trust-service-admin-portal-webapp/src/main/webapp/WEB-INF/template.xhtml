@@ -18,21 +18,17 @@
 <a4j:loadStyle src="/style.css" />
 </head>
 
-<body onload="setClass('menu_item_#{activeMenu}', 'selected');">
+<body>
 	<div id="header">
-
 		<div id="logo">
 			<h:graphicImage id="logo" alt="Fedict Logo" height="45"
 				url="/images/fedict.png" />
 		</div>
-
 		<h1>#{messages.title}</h1>
-
 	</div>
 
 	<!-- Seems to resolve deployJava.js/Chrome issue ... -->
 	<f:view contentType="text/html">
-
 		<div id="menu">
 			<div id="menuPanel">
 				<h:form>
@@ -40,8 +36,7 @@
 						<rich:panelMenuItem label="#{messages.home}" action="/main.xhtml"
 							rendered="#{!identity.isLoggedIn()}" />
 						<rich:panelMenuItem label="#{messages.login}"
-							action="/admin/main.xhtml"
-							rendered="#{!identity.isLoggedIn()}" />
+							action="/admin/main.xhtml" rendered="#{!identity.isLoggedIn()}" />
 						<rich:panelMenuItem label="#{messages.configuration}"
 							action="/admin/configuration.xhtml"
 							rendered="#{s:hasRole('admin')}" />
@@ -58,6 +53,8 @@
 							action="/admin/crl-cache.xhtml" rendered="#{s:hasRole('admin')}" />
 						<rich:panelMenuItem label="#{messages.audit}"
 							action="/admin/audit.xhtml" rendered="#{s:hasRole('admin')}" />
+						<rich:panelMenuItem label="#{messages.about}"
+							action="/admin/about.xhtml" rendered="#{s:hasRole('admin')}" />
 					</rich:panelMenu>
 				</h:form>
 			</div>
@@ -92,5 +89,4 @@
 	</f:view>
 
 </body>
-
 </html>
