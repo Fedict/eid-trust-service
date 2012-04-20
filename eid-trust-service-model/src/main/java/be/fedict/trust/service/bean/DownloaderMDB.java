@@ -141,9 +141,10 @@ public class DownloaderMDB implements MessageListener {
 		}
 
 		String crlFilePath;
+		File crlFile = null;
 		try {
+			crlFile = File.createTempFile("crl-", ".der");
 			InputStream crlInputStream = getMethod.getResponseBodyAsStream();
-			File crlFile = File.createTempFile("crl-", ".der");
 			OutputStream crlOutputStream = new FileOutputStream(crlFile);
 			IOUtils.copy(crlInputStream, crlOutputStream);
 			IOUtils.closeQuietly(crlInputStream);
@@ -152,12 +153,16 @@ public class DownloaderMDB implements MessageListener {
 			LOG.debug("temp CRL file: " + crlFilePath);
 		} catch (IOException e) {
 			downloadFailed(caName, crlUrl);
+			if (null != crlFile) {
+				crlFile.delete();
+			}
 			throw new RuntimeException(e);
 		}
 		try {
 			this.notificationService.notifyHarvester(caName, crlFilePath,
 					update);
 		} catch (JMSException e) {
+			crlFile.delete();
 			throw new RuntimeException(e);
 		}
 	}

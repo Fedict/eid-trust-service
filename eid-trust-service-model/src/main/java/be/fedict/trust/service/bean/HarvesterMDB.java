@@ -112,12 +112,14 @@ public class HarvesterMDB implements MessageListener {
 		String caName = harvestMessage.getCaName();
 		boolean update = harvestMessage.isUpdate();
 		String crlFilePath = harvestMessage.getCrlFile();
+		File crlFile = new File(crlFilePath);
 
 		LOG.debug("issuer: " + caName);
 		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
 				.findCertificateAuthority(caName);
 		if (null == certificateAuthority) {
 			LOG.error("unknown certificate authority: " + caName);
+			deleteCrlFile(crlFile);
 			return;
 		}
 		if (!update && Status.PROCESSING != certificateAuthority.getStatus()) {
@@ -126,13 +128,12 @@ public class HarvesterMDB implements MessageListener {
 			 * processing the CA cache in the meanwhile.
 			 */
 			LOG.debug("CA status not marked for processing");
+			deleteCrlFile(crlFile);
 			return;
 		}
 
-		File crlFile;
 		FileInputStream crlInputStream;
 		try {
-			crlFile = new File(crlFilePath);
 			crlInputStream = new FileInputStream(crlFile);
 		} catch (FileNotFoundException e) {
 			LOG.error("CRL file does not exist: " + crlFilePath);
@@ -145,6 +146,7 @@ public class HarvesterMDB implements MessageListener {
 			crl = (X509CRL) certificateFactory.generateCRL(crlInputStream);
 		} catch (Exception e) {
 			LOG.error("BC error: " + e.getMessage(), e);
+			deleteCrlFile(crlFile);
 			return;
 		}
 
@@ -158,6 +160,7 @@ public class HarvesterMDB implements MessageListener {
 				issuerCertificate, validationDate);
 		if (!crlValid) {
 			this.auditDAO.logAudit("Invalid CRL for CA=" + caName);
+			deleteCrlFile(crlFile);
 			return;
 		}
 		BigInteger crlNumber = getCrlNumber(crl);
@@ -170,6 +173,7 @@ public class HarvesterMDB implements MessageListener {
 				&& certificateAuthority.getStatus() == Status.ACTIVE) {
 			// current CRL cache is higher or equal, no update needed
 			LOG.debug("current CA cache is new enough.");
+			deleteCrlFile(crlFile);
 			return;
 		}
 
@@ -233,10 +237,7 @@ public class HarvesterMDB implements MessageListener {
 			}
 		}
 
-		boolean deletedCrlFile = crlFile.delete();
-		if (!deletedCrlFile) {
-			LOG.warn("could not delete temp CRL file: " + crlFilePath);
-		}
+		deleteCrlFile(crlFile);
 
 		LOG.debug("CRL this update: " + crl.getThisUpdate());
 		LOG.debug("CRL next update: " + crl.getNextUpdate());
@@ -245,6 +246,14 @@ public class HarvesterMDB implements MessageListener {
 		certificateAuthority.setNextUpdate(crl.getNextUpdate());
 		LOG.debug("cache activated for CA: " + crl.getIssuerX500Principal()
 				+ " (entries=" + entries + ")");
+	}
+
+	private void deleteCrlFile(File crlFile) {
+		boolean deletedCrlFile = crlFile.delete();
+		if (!deletedCrlFile) {
+			LOG.warn("could not delete temp CRL file: "
+					+ crlFile.getAbsolutePath());
+		}
 	}
 
 	private BigInteger getCrlNumber(X509CRL crl) {
