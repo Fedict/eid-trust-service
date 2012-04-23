@@ -5,6 +5,9 @@
 <article lang="en">
 	<articleinfo>
 		<title>Fedict eID Trust Service Administrator Manual</title>
+		<subtitle>
+			Version &project.version;
+		</subtitle>
 		<copyright>
 			<year>2010-2011</year>
 			<holder>Fedict</holder>
@@ -469,14 +472,14 @@ QUIT;]]></programlisting>
 					SQL> exit
 				]]></programlisting>
 			</para>
-            <warning>
-                As the JBoss Oracle distribution is configured for an XA datasource
-                some extra permissions are required to be granted to the
-                trust database user. The oracle-create-account.sql script does
-                this for you but is preconfigured for Oracle 10g Release 2
-                without patch for bug 5945463. For later versions the grant on
-                sys.dbms_system needs to be changed to sys.dbms_xa.
-            </warning>
+			<warning>
+				As the JBoss Oracle distribution is configured for an XA datasource
+				some extra permissions are required to be granted to the
+				trust database user. The oracle-create-account.sql script does
+				this for you but is preconfigured for Oracle 10g Release 2
+				without patch for bug 5945463. For later versions the grant on
+				sys.dbms_system needs to be changed to sys.dbms_xa.
+			</warning>
 		</section>
 		<section>
 			<title>PostgreSQL database setup on Redhat (Fedora)</title>
@@ -1054,7 +1057,7 @@ JBOSS_CONF="default"]]></programlisting>
 						PKCS#12 keystores. The keystore path in case of PKCS#11 is the
 						path to the configuration file which will be used by the Sun
 						PKCS#11 provider.
-				</para>
+					</para>
 				</section>
 				<section>
 					<title>Network Configuration</title>
@@ -1073,7 +1076,7 @@ JBOSS_CONF="default"]]></programlisting>
 						configured TSA server, returning a timestamp response containing a
 						timestamp token. The received timestamp token will be used for
 						clock drift detection.
-				    </para>
+					</para>
 					<para>
 						You can configure the times when to perform the clock drift
 						detection check using a cron-like expression string. See

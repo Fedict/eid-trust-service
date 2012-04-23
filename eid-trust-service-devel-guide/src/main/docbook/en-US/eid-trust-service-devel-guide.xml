@@ -5,6 +5,9 @@
 <article lang="en">
 	<articleinfo>
 		<title>Fedict eID Trust Service Developer Guide</title>
+		<subtitle>
+			Version &project.version;
+		</subtitle>
 		<copyright>
 			<year>2008-2010</year>
 			<holder>Fedict</holder>
@@ -37,7 +40,8 @@
 			for validation of a certificate chain against a certain trust domain.
 			The web service also allows for historical validation of a
 			certificate chain,
-			where you can provide the necessary revocation data using or a list of
+			where you can provide the necessary revocation data
+			using or a list of
 			OCSP response and/or CRLs or using the
 			<ulink
 				url="http://www.w3.org/TR/XAdES/#Syntax_for_XAdES-L_form_The_RevocationValues_element">
@@ -49,7 +53,8 @@
 			and timestamp tokens.
 		</para>
 		<para>
-			For more technical detail on the XKMS 2 web service, please see the
+			For more technical detail on the XKMS 2 web service, please see
+			the
 			architecture guide
 			provided in the SDK package.
 		</para>
@@ -60,8 +65,10 @@
 			To access the Fedict eID Trust Service XKMS v2.0 web service the SDK
 			provides an
 			XKMS2Client component.
-			Initializing this component takes a String location argument which expects to be
-			the full path of the XKMS2 web service,
+			Initializing this component takes a
+			String location argument which expects to be
+			the full path of the
+			XKMS2 web service,
 			e.g.
 			<code>http://www.e-contract.be/eid-trust-service-ws/xkms2</code>
 			.
@@ -71,7 +78,8 @@
 			<para>
 				During the development process, you might want some more debugging
 				info on the
-				sent and received SOAP messages. You can turn this feature on using the
+				sent and received SOAP messages. You can turn this
+				feature on using the
 				<code>setLogging(boolean)</code>
 				method.
 			</para>
@@ -90,17 +98,22 @@
 			<para>
 				The Trust Service you are connecting might be configured to use
 				WS-Security for signing the outgoing
-				message. The XKMS2 client will in this case automatically verify the
+				message. The XKMS2 client will
+				in this case automatically verify the
 				incoming message signature
 				using the embedded certificate in the WS-Security element.
-				You can optionally add extra verification for this certificate by
-				specifying manually the certificate
+				You can
+				optionally add extra verification for this certificate by
+				specifying
+				manually the certificate
 				you expect it to be using the
 				<code>setServerCertificate(X509Certificate)</code>
 				method.
-				By default the WS-Security timestamp present will be verified to not
+				By default the WS-Security timestamp present will be verified
+				to not
 				have an offset bigger then
-				5 minutes. You can optionally configure this offset using the
+				5 minutes. You can optionally
+				configure this offset using the
 				<code>setMaxWSSecurityTimestampOffset(long)</code>
 				( in seconds ).
 			</para>
@@ -110,7 +123,8 @@
 			<para>
 				When accessing the trust service over SSL, you can optionally
 				specify the Public Key
-				to be used for verification of the SSL certificate using the method
+				to be used for verification of the SSL
+				certificate using the method
 				<code>setServicePublicKey(PublicKey)</code>
 				.
 			</para>
@@ -119,11 +133,14 @@
 	<section>
 		<title>Certificate chain validation</title>
 		<para>
-			In its most minimal configuration, a client can specify a certificate
+			In its most minimal configuration, a client can specify a
+			certificate
 			path for validation. The trust service
-			will then perform a PKI-validation against the configured default trust
+			will then perform a
+			PKI-validation against the configured default trust
 			domain.
-			It is expected for the certificate path to be ordered, holding the root
+			It is
+			expected for the certificate path to be ordered, holding the root
 			certificate as last in the list.
 		</para>
 		<para>
@@ -140,10 +157,13 @@
 		<para>
 			Case you want to validate against a specific trust domain off course
 			the XKMS2 client's API lets you specify this.
-			You can also optionally request for the trust service to return the used
+			You can also optionally
+			request for the trust service to return the used
 			revocation data
-			( OCSP responses and/or CRL data ). This revocation data can
-			afterwards be retrieved using
+			( OCSP
+			responses and/or CRL data ). This revocation data can
+			afterwards be
+			retrieved using
 			<code>getRevocationValues</code>
 			which returns a
 			<ulink
@@ -158,7 +178,8 @@
 		<para>
 			It is possible to perform historical validation on certificate paths.
 			The XKMS2Client provides 3 means of providing
-			the necessary revocation data for the trust service. Either by explictly
+			the necessary revocation
+			data for the trust service. Either by explictly
 			specifying the list of
 			<code>OCSPResp</code>
 			and
@@ -172,16 +193,20 @@
 			explicitly.
 		</para>
 		<para>
-			Historical validations are usefull in the context of verification of
-			ETSI XAdES v.1.3.2 digital signatures, focussed on XAdES-X-L signatures.
+			Historical validations are usefull in the context of
+			verification of
+			ETSI XAdES v.1.3.2 digital signatures, focussed on
+			XAdES-X-L signatures.
 		</para>
 	</section>
 	<section>
 		<title>Attribute certificate validation</title>
 		<para>
-			It is possible to validate Attribute certificates using the XKMS2 web
+			It is possible to validate Attribute certificates using the
+			XKMS2 web
 			service. To do so you will have to
-			provide the certificate path for PKI-validation of these attribute
+			provide the certificate
+			path for PKI-validation of these attribute
 			certificates.
 		</para>
 		<para>
@@ -198,9 +223,11 @@
 		<para>
 			It is possible to validate TSA certificates using the XKMS2 web
 			service.
-			The encoded timestamp token will then off course need to contain the
+			The encoded timestamp token will then off course need to
+			contain the
 			certificate path of the
-			the TSA certificate for the trust service be able to perform
+			the TSA certificate for the trust
+			service be able to perform
 			PKI-validation.
 		</para>
 		<para>
@@ -223,7 +250,8 @@
 			to be used in case the validation request to the XKMS2 web service
 			failed unexpectedly due to connection
 			issues.
-			In that case it will fallback to your specified TrustValidator.
+			In that case it will
+			fallback to your specified TrustValidator.
 		</para>
 	</section>
 	<appendix>
