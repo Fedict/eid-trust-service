@@ -616,13 +616,15 @@ public class TrustServiceBean implements TrustService {
 												.getTrustPoint());
 							}
 						} catch (JMSException e) {
-							logAudit("Failed to notify harvester: "
-									+ e.getMessage());
+							this.auditDAO
+									.logAudit("Failed to notify harvester: "
+											+ e.getMessage());
 							LOG.error(e.getMessage(), e);
 						} catch (InvalidCronExpressionException e) {
-							logAudit("Failed to start timer for trust point: "
-									+ certificateAuthority.getTrustPoint()
-											.getName());
+							this.auditDAO
+									.logAudit("Failed to start timer for trust point: "
+											+ certificateAuthority
+													.getTrustPoint().getName());
 							LOG.error(e.getMessage(), e);
 						}
 					} else {
