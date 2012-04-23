@@ -22,7 +22,7 @@
     </context-param>
     <context-param>
         <param-name>facelets.DEVELOPMENT</param-name>
-        <param-value>true</param-value>
+        <param-value>false</param-value>
     </context-param>
 
     <!-- JBoss Richfaces -->
@@ -125,4 +125,5 @@
         <servlet-name>AppletServiceServlet</servlet-name>
         <url-pattern>/applet-service</url-pattern>
     </servlet-mapping>
+	    
 </web-app>

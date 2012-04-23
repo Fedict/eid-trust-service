@@ -12,6 +12,9 @@
         <phase-listener>
             be.fedict.trust.admin.listener.CacheControlPhaseListener
         </phase-listener>
+        <phase-listener>
+            be.fedict.trust.admin.listener.SessionTimeoutPhaseListener
+        </phase-listener>
     </lifecycle>
 
     <!-- Configuration page navigation rules -->
