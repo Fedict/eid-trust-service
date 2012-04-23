@@ -158,7 +158,7 @@ public class TrustServiceBean implements TrustService {
 			try {
 				trustValidator.isTrusted(certificateChain);
 			} catch (CertPathValidatorException ignored) {
-				LOG.error(
+				LOG.debug(
 						"cert path validation error: " + ignored.getMessage(),
 						ignored);
 			}
