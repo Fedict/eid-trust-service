@@ -49,7 +49,9 @@ public class CrlRepositoryServiceBean {
 	}
 
 	/**
-	 * Sets the {@link CachedCrlRepository}.
+	 * Sets the {@link CachedCrlRepository}. Different TrustServiceBeans might
+	 * be racing on this setter. But that's not a problem as it's all about
+	 * caching anyway.
 	 * 
 	 * @param cachedCrlRepository
 	 *            the cached CRL repository
