@@ -328,7 +328,7 @@
 	<properties>
 		<eid-applet.version>1.0.5.Beta2</eid-applet.version>
 		<jtrust.version>1.1.2</jtrust.version>
-		<eid-as.version>1.0.0.Beta1</eid-as.version>
+		<eid-as.version>1.0.0-SNAPSHOT</eid-as.version>
 		<trust-service.data.source.user>trust</trust-service.data.source.user>
 		<trust-service.data.source.pass>trust</trust-service.data.source.pass>
 		<hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
