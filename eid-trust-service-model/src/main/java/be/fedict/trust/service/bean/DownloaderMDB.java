@@ -35,6 +35,7 @@ import javax.jms.MessageListener;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -124,6 +125,9 @@ public class DownloaderMDB implements MessageListener {
 			httpClient.getHostConfiguration().setProxy(
 					networkConfig.getProxyHost(), networkConfig.getProxyPort());
 		}
+		HttpClientParams httpClientParams = httpClient.getParams();
+		httpClientParams.setParameter("http.socket.timeout", new Integer(
+				1000 * 20));
 		LOG.debug("downloading CRL from: " + crlUrl);
 		GetMethod getMethod = new GetMethod(crlUrl);
 		getMethod.addRequestHeader("User-Agent", "jTrust CRL Client");
