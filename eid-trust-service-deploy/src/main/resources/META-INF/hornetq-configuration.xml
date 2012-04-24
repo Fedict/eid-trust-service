@@ -4,9 +4,14 @@
 	xsi:schemaLocation="urn:hornetq /schema/hornetq-configuration.xsd">
 
 	<address-settings>
-		<address-setting match="jms.queue.TrustServiceHarvester">
-			<!-- delay redelivery for 1 minute -->
+		<address-setting match="jms.queue.TrustServiceDownloader">
 			<redelivery-delay>60000</redelivery-delay>
+			<max-delivery-attempts>3</max-delivery-attempts>
+		</address-setting>
+
+		<address-setting match="jms.queue.TrustServiceHarvester">
+			<redelivery-delay>20000</redelivery-delay>
+			<max-delivery-attempts>2</max-delivery-attempts>
 		</address-setting>
 	</address-settings>
 
