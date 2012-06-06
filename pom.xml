@@ -25,6 +25,7 @@
 		<module>eid-trust-service-xkms2-ws</module>
 		<module>eid-trust-service-xkms2-ws-impl</module>
 		<module>eid-trust-service-ws</module>
+		<module>eid-trust-service-ocsp-webapp</module>
 		<module>eid-trust-service-entity</module>
 		<module>eid-trust-service-sql-ddl</module>
 		<module>eid-trust-service-model</module>

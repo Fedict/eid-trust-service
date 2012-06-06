@@ -68,6 +68,11 @@
 							<artifactId>eid-trust-service-ws</artifactId>
 							<contextRoot>/eid-trust-service-ws</contextRoot>
 						</webModule>
+						<webModule>
+							<groupId>be.fedict.eid-trust-service</groupId>
+							<artifactId>eid-trust-service-ocsp-webapp</artifactId>
+							<contextRoot>/eid-trust-service-ocsp</contextRoot>
+						</webModule>
 						<ejbModule>
 							<groupId>be.fedict.eid-trust-service</groupId>
 							<artifactId>eid-trust-service-portal-model
@@ -207,6 +212,12 @@
 		<dependency>
 			<groupId>be.fedict.eid-trust-service</groupId>
 			<artifactId>eid-trust-service-ws</artifactId>
+			<type>war</type>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.fedict.eid-trust-service</groupId>
+			<artifactId>eid-trust-service-ocsp-webapp</artifactId>
 			<type>war</type>
 			<version>${project.version}</version>
 		</dependency>
