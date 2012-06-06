@@ -20,16 +20,36 @@
 package be.fedict.trust.service.ocsp;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 
+import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.ocsp.CertificateID;
+import org.bouncycastle.ocsp.OCSPReq;
+import org.bouncycastle.ocsp.Req;
+
+import be.fedict.trust.service.ValidationService;
+
 public class OCSPResponderServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final Log LOG = LogFactory
+			.getLog(OCSPResponderServlet.class);
+
+	public static final String OCSP_REQUEST_CONTENT_TYPE = "application/ocsp-request";
+
+	@EJB
+	private ValidationService validationService;
 
 	@Override
 	protected void doGet(HttpServletRequest request,
@@ -59,6 +79,44 @@ public class OCSPResponderServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		String contentType = request.getContentType();
+		if (false == OCSP_REQUEST_CONTENT_TYPE.equals(contentType)) {
+			LOG.error("incorrect content type: " + contentType);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
 
+		InputStream ocspRequestInputStream = request.getInputStream();
+		OCSPReq ocspReq = new OCSPReq(ocspRequestInputStream);
+
+		Req[] requestList = ocspReq.getRequestList();
+		if (1 != requestList.length) {
+			LOG.error("OCSP request list size not 1: " + requestList.length);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		Req ocspRequest = requestList[0];
+
+		CertificateID certificateID = ocspRequest.getCertID();
+		LOG.debug("certificate Id hash algo OID: "
+				+ certificateID.getHashAlgOID());
+		if (false == CertificateID.HASH_SHA1.equals(certificateID
+				.getHashAlgOID())) {
+			LOG.debug("only supporting SHA1 hash algo");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		BigInteger serialNumber = certificateID.getSerialNumber();
+		byte[] issuerNameHash = certificateID.getIssuerNameHash();
+		byte[] issuerKeyHash = certificateID.getIssuerKeyHash();
+		LOG.debug("serial number: " + serialNumber);
+		LOG.debug("issuer name hash: "
+				+ new String(Hex.encodeHex(issuerNameHash)));
+		LOG.debug("issuer key hash: "
+				+ new String(Hex.encodeHex(issuerKeyHash)));
+
+		boolean valid = this.validationService.validate(serialNumber,
+				issuerNameHash, issuerKeyHash);
+		// TODO: implement me
 	}
 }
