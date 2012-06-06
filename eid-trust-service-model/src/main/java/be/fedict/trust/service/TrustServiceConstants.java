@@ -36,7 +36,7 @@ public abstract class TrustServiceConstants {
 	public static final int CLOCK_DRIFT_TIMEOUT = 10 * 1000;
 	public static final int CLOCK_DRIFT_MAX_CLOCK_OFFSET = 5 * 1000;
 
-	public static final String DEFAULT_CRON_EXPRESSION = "0 0 0/3 * * *";
+	public static final String DEFAULT_CRON_EXPRESSION = "0 0 0 * * *";
 
 	public static final String INFO_MESSAGE_KEY = "info";
 }
