@@ -5,4 +5,13 @@
 
 	<display-name>eID Trust Service OCSP Responder</display-name>
 
+	<servlet>
+	    <servlet-name>OCSPResponderServlet</servlet-name>
+	    <servlet-class>be.fedict.trust.service.ocsp.OCSPResponderServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	   	<servlet-name>OCSPResponderServlet</servlet-name>
+	   	<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	
 </web-app>
