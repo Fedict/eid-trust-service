@@ -97,10 +97,18 @@ public interface CertificateAuthorityDAO {
 	 *         issuer or <code>null</code> if no cache entries exist.
 	 */
 	BigInteger findCrlNumber(String issuerName);
-	
+
 	List<CertificateAuthorityEntity> listCertificateAuthorities();
-	
+
 	long getTotalCachedCertificates();
 
 	long getTotalActiveCachedCAs();
+
+	/**
+	 * Gives back a list of all certificate authorities that have an active CRL
+	 * cache.
+	 * 
+	 * @return
+	 */
+	List<CertificateAuthorityEntity> listActiveCertificateAuthorities();
 }

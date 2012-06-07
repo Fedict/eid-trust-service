@@ -54,6 +54,8 @@ import javax.persistence.Transient;
 				+ "WHERE ca.trustPoint = :trustPoint"),
 		@NamedQuery(name = CertificateAuthorityEntity.QUERY_ALL, query = "FROM CertificateAuthorityEntity"),
 		@NamedQuery(name = CertificateAuthorityEntity.QUERY_COUNT_ACTIVE, query = "SELECT COUNT(*) FROM CertificateAuthorityEntity AS ca "
+				+ "WHERE ca.status = 'ACTIVE'"),
+		@NamedQuery(name = CertificateAuthorityEntity.QUERY_ACTIVE, query = "SELECT ca FROM CertificateAuthorityEntity AS ca "
 				+ "WHERE ca.status = 'ACTIVE'") })
 public class CertificateAuthorityEntity implements Serializable {
 
@@ -63,6 +65,7 @@ public class CertificateAuthorityEntity implements Serializable {
 	public static final String QUERY_NAME_WHERE_TRUST_POINT = "ts_ca.q.n.w.tp";
 	public static final String DELETE_WHERE_TRUST_POINT = "ts_ca.d.w.tp";
 	public static final String QUERY_ALL = "ts_ca.q.all";
+	public static final String QUERY_ACTIVE = "ts_ca.q.active";
 	public static final String QUERY_COUNT_ACTIVE = "ts_ca.q.count.active";
 
 	private String name;

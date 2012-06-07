@@ -197,4 +197,11 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 				.createNamedQuery(CertificateAuthorityEntity.QUERY_COUNT_ACTIVE);
 		return (Long) query.getSingleResult();
 	}
+
+	@SuppressWarnings("unchecked")
+	public List<CertificateAuthorityEntity> listActiveCertificateAuthorities() {
+		Query query = this.entityManager
+				.createNamedQuery(CertificateAuthorityEntity.QUERY_ACTIVE);
+		return (List<CertificateAuthorityEntity>) query.getResultList();
+	}
 }
