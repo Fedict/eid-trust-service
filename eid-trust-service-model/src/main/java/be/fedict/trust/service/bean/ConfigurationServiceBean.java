@@ -67,6 +67,9 @@ public class ConfigurationServiceBean implements ConfigurationService {
 
 	@EJB
 	private CrlRepositoryServiceBean crlRepositoryServiceBean;
+	
+	@EJB
+	private ServiceIdentityManagerBean serviceIdentityManagerBean;
 
 	/**
 	 * {@inheritDoc}
@@ -205,5 +208,7 @@ public class ConfigurationServiceBean implements ConfigurationService {
 
 		this.configurationDAO.setWSSecurityConfig(signing, keyStoreType,
 				keyStorePath, keyStorePassword, keyEntryPassword, alias);
+		
+		this.serviceIdentityManagerBean.updateServiceIdentity();
 	}
 }

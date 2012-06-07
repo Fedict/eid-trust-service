@@ -104,8 +104,13 @@ public final class KeyStoreUtils {
 			throw new KeyStoreLoadException("could not get aliases: "
 					+ e.getMessage(), e);
 		}
-		if (!aliases.hasMoreElements())
+		if (!aliases.hasMoreElements()) {
 			throw new KeyStoreLoadException("keystore is empty");
+		}
+		if (null == alias || alias.isEmpty()) {
+			alias = aliases.nextElement();
+			LOG.debug("alias: " + alias);
+		}
 
 		try {
 			if (!keyStore.isKeyEntry(alias))

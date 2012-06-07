@@ -23,6 +23,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.math.BigInteger;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
@@ -33,9 +38,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.x509.CRLReason;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.ocsp.BasicOCSPResp;
+import org.bouncycastle.ocsp.BasicOCSPRespGenerator;
 import org.bouncycastle.ocsp.CertificateID;
+import org.bouncycastle.ocsp.CertificateStatus;
 import org.bouncycastle.ocsp.OCSPReq;
+import org.bouncycastle.ocsp.OCSPResp;
+import org.bouncycastle.ocsp.OCSPRespGenerator;
 import org.bouncycastle.ocsp.Req;
+import org.bouncycastle.ocsp.RevokedStatus;
 
 import be.fedict.trust.service.ValidationService;
 
@@ -117,6 +130,42 @@ public class OCSPResponderServlet extends HttpServlet {
 
 		boolean valid = this.validationService.validate(serialNumber,
 				issuerNameHash, issuerKeyHash);
-		// TODO: implement me
+
+		PrivateKeyEntry privateKeyEntry = this.validationService
+				.getPrivateKeyEntry();
+		if (null == privateKeyEntry) {
+			LOG.debug("missing service identity");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		X509Certificate certificate = (X509Certificate) privateKeyEntry
+				.getCertificate();
+		PublicKey publicKey = certificate.getPublicKey();
+		PrivateKey privateKey = privateKeyEntry.getPrivateKey();
+		try {
+			BasicOCSPRespGenerator basicOCSPRespGenerator = new BasicOCSPRespGenerator(
+					publicKey);
+			CertificateStatus certificateStatus;
+			if (valid) {
+				certificateStatus = CertificateStatus.GOOD;
+			} else {
+				certificateStatus = new RevokedStatus(new Date(),
+						CRLReason.unspecified);
+			}
+			basicOCSPRespGenerator
+					.addResponse(certificateID, certificateStatus);
+			BasicOCSPResp basicOCSPResp = basicOCSPRespGenerator.generate(
+					"SHA1WITHRSA", privateKey, null, new Date(),
+					BouncyCastleProvider.PROVIDER_NAME);
+			OCSPRespGenerator ocspRespGenerator = new OCSPRespGenerator();
+			OCSPResp ocspResp = ocspRespGenerator.generate(
+					OCSPRespGenerator.SUCCESSFUL, basicOCSPResp);
+			response.setContentType("application/ocsp-response");
+			response.getOutputStream().write(ocspResp.getEncoded());
+		} catch (Exception e) {
+			LOG.error("OCSP generator error: " + e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
 	}
 }

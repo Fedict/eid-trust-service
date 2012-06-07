@@ -19,6 +19,7 @@
 package be.fedict.trust.service;
 
 import java.math.BigInteger;
+import java.security.KeyStore.PrivateKeyEntry;
 
 import javax.ejb.Local;
 
@@ -45,4 +46,10 @@ public interface ValidationService {
 	boolean validate(BigInteger serialNumber, byte[] issuerNameHash,
 			byte[] issuerKeyHash);
 
+	/**
+	 * Gives back the private key for OCSP responder signing.
+	 * 
+	 * @return
+	 */
+	PrivateKeyEntry getPrivateKeyEntry();
 }

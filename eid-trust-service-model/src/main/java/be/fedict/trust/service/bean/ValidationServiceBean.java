@@ -19,6 +19,7 @@
 package be.fedict.trust.service.bean;
 
 import java.math.BigInteger;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Date;
 
 import javax.ejb.EJB;
@@ -51,6 +52,9 @@ public class ValidationServiceBean implements ValidationService {
 
 	@EJB
 	private CertificateAuthorityLookupBean certificateAuthorityLookupBean;
+
+	@EJB
+	private ServiceIdentityManagerBean serviceIdentityManagerBean;
 
 	public boolean validate(BigInteger serialNumber, byte[] issuerNameHash,
 			byte[] issuerKeyHash) {
@@ -86,5 +90,9 @@ public class ValidationServiceBean implements ValidationService {
 		}
 		LOG.debug("revoked certificate: " + caName + " " + serialNumber);
 		return false;
+	}
+
+	public PrivateKeyEntry getPrivateKeyEntry() {
+		return this.serviceIdentityManagerBean.getPrivateKeyEntry();
 	}
 }
