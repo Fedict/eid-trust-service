@@ -26,5 +26,7 @@ import javax.jms.Session;
 
 public interface JMSMessage extends Serializable {
 
+	public static final String MESSAGE_TYPE_PROPERTY = "MessageType";
+	
 	Message getJMSMessage(Session session) throws JMSException;
 }

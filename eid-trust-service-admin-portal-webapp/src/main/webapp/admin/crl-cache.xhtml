@@ -11,54 +11,86 @@
 		<ui:define name="body">
 			<h2>#{messages.crlCache}</h2>
 
-			<h:panelGrid columns="2">
-				<h:outputText value="#{messages.cachedCAs}" />
-				<h:outputText value="#{ts_certificateAuthority.cachedCAs}" />
+			<rich:tabPanel switchType="client">
+				<rich:tab label="#{messages.status}">
 
-				<h:outputText value="#{messages.cachedCertificates}" />
-				<h:outputText value="#{ts_certificateAuthority.cachedCertificates}" />
-			</h:panelGrid>
+					<h:panelGrid columns="2">
+						<h:outputText value="#{messages.cachedCAs}" />
+						<h:outputText value="#{ts_certificateAuthority.cachedCAs}" />
 
-			<h:form>
-				<rich:dataTable id="data" var="item" value="#{ts_caList}" rows="20"
-					rowClasses="listingTable_Row1,listingTable_Row2">
+						<h:outputText value="#{messages.cachedCertificates}" />
+						<h:outputText
+							value="#{ts_certificateAuthority.cachedCertificates}" />
+					</h:panelGrid>
 
-					<rich:column sortBy="#{item.name}">
-						<f:facet name="header">#{messages.certificateAuthority}</f:facet>
-						<h:outputText value="#{item.name}" />
-					</rich:column>
+					<h:form>
+						<rich:dataTable id="data" var="item" value="#{ts_caList}"
+							rows="20" rowClasses="listingTable_Row1,listingTable_Row2">
 
-					<rich:column sortBy="#{item.status}">
-						<f:facet name="header">#{messages.cache}</f:facet>
-						<h:outputText value="#{item.status}" />
-					</rich:column>
+							<rich:column sortBy="#{item.name}">
+								<f:facet name="header">#{messages.certificateAuthority}</f:facet>
+								<h:outputText value="#{item.name}" />
+							</rich:column>
 
-					<rich:column sortBy="#{item.thisUpdate}">
-						<f:facet name="header">#{messages.thisUpdate}</f:facet>
-						<h:outputText value="#{item.thisUpdate}">
-							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="CET" />
-						</h:outputText>
-					</rich:column>
+							<rich:column sortBy="#{item.status}">
+								<f:facet name="header">#{messages.cache}</f:facet>
+								<h:outputText value="#{item.status}" />
+							</rich:column>
 
-					<rich:column sortBy="#{item.nextUpdate}">
-						<f:facet name="header">#{messages.nextUpdate}</f:facet>
-						<h:outputText value="#{item.nextUpdate}">
-							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="CET" />
-						</h:outputText>
-					</rich:column>
+							<rich:column sortBy="#{item.thisUpdate}">
+								<f:facet name="header">#{messages.thisUpdate}</f:facet>
+								<h:outputText value="#{item.thisUpdate}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="CET" />
+								</h:outputText>
+							</rich:column>
 
-					<rich:column>
-						<h:commandLink value="#{messages.refreshNow}"
-							action="#{ts_certificateAuthority.refresh}" />
-					</rich:column>
+							<rich:column sortBy="#{item.nextUpdate}">
+								<f:facet name="header">#{messages.nextUpdate}</f:facet>
+								<h:outputText value="#{item.nextUpdate}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="CET" />
+								</h:outputText>
+							</rich:column>
 
-					<f:facet name="footer">
-						<rich:datascroller for="data" pageIndexVar="pageIndex"
-							pagesVar="pages" fastControls="hide">
-						</rich:datascroller>
-					</f:facet>
-				</rich:dataTable>
-			</h:form>
+							<rich:column>
+								<h:commandLink value="#{messages.refreshNow}"
+									action="#{ts_certificateAuthority.refresh}" />
+							</rich:column>
+
+							<f:facet name="footer">
+								<rich:datascroller for="data" pageIndexVar="pageIndex"
+									pagesVar="pages" fastControls="hide">
+								</rich:datascroller>
+							</f:facet>
+						</rich:dataTable>
+					</h:form>
+				</rich:tab>
+
+				<rich:tab label="#{messages.coldStart}">
+					<h:form>
+						<h:panelGrid columns="2">
+							<h:outputLabel for="crlUrl" value="#{messages.crlUrl}" />
+							<s:decorate>
+								<h:inputText id="crlUrl"
+									value="#{ts_certificateAuthority.crlUrl}" size="40" />
+								<h:message for="crlUrl" styleClass="error" />
+							</s:decorate>
+
+							<h:outputLabel for="certUrl" value="#{messages.certificateUrl}" />
+							<s:decorate>
+								<h:inputText id="certUrl"
+									value="#{ts_certificateAuthority.certUrl}" size="40" />
+								<h:message for="certUrl" styleClass="error" />
+							</s:decorate>
+						</h:panelGrid>
+
+						<h:inputTextarea id="crlText"
+							value="#{ts_certificateAuthority.crlText}" />
+
+						<h:commandButton value="#{messages.start}"
+							action="#{ts_certificateAuthority.coldStart}" />
+					</h:form>
+				</rich:tab>
+			</rich:tabPanel>
 		</ui:define>
 	</ui:composition>
 </body>

@@ -38,10 +38,24 @@ public interface CertificateAuthority {
 	 */
 	String refresh();
 
+	String coldStart();
+
 	/*
 	 * Accessors.
 	 */
 	long getCachedCertificates();
 
 	long getCachedCAs();
+
+	String getCrlUrl();
+
+	void setCrlUrl(String crlUrl);
+
+	String getCertUrl();
+
+	void setCertUrl(String certUrl);
+
+	String getCrlText();
+
+	void setCrlText(String crlText);
 }

@@ -61,6 +61,12 @@ public class CertificateAuthorityBean implements CertificateAuthority {
 	@In
 	FacesMessages facesMessages;
 
+	private String crlUrl;
+
+	private String certUrl;
+
+	private String crlText;
+
 	@DataModel(CERTIFICATE_AUTHORITY_LIST_NAME)
 	@SuppressWarnings("unused")
 	private List<CertificateAuthorityEntity> caList;
@@ -100,5 +106,42 @@ public class CertificateAuthorityBean implements CertificateAuthority {
 	@Admin
 	public long getCachedCAs() {
 		return this.trustDomainService.getTotalActiveCachedCAs();
+	}
+
+	public String getCrlUrl() {
+		return this.crlUrl;
+	}
+
+	public void setCrlUrl(String crlUrl) {
+		this.crlUrl = crlUrl;
+	}
+
+	public String getCertUrl() {
+		return this.certUrl;
+	}
+
+	public void setCertUrl(String certUrl) {
+		this.certUrl = certUrl;
+	}
+
+	public String coldStart() {
+		this.log.debug("cold start: #0 #1", this.crlUrl, this.certUrl);
+		if (null != this.crlText && false == this.crlText.isEmpty()) {
+			this.trustDomainService.coldStart(this.crlText);
+		} else {
+			this.trustDomainService.coldStart(this.crlUrl, this.certUrl);
+		}
+		this.crlUrl = null;
+		this.certUrl = null;
+		this.crlText = null;
+		return "success";
+	}
+
+	public String getCrlText() {
+		return this.crlText;
+	}
+
+	public void setCrlText(String crlText) {
+		this.crlText = crlText;
 	}
 }

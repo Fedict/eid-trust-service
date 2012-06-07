@@ -36,4 +36,6 @@ public interface NotificationService {
 
 	void notifyHarvester(String issuerName, String crlFile, boolean update)
 			throws JMSException;
+
+	void notifyColdStart(String crlUrl, String certUrl) throws JMSException;
 }

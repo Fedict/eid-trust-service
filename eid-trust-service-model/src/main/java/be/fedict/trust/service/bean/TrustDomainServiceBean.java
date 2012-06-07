@@ -18,7 +18,10 @@
 
 package be.fedict.trust.service.bean;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -34,6 +37,7 @@ import javax.jms.JMSException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import be.fedict.trust.service.NotificationService;
 import be.fedict.trust.service.SchedulingService;
 import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
@@ -76,6 +80,9 @@ public class TrustDomainServiceBean implements TrustDomainService {
 
 	@EJB
 	private SchedulingService schedulingService;
+
+	@EJB
+	private NotificationService notificationService;
 
 	/**
 	 * {@inheritDoc}
@@ -480,5 +487,55 @@ public class TrustDomainServiceBean implements TrustDomainService {
 
 	public long getTotalActiveCachedCAs() {
 		return this.certificateAuthorityDAO.getTotalActiveCachedCAs();
+	}
+
+	public void coldStart(String crlUrl, String certUrl) {
+		LOG.debug("cold start: " + crlUrl + "; " + certUrl);
+		if (null == crlUrl) {
+			return;
+		}
+		if (null == certUrl) {
+			return;
+		}
+		if (crlUrl.isEmpty()) {
+			return;
+		}
+		if (certUrl.isEmpty()) {
+			return;
+		}
+		try {
+			this.notificationService.notifyColdStart(crlUrl, certUrl);
+		} catch (JMSException e) {
+			LOG.error("JMS error: " + e.getMessage(), e);
+		}
+	}
+
+	public void coldStart(String crlText) {
+		LOG.debug("coldstart from text file: " + crlText);
+		if (null == crlText) {
+			return;
+		}
+		if (crlText.isEmpty()) {
+			return;
+		}
+
+		BufferedReader bufferedReader = new BufferedReader(new StringReader(
+				crlText));
+
+		String crlUrl;
+		try {
+			while (null != (crlUrl = bufferedReader.readLine())) {
+				crlUrl = crlUrl.trim();
+				String certUrl = bufferedReader.readLine();
+				certUrl = certUrl.trim();
+				try {
+					this.notificationService.notifyColdStart(crlUrl, certUrl);
+				} catch (JMSException e) {
+					LOG.error("JMS error: " + e.getMessage(), e);
+				}
+			}
+		} catch (IOException e) {
+			LOG.error("error parsing CRL text file: " + e.getMessage(), e);
+		}
 	}
 }

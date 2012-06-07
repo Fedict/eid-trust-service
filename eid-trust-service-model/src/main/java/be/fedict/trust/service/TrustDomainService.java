@@ -297,4 +297,8 @@ public interface TrustDomainService {
 	long getTotalCachedCertificates();
 
 	long getTotalActiveCachedCAs();
+
+	void coldStart(String crlUrl, String certUrl);
+
+	void coldStart(String crlText);
 }

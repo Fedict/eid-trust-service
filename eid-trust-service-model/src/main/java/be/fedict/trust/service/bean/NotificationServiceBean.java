@@ -3,6 +3,7 @@ package be.fedict.trust.service.bean;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
@@ -44,9 +45,13 @@ public class NotificationServiceBean implements NotificationService {
 			QueueSession queueSession = queueConnection.createQueueSession(
 					true, Session.AUTO_ACKNOWLEDGE);
 			try {
+				String messageType = message.getClass().getSimpleName();
+				Message jmsMessage = message.getJMSMessage(queueSession);
+				jmsMessage.setStringProperty(JMSMessage.MESSAGE_TYPE_PROPERTY,
+						messageType);
 				QueueSender queueSender = queueSession.createSender(queue);
 				try {
-					queueSender.send(message.getJMSMessage(queueSession));
+					queueSender.send(jmsMessage);
 				} finally {
 					queueSender.close();
 				}
@@ -71,5 +76,13 @@ public class NotificationServiceBean implements NotificationService {
 		JMSMessage harvestMessage = new HarvestMessage(issuerName, crlFile,
 				update);
 		sendMessage(harvestMessage, this.harvesterQueue);
+	}
+
+	public void notifyColdStart(String crlUrl, String certUrl)
+			throws JMSException {
+		LOG.debug("notifying downloader for CA cold starting: " + crlUrl);
+		ColdStartMessage coldStartMessage = new ColdStartMessage(crlUrl,
+				certUrl);
+		sendMessage(coldStartMessage, this.downloaderQueue);
 	}
 }
