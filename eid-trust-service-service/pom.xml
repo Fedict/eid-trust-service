@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1.Beta3</version>
 	</parent>
 	<name>FedICT eID Trust Service MBean Services</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-service</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1.Beta3</version>
 	<packaging>jboss-sar</packaging>
 	<build>
 		<plugins>

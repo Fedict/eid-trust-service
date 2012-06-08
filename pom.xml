@@ -8,11 +8,11 @@
 			anyway. -->
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.5.Beta2</version>
+		<version>1.0.5.Beta5</version>
 	</parent>
 	<groupId>be.fedict</groupId>
 	<artifactId>eid-trust-service</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1.Beta3</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2009</inceptionYear>
 	<scm>
@@ -326,7 +326,7 @@
 
 	<!-- Default properties -->
 	<properties>
-		<eid-applet.version>1.0.5.Beta2</eid-applet.version>
+		<eid-applet.version>1.0.5.Beta5</eid-applet.version>
 		<jtrust.version>1.1.2</jtrust.version>
 		<eid-as.version>1.0.0.Beta2</eid-as.version>
 		<trust-service.data.source.user>trust</trust-service.data.source.user>
