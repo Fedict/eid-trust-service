@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.1.Beta3</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service Developer Guide</name>
 	<description>Developer Guide for the eID Trust Service.</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-devel-guide</artifactId>
-	<version>1.0.1.Beta3</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
