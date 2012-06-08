@@ -56,14 +56,15 @@ public class ValidationServiceBean implements ValidationService {
 	@EJB
 	private ServiceIdentityManagerBean serviceIdentityManagerBean;
 
-	public boolean validate(BigInteger serialNumber, byte[] issuerNameHash,
+	public Date validate(BigInteger serialNumber, byte[] issuerNameHash,
 			byte[] issuerKeyHash) {
 		LOG.debug("validate");
+		Date unknownRevocationDate = new Date();
 		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityLookupBean
 				.lookup(issuerNameHash, issuerKeyHash);
 		if (null == certificateAuthority) {
 			LOG.error("no certificate authority found");
-			return false;
+			return unknownRevocationDate;
 		}
 		String caName = certificateAuthority.getName();
 		LOG.debug("CA: " + caName);
@@ -72,24 +73,24 @@ public class ValidationServiceBean implements ValidationService {
 		Date validationDate = new Date();
 		if (Status.ACTIVE != certificateAuthority.getStatus()) {
 			LOG.debug("CRL cache not active for CA: " + caName);
-			return false;
+			return unknownRevocationDate;
 		}
 		if (null == thisUpdate || validationDate.before(thisUpdate)) {
 			LOG.debug("validation date before this update: " + caName);
-			return false;
+			return unknownRevocationDate;
 		}
 		if (null == nextUpdate || validationDate.after(nextUpdate)) {
 			LOG.debug("validation date after next update: " + caName);
-			return false;
+			return unknownRevocationDate;
 		}
 		RevokedCertificateEntity revokedCertificate = this.entityManager.find(
 				RevokedCertificateEntity.class, new RevokedCertificatePK(
 						caName, serialNumber.toString()));
 		if (null == revokedCertificate) {
-			return true;
+			return null;
 		}
 		LOG.debug("revoked certificate: " + caName + " " + serialNumber);
-		return false;
+		return revokedCertificate.getRevocationDate();
 	}
 
 	public PrivateKeyEntry getPrivateKeyEntry() {

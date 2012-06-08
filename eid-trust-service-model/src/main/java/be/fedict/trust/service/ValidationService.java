@@ -20,6 +20,7 @@ package be.fedict.trust.service;
 
 import java.math.BigInteger;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.Date;
 
 import javax.ejb.Local;
 
@@ -41,9 +42,9 @@ public interface ValidationService {
 	 *            the SHA1 of the issuer name.
 	 * @param issuerKeyHash
 	 *            the SHA1 of the issuer public key.
-	 * @return <code>true</code> if valid, <code>false</code> otherwise.
+	 * @return <code>null</code> if valid, else the revocation date.
 	 */
-	boolean validate(BigInteger serialNumber, byte[] issuerNameHash,
+	Date validate(BigInteger serialNumber, byte[] issuerNameHash,
 			byte[] issuerKeyHash);
 
 	/**

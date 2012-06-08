@@ -21,6 +21,7 @@ package be.fedict.trust.service.bean;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,6 +45,7 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.openssl.PEMReader;
 
 import be.fedict.trust.NetworkConfig;
 import be.fedict.trust.service.NotificationService;
@@ -146,7 +148,13 @@ public class DownloaderMDB implements MessageListener {
 			certificate = (X509Certificate) certificateFactory
 					.generateCertificate(new FileInputStream(certFile));
 		} catch (Exception e) {
-			retry("error parsing certificate", e, crlFile, certFile);
+			LOG.debug("error DER-parsing certificate");
+			try {
+				PEMReader pemReader = new PEMReader(new FileReader(certFile));
+				certificate = (X509Certificate) pemReader.readObject();
+			} catch (Exception e2) {
+				retry("error PEM-parsing certificate", e, certFile, crlFile);
+			}
 		}
 		certFile.delete();
 

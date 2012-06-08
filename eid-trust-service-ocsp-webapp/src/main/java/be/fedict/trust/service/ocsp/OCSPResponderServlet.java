@@ -128,7 +128,7 @@ public class OCSPResponderServlet extends HttpServlet {
 		LOG.debug("issuer key hash: "
 				+ new String(Hex.encodeHex(issuerKeyHash)));
 
-		boolean valid = this.validationService.validate(serialNumber,
+		Date revocationDate = this.validationService.validate(serialNumber,
 				issuerNameHash, issuerKeyHash);
 
 		PrivateKeyEntry privateKeyEntry = this.validationService
@@ -146,10 +146,10 @@ public class OCSPResponderServlet extends HttpServlet {
 			BasicOCSPRespGenerator basicOCSPRespGenerator = new BasicOCSPRespGenerator(
 					publicKey);
 			CertificateStatus certificateStatus;
-			if (valid) {
+			if (null == revocationDate) {
 				certificateStatus = CertificateStatus.GOOD;
 			} else {
-				certificateStatus = new RevokedStatus(new Date(),
+				certificateStatus = new RevokedStatus(revocationDate,
 						CRLReason.unspecified);
 			}
 			basicOCSPRespGenerator

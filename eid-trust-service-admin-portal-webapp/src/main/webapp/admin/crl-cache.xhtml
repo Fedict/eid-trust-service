@@ -83,8 +83,11 @@
 							</s:decorate>
 						</h:panelGrid>
 
-						<h:inputTextarea id="crlText"
-							value="#{ts_certificateAuthority.crlText}" />
+						<h:panelGrid columns="1">
+							<h:outputText value="Multi-line: CRL URL\nCert URL" />
+							<h:inputTextarea id="crlText"
+								value="#{ts_certificateAuthority.crlText}" cols="60" rows="20" />
+						</h:panelGrid>
 
 						<h:commandButton value="#{messages.start}"
 							action="#{ts_certificateAuthority.coldStart}" />
