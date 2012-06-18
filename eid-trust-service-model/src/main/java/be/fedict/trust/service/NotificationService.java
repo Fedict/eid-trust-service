@@ -38,4 +38,6 @@ public interface NotificationService {
 			throws JMSException;
 
 	void notifyColdStart(String crlUrl, String certUrl) throws JMSException;
+
+	void notifyRemoveCA(String issuerName) throws JMSException;
 }

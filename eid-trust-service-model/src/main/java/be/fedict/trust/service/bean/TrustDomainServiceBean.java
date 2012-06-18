@@ -43,6 +43,7 @@ import be.fedict.trust.service.TrustDomainService;
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.dao.TrustDomainDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.Status;
 import be.fedict.trust.service.entity.TrustDomainEntity;
 import be.fedict.trust.service.entity.TrustPointEntity;
 import be.fedict.trust.service.entity.VirtualTrustDomainEntity;
@@ -537,5 +538,26 @@ public class TrustDomainServiceBean implements TrustDomainService {
 		} catch (IOException e) {
 			LOG.error("error parsing CRL text file: " + e.getMessage(), e);
 		}
+	}
+
+	public void removeCACache(CertificateAuthorityEntity ca)
+			throws JMSException {
+		String caName = ca.getName();
+		LOG.debug("remove CA cache: " + caName);
+		/*
+		 * We first disable the cache for this CA.
+		 */
+		CertificateAuthorityEntity caEntity = this.certificateAuthorityDAO
+				.findCertificateAuthority(caName);
+		if (null == caEntity) {
+			LOG.error("CA entity not found: " + caName);
+			return;
+		}
+		caEntity.setStatus(Status.NONE);
+		/*
+		 * Next we notify the scheduling service that the CRL cache for this CA
+		 * can be cleared.
+		 */
+		this.notificationService.notifyRemoveCA(caName);
 	}
 }

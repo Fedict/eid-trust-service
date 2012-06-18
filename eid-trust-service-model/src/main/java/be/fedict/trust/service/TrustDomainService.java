@@ -301,4 +301,11 @@ public interface TrustDomainService {
 	void coldStart(String crlUrl, String certUrl);
 
 	void coldStart(String crlText);
+
+	/**
+	 * Remove the CRL cache for the given CA.
+	 * 
+	 * @param ca
+	 */
+	void removeCACache(CertificateAuthorityEntity ca) throws JMSException;
 }

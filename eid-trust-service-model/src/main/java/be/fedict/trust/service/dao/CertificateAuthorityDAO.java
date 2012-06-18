@@ -65,6 +65,8 @@ public interface CertificateAuthorityDAO {
 	 */
 	void removeCertificateAuthorities(TrustPointEntity trustPoint);
 
+	void removeCertificateAuthority(CertificateAuthorityEntity ca);
+
 	/**
 	 * Add a {@link RevokedCertificateEntity} entry.
 	 */

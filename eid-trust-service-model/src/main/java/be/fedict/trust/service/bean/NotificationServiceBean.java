@@ -85,4 +85,11 @@ public class NotificationServiceBean implements NotificationService {
 				certUrl);
 		sendMessage(coldStartMessage, this.downloaderQueue);
 	}
+
+	public void notifyRemoveCA(String issuerName) throws JMSException {
+		LOG.debug("notifying harvester for removal of CRL cache for CA: "
+				+ issuerName);
+		RemoveCAMessage removeCAMessage = new RemoveCAMessage(issuerName);
+		sendMessage(removeCAMessage, this.harvesterQueue);
+	}
 }

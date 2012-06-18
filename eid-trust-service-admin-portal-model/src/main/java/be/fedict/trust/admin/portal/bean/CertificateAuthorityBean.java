@@ -144,4 +144,16 @@ public class CertificateAuthorityBean implements CertificateAuthority {
 	public void setCrlText(String crlText) {
 		this.crlText = crlText;
 	}
+
+	public String remove() {
+		this.log.debug("remove CA cache: #0", this.selectedCA.getName());
+		try {
+			this.trustDomainService.removeCACache(this.selectedCA);
+		} catch (JMSException e) {
+			this.facesMessages.addFromResourceBundle(
+					StatusMessage.Severity.ERROR, "errorHarvesterNotification");
+			return null;
+		}
+		return "success";
+	}
 }

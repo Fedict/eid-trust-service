@@ -39,6 +39,8 @@ public interface CertificateAuthority {
 	String refresh();
 
 	String coldStart();
+	
+	String remove();
 
 	/*
 	 * Accessors.

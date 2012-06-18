@@ -44,9 +44,19 @@
 								</h:outputText>
 							</rich:column>
 
+							<rich:column sortBy="#{item.nextUpdate}">
+								<f:facet name="header">#{messages.nextUpdate}</f:facet>
+								<h:outputText value="#{item.nextUpdate}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="CET" />
+								</h:outputText>
+							</rich:column>
+
 							<rich:column>
 								<h:commandLink value="#{messages.refresh}"
 									action="#{ts_certificateAuthority.refresh}" />
+								<h:outputText value=" " />
+								<h:commandLink value="#{messages.remove}"
+									action="#{ts_certificateAuthority.remove}" />
 							</rich:column>
 
 							<f:facet name="footer">

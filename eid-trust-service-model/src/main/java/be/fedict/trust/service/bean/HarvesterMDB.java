@@ -102,11 +102,46 @@ public class HarvesterMDB implements MessageListener {
 	@SNMP(oid = SnmpConstants.CACHE_REFRESH)
 	public void onMessage(Message message) {
 		LOG.debug("onMessage");
-		HarvestMessage harvestMessage;
+		HarvestMessage harvestMessage = null;
+		RemoveCAMessage removeCAMessage = null;
 		try {
-			harvestMessage = new HarvestMessage(message);
+			String messageType = message
+					.getStringProperty(JMSMessage.MESSAGE_TYPE_PROPERTY);
+			if (messageType.equals(HarvestMessage.class.getSimpleName())) {
+				harvestMessage = new HarvestMessage(message);
+			} else if (messageType
+					.equals(RemoveCAMessage.class.getSimpleName())) {
+				removeCAMessage = new RemoveCAMessage(message);
+			}
 		} catch (JMSException e) {
 			LOG.error("JMS error: " + e.getMessage(), e);
+			return;
+		}
+		processHarvestMessage(harvestMessage);
+		processRemoveCAMessage(removeCAMessage);
+	}
+
+	private void processRemoveCAMessage(RemoveCAMessage removeCAMessage) {
+		if (null == removeCAMessage) {
+			return;
+		}
+		String issuerName = removeCAMessage.getCAName();
+		LOG.debug("remove CA: " + issuerName);
+		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
+				.findCertificateAuthority(issuerName);
+		if (null == certificateAuthority) {
+			LOG.warn("CA not found: " + issuerName);
+			return;
+		}
+		int removeCount = this.certificateAuthorityDAO
+				.removeRevokedCertificates(issuerName);
+		LOG.debug("number of removed CRL cache entries: " + removeCount);
+		this.certificateAuthorityDAO
+				.removeCertificateAuthority(certificateAuthority);
+	}
+
+	private void processHarvestMessage(HarvestMessage harvestMessage) {
+		if (null == harvestMessage) {
 			return;
 		}
 		String caName = harvestMessage.getCaName();

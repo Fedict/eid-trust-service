@@ -204,4 +204,12 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 				.createNamedQuery(CertificateAuthorityEntity.QUERY_ACTIVE);
 		return (List<CertificateAuthorityEntity>) query.getResultList();
 	}
+
+	public void removeCertificateAuthority(CertificateAuthorityEntity ca) {
+		String caName = ca.getName();
+		CertificateAuthorityEntity caEntity = this.entityManager.find(
+				CertificateAuthorityEntity.class, caName);
+		LOG.debug("removing CA entity: " + caName);
+		this.entityManager.remove(caEntity);
+	}
 }
