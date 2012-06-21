@@ -32,6 +32,11 @@
 								<h:outputText value="#{item.name}" />
 							</rich:column>
 
+							<rich:column sortBy="#{item.expired}">
+								<f:facet name="header">#{messages.caExpired}</f:facet>
+								<h:outputText value="#{item.expired}" />
+							</rich:column>
+
 							<rich:column sortBy="#{item.status}">
 								<f:facet name="header">#{messages.cache}</f:facet>
 								<h:outputText value="#{item.status}" />

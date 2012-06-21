@@ -185,4 +185,14 @@ public class CertificateAuthorityEntity implements Serializable {
 			throw new RuntimeException("cert factory error: " + e.getMessage());
 		}
 	}
+
+	@Transient
+	public boolean isExpired() {
+		X509Certificate certificate = getCertificate();
+		Date now = new Date();
+		if (now.after(certificate.getNotAfter())) {
+			return true;
+		}
+		return false;
+	}
 }
