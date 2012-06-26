@@ -31,7 +31,10 @@ import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -61,6 +64,7 @@ import be.fedict.trust.service.SnmpConstants;
 import be.fedict.trust.service.dao.AuditDAO;
 import be.fedict.trust.service.dao.CertificateAuthorityDAO;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
+import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.Status;
 import be.fedict.trust.service.snmp.SNMP;
 import be.fedict.trust.service.snmp.SNMPInterceptor;
@@ -212,6 +216,17 @@ public class HarvesterMDB implements MessageListener {
 			return;
 		}
 
+		List<RevokedCertificateEntity> revokedCertificateEntities = this.certificateAuthorityDAO
+				.getRevokedCertificates(caName);
+		LOG.debug("number of revoked certificates in database: "
+				+ revokedCertificateEntities.size());
+		Map<String, RevokedCertificateEntity> revokedCertificatesMap = new HashMap<String, RevokedCertificateEntity>();
+		for (RevokedCertificateEntity revokedCertificateEntity : revokedCertificateEntities) {
+			String serialNumber = revokedCertificateEntity.getPk()
+					.getSerialNumber();
+			revokedCertificatesMap.put(serialNumber, revokedCertificateEntity);
+		}
+
 		LOG.debug("processing CRL... " + caName);
 		boolean isIndirect;
 		Enumeration revokedCertificatesEnum;
@@ -250,7 +265,8 @@ public class HarvesterMDB implements MessageListener {
 					 */
 					this.certificateAuthorityDAO.updateRevokedCertificates(
 							revokedCertsBatch, crlNumber,
-							crl.getIssuerX500Principal());
+							crl.getIssuerX500Principal(),
+							revokedCertificatesMap);
 					entries += revokedCertsBatch.size();
 					revokedCertsBatch.clear();
 					added = 0;
@@ -260,7 +276,8 @@ public class HarvesterMDB implements MessageListener {
 			 * Persist final batch
 			 */
 			this.certificateAuthorityDAO.updateRevokedCertificates(
-					revokedCertsBatch, crlNumber, crl.getIssuerX500Principal());
+					revokedCertsBatch, crlNumber, crl.getIssuerX500Principal(),
+					revokedCertificatesMap);
 			entries += revokedCertsBatch.size();
 
 			/*

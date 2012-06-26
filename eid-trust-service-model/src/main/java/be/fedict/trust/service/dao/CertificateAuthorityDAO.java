@@ -23,6 +23,7 @@ import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.Local;
@@ -88,9 +89,24 @@ public interface CertificateAuthorityDAO {
 			BigInteger crlNumber, X500Principal crlIssuer);
 
 	/**
+	 * Persist a batch of CRL entries to the database given the map of already
+	 * loaded database entities.
+	 * 
+	 * @param revokedCertificates
+	 * @param crlNumber
+	 * @param crlIssuer
+	 * @param revokedCertificateEntities
+	 */
+	void updateRevokedCertificates(Set<X509CRLEntry> revokedCertificates,
+			BigInteger crlNumber, X500Principal crlIssuer,
+			Map<String, RevokedCertificateEntity> revokedCertificatesMap);
+
+	/**
 	 * Remove all {@link RevokedCertificateEntity}'s for specified issuer.
 	 */
 	int removeRevokedCertificates(String issuerName);
+
+	List<RevokedCertificateEntity> getRevokedCertificates(String issuerName);
 
 	/**
 	 * @param issuerName

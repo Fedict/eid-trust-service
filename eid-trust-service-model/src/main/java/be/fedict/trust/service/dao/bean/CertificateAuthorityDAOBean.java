@@ -24,6 +24,7 @@ import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.Stateless;
@@ -141,11 +142,46 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 		}
 	}
 
-	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	//@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public void updateRevokedCertificates(
+			Set<X509CRLEntry> revokedCertificates, BigInteger crlNumber,
+			X500Principal crlIssuer,
+			Map<String, RevokedCertificateEntity> revokedCertificatesMap) {
+		LOG.debug("Update " + revokedCertificates.size()
+				+ " revoked certificates (crlNumber=" + crlNumber + ")");
+		for (X509CRLEntry revokedCertificate : revokedCertificates) {
+			X500Principal certificateIssuer = revokedCertificate
+					.getCertificateIssuer();
+			String issuerName;
+			if (null == certificateIssuer) {
+				issuerName = crlIssuer.toString();
+			} else {
+				issuerName = certificateIssuer.toString();
+			}
+			BigInteger serialNumber = revokedCertificate.getSerialNumber();
+			Date revocationDate = revokedCertificate.getRevocationDate();
+
+			// lookup
+			RevokedCertificateEntity revokedCertificateEntity = revokedCertificatesMap
+					.get(serialNumber.toString());
+
+			if (null != revokedCertificateEntity) {
+				// already exists, update revocationDate and crl number
+				revokedCertificateEntity.setRevocationDate(revocationDate);
+				revokedCertificateEntity.setCrlNumber(crlNumber);
+			} else {
+				// don't exist yet, add
+				this.entityManager.persist(new RevokedCertificateEntity(
+						issuerName, serialNumber, revocationDate, crlNumber));
+			}
+		}
+	}
+
+	//@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public int removeOldRevokedCertificates(BigInteger crlNumber,
 			String issuerName) {
 		LOG.debug("deleting revoked certificates (issuer=" + issuerName
-				+ " older than crl=" + crlNumber);
+				+ " older than crl=" + crlNumber + ")");
 		Query query = this.entityManager
 				.createNamedQuery(RevokedCertificateEntity.DELETE_WHERE_ISSUER_OLDER_CRL_NUMBER);
 		query.setParameter("issuer", issuerName);
@@ -211,5 +247,16 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 				CertificateAuthorityEntity.class, caName);
 		LOG.debug("removing CA entity: " + caName);
 		this.entityManager.remove(caEntity);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<RevokedCertificateEntity> getRevokedCertificates(
+			String issuerName) {
+		LOG.debug("get revoked certificates from database for CA: "
+				+ issuerName);
+		Query query = this.entityManager
+				.createNamedQuery(RevokedCertificateEntity.QUERY_WHERE_ISSUER);
+		query.setParameter("issuer", issuerName);
+		return query.getResultList();
 	}
 }
