@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1.RC1</version>
 	</parent>
 	<name>FedICT eID Trust Service Model</name>
 	<description>EJB3 Model for eID Trust Service</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-model</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1.RC1</version>
 	<packaging>ejb</packaging>
 	<build>
 		<plugins>
