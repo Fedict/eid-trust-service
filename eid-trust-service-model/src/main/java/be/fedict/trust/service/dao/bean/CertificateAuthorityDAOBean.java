@@ -142,7 +142,7 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 		}
 	}
 
-	//@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	// @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public void updateRevokedCertificates(
 			Set<X509CRLEntry> revokedCertificates, BigInteger crlNumber,
 			X500Principal crlIssuer,
@@ -177,7 +177,7 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 		}
 	}
 
-	//@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	// @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public int removeOldRevokedCertificates(BigInteger crlNumber,
 			String issuerName) {
 		LOG.debug("deleting revoked certificates (issuer=" + issuerName
@@ -223,6 +223,10 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 	}
 
 	public long getTotalCachedCertificates() {
+		/*
+		 * Oracle has problems executing this query. So we no longer use it
+		 * within the admin portal.
+		 */
 		Query query = this.entityManager
 				.createNamedQuery(RevokedCertificateEntity.QUERY_COUNT_ALL);
 		return (Long) query.getSingleResult();
