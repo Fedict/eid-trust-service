@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.1.RC2</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service Admin Portal Webapp</name>
 	<description>Admin Web Application for eID Trust Service</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-admin-portal-webapp</artifactId>
-	<version>1.0.1.RC2</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<build>
 		<plugins>
