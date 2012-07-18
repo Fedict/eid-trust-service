@@ -8,7 +8,6 @@
 	<name>FedICT eID Trust Service SNMP</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-snmp</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
 	<packaging>ejb</packaging>
 
 	<build>

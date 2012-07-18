@@ -10,7 +10,6 @@
 	<description>Startup Runtime for eID Trust Service</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-startup-runtime</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
 	<build>

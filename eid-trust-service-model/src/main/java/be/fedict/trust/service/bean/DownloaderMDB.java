@@ -152,6 +152,7 @@ public class DownloaderMDB implements MessageListener {
 			try {
 				PEMReader pemReader = new PEMReader(new FileReader(certFile));
 				certificate = (X509Certificate) pemReader.readObject();
+				pemReader.close();
 			} catch (Exception e2) {
 				retry("error PEM-parsing certificate", e, certFile, crlFile);
 			}

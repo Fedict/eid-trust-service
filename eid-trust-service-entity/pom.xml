@@ -9,7 +9,6 @@
 	<description>EJB3 Entities for eID Trust Service</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-entity</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>

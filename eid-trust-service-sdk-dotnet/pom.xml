@@ -10,7 +10,6 @@
 	<name>FedICT eID Trust Service .NET SDK</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-sdk-dotnet</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<build>

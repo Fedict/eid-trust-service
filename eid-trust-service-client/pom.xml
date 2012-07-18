@@ -8,7 +8,6 @@
 	<name>FedICT eID Trust Service Java Client</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-client</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<profiles>

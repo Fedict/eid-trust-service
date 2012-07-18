@@ -10,7 +10,6 @@
 	<description>Developer Guide for the eID Trust Service.</description>
 	<groupId>be.fedict.eid-trust-service</groupId>
 	<artifactId>eid-trust-service-devel-guide</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
 		<plugins>
