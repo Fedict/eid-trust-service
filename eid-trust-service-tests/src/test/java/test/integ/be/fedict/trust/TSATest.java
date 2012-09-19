@@ -18,11 +18,18 @@
 
 package test.integ.be.fedict.trust;
 
+import static org.junit.Assert.assertNotNull;
+
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.Security;
 import java.security.cert.CertStore;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -38,7 +45,6 @@ import org.bouncycastle.tsp.TimeStampResponse;
 import org.junit.Before;
 import org.junit.Test;
 
-import test.integ.be.fedict.trust.util.TestUtils;
 import be.fedict.trust.client.TrustServiceDomains;
 import be.fedict.trust.client.XKMS2Client;
 
@@ -96,8 +102,34 @@ public class TSATest {
 
 		LOG.debug("token received");
 		// send token to trust service
-		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
+		XKMS2Client client = new XKMS2Client(
+				"https://www.e-contract.be/eid-trust-service-ws/xkms2");
+		client.setProxy("proxy.yourict.net", 8080);
 		client.validate(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN,
 				tspResponse.getTimeStampToken());
+	}
+
+	@Test
+	public void testNewTSACertificateChain2012() throws Exception {
+		InputStream p7InputStream = TSATest.class
+				.getResourceAsStream("/Fedict2012Chainpub.p7c");
+		assertNotNull(p7InputStream);
+
+		CertificateFactory certificateFactory = CertificateFactory
+				.getInstance("X.509");
+		Collection<? extends Certificate> certificates = certificateFactory
+				.generateCertificates(p7InputStream);
+		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
+		LOG.debug("# of certificates: " + certificates.size());
+		for (Certificate certificate : certificates) {
+			LOG.debug("certificate: " + certificate);
+			certificateChain.add(0, (X509Certificate) certificate);
+		}
+
+		XKMS2Client client = new XKMS2Client(
+				"https://www.e-contract.be/eid-trust-service-ws/xkms2");
+		client.setProxy("proxy.yourict.net", 8080);
+		client.validate(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN,
+				certificateChain);
 	}
 }
