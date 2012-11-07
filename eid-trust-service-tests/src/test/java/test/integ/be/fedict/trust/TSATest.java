@@ -96,8 +96,10 @@ public class TSATest {
 
 		Collection<? extends Certificate> certificates = certStore
 				.getCertificates(null);
+		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
 		for (Certificate certificate : certificates) {
 			LOG.debug("certificate: " + certificate.toString());
+			certificateChain.add(0, (X509Certificate) certificate);
 		}
 
 		LOG.debug("token received");
@@ -106,7 +108,7 @@ public class TSATest {
 				"https://www.e-contract.be/eid-trust-service-ws/xkms2");
 		client.setProxy("proxy.yourict.net", 8080);
 		client.validate(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN,
-				tspResponse.getTimeStampToken());
+				certificateChain, true);
 	}
 
 	@Test
