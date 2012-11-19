@@ -126,14 +126,14 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		 */
 		Date thisUpdate = certificateAuthority.getThisUpdate();
 		if (null == thisUpdate) {
-			LOG.warn("no thisUpdate value");
+			LOG.warn("no thisUpdate value: " + certificateAuthority.getName());
 			SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
 					SnmpConstants.SNMP_SERVICE, 1L);
 			return null;
 		}
 		Date nextUpdate = certificateAuthority.getNextUpdate();
 		if (null == nextUpdate) {
-			LOG.warn("no nextUpdate value");
+			LOG.warn("no nextUpdate value: " + certificateAuthority.getName());
 			SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
 					SnmpConstants.SNMP_SERVICE, 1L);
 			return null;
@@ -142,13 +142,15 @@ public class TrustServiceTrustLinker implements TrustLinker {
 		 * First check whether the cached revocation data is up-to-date.
 		 */
 		if (thisUpdate.after(validationDate)) {
-			LOG.warn("cached CRL data too recent");
+			LOG.warn("cached CRL data too recent: "
+					+ certificateAuthority.getName());
 			SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
 					SnmpConstants.SNMP_SERVICE, 1L);
 			return null;
 		}
 		if (validationDate.after(nextUpdate)) {
-			LOG.warn("cached CRL data too old");
+			LOG.warn("cached CRL data too old: "
+					+ certificateAuthority.getName());
 			SNMPInterceptor.increment(SnmpConstants.CACHE_MISSES,
 					SnmpConstants.SNMP_SERVICE, 1L);
 			return null;
