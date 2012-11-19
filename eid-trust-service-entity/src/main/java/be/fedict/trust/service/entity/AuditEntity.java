@@ -34,7 +34,7 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "ts_audit")
 @NamedQueries({
-		@NamedQuery(name = AuditEntity.QUERY_LIST_ALL, query = "FROM AuditEntity"),
+		@NamedQuery(name = AuditEntity.QUERY_LIST_ALL, query = "FROM AuditEntity ORDER BY id DESC"),
 		@NamedQuery(name = AuditEntity.REMOVE_ALL, query = "DELETE FROM AuditEntity") })
 public class AuditEntity implements Serializable {
 

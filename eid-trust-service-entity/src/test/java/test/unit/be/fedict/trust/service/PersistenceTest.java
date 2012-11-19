@@ -36,6 +36,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import be.fedict.trust.service.entity.AuditEntity;
 import be.fedict.trust.service.entity.CertificateAuthorityEntity;
 import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.TrustDomainEntity;
@@ -80,6 +81,7 @@ public class PersistenceTest {
 		configuration.addAnnotatedClass(KeyUsageConstraintEntity.class);
 		configuration.addAnnotatedClass(QCStatementsConstraintEntity.class);
 		configuration.addAnnotatedClass(TrustPointEntity.class);
+		configuration.addAnnotatedClass(AuditEntity.class);
 		EntityManagerFactory entityManagerFactory = configuration
 				.buildEntityManagerFactory();
 
