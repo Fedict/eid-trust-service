@@ -9,7 +9,7 @@
 			anyway. -->
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.0.5-SNAPSHOT</version>
+		<version>1.0.5.GA</version>
 	</parent>
 	<artifactId>eid-trust-service</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
@@ -37,6 +37,7 @@
 		<module>eid-trust-service-client</module>
 		<module>eid-trust-service-startup-runtime</module>
 		<module>eid-trust-service-snmp</module>
+		<module>eid-trust-service-tests</module>
 	</modules>
 	<profiles>
 		<profile>
