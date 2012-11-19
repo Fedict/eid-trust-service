@@ -146,6 +146,16 @@ public class TrustServiceBean implements TrustService {
 			List<X509Certificate> certificateChain, boolean returnRevocationData)
 			throws TrustDomainNotFoundException {
 
+		if (null == certificateChain) {
+			throw new IllegalArgumentException(
+					"certificate chain should not be null");
+		}
+		for (X509Certificate certificate : certificateChain) {
+			if (null == certificate) {
+				throw new IllegalArgumentException(
+						"certificate chain entry should not be null");
+			}
+		}
 		LOG.debug("isValid: "
 				+ certificateChain.get(0).getSubjectX500Principal());
 

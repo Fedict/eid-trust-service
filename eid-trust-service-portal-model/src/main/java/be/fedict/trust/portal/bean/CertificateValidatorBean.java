@@ -91,6 +91,15 @@ public class CertificateValidatorBean implements CertificateValidator {
 		X509Certificate rootCert = (X509Certificate) this.sessionContext
 				.get(IdentityDataMessageHandler.ROOT_CERT_SESSION_ATTRIBTUE);
 
+		if (null == authnCert) {
+			this.log.error("no eID certificates in session");
+			this.authnResult = new ValidationResult(
+					new TrustLinkerResult(false), null);
+			this.signResult = new ValidationResult(
+					new TrustLinkerResult(false), null);
+			return;
+		}
+
 		/*
 		 * Validate authentication certificate chain
 		 */
