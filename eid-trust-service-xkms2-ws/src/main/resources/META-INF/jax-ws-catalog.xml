@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"
+	prefer="system">
+	<system systemId="http://www.w3.org/TR/xkms2/Schemas/xkms.xsd"
+		uri="../xkms.xsd" />
+	<system systemId="urn:be:fedict:trust:xkms:extensions" uri="../xkms-extensions.xsd" />
+	<system
+		systemId="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"
+		uri="../xmldsig-core-schema.xsd" />
+	<system systemId="http://www.w3.org/TR/xmlenc-core/xenc-schema.xsd"
+		uri="../xenc-schema.xsd" />
+	<system systemId="http://uri.etsi.org/01903/v1.3.2/XAdES.xsd"
+		uri="../xades.xsd" />
+</catalog>

@@ -4,9 +4,6 @@
 	<modelVersion>4.0.0</modelVersion>
 	<name>FedICT eID Trust Service Project</name>
 	<parent>
-		<!-- We want to limit duplicate work, so we reuse the eID Applet parent 
-			POM. The eID Applet project also holds our JBoss AS runtime configuration 
-			anyway. -->
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
 		<version>1.0.5.GA</version>
@@ -38,6 +35,7 @@
 		<module>eid-trust-service-startup-runtime</module>
 		<module>eid-trust-service-snmp</module>
 		<module>eid-trust-service-tests</module>
+		<module>eid-trust-service-tests-cxf</module>
 	</modules>
 	<profiles>
 		<profile>
@@ -262,6 +260,21 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-frontend-jaxws</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-transports-http</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.fedict.commons-eid</groupId>
+				<artifactId>commons-eid-jca</artifactId>
+				<version>0.2.1</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -394,6 +407,7 @@
 		<eid-applet.version>1.0.5.GA</eid-applet.version>
 		<jtrust.version>1.1.2</jtrust.version>
 		<eid-as.version>1.0.0-SNAPSHOT</eid-as.version>
+		<cxf.version>2.4.8</cxf.version>
 		<trust-service.data.source.user>trust</trust-service.data.source.user>
 		<trust-service.data.source.pass>trust</trust-service.data.source.pass>
 		<hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>

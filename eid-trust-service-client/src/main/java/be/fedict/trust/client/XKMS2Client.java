@@ -29,6 +29,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -57,7 +58,6 @@ import org.bouncycastle.ocsp.OCSPResp;
 import org.bouncycastle.tsp.TimeStampToken;
 import org.bouncycastle.x509.X509V2AttributeCertificate;
 
-import sun.security.timestamp.TimestampToken;
 import be.fedict.trust.client.exception.RevocationDataCorruptException;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
@@ -87,8 +87,6 @@ import be.fedict.trust.xkms2.ResultMajorCode;
 import be.fedict.trust.xkms2.ResultMinorCode;
 import be.fedict.trust.xkms2.XKMSConstants;
 import be.fedict.trust.xkms2.XKMSServiceFactory;
-
-import com.sun.xml.ws.developer.JAXWSProperties;
 
 /**
  * Client component for the eID Trust Service XKMS2 web service.
@@ -251,7 +249,8 @@ public class XKMS2Client {
 			// Setup TrustManager for validation
 			Map<String, Object> requestContext = ((BindingProvider) this.port)
 					.getRequestContext();
-			requestContext.put(JAXWSProperties.SSL_SOCKET_FACTORY,
+			requestContext.put(
+					"com.sun.xml.ws.transport.https.client.SSLSocketFactory",
 					sslContext.getSocketFactory());
 
 		} catch (KeyManagementException e) {
@@ -333,6 +332,28 @@ public class XKMS2Client {
 			RevocationDataNotFoundException, ValidationFailedException {
 
 		validate(null, certificateChain);
+	}
+
+	/**
+	 * Validates the given certificate chain against the default trust domain
+	 * configured at the trust service we are connecting to.
+	 * 
+	 * @param certificateChain
+	 *            the certificate chain to be validated.
+	 * @throws CertificateEncodingException
+	 * @throws TrustDomainNotFoundException
+	 * @throws RevocationDataNotFoundException
+	 * @throws ValidationFailedException
+	 */
+	public void validate(Certificate[] certificateChain)
+			throws CertificateEncodingException, TrustDomainNotFoundException,
+			RevocationDataNotFoundException, ValidationFailedException {
+		List<X509Certificate> x509CertificateChain = new LinkedList<X509Certificate>();
+		for (Certificate certificate : certificateChain) {
+			X509Certificate x509Certificate = (X509Certificate) certificate;
+			x509CertificateChain.add(x509Certificate);
+		}
+		validate(x509CertificateChain);
 	}
 
 	/**
