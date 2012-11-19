@@ -207,6 +207,9 @@ public class HarvesterMDB implements MessageListener {
 
 		BigInteger currentCrlNumber = this.certificateAuthorityDAO
 				.findCrlNumber(caName);
+		if (null != currentCrlNumber) {
+			LOG.debug("CRL number in database: " + currentCrlNumber);
+		}
 		if (null != currentCrlNumber
 				&& currentCrlNumber.compareTo(crlNumber) >= 0
 				&& certificateAuthority.getStatus() == Status.ACTIVE) {
