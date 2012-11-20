@@ -171,6 +171,19 @@ public class HarvesterMDB implements MessageListener {
 			return;
 		}
 
+		Date validationDate = new Date();
+
+		X509Certificate issuerCertificate = certificateAuthority
+				.getCertificate();
+
+		Date notAfter = issuerCertificate.getNotAfter();
+		if (validationDate.after(notAfter)) {
+			LOG.info("will not update CRL cache for expired CA: "
+					+ issuerCertificate.getSubjectX500Principal());
+			deleteCrlFile(crlFile);
+			return;
+		}
+
 		FileInputStream crlInputStream;
 		try {
 			crlInputStream = new FileInputStream(crlFile);
@@ -188,11 +201,6 @@ public class HarvesterMDB implements MessageListener {
 			deleteCrlFile(crlFile);
 			return;
 		}
-
-		Date validationDate = new Date();
-
-		X509Certificate issuerCertificate = certificateAuthority
-				.getCertificate();
 
 		LOG.debug("checking integrity CRL...");
 		boolean crlValid = CrlTrustLinker.checkCrlIntegrity(crl,
