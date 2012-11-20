@@ -226,6 +226,15 @@ public class TrustDomainBean implements TrustDomain {
 		this.log.debug("modify trust domain: #0",
 				this.selectedTrustDomain.getName());
 		this.useCaching = this.selectedTrustDomain.isUseCaching();
+		constraintsPolicyFactory();
+		constraintsKeyUsageFactory();
+		constraintsEndEntityFactory();
+		loadTree();
+		this.dnConstraint = null;
+		this.dn = null;
+		this.qcConstraint = null;
+		this.qc = false;
+		this.tsaConstraint = null;
 		for (CertificateConstraintEntity certificateConstraint : this.selectedTrustDomain
 				.getCertificateConstraints()) {
 			if (certificateConstraint instanceof DNConstraintEntity) {

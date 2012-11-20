@@ -144,6 +144,7 @@ public class TrustPointBean implements TrustPoint {
 		this.log.debug("modify: #0", this.selectedTrustPoint.getName());
 		this.crlRefreshCronSchedule = this.selectedTrustPoint
 				.getCrlRefreshCronSchedule();
+		trustPointCAListFactory();
 		return "modify";
 	}
 
