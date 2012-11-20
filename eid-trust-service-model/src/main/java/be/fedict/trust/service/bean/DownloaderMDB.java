@@ -30,6 +30,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
@@ -178,6 +179,16 @@ public class DownloaderMDB implements MessageListener {
 			return;
 		}
 		LOG.debug("CRL matches CA: " + certificate.getSubjectX500Principal());
+
+		// skip expired CAs
+		Date now = new Date();
+		Date notAfter = certificate.getNotAfter();
+		if (now.after(notAfter)) {
+			LOG.warn("CA already expired: "
+					+ certificate.getSubjectX500Principal());
+			crlFile.delete();
+			return;
+		}
 
 		// create database entitities
 		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
