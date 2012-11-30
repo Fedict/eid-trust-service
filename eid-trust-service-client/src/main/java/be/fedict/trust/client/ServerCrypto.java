@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2009-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -19,15 +19,19 @@
 package be.fedict.trust.client;
 
 import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.cert.Certificate;
+import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import javax.security.auth.callback.CallbackHandler;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 
 /**
  * WSS4J Crypto implementation. This component is used by wss4j during
@@ -35,151 +39,123 @@ import org.apache.ws.security.components.crypto.Crypto;
  * {@link X509Certificate}
  * 
  * @author wvdhaute
- * 
+ * @author Frank Cornelis
  */
 public class ServerCrypto implements Crypto {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getAliasForX509Cert(Certificate certificate) {
+	private static final Log LOG = LogFactory.getLog(ServerCrypto.class);
 
+	private X509Certificate certificate;
+
+	public byte[] getBytesFromCertificates(X509Certificate[] certs)
+			throws WSSecurityException {
+		LOG.debug("getBytesFromCertificates");
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getAliasForX509Cert(String issuer) {
-
+	public CertificateFactory getCertificateFactory()
+			throws WSSecurityException {
+		LOG.debug("getCertificateFactory");
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getAliasForX509Cert(byte[] subjectKeyIdentifier) {
-
+	public X509Certificate[] getCertificatesFromBytes(byte[] data)
+			throws WSSecurityException {
+		LOG.debug("getCertificatesFromBytes");
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getAliasForX509Cert(String issuer, BigInteger serialNumber) {
-
+	public String getCryptoProvider() {
+		LOG.debug("getCryptoProvider");
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getAliasForX509CertThumb(byte[] thumb) {
-
+	public String getDefaultX509Identifier() throws WSSecurityException {
+		LOG.debug("getDefaultX509Identifier");
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String[] getAliasesForDN(String subjectDN) {
-
+	public PrivateKey getPrivateKey(X509Certificate certificate,
+			CallbackHandler callbackHandler) throws WSSecurityException {
+		LOG.debug("getPrivateKey(cert, callback)");
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public byte[] getCertificateData(boolean reverse,
-			X509Certificate[] certificates) {
-
+	public PrivateKey getPrivateKey(String identifier, String password)
+			throws WSSecurityException {
+		LOG.debug("getPrivateKey(identifier, password)");
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public CertificateFactory getCertificateFactory() {
-
+	public byte[] getSKIBytesFromCert(X509Certificate cert)
+			throws WSSecurityException {
+		LOG.debug("getSKIBytesFromCert");
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public X509Certificate[] getCertificates(String alias) {
+	public X509Certificate[] getX509Certificates(CryptoType cryptoType)
+			throws WSSecurityException {
+		LOG.debug("getX509Certificates: " + cryptoType.getSubjectDN());
+		// trusting everything here... not to be used for production
+		return new X509Certificate[] { this.certificate };
+	}
 
+	public String getX509Identifier(X509Certificate cert)
+			throws WSSecurityException {
+		LOG.debug("getX509Identifier");
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getDefaultX509Alias() {
-
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public KeyStore getKeyStore() {
-
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public PrivateKey getPrivateKey(String alias, String password)
-			throws Exception {
-
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public byte[] getSKIBytesFromCert(X509Certificate certificate) {
-
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public X509Certificate[] getX509Certificates(byte[] data, boolean reverse) {
-
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public X509Certificate loadCertificate(InputStream inputStream) {
-
+	public X509Certificate loadCertificate(InputStream in)
+			throws WSSecurityException {
+		LOG.debug("loadCertificate");
 		CertificateFactory certificateFactory;
 		try {
 			certificateFactory = CertificateFactory.getInstance("X.509");
 		} catch (CertificateException e) {
-			throw new RuntimeException("cert error: " + e.getMessage());
+			throw new WSSecurityException("X509 algo", e);
 		}
 		X509Certificate certificate;
 		try {
 			certificate = (X509Certificate) certificateFactory
-					.generateCertificate(inputStream);
+					.generateCertificate(in);
 		} catch (CertificateException e) {
-			throw new RuntimeException("cert error: " + e.getMessage());
+			throw new WSSecurityException("X509 error: " + e.getMessage(), e);
+		}
+		if (null == this.certificate) {
+			LOG.debug("trusting incoming certificate as is");
+			this.certificate = certificate;
 		}
 		return certificate;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean validateCertPath(X509Certificate[] certificates) {
+	public void setCertificateFactory(String provider,
+			CertificateFactory certFactory) {
+		LOG.debug("setCertifiateFactory");
+	}
 
+	public void setCryptoProvider(String provider) {
+		LOG.debug("setCryptoProvider");
+	}
+
+	public void setDefaultX509Identifier(String identifier) {
+		LOG.debug("setDefaultX509Identifier");
+	}
+
+	public boolean verifyTrust(X509Certificate[] certs)
+			throws WSSecurityException {
+		LOG.debug("verifyTrust(certs)");
 		return false;
 	}
 
+	public boolean verifyTrust(PublicKey publicKey) throws WSSecurityException {
+		LOG.debug("verifyTrust(publicKey)");
+		return false;
+	}
+
+	public boolean verifyTrust(X509Certificate[] certs, boolean enableRevocation)
+			throws WSSecurityException {
+		LOG.debug("verifyTrust(certs, enableRevocation)");
+		return false;
+	}
 }

@@ -248,7 +248,7 @@
 			<dependency>
 				<groupId>org.apache.ws.security</groupId>
 				<artifactId>wss4j</artifactId>
-				<version>1.5.8</version>
+				<version>1.6.7</version>
 				<exclusions>
 					<exclusion>
 						<groupId>xalan</groupId>
@@ -259,6 +259,11 @@
 						<artifactId>xercesImpl</artifactId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.santuario</groupId>
+				<artifactId>xmlsec</artifactId>
+				<version>1.5.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.cxf</groupId>

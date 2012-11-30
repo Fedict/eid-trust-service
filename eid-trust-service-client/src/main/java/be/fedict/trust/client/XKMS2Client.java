@@ -213,6 +213,7 @@ public class XKMS2Client {
 								.toString());
 				LOG.debug("authentication type: " + authType);
 				if (null == publicKey) {
+					LOG.warn("not performing any server certificate validation at all");
 					return;
 				}
 

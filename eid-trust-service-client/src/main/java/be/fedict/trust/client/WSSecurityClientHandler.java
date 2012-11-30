@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2009-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -19,31 +19,27 @@
 package be.fedict.trust.client;
 
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.Timestamp;
-import org.joda.time.DateTime;
-import org.joda.time.Instant;
+import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * WS-Security client SOAP handler that will validate the WS-Security header if
@@ -51,6 +47,7 @@ import org.joda.time.Instant;
  * WS-Security header will be checked against this.
  * 
  * @author wvdhaute
+ * @author Frank Cornelis
  */
 public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> {
 
@@ -143,7 +140,7 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 			/*
 			 * Validate incoming WS-Security header if present
 			 */
-			handleInboundDocument(soapPart, soapMessageContext);
+			return handleInboundDocument(soapPart, soapMessageContext);
 		}
 
 		return true;
@@ -151,117 +148,63 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 
 	/**
 	 * Handles the inbound SOAP message. If a WS-Security header is present, it
-	 * will be validates. If a server certificate was specified, it will be
+	 * will be validated. If a server certificate was specified, it will be
 	 * checked against the {@link X509Certificate} in the WS-Security header.
 	 */
-	private void handleInboundDocument(SOAPPart document,
+	private boolean handleInboundDocument(SOAPPart document,
 			SOAPMessageContext soapMessageContext) {
+		WSSecurityEngine securityEngine = new WSSecurityEngine();
+		WSSConfig wssConfig = WSSConfig.getNewInstance();
+		securityEngine.setWssConfig(wssConfig);
 
-		WSSecurityEngine securityEngine = WSSecurityEngine.getInstance();
-		Crypto crypto = new ServerCrypto();
-
-		Vector<WSSecurityEngineResult> wsSecurityEngineResults;
+		List<WSSecurityEngineResult> wsSecurityEngineResults;
 		try {
-			@SuppressWarnings("unchecked")
-			Vector<WSSecurityEngineResult> checkedWsSecurityEngineResults = securityEngine
-					.processSecurityHeader(document, null, null, crypto);
-			wsSecurityEngineResults = checkedWsSecurityEngineResults;
+			Crypto crypto = new ServerCrypto();
+			wsSecurityEngineResults = securityEngine.processSecurityHeader(
+					document, null, null, crypto);
 		} catch (WSSecurityException e) {
 			LOG.debug("WS-Security error: " + e.getMessage(), e);
-			throw createSOAPFaultException(ERROR_INVALID_SIGNATURE,
-					"FailedCheck");
+			throw new SecurityException("WS-Security error: " + e.getMessage(),
+					e);
 		}
 		if (null == wsSecurityEngineResults) {
 			LOG.debug("No WS-Security header to validate");
-			return;
+			return true;
 		}
-
 		LOG.debug("WS-Security header validation");
 
-		Timestamp timestamp = null;
-		X509Certificate signingCertificate = null;
-		Set<String> signedElements = null;
-		for (WSSecurityEngineResult result : wsSecurityEngineResults) {
-			@SuppressWarnings("unchecked")
-			Set<String> resultSignedElements = (Set<String>) result
-					.get(WSSecurityEngineResult.TAG_SIGNED_ELEMENT_IDS);
-			if (null != resultSignedElements) {
-				signedElements = resultSignedElements;
-			}
-
-			if (null != result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE)) {
-				signingCertificate = (X509Certificate) result
-						.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-			}
-
-			Timestamp resultTimestamp = (Timestamp) result
-					.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-			if (null != resultTimestamp) {
-				timestamp = resultTimestamp;
-			}
+		// WS-Security timestamp validation
+		WSSecurityEngineResult timeStampActionResult = WSSecurityUtil
+				.fetchActionResult(wsSecurityEngineResults, WSConstants.TS);
+		if (null == timeStampActionResult) {
+			throw new SecurityException("no WS-Security timestamp result");
+		}
+		Timestamp receivedTimestamp = (Timestamp) timeStampActionResult
+				.get(WSSecurityEngineResult.TAG_TIMESTAMP);
+		if (null == receivedTimestamp) {
+			throw new SecurityException(ERROR_TIMESTAMP_MISSING);
 		}
 
-		if (null == signedElements) {
-			throw createSOAPFaultException(ERROR_INVALID_SIGNATURE,
-					"FailedCheck");
+		// WS-Security signature
+		WSSecurityEngineResult signActionResult = WSSecurityUtil
+				.fetchActionResult(wsSecurityEngineResults, WSConstants.SIGN);
+		if (null == signActionResult) {
+			throw new SecurityException("missing WS-Security signature");
 		}
-		LOG.debug("signed elements: " + signedElements);
+		X509Certificate signingCertificate = (X509Certificate) signActionResult
+				.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
 
 		/*
 		 * Validate certificate
 		 */
 		if (null == signingCertificate) {
-			throw createSOAPFaultException(ERROR_CERTIFICATE_MISSING,
-					"InvalidSecurity");
+			throw new SecurityException(ERROR_CERTIFICATE_MISSING);
 		}
-		if (null != serverCertificate
+		if (null != this.serverCertificate
 				&& !serverCertificate.equals(signingCertificate)) {
-			throw createSOAPFaultException(ERROR_CERTIFICATE_MISMATCH,
-					"FailedCheck");
+			throw new SecurityException(ERROR_CERTIFICATE_MISMATCH);
 		}
 
-		/*
-		 * Check timestamp.
-		 */
-		if (null == timestamp) {
-			throw createSOAPFaultException(ERROR_TIMESTAMP_MISSING,
-					"InvalidSecurity");
-		}
-		String timestampId = timestamp.getID();
-		if (false == signedElements.contains(timestampId)) {
-			throw createSOAPFaultException("Timestamp not signed",
-					"FailedCheck");
-		}
-		Calendar created = timestamp.getCreated();
-		DateTime createdDateTime = new DateTime(created);
-		Instant createdInstant = createdDateTime.toInstant();
-		Instant nowInstant = new DateTime().toInstant();
-		long offset = Math.abs(createdInstant.getMillis()
-				- nowInstant.getMillis());
-		if (offset > maxTimestampOffset) {
-			LOG.debug("timestamp offset: " + offset);
-			LOG.debug("maximum allowed offset: " + maxTimestampOffset);
-			throw createSOAPFaultException(ERROR_TIMESTAMP_OFFSET,
-					"FailedCheck");
-		}
+		return true;
 	}
-
-	public static SOAPFaultException createSOAPFaultException(
-			String faultString, String wsseFaultCode) {
-
-		SOAPFault soapFault;
-		try {
-			SOAPFactory soapFactory = SOAPFactory.newInstance();
-			soapFault = soapFactory
-					.createFault(
-							faultString,
-							new QName(
-									"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-									wsseFaultCode, "wsse"));
-		} catch (SOAPException e) {
-			throw new RuntimeException("SOAP error");
-		}
-		return new SOAPFaultException(soapFault);
-	}
-
 }
