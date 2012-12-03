@@ -64,10 +64,6 @@
 			<artifactId>wss4j</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>be.fedict</groupId>
-			<artifactId>jtrust</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging-api</artifactId>
 		</dependency>
