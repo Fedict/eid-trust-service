@@ -58,6 +58,7 @@ import org.bouncycastle.ocsp.OCSPResp;
 import org.bouncycastle.tsp.TimeStampToken;
 import org.bouncycastle.x509.X509V2AttributeCertificate;
 
+import sun.security.timestamp.TimestampToken;
 import be.fedict.trust.client.exception.RevocationDataCorruptException;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
@@ -139,7 +140,6 @@ public class XKMS2Client {
 	 *            enable logging on or not
 	 */
 	public void setLogging(boolean logging) {
-
 		if (logging) {
 			registerLoggerHandler(this.port);
 		} else {
@@ -161,7 +161,7 @@ public class XKMS2Client {
 
 	/**
 	 * Set the optional server {@link X509Certificate}. If specified and the
-	 * trust service has message signing configured, the incoming
+	 * trust service has WS-Security message signing configured, the incoming
 	 * {@link X509Certificate} will be checked against the specified
 	 * {@link X509Certificate}.
 	 * 
@@ -169,33 +169,19 @@ public class XKMS2Client {
 	 *            the server X509 certificate.
 	 */
 	public void setServerCertificate(X509Certificate serverCertificate) {
-
 		this.wsSecurityClientHandler.setServerCertificate(serverCertificate);
-	}
-
-	/**
-	 * Set the maximum offset of the WS-Security timestamp ( in seconds ). If
-	 * not specified this will be defaulted to 5 minutes.
-	 * 
-	 * @param maxWSSecurityTimestampOffset
-	 *            maximum WS Security Timestamp offset
-	 */
-	public void setMaxWSSecurityTimestampOffset(
-			long maxWSSecurityTimestampOffset) {
-
-		this.wsSecurityClientHandler
-				.setMaxWSSecurityTimestampOffset(maxWSSecurityTimestampOffset * 1000);
 	}
 
 	/**
 	 * If set, unilateral TLS authentication will occurs, verifying the server
 	 * {@link X509Certificate} specified {@link PublicKey}.
+	 * <p/>
+	 * WARNING: only works when using the JAX-WS RI.
 	 * 
 	 * @param publicKey
 	 *            public key to validate server TLS certificate against.
 	 */
 	public void setServicePublicKey(final PublicKey publicKey) {
-
 		// Create TrustManager
 		TrustManager[] trustManager = { new X509TrustManager() {
 
@@ -279,12 +265,10 @@ public class XKMS2Client {
 	/**
 	 * Registers the logging SOAP handler on the given JAX-WS port component.
 	 */
-	protected void registerLoggerHandler(Object port) {
-
+	private void registerLoggerHandler(Object port) {
 		BindingProvider bindingProvider = (BindingProvider) port;
-
 		Binding binding = bindingProvider.getBinding();
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = binding.getHandlerChain();
 		handlerChain.add(new LoggingSoapHandler());
 		binding.setHandlerChain(handlerChain);
@@ -294,12 +278,9 @@ public class XKMS2Client {
 	 * Unregister possible logging SOAP handlers on the given JAX-WS port
 	 * component.
 	 */
-	protected void removeLoggerHandler(Object port) {
-
+	private void removeLoggerHandler(Object port) {
 		BindingProvider bindingProvider = (BindingProvider) port;
-
 		Binding binding = bindingProvider.getBinding();
-		@SuppressWarnings("unchecked")
 		List<Handler> handlerChain = binding.getHandlerChain();
 		Iterator<Handler> iter = handlerChain.iterator();
 		while (iter.hasNext()) {
@@ -307,21 +288,18 @@ public class XKMS2Client {
 			if (handler instanceof LoggingSoapHandler) {
 				iter.remove();
 			}
-
 		}
+		binding.setHandlerChain(handlerChain);
 	}
 
-	protected void registeredWSSecurityHandler(Object port) {
-
+	private void registeredWSSecurityHandler(Object port) {
 		BindingProvider bindingProvider = (BindingProvider) port;
-
 		Binding binding = bindingProvider.getBinding();
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = binding.getHandlerChain();
 		this.wsSecurityClientHandler = new WSSecurityClientHandler();
 		handlerChain.add(this.wsSecurityClientHandler);
 		binding.setHandlerChain(handlerChain);
-
 	}
 
 	/**
@@ -331,7 +309,6 @@ public class XKMS2Client {
 	public void validate(List<X509Certificate> certificateChain)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException {
-
 		validate(null, certificateChain);
 	}
 
@@ -371,7 +348,6 @@ public class XKMS2Client {
 			boolean returnRevocationData) throws CertificateEncodingException,
 			TrustDomainNotFoundException, RevocationDataNotFoundException,
 			ValidationFailedException {
-
 		validate(null, certificateChain, returnRevocationData);
 	}
 
@@ -383,7 +359,6 @@ public class XKMS2Client {
 			List<X509Certificate> certificateChain)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException {
-
 		validate(trustDomain, certificateChain, false);
 	}
 
@@ -401,7 +376,6 @@ public class XKMS2Client {
 			List<X509Certificate> certificateChain, boolean returnRevocationData)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException {
-
 		validate(trustDomain, certificateChain, returnRevocationData, null,
 				null, null, null, null, null);
 	}
@@ -415,7 +389,6 @@ public class XKMS2Client {
 			List<OCSPResp> ocspResponses, List<X509CRL> crls)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException {
-
 		if ((null == ocspResponses || ocspResponses.isEmpty())
 				&& (null == crls || crls.isEmpty())) {
 			LOG.error("No revocation data for historical validation.");
@@ -454,7 +427,6 @@ public class XKMS2Client {
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException,
 			RevocationDataCorruptException {
-
 		if ((null == ocspResponses || ocspResponses.isEmpty())
 				&& (null == crls || crls.isEmpty())) {
 			LOG.error("No revocation data for historical validation.");
@@ -494,7 +466,6 @@ public class XKMS2Client {
 			RevocationValuesType revocationValues)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException {
-
 		if (null == revocationValues) {
 			LOG.error("No revocation data for historical validation.");
 			throw new RevocationDataNotFoundException();
@@ -511,7 +482,6 @@ public class XKMS2Client {
 	public void validate(String trustDomain, TimeStampToken timeStampToken)
 			throws TrustDomainNotFoundException, CertificateEncodingException,
 			RevocationDataNotFoundException, ValidationFailedException {
-
 		LOG.debug("validate timestamp token");
 		validate(trustDomain, new LinkedList<X509Certificate>(), false, null,
 				null, null, revocationValues, timeStampToken, null);
@@ -530,7 +500,6 @@ public class XKMS2Client {
 			CertifiedRolesListType attributeCertificates)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException {
-
 		LOG.debug("validate attribute certificate");
 		validate(trustDomain, certificateChain, false, null, null, null,
 				revocationValues, null, attributeCertificates);
@@ -545,9 +514,7 @@ public class XKMS2Client {
 			CertifiedRolesListType attributeCertificates)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException {
-
 		LOG.debug("validate");
-
 		be.fedict.trust.client.jaxb.xkms.ObjectFactory objectFactory = new be.fedict.trust.client.jaxb.xkms.ObjectFactory();
 		be.fedict.trust.client.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory = new be.fedict.trust.client.jaxb.xmldsig.ObjectFactory();
 
@@ -605,14 +572,12 @@ public class XKMS2Client {
 		 * Historical validation, add the revocation data to the request
 		 */
 		if (null != validationDate) {
-
 			TimeInstantType timeInstant = objectFactory.createTimeInstantType();
 			timeInstant.setTime(getXmlGregorianCalendar(validationDate));
 			queryKeyBinding.setTimeInstant(timeInstant);
 
 			addRevocationData(validateRequest, ocspResponses, crls,
 					revocationValues);
-
 		}
 
 		ValidateResultType validateResult = this.port.validate(validateRequest);
@@ -662,7 +627,6 @@ public class XKMS2Client {
 	private void addRevocationData(ValidateRequestType validateRequest,
 			List<byte[]> ocspResponses, List<byte[]> crls,
 			RevocationValuesType revocationData) {
-
 		be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
 		RevocationDataMessageExtensionType revocationDataMessageExtension = extensionsObjectFactory
 				.createRevocationDataMessageExtensionType();
@@ -708,7 +672,6 @@ public class XKMS2Client {
 	 */
 	private void addTimeStampToken(ValidateRequestType validateRequest,
 			TimeStampToken timeStampToken) {
-
 		be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
 		be.fedict.trust.client.jaxb.xades132.ObjectFactory xadesObjectFactory = new be.fedict.trust.client.jaxb.xades132.ObjectFactory();
 
@@ -732,7 +695,6 @@ public class XKMS2Client {
 	 */
 	private void addAttributeCertificates(ValidateRequestType validateRequest,
 			CertifiedRolesListType attributeCertificates) {
-
 		be.fedict.trust.xkms.extensions.ObjectFactory extensionsObjectFactory = new be.fedict.trust.xkms.extensions.ObjectFactory();
 
 		AttributeCertificateMessageExtensionType attributeCertificateMessageExtension = extensionsObjectFactory
@@ -748,7 +710,6 @@ public class XKMS2Client {
 	 */
 	private void checkResponse(ValidateResultType validateResult)
 			throws TrustDomainNotFoundException {
-
 		if (!validateResult.getResultMajor().equals(
 				ResultMajorCode.SUCCESS.getErrorCode())) {
 
@@ -756,7 +717,6 @@ public class XKMS2Client {
 					ResultMinorCode.TRUST_DOMAIN_NOT_FOUND.getErrorCode())) {
 				throw new TrustDomainNotFoundException();
 			}
-
 		}
 	}
 
@@ -765,7 +725,6 @@ public class XKMS2Client {
 	 * <code>null</code> if this was not specified.
 	 */
 	public RevocationValuesType getRevocationValues() {
-
 		return this.revocationValues;
 	}
 
@@ -776,12 +735,10 @@ public class XKMS2Client {
 	 *      2.0</a>
 	 */
 	public List<String> getInvalidReasons() {
-
 		return this.invalidReasonURIs;
 	}
 
 	private XMLGregorianCalendar getXmlGregorianCalendar(Date date) {
-
 		try {
 			DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
 
@@ -795,5 +752,4 @@ public class XKMS2Client {
 			throw new RuntimeException("datatype config error");
 		}
 	}
-
 }

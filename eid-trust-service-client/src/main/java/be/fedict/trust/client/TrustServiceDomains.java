@@ -1,6 +1,6 @@
 /*
  * eID Trust Service Project.
- * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2009-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -19,7 +19,8 @@
 package be.fedict.trust.client;
 
 /**
- * Some general constants.
+ * Constants for trust domains available within default installations of the eID
+ * Trust Service.
  * 
  * @author wvdhaute
  */

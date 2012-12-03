@@ -63,15 +63,6 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 	public static final long defaultMaxTimestampOffset = 1000 * 60 * 5L;
 
 	private X509Certificate serverCertificate;
-	private long maxTimestampOffset;
-
-	/**
-	 * Main constructor.
-	 */
-	public WSSecurityClientHandler() {
-
-		this.maxTimestampOffset = defaultMaxTimestampOffset;
-	}
 
 	/**
 	 * Set the optional server {@link X509Certificate}. If specified and the
@@ -83,25 +74,10 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 	 *            the server X509 certificate.
 	 */
 	public void setServerCertificate(X509Certificate serverCertificate) {
-
 		this.serverCertificate = serverCertificate;
 	}
 
-	/**
-	 * Set the maximum offset of the WS-Security timestamp ( in ms ). If not
-	 * specified this will be defaulted to 5 minutes.
-	 */
-	public void setMaxWSSecurityTimestampOffset(
-			long maxWSSecurityTimestampOffset) {
-
-		this.maxTimestampOffset = maxWSSecurityTimestampOffset;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public Set<QName> getHeaders() {
-
 		Set<QName> headers = new HashSet<QName>();
 		headers.add(new QName(
 				"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
@@ -109,27 +85,15 @@ public class WSSecurityClientHandler implements SOAPHandler<SOAPMessageContext> 
 		return headers;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void close(MessageContext messageContext) {
-
 		// empty
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean handleFault(SOAPMessageContext soapMessageContext) {
-
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean handleMessage(SOAPMessageContext soapMessageContext) {
-
 		Boolean outboundProperty = (Boolean) soapMessageContext
 				.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 
