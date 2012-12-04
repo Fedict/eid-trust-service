@@ -297,6 +297,12 @@ export PATH=$JAVA_HOME/bin:$PATH]]></programlisting>
 				command:
 				<programlisting><![CDATA[java -version]]></programlisting>
 			</para>
+			<para>
+				The eID Trust Service also has been tested on a Java 7 runtime.
+				If you want to run the eID services on a Java 7 runtime, we
+				recommend Java 7u9+. In the past, previous versions of the JVM
+				resulted in various errors.
+			</para>
 		</section>
 		<section>
 			<title>JBoss Application Server</title>
