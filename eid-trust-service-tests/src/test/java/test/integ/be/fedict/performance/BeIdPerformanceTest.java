@@ -53,10 +53,11 @@ public class BeIdPerformanceTest implements PerformanceTest {
 	// private static final String XKMS_LOCATION =
 	// "http://sebeco-dev-11:8080/eid-trust-service-ws/xkms2";
 	private static final String PROXY_HOST = "proxy.yourict.net";
-	// private static final String PROXY_HOST = null;
+	//private static final String PROXY_HOST = null;
 	private static final int PROXY_PORT = 8080;
 
-	private static final int INTERVAL_SIZE = 1000 * 60 * 5;
+	//private static final int INTERVAL_SIZE = 1000 * 60 * 5;
+	private static final int INTERVAL_SIZE = 1000 * 1;
 
 	@Before
 	public void setUp() {
