@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-applet</artifactId>
-		<version>1.1.0.RC2</version>
+		<version>1.1.2</version>
 	</parent>
 	<artifactId>eid-trust-service</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
@@ -213,7 +213,7 @@
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>5.1.21</version>
+				<version>5.1.27</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle</groupId>
@@ -429,9 +429,9 @@
 
 	<!-- Default properties -->
 	<properties>
-		<eid-applet.version>1.1.0.RC2</eid-applet.version>
+		<eid-applet.version>1.1.2</eid-applet.version>
 		<jtrust.version>1.1.2</jtrust.version>
-		<eid-as.version>1.0.0.RC1</eid-as.version>
+		<eid-as.version>1.0.0.RC2</eid-as.version>
 		<cxf.version>2.4.8</cxf.version>
 		<trust-service.data.source.user>trust</trust-service.data.source.user>
 		<trust-service.data.source.pass>trust</trust-service.data.source.pass>

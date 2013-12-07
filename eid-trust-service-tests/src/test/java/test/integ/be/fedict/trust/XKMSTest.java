@@ -48,9 +48,10 @@ public class XKMSTest {
 
 	private static final Log LOG = LogFactory.getLog(XKMSTest.class);
 
-	 private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
-	 "proxy.yourict.net", 8080);
-	//private static final NetworkConfig NETWORK_CONFIG = null;
+	private static final NetworkConfig NETWORK_CONFIG = new NetworkConfig(
+			"proxy.yourict.net", 8080);
+
+	// private static final NetworkConfig NETWORK_CONFIG = null;
 
 	@Before
 	public void setUp() {
@@ -64,8 +65,9 @@ public class XKMSTest {
 		List<X509Certificate> authnCertificateChain = TestUtils
 				.getAuthnCertificateChain();
 
-		XKMS2Client client = new XKMS2Client(TestUtils.XKMS_WS_LOCATION);
-		client.validate(authnCertificateChain);
+		XKMS2Client client = new XKMS2Client(
+				"https://www.e-contract.be/eid-trust-service-ws/xkms2");
+		client.validate("BE-AUTH", authnCertificateChain);
 	}
 
 	@Test
