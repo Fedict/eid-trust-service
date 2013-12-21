@@ -1,6 +1,7 @@
 /*
  * eID Trust Service Project.
  * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2013 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -57,6 +58,7 @@ import be.fedict.trust.service.snmp.SNMPInterceptor;
  * Initialization Service Bean implementation.
  * 
  * @author wvdhaute
+ * @author Frank Cornelis
  */
 @Stateless
 public class InitializationServiceBean implements InitializationService {
@@ -380,6 +382,24 @@ public class InitializationServiceBean implements InitializationService {
 			rootCa.setTrustPoint(rootCaTrustPoint);
 		}
 		trustPoints.add(rootCa.getTrustPoint());
+
+		// Baltimore CA
+		X509Certificate baltimoreCertificate = loadCertificate("be/fedict/trust/baltimore.crt");
+		CertificateAuthorityEntity baltimoreCa = this.certificateAuthorityDAO
+				.findCertificateAuthority(baltimoreCertificate);
+		if (null == baltimoreCa) {
+			baltimoreCa = this.certificateAuthorityDAO.addCertificateAuthority(
+					baltimoreCertificate, null);
+		}
+
+		if (null == baltimoreCa.getTrustPoint()) {
+			TrustPointEntity baltimoreTrustPoint = this.trustDomainDAO
+					.addTrustPoint(
+							TrustServiceConstants.DEFAULT_CRON_EXPRESSION,
+							baltimoreCa);
+			baltimoreCa.setTrustPoint(baltimoreTrustPoint);
+		}
+		trustPoints.add(baltimoreCa.getTrustPoint());
 
 		// Belgian TSA trust domain
 		TrustDomainEntity trustDomain = this.trustDomainDAO
