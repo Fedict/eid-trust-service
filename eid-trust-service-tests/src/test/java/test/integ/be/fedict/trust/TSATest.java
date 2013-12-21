@@ -1,6 +1,7 @@
 /*
  * eID Trust Service Project.
  * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2013 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -52,6 +53,7 @@ import be.fedict.trust.client.XKMS2Client;
  * TSA Test.
  * 
  * @author wvdhaute
+ * @author Frank Cornelis
  */
 public class TSATest {
 
@@ -131,6 +133,28 @@ public class TSATest {
 		XKMS2Client client = new XKMS2Client(
 				"https://www.e-contract.be/eid-trust-service-ws/xkms2");
 		client.setProxy("proxy.yourict.net", 8080);
+		client.validate(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN,
+				certificateChain);
+	}
+
+	@Test
+	public void testTSA2014() throws Exception {
+		InputStream p7InputStream = TSATest.class
+				.getResourceAsStream("/tsa-2014-chain.der");
+		assertNotNull(p7InputStream);
+
+		CertificateFactory certificateFactory = CertificateFactory
+				.getInstance("X.509");
+		Collection<? extends Certificate> certificates = certificateFactory
+				.generateCertificates(p7InputStream);
+		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
+		LOG.debug("# of certificates: " + certificates.size());
+		for (Certificate certificate : certificates) {
+			certificateChain.add((X509Certificate) certificate);
+		}
+
+		XKMS2Client client = new XKMS2Client(
+				"https://www.e-contract.be/eid-trust-service-ws/xkms2");
 		client.validate(TrustServiceDomains.BELGIAN_TSA_TRUST_DOMAIN,
 				certificateChain);
 	}
