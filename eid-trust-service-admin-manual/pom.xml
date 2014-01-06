@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.2-fedict</version>
+		<version>1.0.3-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service Administrator Guide</name>
 	<description>Administrator Guide for the eID Trust Service.</description>

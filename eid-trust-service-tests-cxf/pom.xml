@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.2-fedict</version>
+		<version>1.0.3-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service CXF Integration Tests</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
