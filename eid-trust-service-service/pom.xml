@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.2</version>
+		<version>1.0.3-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service MBean Services</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
