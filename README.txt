@@ -10,8 +10,8 @@ The source code is hosted at: http://code.google.com/p/eid-trust-service/
 === 2. Requirements
 
 The following is required for compiling the eID Trust Service software:
-* Sun Java 1.6.0_31
-* Apache Maven 3.0.4
+* Oracle Java 1.6.0_45
+* Apache Maven 3.1.1
 
 
 === 3. Build
@@ -24,6 +24,9 @@ The deployable Java EE application can be found under:
 
 You can speed up the development build cycle by skipping the unit tests via:
 	mvn -Dmaven.test.skip=true clean install
+
+You might receive an OutOfMemoryException from Maven. Prevent this via:
+        export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
 
 
 === 4. Eclipse IDE
