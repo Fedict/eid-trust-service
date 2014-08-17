@@ -8,7 +8,7 @@
 	<types>
 		<schema xmlns="http://www.w3.org/2001/XMLSchema">
 			<import namespace="http://www.w3.org/2002/03/xkms#"
-				schemaLocation="http://www.w3.org/TR/xkms2/Schemas/xkms.xsd" />
+				schemaLocation="xkms.xsd" />
 			<import namespace="urn:be:fedict:trust:xkms:extensions"
 				schemaLocation="xkms-extensions.xsd" />
 		</schema>
@@ -103,10 +103,10 @@
 		-->
 		<operation name="Validate">
 			<wsdlsoap:operation soapAction="validate" />
-			<input message="tns:ValidateRequest">
+			<input>
 				<wsdlsoap:body use="literal" />
 			</input>
-			<output message="tns:ValidateResult">
+			<output>
 				<wsdlsoap:body use="literal" />
 			</output>
 		</operation>

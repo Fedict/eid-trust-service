@@ -15,13 +15,13 @@
     </annotation>
 
     <import namespace="http://www.w3.org/2001/04/xmlenc#"
-            schemaLocation="http://www.w3.org/TR/xmlenc-core/xenc-schema.xsd"/>
+            schemaLocation="xenc-schema.xsd"/>
     <import namespace="http://www.w3.org/2002/03/xkms#"
-            schemaLocation="http://www.w3.org/TR/xkms2/Schemas/xkms.xsd"/>
+            schemaLocation="xkms.xsd"/>
     <import namespace="http://uri.etsi.org/01903/v1.3.2#"
-            schemaLocation="http://uri.etsi.org/01903/v1.3.2/XAdES.xsd"/>
+            schemaLocation="xades.xsd"/>
     <import namespace="http://www.w3.org/2000/09/xmldsig#"
-            schemaLocation="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"/>
+            schemaLocation="xmldsig-core-schema.xsd"/>
 
     <element name="RevocationDataMessageExtension" type="tns:RevocationDataMessageExtensionType"/>
     <complexType name="RevocationDataMessageExtensionType">

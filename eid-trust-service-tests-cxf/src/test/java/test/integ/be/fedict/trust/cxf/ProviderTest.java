@@ -1,6 +1,7 @@
 /*
  * eID Trust Service Project.
  * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2014 e-Contract.be BVBA.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -20,10 +21,12 @@ package test.integ.be.fedict.trust.cxf;
 
 import static org.junit.Assert.assertEquals;
 
+import java.net.URL;
 import java.security.KeyStore;
 import java.security.Security;
 import java.security.cert.Certificate;
 
+import javax.wsdl.xml.WSDLReader;
 import javax.xml.ws.spi.Provider;
 
 import org.apache.commons.logging.Log;
@@ -32,6 +35,9 @@ import org.junit.Test;
 
 import be.fedict.commons.eid.jca.BeIDProvider;
 import be.fedict.trust.client.XKMS2Client;
+import be.fedict.trust.xkms2.XKMSServiceFactory;
+
+import com.ibm.wsdl.xml.WSDLReaderImpl;
 
 public class ProviderTest {
 
@@ -55,13 +61,21 @@ public class ProviderTest {
 				.getCertificateChain("Authentication");
 
 		LOG.debug("creating XKMS client...");
-		//String xkms2Url = "https://www.e-contract.be/eid-trust-service-ws/xkms2";
-		String xkms2Url = "http://localhost/eid-trust-service-ws/xkms2";
+		String xkms2Url = "https://www.e-contract.be/eid-trust-service-ws/xkms2";
+		// String xkms2Url = "http://localhost/eid-trust-service-ws/xkms2";
 		XKMS2Client xkms2Client = new XKMS2Client(xkms2Url);
-		//xkms2Client.setProxy("proxy.yourict.net", 8080);
+		// xkms2Client.setProxy("proxy.yourict.net", 8080);
 
 		LOG.debug("invoking XKMS client...");
 		xkms2Client.validate(certificateChain);
 		LOG.debug("done");
+	}
+
+	@Test
+	public void testWSDLServiceFactory() throws Exception {
+		WSDLReader wsdlReader = new WSDLReaderImpl();
+		URL wsdlLocation = XKMSServiceFactory.class
+				.getResource(XKMSServiceFactory.WSDL_RESOURCE);
+		wsdlReader.readWSDL(wsdlLocation.toURI().toString());
 	}
 }
