@@ -29,6 +29,18 @@
 		<developerConnection>scm:git:ssh://git@github.com/Fedict/eid-trust-service.git</developerConnection>
 	</scm>
 
+	<distributionManagement>
+		<repository>
+			<id>maven.eid.belgium.be</id>
+			<url>sftp://maven.eid.belgium.be/home/maven</url>
+			<uniqueVersion>false</uniqueVersion>
+		</repository>
+		<site>
+			<id>github-site</id>
+			<url>git:gh-pages://git@github.com:Fedict/eid-trust-service.git</url>
+		</site>
+	</distributionManagement>
+
 	<properties>
 		<eid-applet.version>2.0.0.FEDICT-SNAPSHOT</eid-applet.version>
 		<jtrust.version>1.1.2</jtrust.version>
@@ -85,11 +97,9 @@
 				</property>
 			</activation>
 			<properties>
-				<hibernate.dialect>org.hibernate.dialect.MySQLDialect
-				</hibernate.dialect>
+				<hibernate.dialect>org.hibernate.dialect.MySQLDialect</hibernate.dialect>
 				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
-				<eid-applet.SkipSecureConnectionCheck>true
-				</eid-applet.SkipSecureConnectionCheck>
+				<eid-applet.SkipSecureConnectionCheck>true</eid-applet.SkipSecureConnectionCheck>
 			</properties>
 			<modules>
 				<module>eid-trust-service-mysql-distribution</module>
@@ -106,11 +116,9 @@
 				</property>
 			</activation>
 			<properties>
-				<hibernate.dialect>org.hibernate.dialect.Oracle10gDialect
-				</hibernate.dialect>
+				<hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
 				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
-				<eid-applet.SkipSecureConnectionCheck>true
-				</eid-applet.SkipSecureConnectionCheck>
+				<eid-applet.SkipSecureConnectionCheck>true</eid-applet.SkipSecureConnectionCheck>
 			</properties>
 			<modules>
 				<module>eid-trust-service-oracle-distribution</module>
@@ -127,13 +135,10 @@
 				</property>
 			</activation>
 			<properties>
-				<hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect
-				</hibernate.dialect>
+				<hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
 				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
-				<eid-applet.SkipSecureConnectionCheck>true
-				</eid-applet.SkipSecureConnectionCheck>
-				<hibernate.jdbc.use_streams_for_binary>false
-				</hibernate.jdbc.use_streams_for_binary>
+				<eid-applet.SkipSecureConnectionCheck>true</eid-applet.SkipSecureConnectionCheck>
+				<hibernate.jdbc.use_streams_for_binary>false</hibernate.jdbc.use_streams_for_binary>
 			</properties>
 			<modules>
 				<module>eid-trust-service-postgresql-distribution</module>
@@ -340,6 +345,22 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.8</version>
+					<configuration>
+						<links>
+							<link>http://java.sun.com/javase/6/docs/api/</link>
+							<link>http://java.sun.com/javaee/5/docs/api/</link>
+						</links>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.2.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>2.7</version>
 				</plugin>
@@ -380,14 +401,65 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadoc</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.10</version>
+			</extension>
+			<extension>
+				<groupId>org.apache.maven.scm</groupId>
+				<artifactId>maven-scm-provider-gitexe</artifactId>
+				<version>1.9.4</version>
+			</extension>
+			<extension>
+				<groupId>org.apache.maven.scm</groupId>
+				<artifactId>maven-scm-manager-plexus</artifactId>
+				<version>1.9.4</version>
+			</extension>
+			<extension>
+				<groupId>ar.com.synergian</groupId>
+				<artifactId>wagon-git</artifactId>
+				<version>0.2.5</version>
+			</extension>
+		</extensions>
 	</build>
 
 	<repositories>
 		<repository>
 			<id>jboss-public</id>
 			<name>JBoss public nexus</name>
-			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/
-			</url>
+			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -422,18 +494,30 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>eid-maven-repo</id>
+			<url>https://maven.eid.belgium.be/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
 	</repositories>
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>codehaus-nexus</id>
-			<url>https://nexus.codehaus.org/content/repositories/releases/</url>
+			<id>jboss-public</id>
+			<name>JBoss public nexus</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>synergian-repo</id>
+			<url>https://raw.github.com/synergian/wagon-git/releases</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 		</pluginRepository>
 	</pluginRepositories>
 </project>
