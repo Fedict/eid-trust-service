@@ -18,7 +18,7 @@
 
 package test.integ.be.fedict.trust.util;
 
-import java.awt.Component;
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -67,23 +67,7 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.CRLNumber;
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.DistributionPointName;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
@@ -93,13 +77,11 @@ import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 
-import be.fedict.eid.applet.DiagnosticTests;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.Status;
 import be.fedict.eid.applet.View;
 import be.fedict.eid.applet.sc.PcscEid;
-import be.fedict.eid.applet.sc.PcscEidSpi;
 
 /**
  * Utility class for unit tests.
@@ -346,7 +328,7 @@ public class TestUtils {
 			throws Exception {
 		Messages messages = new Messages(Locale.getDefault());
 		View view = new LogTestView(LOG);
-		PcscEidSpi pcscEid = new PcscEid(view, messages);
+		PcscEid pcscEid = new PcscEid(view, messages);
 
 		if (!pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card...");
@@ -366,7 +348,7 @@ public class TestUtils {
 			throws Exception {
 		Messages messages = new Messages(Locale.getDefault());
 		View view = new LogTestView(LOG);
-		PcscEidSpi pcscEid = new PcscEid(view, messages);
+		PcscEid pcscEid = new PcscEid(view, messages);
 
 		if (!pcscEid.isEidPresent()) {
 			LOG.debug("insert eID card...");
@@ -437,11 +419,16 @@ public class TestUtils {
 			return true;
 		}
 
-		public void addTestResult(DiagnosticTests arg0, boolean arg1,
-				String arg2) {
+		public void increaseProgress() {
 		}
 
-		public void increaseProgress() {
+		@Override
+		public void confirmAuthenticationSignature(String message) {
+		}
+
+		@Override
+		public int confirmSigning(String description, String digestAlgo) {
+			return 0;
 		}
 
 		public void resetProgress(int arg0) {

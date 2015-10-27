@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.0.4-SNAPSHOT</version>
+		<version>1.1.0.FEDICT-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service Model</name>
 	<description>EJB3 Model for eID Trust Service</description>
@@ -52,6 +52,14 @@
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-spi</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>be.fedict</groupId>
