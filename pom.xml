@@ -42,7 +42,7 @@
 	</distributionManagement>
 
 	<properties>
-		<eid-applet.version>2.0.0.FEDICT-SNAPSHOT</eid-applet.version>
+		<eid-applet.version>2.0.0.FEDICT</eid-applet.version>
 		<jtrust.version>1.1.2</jtrust.version>
 		<eid-as.version>1.0.0.RC2</eid-as.version>
 		<cxf.version>2.7.12</cxf.version>
@@ -194,7 +194,7 @@
 			<dependency>
 				<groupId>be.fedict.eid-applet</groupId>
 				<artifactId>eid-applet-bom</artifactId>
-				<version>2.0.0.FEDICT-SNAPSHOT</version>
+				<version>${eid-applet.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
