@@ -42,7 +42,7 @@
 	</distributionManagement>
 
 	<properties>
-		<eid-applet.version>2.0.0.FEDICT</eid-applet.version>
+		<eid-applet.version>2.0.1.FEDICT</eid-applet.version>
 		<jtrust.version>1.1.2</jtrust.version>
 		<eid-as.version>1.0.0.RC2</eid-as.version>
 		<cxf.version>2.7.12</cxf.version>
@@ -122,7 +122,7 @@
 			</properties>
 			<modules>
 				<module>eid-trust-service-oracle-distribution</module>
-				<module>eid-trust-service-admin-manual</module>
+				<!--<module>eid-trust-service-admin-manual</module>-->
 			</modules>
 		</profile>
 
