@@ -84,10 +84,10 @@
 		</file>
 
 		<!-- Admin manual -> /manual -->
-		<file>
-			<source>target/files/eid-trust-service-admin-manual.pdf</source>
-			<outputDirectory>manual</outputDirectory>
-		</file>
+		<!--<file>-->
+			<!--<source>target/files/eid-trust-service-admin-manual.pdf</source>-->
+			<!--<outputDirectory>manual</outputDirectory>-->
+		<!--</file>-->
 
 	</files>
 
