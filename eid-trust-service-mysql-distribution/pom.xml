@@ -66,11 +66,11 @@
 									<groupId>be.fedict.eid-trust-service</groupId>
 									<artifactId>eid-trust-service-sql-ddl</artifactId>
 								</artifactItem>
-								<artifactItem>
-									<groupId>be.fedict.eid-trust-service</groupId>
-									<artifactId>eid-trust-service-admin-manual</artifactId>
-									<type>zip</type>
-								</artifactItem>
+								<!--<artifactItem>-->
+									<!--<groupId>be.fedict.eid-trust-service</groupId>-->
+									<!--<artifactId>eid-trust-service-admin-manual</artifactId>-->
+									<!--<type>zip</type>-->
+								<!--</artifactItem>-->
 							</artifactItems>
 							<outputDirectory>${project.build.directory}/files
 							</outputDirectory>
@@ -186,13 +186,13 @@
 			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>
-		<dependency>
-			<groupId>be.fedict.eid-trust-service</groupId>
-			<artifactId>eid-trust-service-admin-manual</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-			<type>zip</type>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>be.fedict.eid-trust-service</groupId>-->
+			<!--<artifactId>eid-trust-service-admin-manual</artifactId>-->
+			<!--<version>${project.version}</version>-->
+			<!--<scope>provided</scope>-->
+			<!--<type>zip</type>-->
+		<!--</dependency>-->
 
 		<!-- Specific Dependencies: Persistence Provider -->
 		<dependency>
