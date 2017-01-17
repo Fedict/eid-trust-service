@@ -514,7 +514,12 @@ public class XKMS2Client {
 			CertifiedRolesListType attributeCertificates)
 			throws CertificateEncodingException, TrustDomainNotFoundException,
 			RevocationDataNotFoundException, ValidationFailedException {
-		LOG.debug("validate");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Validate certificate chain");
+			for (X509Certificate x509Certificate : certificateChain) {
+				LOG.debug(x509Certificate.getSubjectDN().getName());
+			}
+		}
 		be.fedict.trust.client.jaxb.xkms.ObjectFactory objectFactory = new be.fedict.trust.client.jaxb.xkms.ObjectFactory();
 		be.fedict.trust.client.jaxb.xmldsig.ObjectFactory xmldsigObjectFactory = new be.fedict.trust.client.jaxb.xmldsig.ObjectFactory();
 
@@ -598,7 +603,7 @@ public class XKMS2Client {
 				}
 			}
 			if (null == this.revocationValues) {
-				LOG.error("no revocation data found");
+				LOG.error("Validation failed: no revocation data found");
 				throw new RevocationDataNotFoundException();
 			}
 		}
@@ -613,9 +618,8 @@ public class XKMS2Client {
 			if (XKMSConstants.KEY_BINDING_STATUS_VALID_URI.equals(statusValue)) {
 				return;
 			}
-			for (String invalidReason : status.getInvalidReason()) {
-				this.invalidReasonURIs.add(invalidReason);
-			}
+			this.invalidReasonURIs.addAll(status.getInvalidReason());
+			LOG.error("Validation failed: status:" + statusValue + ", invalidReasonURIs:" + invalidReasonURIs);
 			throw new ValidationFailedException(invalidReasonURIs);
 		}
 	}

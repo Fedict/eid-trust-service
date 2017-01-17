@@ -27,7 +27,6 @@ public class ValidationFailedException extends Exception {
 	private final List<String> reasonURIs;
 
 	public ValidationFailedException(List<String> reasonURIs) {
-
 		this.reasonURIs = reasonURIs;
 	}
 
@@ -38,7 +37,6 @@ public class ValidationFailedException extends Exception {
 	 *      2.0</a>
 	 */
 	public List<String> getReasons() {
-
 		return this.reasonURIs;
 	}
 }
