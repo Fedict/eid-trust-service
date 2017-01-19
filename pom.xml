@@ -42,15 +42,20 @@
 	</distributionManagement>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
 		<eid-applet.version>2.0.1.FEDICT</eid-applet.version>
 		<jtrust.version>1.1.2</jtrust.version>
 		<eid-as.version>1.0.0.RC2</eid-as.version>
 		<cxf.version>2.7.12</cxf.version>
+
 		<trust-service.data.source.user>trust</trust-service.data.source.user>
 		<trust-service.data.source.pass>trust</trust-service.data.source.pass>
+
 		<hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
 		<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
 		<hibernate.dbc.use_streams_for_binary>true</hibernate.dbc.use_streams_for_binary>
+
 		<eid-applet.SkipSecureConnectionCheck>false</eid-applet.SkipSecureConnectionCheck>
 	</properties>
 
