@@ -105,6 +105,7 @@
 				<hibernate.dialect>org.hibernate.dialect.MySQLDialect</hibernate.dialect>
 				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
 				<eid-applet.SkipSecureConnectionCheck>true</eid-applet.SkipSecureConnectionCheck>
+				<hibernate.jdbc.use_streams_for_binary>false</hibernate.jdbc.use_streams_for_binary>
 			</properties>
 			<modules>
 				<module>eid-trust-service-mysql-distribution</module>
@@ -124,6 +125,7 @@
 				<hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
 				<hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
 				<eid-applet.SkipSecureConnectionCheck>true</eid-applet.SkipSecureConnectionCheck>
+				<hibernate.jdbc.use_streams_for_binary>true</hibernate.jdbc.use_streams_for_binary>
 			</properties>
 			<modules>
 				<module>eid-trust-service-oracle-distribution</module>
