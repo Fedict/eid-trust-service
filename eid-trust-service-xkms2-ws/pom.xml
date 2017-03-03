@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>be.fedict</groupId>
 		<artifactId>eid-trust-service</artifactId>
-		<version>1.2.0.FEDICT</version>
+		<version>1.2.1.FEDICT-SNAPSHOT</version>
 	</parent>
 	<name>FedICT eID Trust Service XKMS2 Web Service Binding</name>
 	<groupId>be.fedict.eid-trust-service</groupId>
