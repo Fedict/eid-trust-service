@@ -28,36 +28,33 @@ import be.fedict.trust.service.entity.TrustPointEntity;
  * Trust domain {@link CertificateRepository} that takes a
  * {@link TrustDomainEntity} as input and fills it up with its
  * {@link TrustPointEntity}'s certificates.
- * 
- * @author wvdhaute
- * 
  */
 public class TrustDomainCertificateRepository implements CertificateRepository {
 
 	private final TrustDomainEntity trustDomain;
 
-	/**
-	 * Main Constructor
-	 * 
-	 * @param trustDomain
-	 */
 	public TrustDomainCertificateRepository(TrustDomainEntity trustDomain) {
-
 		this.trustDomain = trustDomain;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isTrustPoint(X509Certificate certificate) {
-
 		for (TrustPointEntity trustPoint : this.trustDomain.getTrustPoints()) {
-			if (trustPoint.getCertificateAuthority().getCertificate()
-					.equals(certificate)) {
+			if (matches(trustPoint, certificate)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private boolean matches(TrustPointEntity trustPoint, X509Certificate certificate) {
+		X509Certificate trustPointCertificate = trustPoint.getCertificateAuthority().getCertificate();
+
+		return trustPointCertificate.getSubjectDN().equals(certificate.getSubjectDN()) &&
+				trustPointCertificate.getPublicKey().equals(certificate.getPublicKey());
 	}
 
 }
