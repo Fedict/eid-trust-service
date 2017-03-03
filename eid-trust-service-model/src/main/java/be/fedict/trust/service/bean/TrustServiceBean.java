@@ -98,7 +98,7 @@ import be.fedict.trust.service.snmp.SNMPInterceptor;
 
 /**
  * Trust Service Bean implementation.
- * 
+ *
  * @author Frank Cornelis
  */
 @Stateless
@@ -142,42 +142,33 @@ public class TrustServiceBean implements TrustService {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE)
-	public ValidationResult validate(String trustDomainName,
-			List<X509Certificate> certificateChain, boolean returnRevocationData)
-			throws TrustDomainNotFoundException {
-
+	public ValidationResult validate(String trustDomainName, List<X509Certificate> certificateChain, boolean returnRevocationData) throws TrustDomainNotFoundException {
 		if (null == certificateChain) {
-			throw new IllegalArgumentException(
-					"certificate chain should not be null");
+			throw new IllegalArgumentException("certificate chain should not be null");
 		}
+
 		for (X509Certificate certificate : certificateChain) {
 			if (null == certificate) {
-				throw new IllegalArgumentException(
-						"certificate chain entry should not be null");
+				throw new IllegalArgumentException("certificate chain entry should not be null");
 			}
 		}
-		LOG.debug("isValid: "
-				+ certificateChain.get(0).getSubjectX500Principal());
+		LOG.debug("isValid: " + certificateChain.get(0).getSubjectX500Principal());
 
 		TrustLinkerResult lastResult = null;
 		RevocationData lastRevocationData = null;
 		for (TrustDomainEntity trustDomain : getTrustDomains(trustDomainName)) {
+			TrustValidator trustValidator = getTrustValidator(trustDomain, returnRevocationData);
 
-			TrustValidator trustValidator = getTrustValidator(trustDomain,
-					returnRevocationData);
 			try {
 				trustValidator.isTrusted(certificateChain);
 			} catch (CertPathValidatorException ignored) {
-				LOG.debug(
-						"cert path validation error: " + ignored.getMessage(),
-						ignored);
+				LOG.debug("cert path validation error: " + ignored.getMessage(), ignored);
 			}
 
 			if (trustValidator.getResult().isValid()) {
 				LOG.debug("valid for trust domain: " + trustDomain.getName());
 				harvest(trustDomain, certificateChain);
-				return new ValidationResult(trustValidator.getResult(),
-						trustValidator.getRevocationData());
+				return new ValidationResult(trustValidator.getResult(), trustValidator.getRevocationData());
 			}
 
 			lastResult = trustValidator.getResult();
@@ -189,21 +180,14 @@ public class TrustServiceBean implements TrustService {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE)
-	public ValidationResult validate(String trustDomainName,
-			List<X509Certificate> certificateChain, Date validationDate,
-			List<byte[]> ocspResponses, List<byte[]> crls)
-			throws TrustDomainNotFoundException, CertificateException,
-			NoSuchProviderException, CRLException, IOException {
-
-		LOG.debug("isValid: "
-				+ certificateChain.get(0).getSubjectX500Principal());
+	public ValidationResult validate(String trustDomainName, List<X509Certificate> certificateChain, Date validationDate, List<byte[]> ocspResponses, List<byte[]> crls)
+			throws TrustDomainNotFoundException, CertificateException, NoSuchProviderException, CRLException, IOException {
+		LOG.debug("isValid: " + certificateChain.get(0).getSubjectX500Principal());
 
 		TrustLinkerResult lastResult = null;
 		RevocationData lastRevocationData = null;
 		for (TrustDomainEntity trustDomain : getTrustDomains(trustDomainName)) {
-
-			TrustValidator trustValidator = getTrustValidator(trustDomain,
-					ocspResponses, crls);
+			TrustValidator trustValidator = getTrustValidator(trustDomain, ocspResponses, crls);
 
 			try {
 				trustValidator.isTrusted(certificateChain, validationDate);
@@ -212,8 +196,7 @@ public class TrustServiceBean implements TrustService {
 
 			if (trustValidator.getResult().isValid()) {
 				LOG.debug("valid for trust domain: " + trustDomain.getName());
-				return new ValidationResult(trustValidator.getResult(),
-						trustValidator.getRevocationData());
+				return new ValidationResult(trustValidator.getResult(), trustValidator.getRevocationData());
 			}
 
 			lastResult = trustValidator.getResult();
@@ -225,24 +208,17 @@ public class TrustServiceBean implements TrustService {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE_TSA)
-	public ValidationResult validateTimestamp(String trustDomainName,
-			byte[] encodedTimestampToken, boolean returnRevocationData)
-			throws TSPException, IOException, CMSException,
-			NoSuchAlgorithmException, NoSuchProviderException,
-			CertStoreException, TrustDomainNotFoundException {
-
+	public ValidationResult validateTimestamp(String trustDomainName, byte[] encodedTimestampToken, boolean returnRevocationData)
+			throws TSPException, IOException, CMSException, NoSuchAlgorithmException, NoSuchProviderException, CertStoreException, TrustDomainNotFoundException {
 		LOG.debug("validate timestamp token");
 
 		/*
 		 * Parse embedded certificate chain
 		 */
 		List<X509Certificate> certificateChain = new LinkedList<X509Certificate>();
-		TimeStampToken timestampToken = new TimeStampToken(new CMSSignedData(
-				encodedTimestampToken));
-		CertStore certStore = timestampToken.getCertificatesAndCRLs(
-				"Collection", "BC");
-		Collection<? extends Certificate> certificates = certStore
-				.getCertificates(null);
+		TimeStampToken timestampToken = new TimeStampToken(new CMSSignedData(encodedTimestampToken));
+		CertStore certStore = timestampToken.getCertificatesAndCRLs("Collection", "BC");
+		Collection<? extends Certificate> certificates = certStore.getCertificates(null);
 		for (Certificate certificate : certificates) {
 			certificateChain.add((X509Certificate) certificate);
 		}
@@ -257,9 +233,7 @@ public class TrustServiceBean implements TrustService {
 		TrustLinkerResult lastResult = null;
 		RevocationData lastRevocationData = null;
 		for (TrustDomainEntity trustDomain : getTrustDomains(trustDomainName)) {
-
-			TrustValidator trustValidator = getTrustValidator(trustDomain,
-					returnRevocationData);
+			TrustValidator trustValidator = getTrustValidator(trustDomain, returnRevocationData);
 
 			try {
 				trustValidator.isTrusted(certificateChain);
@@ -269,8 +243,7 @@ public class TrustServiceBean implements TrustService {
 			if (trustValidator.getResult().isValid()) {
 				LOG.debug("valid for trust domain: " + trustDomain.getName());
 				harvest(trustDomain, certificateChain);
-				return new ValidationResult(trustValidator.getResult(),
-						trustValidator.getRevocationData());
+				return new ValidationResult(trustValidator.getResult(), trustValidator.getRevocationData());
 			}
 
 			lastResult = trustValidator.getResult();
@@ -282,30 +255,23 @@ public class TrustServiceBean implements TrustService {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	@SNMP(oid = SnmpConstants.VALIDATE_ATTRIBUTE_CERT)
-	public ValidationResult validateAttributeCertificates(
-			String trustDomainName, List<byte[]> encodedAttributeCertificates,
-			List<X509Certificate> certificateChain, boolean returnRevocationData)
+	public ValidationResult validateAttributeCertificates(String trustDomainName, List<byte[]> encodedAttributeCertificates, List<X509Certificate> certificateChain, boolean returnRevocationData)
 			throws TrustDomainNotFoundException {
-
 		LOG.debug("validate attribute certificates");
 
 		TrustLinkerResult lastResult = null;
 		RevocationData lastRevocationData = null;
 		for (TrustDomainEntity trustDomain : getTrustDomains(trustDomainName)) {
-
-			TrustValidator trustValidator = getTrustValidator(trustDomain,
-					returnRevocationData);
+			TrustValidator trustValidator = getTrustValidator(trustDomain, returnRevocationData);
 			try {
-				trustValidator.isTrusted(encodedAttributeCertificates,
-						certificateChain);
-			} catch (CertPathValidatorException e) {
+				trustValidator.isTrusted(encodedAttributeCertificates, certificateChain);
+			} catch (CertPathValidatorException ignored) {
 			}
 
 			if (trustValidator.getResult().isValid()) {
 				LOG.debug("valid for trust domain: " + trustDomain.getName());
 				harvest(trustDomain, certificateChain);
-				return new ValidationResult(trustValidator.getResult(),
-						trustValidator.getRevocationData());
+				return new ValidationResult(trustValidator.getResult(), trustValidator.getRevocationData());
 			}
 
 			lastResult = trustValidator.getResult();
@@ -319,36 +285,33 @@ public class TrustServiceBean implements TrustService {
 	 * Returns {@link Set} of {@link TrustDomainEntity}'s. Multiple are possible
 	 * if the specified trustDomainName is a {@link VirtualTrustDomainEntity}.
 	 */
-	private Set<TrustDomainEntity> getTrustDomains(String name)
-			throws TrustDomainNotFoundException {
+	private Set<TrustDomainEntity> getTrustDomains(String name) throws TrustDomainNotFoundException {
 		if (null == name) {
-			return Collections.singleton(this.trustDomainDAO
-					.getDefaultTrustDomain());
+			return Collections.singleton(this.trustDomainDAO.getDefaultTrustDomain());
 		}
-		TrustDomainEntity trustDomain = this.trustDomainDAO
-				.findTrustDomain(name);
+
+		TrustDomainEntity trustDomain = this.trustDomainDAO.findTrustDomain(name);
 		if (null != trustDomain) {
 			return Collections.singleton(trustDomain);
 		}
+
 		// maybe a virtual trust domain?
-		VirtualTrustDomainEntity virtualTrustDomain = this.trustDomainDAO
-				.findVirtualTrustDomain(name);
+		VirtualTrustDomainEntity virtualTrustDomain = this.trustDomainDAO.findVirtualTrustDomain(name);
 		if (null != virtualTrustDomain) {
 			return virtualTrustDomain.getTrustDomains();
 		}
+
 		throw new TrustDomainNotFoundException();
 	}
 
 	/**
 	 * Returns new {@link TrustValidator}.
-	 * 
+	 *
 	 * @param returnRevocationData
 	 *            if <code>true</code> the used revocation data will be filled
 	 *            in the returned {@link TrustValidator}.
 	 */
-	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain,
-			boolean returnRevocationData) {
-
+	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain, boolean returnRevocationData) {
 		TrustLinker trustLinker = null;
 		if (!returnRevocationData && trustDomain.isUseCaching()) {
 			// if returnRevocationData set, don't use cached revocation data
@@ -359,45 +322,34 @@ public class TrustServiceBean implements TrustService {
 	}
 
 	/**
-	 * Returns new {@link TrustValidator} configured according to the specified
-	 * {@link TrustDomainEntity}.
-	 * 
+	 * Returns new {@link TrustValidator} configured according to the specified {@link TrustDomainEntity}.
+	 *
 	 * @param trustDomain
+	 *            trust domain to get a validator for
 	 * @param trustLinker
-	 *            optional customized {@link TrustLinker}. Can be
-	 *            <code>null</code>.
+	 *            optional customized {@link TrustLinker}. Can be <code>null</code>.
 	 * @param returnRevocationData
-	 *            if <code>true</code> the used revocation data will be filled
-	 *            in the returned {@link TrustValidator}.
+	 *            if <code>true</code> the used revocation data will be filled in the returned {@link TrustValidator}.
 	 */
-	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain,
-			TrustLinker trustLinker, boolean returnRevocationData) {
-
+	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain, TrustLinker trustLinker, boolean returnRevocationData) {
 		NetworkConfig networkConfig = this.configurationDAO.getNetworkConfig();
-
-		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(
-				trustDomain);
+		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(trustDomain);
 
 		TrustValidator trustValidator;
 		if (returnRevocationData) {
-			trustValidator = new TrustValidator(certificateRepository,
-					new RevocationData());
+			trustValidator = new TrustValidator(certificateRepository, new RevocationData());
 		} else {
 			trustValidator = new TrustValidator(certificateRepository);
 		}
 		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
 
-		OnlineOcspRepository ocspRepository = new OnlineOcspRepository(
-				networkConfig);
+		OnlineOcspRepository ocspRepository = new OnlineOcspRepository(networkConfig);
 
-		CachedCrlRepository cachedCrlRepository = this.crlRepositoryService
-				.getCachedCrlRepository();
+		CachedCrlRepository cachedCrlRepository = this.crlRepositoryService.getCachedCrlRepository();
 		if (null == cachedCrlRepository) {
-			OnlineCrlRepository crlRepository = new OnlineCrlRepository(
-					networkConfig);
+			OnlineCrlRepository crlRepository = new OnlineCrlRepository(networkConfig);
 			cachedCrlRepository = new CachedCrlRepository(crlRepository);
-			this.crlRepositoryService
-					.setCachedCrlRepository(cachedCrlRepository);
+			this.crlRepositoryService.setCachedCrlRepository(cachedCrlRepository);
 		}
 
 		FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
@@ -405,8 +357,7 @@ public class TrustServiceBean implements TrustService {
 			fallbackTrustLinker.addTrustLinker(trustLinker);
 		}
 		fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(ocspRepository));
-		fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(
-				cachedCrlRepository));
+		fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(cachedCrlRepository));
 
 		trustValidator.addTrustLinker(fallbackTrustLinker);
 
@@ -419,29 +370,21 @@ public class TrustServiceBean implements TrustService {
 	 * {@link TrustDomainEntity} and using the specified revocation date. All
 	 * validation will be done offline, not using any cache.
 	 */
-	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain,
-			List<byte[]> ocspResponses, List<byte[]> crls) throws IOException,
-			CertificateException, NoSuchProviderException, CRLException {
-
+	private TrustValidator getTrustValidator(TrustDomainEntity trustDomain, List<byte[]> ocspResponses, List<byte[]> crls)
+			throws IOException, CertificateException, NoSuchProviderException, CRLException {
 		LOG.debug("get trust validator using specified ocsp responses and crls");
 
-		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(
-				trustDomain);
-
-		TrustValidator trustValidator = new TrustValidator(
-				certificateRepository);
+		TrustDomainCertificateRepository certificateRepository = new TrustDomainCertificateRepository(trustDomain);
+		TrustValidator trustValidator = new TrustValidator(certificateRepository);
 		trustValidator.addTrustLinker(new PublicKeyTrustLinker());
 
-		OfflineOcspRepository ocspRepository = new OfflineOcspRepository(
-				ocspResponses);
+		OfflineOcspRepository ocspRepository = new OfflineOcspRepository(ocspResponses);
 		OfflineCrlRepository crlRepository = new OfflineCrlRepository(crls);
 
 		FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
 
-		fallbackTrustLinker.addTrustLinker(new TrustServiceOcspTrustLinker(
-				ocspRepository));
-		fallbackTrustLinker.addTrustLinker(new TrustServiceCrlTrustLinker(
-				crlRepository));
+		fallbackTrustLinker.addTrustLinker(new TrustServiceOcspTrustLinker(ocspRepository));
+		fallbackTrustLinker.addTrustLinker(new TrustServiceCrlTrustLinker(crlRepository));
 
 		trustValidator.addTrustLinker(fallbackTrustLinker);
 
@@ -453,123 +396,82 @@ public class TrustServiceBean implements TrustService {
 	 * Add certificate constraints to the specified {@link TrustValidator} using
 	 * the specified {@link TrustDomainEntity}'s configuration.
 	 */
-	private void addConstraints(TrustValidator trustValidator,
-			TrustDomainEntity trustDomain) {
-
+	private void addConstraints(TrustValidator trustValidator, TrustDomainEntity trustDomain) {
 		// add certificate constraints
 		CertificatePoliciesCertificateConstraint certificatePoliciesCertificateConstraint = null;
 		KeyUsageCertificateConstraint keyUsageCertificateConstraint = null;
 		EndEntityCertificateConstraint endEntityCertificateConstraint = null;
-		for (CertificateConstraintEntity certificateConstraint : trustDomain
-				.getCertificateConstraints()) {
-
+		for (CertificateConstraintEntity certificateConstraint : trustDomain.getCertificateConstraints()) {
 			if (certificateConstraint instanceof PolicyConstraintEntity) {
-
 				PolicyConstraintEntity policyConstraint = (PolicyConstraintEntity) certificateConstraint;
 				if (null == certificatePoliciesCertificateConstraint) {
 					certificatePoliciesCertificateConstraint = new CertificatePoliciesCertificateConstraint();
 				}
-				certificatePoliciesCertificateConstraint
-						.addCertificatePolicy(policyConstraint.getPolicy());
-
+				certificatePoliciesCertificateConstraint.addCertificatePolicy(policyConstraint.getPolicy());
 			} else if (certificateConstraint instanceof KeyUsageConstraintEntity) {
-
 				KeyUsageConstraintEntity keyUsageConstraint = (KeyUsageConstraintEntity) certificateConstraint;
 				if (null == keyUsageCertificateConstraint) {
 					keyUsageCertificateConstraint = new KeyUsageCertificateConstraint();
 				}
 				switch (keyUsageConstraint.getKeyUsage()) {
-				case DIGITAL_SIGNATURE: {
-					keyUsageCertificateConstraint
-							.setDigitalSignatureFilter(keyUsageConstraint
-									.isAllowed());
-					break;
+					case DIGITAL_SIGNATURE: {
+						keyUsageCertificateConstraint.setDigitalSignatureFilter(keyUsageConstraint.isAllowed());
+						break;
+					}
+					case NON_REPUDIATION: {
+						keyUsageCertificateConstraint.setNonRepudiationFilter(keyUsageConstraint.isAllowed());
+						break;
+					}
+					case KEY_ENCIPHERMENT: {
+						keyUsageCertificateConstraint.setKeyEnciphermentFilter(keyUsageConstraint.isAllowed());
+					}
+					case DATA_ENCIPHERMENT: {
+						keyUsageCertificateConstraint.setDataEnciphermentFilter(keyUsageConstraint.isAllowed());
+					}
+					case KEY_AGREEMENT: {
+						keyUsageCertificateConstraint.setKeyAgreementFilter(keyUsageConstraint.isAllowed());
+					}
+					case KEY_CERT_SIGN: {
+						keyUsageCertificateConstraint.setKeyCertificateSigningFilter(keyUsageConstraint.isAllowed());
+					}
+					case CRL_SIGN: {
+						keyUsageCertificateConstraint.setCRLSigningFilter(keyUsageConstraint.isAllowed());
+					}
+					case ENCIPHER_ONLY: {
+						keyUsageCertificateConstraint.setEncipherOnlyFilter(keyUsageConstraint.isAllowed());
+					}
+					case DECIPHER_ONLY: {
+						keyUsageCertificateConstraint.setDecipherOnlyFilter(keyUsageConstraint.isAllowed());
+					}
 				}
-				case NON_REPUDIATION: {
-					keyUsageCertificateConstraint
-							.setNonRepudiationFilter(keyUsageConstraint
-									.isAllowed());
-					break;
-				}
-				case KEY_ENCIPHERMENT: {
-					keyUsageCertificateConstraint
-							.setKeyEnciphermentFilter(keyUsageConstraint
-									.isAllowed());
-				}
-				case DATA_ENCIPHERMENT: {
-					keyUsageCertificateConstraint
-							.setDataEnciphermentFilter(keyUsageConstraint
-									.isAllowed());
-				}
-				case KEY_AGREEMENT: {
-					keyUsageCertificateConstraint
-							.setKeyAgreementFilter(keyUsageConstraint
-									.isAllowed());
-				}
-				case KEY_CERT_SIGN: {
-					keyUsageCertificateConstraint
-							.setKeyCertificateSigningFilter(keyUsageConstraint
-									.isAllowed());
-				}
-				case CRL_SIGN: {
-					keyUsageCertificateConstraint
-							.setCRLSigningFilter(keyUsageConstraint.isAllowed());
-				}
-				case ENCIPHER_ONLY: {
-					keyUsageCertificateConstraint
-							.setEncipherOnlyFilter(keyUsageConstraint
-									.isAllowed());
-				}
-				case DECIPHER_ONLY: {
-					keyUsageCertificateConstraint
-							.setDecipherOnlyFilter(keyUsageConstraint
-									.isAllowed());
-				}
-				}
-
 			} else if (certificateConstraint instanceof QCStatementsConstraintEntity) {
-
 				QCStatementsConstraintEntity qcStatementsConstraint = (QCStatementsConstraintEntity) certificateConstraint;
-				trustValidator
-						.addCertificateConstrain(new QCStatementsCertificateConstraint(
-								qcStatementsConstraint.getQcComplianceFilter()));
-
+				trustValidator.addCertificateConstrain(new QCStatementsCertificateConstraint(qcStatementsConstraint.getQcComplianceFilter()));
 			} else if (certificateConstraint instanceof DNConstraintEntity) {
-
 				DNConstraintEntity dnConstraint = (DNConstraintEntity) certificateConstraint;
-				trustValidator
-						.addCertificateConstrain(new DistinguishedNameCertificateConstraint(
-								dnConstraint.getDn()));
-
+				trustValidator.addCertificateConstrain(new DistinguishedNameCertificateConstraint(dnConstraint.getDn()));
 			} else if (certificateConstraint instanceof EndEntityConstraintEntity) {
-
 				EndEntityConstraintEntity endEntityConstraint = (EndEntityConstraintEntity) certificateConstraint;
 				if (null == endEntityCertificateConstraint) {
 					endEntityCertificateConstraint = new EndEntityCertificateConstraint();
 				}
-				endEntityCertificateConstraint.addEndEntity(
-						endEntityConstraint.getIssuerName(),
-						endEntityConstraint.getSerialNumber());
+				endEntityCertificateConstraint.addEndEntity(endEntityConstraint.getIssuerName(), endEntityConstraint.getSerialNumber());
 			}
 		}
 
 		if (null != certificatePoliciesCertificateConstraint) {
-			trustValidator
-					.addCertificateConstrain(certificatePoliciesCertificateConstraint);
+			trustValidator.addCertificateConstrain(certificatePoliciesCertificateConstraint);
 		}
 		if (null != keyUsageCertificateConstraint) {
-			trustValidator
-					.addCertificateConstrain(keyUsageCertificateConstraint);
+			trustValidator.addCertificateConstrain(keyUsageCertificateConstraint);
 		}
 		if (null != endEntityCertificateConstraint) {
-			trustValidator
-					.addCertificateConstrain(endEntityCertificateConstraint);
+			trustValidator.addCertificateConstrain(endEntityCertificateConstraint);
 		}
 	}
 
 	@SNMPCounter
 	public void updateCacheHitPercentage() {
-
 		LOG.debug("update cache hit %");
 		if (0L == this.cacheHits && 0L == this.cacheMisses) {
 			return;
@@ -584,7 +486,6 @@ public class TrustServiceBean implements TrustService {
 	 * {@inheritDoc}
 	 */
 	public WSSecurityConfigEntity getWsSecurityConfig() {
-
 		return this.configurationDAO.getWSSecurityConfig();
 	}
 
@@ -592,7 +493,6 @@ public class TrustServiceBean implements TrustService {
 	 * {@inheritDoc}
 	 */
 	public void logAudit(String message) {
-
 		this.auditDAO.logAudit(message);
 	}
 
@@ -600,41 +500,24 @@ public class TrustServiceBean implements TrustService {
 	 * Harvest the CRLs for specified certificate chain if caching is set for
 	 * the trust domain and no cache is yet active.
 	 */
-	private void harvest(TrustDomainEntity trustDomain,
-			List<X509Certificate> certificateChain) {
-
+	private void harvest(TrustDomainEntity trustDomain, List<X509Certificate> certificateChain) {
 		if (trustDomain.isUseCaching()) {
 			for (X509Certificate certificate : certificateChain) {
-				String issuerName = certificate.getIssuerX500Principal()
-						.toString();
-				CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
-						.findCertificateAuthority(issuerName);
-				if (null != certificateAuthority
-						&& (certificateAuthority.getStatus().equals(
-								Status.INACTIVE) || certificateAuthority
-								.getStatus().equals(Status.NONE))) {
+				String issuerName = certificate.getIssuerX500Principal().toString();
+				CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO.findCertificateAuthority(issuerName);
+				if (null != certificateAuthority && (certificateAuthority.getStatus().equals(Status.INACTIVE) || certificateAuthority.getStatus().equals(Status.NONE))) {
 					if (null != certificateAuthority.getCrlUrl()) {
 						certificateAuthority.setStatus(Status.PROCESSING);
 						try {
-							this.notificationService.notifyDownloader(
-									certificateAuthority.getName(), false);
-							if (null != certificateAuthority.getTrustPoint()
-									&& null == certificateAuthority
-											.getTrustPoint().getFireDate()) {
-								this.schedulingService
-										.startTimer(certificateAuthority
-												.getTrustPoint());
+							this.notificationService.notifyDownloader(certificateAuthority.getName(), false);
+							if (null != certificateAuthority.getTrustPoint() && null == certificateAuthority.getTrustPoint().getFireDate()) {
+								this.schedulingService.startTimer(certificateAuthority.getTrustPoint());
 							}
 						} catch (JMSException e) {
-							this.auditDAO
-									.logAudit("Failed to notify harvester: "
-											+ e.getMessage());
+							this.auditDAO.logAudit("Failed to notify harvester: " + e.getMessage());
 							LOG.error(e.getMessage(), e);
 						} catch (InvalidCronExpressionException e) {
-							this.auditDAO
-									.logAudit("Failed to start timer for trust point: "
-											+ certificateAuthority
-													.getTrustPoint().getName());
+							this.auditDAO.logAudit("Failed to start timer for trust point: " + certificateAuthority.getTrustPoint().getName());
 							LOG.error(e.getMessage(), e);
 						}
 					} else {
